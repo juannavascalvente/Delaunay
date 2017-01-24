@@ -54,6 +54,12 @@ public:
 	void 	printPoint( std::ostream& out);
 
 	// Operators.
+	Vertex& operator=(Vertex other)
+	{
+		this->originEdge = other.getOrigin();
+		this->point = other.getPoint();
+		return(*this);
+	};
 	friend istream &operator>>(istream &in, Vertex &v) { in >> v.point; in >> v.originEdge; return(in);};
 	friend ostream &operator<<(ostream &out, Vertex &v) { out << v.point << " " << v.originEdge; return(out);};
 };
