@@ -42,7 +42,7 @@ public:
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
 	Set();
-	Set( int size);
+	Set(int size);
 	~Set();
 
 	//------------------------------------------------------------------------
@@ -51,18 +51,18 @@ public:
 	bool isEmpty() { return(this->nElements == 0); };
 	bool isFull() { return(this->nElements == this->size); };
 	void add(ElementType element);
-	ElementType *at( int index);
+	ElementType *at(int index);
 
 	int getSize();
 	int getNElements();
 
-	void resize( int size, bool copy);
+	void resize(int size, bool copy);
 	void reset();
 
-	int	 read( const char *fileName);
-	int	 write( const char *fileName);
+	int	 read(string fileName);
+	int	 write(string fileName);
 	void print();
-	int	 random( int nPoints);
+	int	 random(int nPoints);
 	void shake();
 };
 
@@ -76,7 +76,7 @@ template <class ElementType> Set<ElementType>::Set()
 	this->data = NULL;
 }
 
-template <class ElementType> Set<ElementType>::Set( int size)
+template <class ElementType> Set<ElementType>::Set(int size)
 {
 	// Initialize size attributes.
 	this->size = size;
@@ -105,29 +105,29 @@ template <class ElementType> void Set<ElementType>::add(ElementType element)
 	if (this->isFull())
 	{
 #ifdef DEBUG_ADD_SET
-		Logging::buildText( __FILE__, __FUNCTION__,"Resizing set.");
-		Logging::write( true, Info);
+		Logging::buildText(__FILE__, __FUNCTION__,"Resizing set.");
+		Logging::write(true, Info);
 #endif
 		// Resize vector.
-		this->resize( INVALID, true);
+		this->resize(INVALID, true);
 	}
 
 #ifdef DEBUG_ADD_SET
-	Logging::buildText( __FILE__, __FUNCTION__, "Adding element to set.");
-	Logging::write( true, Info);
+	Logging::buildText(__FILE__, __FUNCTION__, "Adding element to set.");
+	Logging::write(true, Info);
 #endif
 	// Insert element.
 	this->data[this->nElements] = element;
 	this->nElements++;
 
 #ifdef DEBUG_ADD_SET
-	Logging::buildText( __FILE__, __FUNCTION__, "Element added. # points is ");
-	Logging::buildText( __FILE__, __FUNCTION__, this->nElements);
-	Logging::write( true, Info);
+	Logging::buildText(__FILE__, __FUNCTION__, "Element added. # points is ");
+	Logging::buildText(__FILE__, __FUNCTION__, this->nElements);
+	Logging::write(true, Info);
 #endif
 }
 
-template <class ElementType> ElementType* Set<ElementType>::at( int index)
+template <class ElementType> ElementType* Set<ElementType>::at(int index)
 {
 	ElementType* ret;		// Return value.
 
@@ -155,7 +155,7 @@ template <class ElementType> int Set<ElementType>::getNElements()
 	return(this->nElements);
 }
 
-template <class ElementType> void Set<ElementType>::resize( int size, bool copy)
+template <class ElementType> void Set<ElementType>::resize(int size, bool copy)
 {
 	ElementType	*tmp;		// Temporary vector.
 
@@ -165,8 +165,8 @@ template <class ElementType> void Set<ElementType>::resize( int size, bool copy)
 		if (size == INVALID)
 		{
 #ifdef DEBUG_RESIZE_SET
-			Logging::buildText( __FILE__, __FUNCTION__, "Doubling size from ");
-			Logging::buildText( __FILE__, __FUNCTION__, this->size);
+			Logging::buildText(__FILE__, __FUNCTION__, "Doubling size from ");
+			Logging::buildText(__FILE__, __FUNCTION__, this->size);
 #endif
 			if (this->size == 0)
 			{
@@ -177,19 +177,19 @@ template <class ElementType> void Set<ElementType>::resize( int size, bool copy)
 				this->size = this->size*2;
 			}
 #ifdef DEBUG_RESIZE_SET
-			Logging::buildText( __FILE__, __FUNCTION__, " to ");
-			Logging::buildText( __FILE__, __FUNCTION__, this->size);
-			Logging::write( true, Info);
+			Logging::buildText(__FILE__, __FUNCTION__, " to ");
+			Logging::buildText(__FILE__, __FUNCTION__, this->size);
+			Logging::write(true, Info);
 #endif
 		}
 		else
 		{
 #ifdef DEBUG_RESIZE_SET
-			Logging::buildText( __FILE__, __FUNCTION__, "Setting new size from ");
-			Logging::buildText( __FILE__, __FUNCTION__, this->size);
-			Logging::buildText( __FILE__, __FUNCTION__, " to ");
-			Logging::buildText( __FILE__, __FUNCTION__, size);
-			Logging::write( true, Info);
+			Logging::buildText(__FILE__, __FUNCTION__, "Setting new size from ");
+			Logging::buildText(__FILE__, __FUNCTION__, this->size);
+			Logging::buildText(__FILE__, __FUNCTION__, " to ");
+			Logging::buildText(__FILE__, __FUNCTION__, size);
+			Logging::write(true, Info);
 #endif
 			this->size = size;
 		}
@@ -201,11 +201,11 @@ template <class ElementType> void Set<ElementType>::resize( int size, bool copy)
 		if (copy)
 		{
 			// Copy current set elements.
-			memcpy( tmp, this->data, sizeof(ElementType)*this->nElements);
+			memcpy(tmp, this->data, sizeof(ElementType)*this->nElements);
 #ifdef DEBUG_RESIZE_SET
-			Logging::buildText( __FILE__, __FUNCTION__, "Number of elements to copy ");
-			Logging::buildText( __FILE__, __FUNCTION__, this->nElements);
-			Logging::write( true, Info);
+			Logging::buildText(__FILE__, __FUNCTION__, "Number of elements to copy ");
+			Logging::buildText(__FILE__, __FUNCTION__, this->nElements);
+			Logging::write(true, Info);
 #endif
 		}
 
@@ -213,11 +213,11 @@ template <class ElementType> void Set<ElementType>::resize( int size, bool copy)
 		delete[] this->data;
 		this->data = tmp;
 #ifdef DEBUG_RESIZE_SET
-		Logging::buildText( __FILE__, __FUNCTION__, "New size is ");
-		Logging::buildText( __FILE__, __FUNCTION__, this->size);
-		Logging::buildText( __FILE__, __FUNCTION__, " and number of elements is ");
-		Logging::buildText( __FILE__, __FUNCTION__, this->nElements);
-		Logging::write( true, Info);
+		Logging::buildText(__FILE__, __FUNCTION__, "New size is ");
+		Logging::buildText(__FILE__, __FUNCTION__, this->size);
+		Logging::buildText(__FILE__, __FUNCTION__, " and number of elements is ");
+		Logging::buildText(__FILE__, __FUNCTION__, this->nElements);
+		Logging::write(true, Info);
 #endif
 	}
 	catch (std::exception &e)
@@ -231,7 +231,7 @@ template <class ElementType> void Set<ElementType>::reset()
 	this->nElements = 0;
 }
 
-template <class ElementType> int Set<ElementType>::read( const char *fileName)
+template <class ElementType> int Set<ElementType>::read(string fileName)
 {
 	int		i=0;			// Loop counter.
     int     ret=SUCCESS;  	// Return value.
@@ -239,7 +239,7 @@ template <class ElementType> int Set<ElementType>::read( const char *fileName)
     ifstream inFile;    	// Input file.
 
     // Open file.
-    inFile.open( fileName, std::ifstream::in);
+    inFile.open(fileName.c_str(), std::ifstream::in);
 
     // Check file is open.
     if (!inFile.is_open())
@@ -247,7 +247,7 @@ template <class ElementType> int Set<ElementType>::read( const char *fileName)
 	    // Error opening input file.
 		Logging::buildText(__FUNCTION__, __FILE__, "Error opening input file ");
 		Logging::buildText(__FUNCTION__, __FILE__, fileName);
-		Logging::write( true, Error);
+		Logging::write(true, Error);
 		ret = FAILURE;
 	}
 	else
@@ -261,13 +261,13 @@ template <class ElementType> int Set<ElementType>::read( const char *fileName)
 			// Resize set.
 	    if (this->size < nPoints)
 	    {
-	    	this->resize( nPoints, false);
+	    	this->resize(nPoints, false);
 	    }
 
 	    // Read set of points.
 	    for (i=0; i<nPoints ;i++)
         {
-	    	data->read( inFile);
+	    	inFile >> this->data[i];
         }
 
         // Close input file.
@@ -277,14 +277,14 @@ template <class ElementType> int Set<ElementType>::read( const char *fileName)
 	return(ret);
 }
 
-template <class ElementType> int Set<ElementType>::write( const char *fileName)
+template <class ElementType> int Set<ElementType>::write(string fileName)
 {
 	int		i=0;			// Loop counter.
     int     ret=SUCCESS;  	// Return value.
-    ifstream outFile;    	// Output file.
+    ofstream outFile;    	// Output file.
 
     // Open file.
-    outFile.open( fileName, std::ifstream::out);
+    outFile.open(fileName.c_str(), std::ifstream::out);
 
     // Check file is open.
     if (!outFile.is_open())
@@ -292,7 +292,7 @@ template <class ElementType> int Set<ElementType>::write( const char *fileName)
 	    // Error opening input file.
 		Logging::buildText(__FUNCTION__, __FILE__, "Error opening input file ");
 		Logging::buildText(__FUNCTION__, __FILE__, fileName);
-		Logging::write( true, Error);
+		Logging::write(true, Error);
     	ret = FAILURE;
 	}
 	else
@@ -303,10 +303,10 @@ template <class ElementType> int Set<ElementType>::write( const char *fileName)
 #ifdef DEBUG_READ_FLAT_FILE
 	    	printf("# points %d\n", number_Points);
 #endif
-	    // Read set of points.
+	    // Write set of points.
 	    for (i=0; i<this->nElements ;i++)
         {
-	    	data->write( outFile);
+	    	outFile << this->data[i];
         }
 
         // Close output file.
@@ -327,7 +327,7 @@ template <class ElementType> void Set<ElementType>::print()
     }
 }
 
-template <class ElementType> int Set<ElementType>::random( int nPoints)
+template <class ElementType> int Set<ElementType>::random(int nPoints)
 {
 	int	i=0;			// Loop counter.
 	int ret=SUCCESS;  	// Return value.
@@ -343,7 +343,7 @@ template <class ElementType> int Set<ElementType>::random( int nPoints)
 }
 
 // PENDING: REMOVE TO POINTS.
-template <class ElementType> void Set<ElementType>::shake( )
+template <class ElementType> void Set<ElementType>::shake()
 {
 	int	i=0;			// Loop counter.
 
