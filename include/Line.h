@@ -44,8 +44,8 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	Line( );
-	Line( Point<TYPE> p, Point<TYPE> q) : origin(p), destination(q)
+	Line();
+	Line(Point<TYPE> p, Point<TYPE> q) : origin(p), destination(q)
 	{
 		// Initialize origin and destination.
 		this->m = 0.0;
@@ -55,11 +55,11 @@ public:
 	//------------------------------------------------------------------------
 	// Public API.
 	//------------------------------------------------------------------------
-	bool intersect( Line other);
-	void getIntersection( Line other, Point<TYPE> &intersection);
-	void getMiddle( Point<TYPE> &middle);
-	void extendToBoundary( Point<TYPE> &extrme);
-	enum Turn_T	checkTurn( Point<TYPE> *p);
+	bool intersect(Line other);
+	void getIntersection(Line other, Point<TYPE> &intersection);
+	void getMiddle(Point<TYPE> &middle);
+	void extendToBoundary(Point<TYPE> &extrme);
+	enum Turn_T	checkTurn(Point<TYPE> *p);
 
 	// GET/SET functions.
 	inline Point<TYPE> 	getOrigin() 	{ return(this->origin); };
@@ -74,6 +74,6 @@ public:
 	inline TYPE 	getSlope()		{ return(this->m); };
 	inline TYPE 	getN() 			{ return(this->n); };
 
-	void 	print( std::ostream& out);
+	void 	print(std::ostream& out);
 };
 #endif /* SRC_LINE_H_ */
