@@ -126,6 +126,8 @@ public:
 	inline int  getFaceEdge(int faceId) { return(this->faces[faceId].getEdge()); };
 	inline void setFaceEdge(int faceIndex, int v) { this->faces[faceIndex].setEdge(v); };
 	bool imaginaryFace(int faceIndex);
+	bool isBottomMostFace(int faceIndex);
+	void getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces);
 	inline bool isExternalFace(int faceIndex) {return(faceIndex == EXTERNAL_FACE); };
 	void getFaceVertices(int faceIndex, int *ids);
 	void getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Point<TYPE> &r);

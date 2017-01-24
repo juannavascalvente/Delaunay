@@ -28,22 +28,25 @@ using namespace std;
 //#define DEBUG_SETHIGHEST_FIRST
 //#define DEBUG_SETLOWESTS_FIRST
 //#define DEBUG_GENERATE_CLUSTER
-//#define DEBUG_GENERATE_RANDOM_DCEL
+#define DEBUG_GENERATE_RANDOM_DCEL
 //#define DEBUG_SELECT_COLLINEAR_EDGE
 //#define DEBUG_HAS_NEGATIVE_VERTEX
 //#define DEBUG_IS_EXTERNAL_EDGE
 //#define DEBUG_ADD_EDGE
 //#define DEBUG_UPDATE_EDGE
 //#define DEBUG_ADD_EDGE_EDGE
+//#define DEBUG_DCEL_ADDVERTEX
 //#define DEBUG_UPDATE_VERTEX_EDGE_AT
 //#define DEBUG_DCEL_RESIZE
 //#define DEBUG_DCEL_CONSTRUCTOR
 //#define DEBUG_ADD_FACE
 //#define DEBUG_DCELIMAGINARYFACE
-#define DEBUG_DELAUNAY_FIND_PATH
+//#define DEBUG_DCEL_BOTTOMMOSTFACE
+//#define DEBUG_DELAUNAY_FIND_PATH
+//#define DEBUG_DCEL_GET_EDGE_POINTS
 #define DEBUG_READBINARY_DCEL
 #define DEBUG_WRITEBINARY_DCEL
-#define DEBUG_DCEL_EDGE_INTERSECTION
+//#define DEBUG_DCEL_EDGE_INTERSECTION
 #endif
 
 /*------------------------------------------------------------------------
@@ -178,7 +181,7 @@ void Dcel::getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest)
 	// Get origin and destination points of the edge.
 	origin = *this->getRefPoint(this->getOrigin(edgeIndex)-1);
 	dest   = *this->getRefPoint(this->getOrigin(this->getTwin(edgeIndex)-1)-1);
-#ifdef DEBUG_OUTOFBOUNDS_EXCEPTION
+#ifdef DEBUG_DCEL_GET_EDGE_POINTS
 	Logging::buildText(__FUNCTION__, __FILE__, "Edge extreme points are ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->getOrigin(edgeIndex));
 	Logging::buildText(__FUNCTION__, __FILE__, " and ");
@@ -224,6 +227,92 @@ bool Dcel::imaginaryFace(int faceId)
 	}
 
 	return(imaginary);
+}
+
+// PENDING: MOVE TO DELAUNAY INSTEAD OF DCEL
+/***************************************************************************
+* Name: 	isBottomMostFace
+* IN:		faceId		face identifier to check
+* OUT:		NONE
+* RETURN:	true 		if faceId is the bottom most face
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	checks if input face is the bottom most face. This face has
+* 				2 imaginary vertices.
+***************************************************************************/
+bool Dcel::isBottomMostFace(int faceId)
+{
+	int	nImaginaryFaces=0;		// # imaginary vertices.
+	int	edgeIndex=0;			// Edge index.
+
+	// Get index edge from face.
+	edgeIndex = this->getFaceEdge(faceId) - 1;
+
+	if (this->getOrigin(edgeIndex) < 0)
+	{
+		nImaginaryFaces++;
+	}
+	if (this->getOrigin(this->getNext(edgeIndex)-1) < 0)
+	{
+		nImaginaryFaces++;
+	}
+	if (this->getOrigin(this->getPrevious(edgeIndex)-1) < 0)
+	{
+		nImaginaryFaces++;
+	}
+#ifdef DEBUG_DCEL_BOTTOMMOSTFACE
+	Logging::buildText(__FUNCTION__, __FILE__, "# imaginary vertices in face ");
+	Logging::buildText(__FUNCTION__, __FILE__, faceId);
+	Logging::buildText(__FUNCTION__, __FILE__, " is ");
+	Logging::buildText(__FUNCTION__, __FILE__, nImaginaryFaces);
+	Logging::write(true, Info);
+#endif
+
+	return(nImaginaryFaces == 2);
+}
+
+// PENDING: MOVE TO DELAUNAY INSTEAD OF DCEL
+/***************************************************************************
+* Name: 	getBottomMostFaceNeighborFaces
+* IN:		faceId			face identifier to check
+* OUT:		faces			set of neighbor faces (only 2).
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	returns the face identifiers of the "faceId". The input face
+* 				is the bottom most point and so it has only two neighbor
+* 				faces (the third is the external face).
+***************************************************************************/
+void Dcel::getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces)
+{
+	int	edgeIndex=0;		// Edge index.
+
+	if (this->isBottomMostFace(faceId))
+	{
+		// Get edge face.
+		edgeIndex = this->getFaceEdge(faceId) - 1;
+		do
+		{
+#ifdef DEBUG_DCEL_BOTTOMMOSTFACE
+			Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
+			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex);
+			Logging::write(true, Info);
+#endif
+			// Skip edge whose origin is point -2.
+			if (this->getOrigin(edgeIndex) != P_MINUS_2)
+			{
+				faces.add(this->getFace(this->getTwin(edgeIndex)-1));
+#ifdef DEBUG_DCEL_BOTTOMMOSTFACE
+				Logging::buildText(__FUNCTION__, __FILE__, "Edge origin ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->getOrigin(edgeIndex));
+				Logging::buildText(__FUNCTION__, __FILE__, " is not -2. Adding face ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->getFace(this->getTwin(edgeIndex)-1));
+				Logging::write(true, Info);
+#endif
+			}
+			// Get next edge.
+			edgeIndex = this->getNext(edgeIndex) - 1;
+		} while(faces.getNElements() < 2);
+	}
 }
 
 /***************************************************************************
@@ -311,6 +400,11 @@ void Dcel::resize(int size, bool copy)
 {
 	try
 	{
+#ifdef DEBUG_DCEL_RESIZE
+		Logging::buildText(__FUNCTION__, __FILE__, "Resizing to size ");
+		Logging::buildText(__FUNCTION__, __FILE__, size);
+		Logging::write(true, Info);
+#endif
 		// Check if new size is higher than current.
 		if (size > this->sizeVertex)
 		{
@@ -321,6 +415,10 @@ void Dcel::resize(int size, bool copy)
 			// Check if current content must be copied.
 			if (copy)
 			{
+#ifdef DEBUG_DCEL_RESIZE
+				Logging::buildText(__FUNCTION__, __FILE__, "Copying existing data");
+				Logging::write(true, Info);
+#endif
 				tmpPoints = this->vertex;
 				tmpEdges = this->edges;
 				tmpFaces = this->faces;
@@ -328,6 +426,10 @@ void Dcel::resize(int size, bool copy)
 			// If not -> reset # elements.
 			else
 			{
+#ifdef DEBUG_DCEL_RESIZE
+				Logging::buildText(__FUNCTION__, __FILE__, "Reseting data");
+				Logging::write(true, Info);
+#endif
 				this->nVertex = 0;
 				this->nEdges = 0;
 				this->nFaces = 0;
@@ -336,6 +438,10 @@ void Dcel::resize(int size, bool copy)
 			// New size unknown -> allocate twice current space.
 			if (size == INVALID)
 			{
+#ifdef DEBUG_DCEL_RESIZE
+				Logging::buildText(__FUNCTION__, __FILE__, "Doubling size");
+				Logging::write(true, Info);
+#endif
 				this->sizeVertex = this->sizeVertex*2;
 			}
 			else
@@ -395,6 +501,16 @@ void Dcel::resize(int size, bool copy)
 				this->created = true;
 			}
 		}
+#ifdef DEBUG_DCEL_RESIZE
+		else
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "No resize required. New size ");
+			Logging::buildText(__FUNCTION__, __FILE__, size);
+			Logging::buildText(__FUNCTION__, __FILE__, " is not higher than current ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
+			Logging::write(true, Info);
+		}
+#endif
 	}
 	catch (bad_alloc &ex)
 	{
@@ -445,6 +561,13 @@ void Dcel::addVertex(const Point<TYPE> *p, const int edge)
 {
 	try
 	{
+#ifdef DEBUG_DCEL_ADDVERTEX
+		Logging::buildText(__FUNCTION__, __FILE__, "Adding vector to position ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->nVertex+1);
+		Logging::buildText(__FUNCTION__, __FILE__, "/");
+		Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
+		Logging::write(true, Info);
+#endif
 		// Add vertex and increase # vertex.
 		this->vertex[this->nVertex] = Vertex(edge, *p);
 		this->nVertex++;
@@ -987,7 +1110,6 @@ int	Dcel::getCollinear(int pointIndex, int edgeID)
     	Logging::buildText(__FUNCTION__, __FILE__, " and ");
     	Logging::buildText(__FUNCTION__, __FILE__, id3);
     	Logging::write(true, Error);
-    	//getchar();
 
 		collinearID = -1;
 	}
@@ -1054,10 +1176,10 @@ bool Dcel::generateRandom(int nPoints)
 	// Check # points to generate is positive.
 	if (nPoints > 0)
 	{
-#ifdef DEBUG_DCEL_FILE
+#ifdef DEBUG_GENERATE_RANDOM_DCEL
 		Logging::buildText(__FUNCTION__, __FILE__, "Generating random set of point. # points is ");
 		Logging::buildText(__FUNCTION__, __FILE__, nPoints);
-		Logging::write(true);
+		Logging::write( true, Info);
 #endif
 		// Resize DCEL if new number of points is higher.
 		if (nPoints > this->sizeVertex)
@@ -1080,9 +1202,9 @@ bool Dcel::generateRandom(int nPoints)
 			p.random();
 			this->addVertex(&p, INVALID);
 		}
-#ifdef DEBUG_DCEL_FILE
+#ifdef DEBUG_GENERATE_RANDOM_DCEL
 		Logging::buildText(__FUNCTION__, __FILE__, "Set of points generated.");
-		Logging::write(true);
+		Logging::write( true, Info);
 #endif
 	}
 	else
@@ -1766,6 +1888,7 @@ bool Dcel::readPoints(string fileName)
 	bool read=true;		// Return value.
 	ifstream ifs;		// Output file.
 	int	i=0;			// Loop counter.
+	int	nVertex=0;		// # vertex valueread from file.
 	Point<TYPE>	p;		// Point read.
 
 #ifdef DEBUG_READPOINTS
@@ -1780,9 +1903,18 @@ bool Dcel::readPoints(string fileName)
 	// Check file is opened.
 	if (ifs.is_open())
 	{
+#ifdef DEBUG_READPOINTS
+		Logging::buildText(__FUNCTION__, __FILE__, "File open succesfully.");
+		Logging::write(true, Info);
+#endif
 		// Get # coordinates to read.
-		ifs >> this->sizeVertex;
-		this->resize(this->sizeVertex, false);
+		ifs >> nVertex;
+#ifdef DEBUG_READPOINTS
+		Logging::buildText(__FUNCTION__, __FILE__, "N vertex to read is ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
+		Logging::write(true, Info);
+#endif
+		this->resize(nVertex, false);
 
 		// Points loop.
 		for (i=0; i<this->sizeVertex ;i++)
