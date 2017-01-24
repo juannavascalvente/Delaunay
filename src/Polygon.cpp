@@ -9,7 +9,8 @@
 #include <string.h>
 
 //#define DEBUG_POLYGON_CENTROID
-//#define DEBUG_POLYGON_INTERSECT
+#define DEBUG_POLYGON_INTERSECT
+#define DEBUG_POLYGON_IS_INTERNAL
 
 //------------------------------------------------------------------------
 // Constructors / Destructor.
@@ -175,15 +176,16 @@ void Polygon::centroid( Point<TYPE> &center)
 }
 
 /***************************************************************************
-* Name: 	intersect
+* Name: 	getIntersections
 * IN:		line		line to check
-* OUT:		nLine		number of the segment that intersects the line.
-* RETURN:	true if intersect.
+* OUT:		set			set of edges that intersect line.
+* RETURN:	true 		if intersect.
+* 			false		i.o.c.
 * GLOBAL:	NONE
-* Description: 	Checks if the input line intersect any of the lines of the
+* Description: 	gets the set of edges(two maximum) that intersects the
 * 				polygon.
 ***************************************************************************/
-bool Polygon::intersect(Line &line, int &nLine)
+bool Polygon::getIntersections(Line &line, Set<int> &set)
 {
 	bool intersection=false;		// Return value.
 	int lineIndex=0;				// Loop counter.
@@ -199,30 +201,31 @@ bool Polygon::intersect(Line &line, int &nLine)
 	Logging::write( true, Info);
 #endif
 
-	// Loop until intersection found or no more lines to check.
-	while ((!intersection) && (lineIndex < nSegments))
+	// Loop until polygon checked or both edges found.
+	while ((set.getNElements() < 2) && (lineIndex < nSegments))
 	{
 		// Get next line.
 		p = *this->set.at(lineIndex);
-		lineIndex++;
-		q = *this->set.at(lineIndex);
+		q = *this->set.at(lineIndex+1);
 		currentLine = Line( p, q);
 #ifdef DEBUG_POLYGON_INTERSECT
-		Logging::buildText(__FUNCTION__, __FILE__, "Checking segment ");
+		Logging::buildText(__FUNCTION__, __FILE__, "Checking segment index ");
 		Logging::buildText(__FUNCTION__, __FILE__, lineIndex);
 		Logging::write( true, Info);
 #endif
 		// Check if lines intersect.
-		if (currentLine.intersect( line))
+		if (currentLine.intersect(line))
 		{
 			intersection = true;
-			nLine = lineIndex;
+			set.add(lineIndex);
 #ifdef DEBUG_POLYGON_INTERSECT
-			Logging::buildText(__FUNCTION__, __FILE__, "Intersection found in segment ");
-			Logging::buildText(__FUNCTION__, __FILE__, lineIndex);
+			Logging::buildText(__FUNCTION__, __FILE__, "Intersection found");
 			Logging::write( true, Info);
 #endif
 		}
+
+		// Next line in polygon.
+		lineIndex++;
 	}
 
 #ifdef DEBUG_POLYGON_INTERSECT
@@ -230,9 +233,74 @@ bool Polygon::intersect(Line &line, int &nLine)
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Intersection NOT found.");
 	}
+	else
+	{
+		Logging::buildText(__FUNCTION__, __FILE__, "Intersection finished.");
+	}
+	Logging::write( true, Info);
 #endif
 
 	return(intersection);
+}
+
+/***************************************************************************
+* Name: 	isInternal
+* IN:		p			point to check
+* OUT:		NONE
+* RETURN:	true 		if point is interior to polygon.
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	Checks if the input point is interior to the polygon
+***************************************************************************/
+bool Polygon::isInternal(Point<TYPE> &p)
+{
+	bool isInternal=true;		// Return value.
+	int	 i=0;					// Loop counter.
+	int	 nElements=0;			// # elements to check in loop.
+	Point<TYPE> currentPoint;
+	Point<TYPE> nextPoint;
+
+#ifdef DEBUG_POLYGON_IS_INTERNAL
+	Logging::buildText(__FUNCTION__, __FILE__, "# lines in polygon is ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->getNElements());
+	Logging::write( true, Info);
+#endif
+
+	// Check all polygon segments.
+	i = 0;
+	nElements = this->getNElements() - 1;
+	while ((i<nElements) && isInternal)
+	{
+		currentPoint = *this->at(i);
+		i++;
+		nextPoint = *this->at(i);
+
+#ifdef DEBUG_POLYGON_IS_INTERNAL
+		Logging::buildText(__FUNCTION__, __FILE__, "Checking line index ");
+		Logging::buildText(__FUNCTION__, __FILE__, i);
+		Logging::write( true, Info);
+#endif
+
+		// If RIGHT_TURN then it is not internal.
+		if (currentPoint.check_Turn(nextPoint, p) == RIGHT_TURN)
+		{
+			isInternal = false;
+		}
+	}
+
+	// Check if point already external.
+	if (isInternal)
+	{
+		// Check line between first and last point and input point.
+		currentPoint = *this->at(nElements);
+		nextPoint = *this->at(0);
+		if (currentPoint.check_Turn(nextPoint, p) == RIGHT_TURN)
+		{
+			isInternal = false;
+		}
+	}
+
+	return(isInternal);
 }
 
 /***************************************************************************
