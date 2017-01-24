@@ -139,8 +139,8 @@ bool Process::readData(int option)
 		// Generate random set.
 		case RANDOMLY:
 		{
-			success = dcel.generateRandom(this->config->getNPoints());
-			status.set(false, true, false, false, false, false);
+			success = this->dcel.generateRandom(this->config->getNPoints());
+			this->status.set(false, true, false, false, false, false);
 			break;
 		}
 		// Generate clusters set.
@@ -148,22 +148,22 @@ bool Process::readData(int option)
 		{
 			success = dcel.generateClusters(this->config->getNPoints(),
 					this->config->getNClusters(), this->config->getRadius());
-			status.set(false, true, false, false, false, false);
+			this->status.set(false, true, false, false, false, false);
 			break;
 		}
 		// Read set from flat file.
 		case READ_POINTS_FILE:
 		{
-			success = dcel.readPoints(this->config->getInFlatFilename());
-			status.set(false, true, false, false, false, false);
+			success = this->dcel.readPoints(this->config->getInFlatFilename());
+			this->status.set(false, true, false, false, false, false);
 			break;
 		}
 		// Read dcel file.
 		case READ_DCEL:
 		{
 			// PENDING CHECK IF A DCEL IS CONSISTENT?
-			success = dcel.read(this->config->getInDCELFilename(), false);
-			status.set(false, true, !success, false, false, false);
+			success = this->dcel.read(this->config->getInDCELFilename(), false);
+			this->status.set(false, true, !success, false, false, false);
 			break;
 		}
 		// Read Delaunay incremental algorithm files.
@@ -173,7 +173,7 @@ bool Process::readData(int option)
 			this->delaunay.setDCEL(&this->dcel);
 			success = this->delaunay.read(this->config->getInDCELFilename(),
 					this->config->getInGraphFilename());
-			status.set(false, true, !success, !success, false, false);
+			this->status.set(false, true, !success, !success, false, false);
 			break;
 		}
 		// Read Voronoi file.
@@ -181,7 +181,7 @@ bool Process::readData(int option)
 		{
 			// PENDING: What to allow in menu if only voronoi is read.
 			success = this->voronoi.read(this->config->getInVoronoiFilename());
-			status.set(false, true, !success, !success, true, false);
+			this->status.set(false, true, !success, !success, true, false);
 			break;
 		}
 		// Read Gabriel file.
@@ -189,7 +189,7 @@ bool Process::readData(int option)
 		{
 			// PENDING: What to allow in menu if only voronoi is read.
 			success = this->gabriel.readBinary(this->config->getOutGabrielFilename());
-			status.setGabrielCreated( true);
+			this->status.setGabrielCreated( true);
 			break;
 		}
 	}
@@ -636,12 +636,12 @@ void Process::execute(void)
 			if (this->status.isDelaunayCreated())
 			{
 				// Generate random points.
-				p1.random();
-				//p1.setX( 1000.0);
-				//p1.setY( 5000.0);
-				p2.random();
-				//p2.setX( 9000.0);
-				//p2.setY( 5000.0);
+				//p1.random();
+				p1.setX( 463.825);
+				p1.setY( 9878.27);
+				//p2.random();
+				p2.setX( 8585.68);
+				p2.setY( 2963.21);
 				line = Line( p1, p2);
 
 				// Compute triangles path between two points.
