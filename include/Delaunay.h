@@ -54,6 +54,9 @@ class Delaunay
 	void 	splitNode( int pointIndex, int nodeIndex, int nTriangles);
 	double	signedArea( Node *node);
 
+	void 	getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace);
+	void 	getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
+
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
@@ -90,6 +93,7 @@ public:
 
 	// Figures functions.
 	bool convexHull();
+	bool internalToConvexHull(Point<TYPE> &p);
 	inline Polygon* getConvexHull() {return(&this->hull);};
 	inline Set<int>* getConvexHullEdges() {return(&this->hullEdges);};
 	bool findTwoClosest( int &first, int &second);
@@ -97,7 +101,7 @@ public:
 	bool findClosestPoint(Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
 															int	&poinIndex,
 															double &dist);
-	bool findClosestPoint( Point<TYPE> &p, int nAnchors, Point<TYPE> &q,
+	bool findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q,
 														double &distance);
 	bool findPath(Line &line, Set<int> &faces);
 

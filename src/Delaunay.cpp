@@ -28,8 +28,10 @@
 //#define DEBUG_GRAPH_INITIALIZEGRAPH
 //#define DEBUG_DELAUNAY_FINDTWOCLOSEST
 //#define DEBUG_DELAUNAY_FINDFACE
-#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
+#define DEBUG_DELAUNAY_GETINITIALFACES
+//#define DEBUG_DELAUNAY_GET_INTERNAL_FACE
+//#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT
+//#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
 #define DEBUG_DELAUNAY_FIND_TRIANG_PATH
 #endif
 
@@ -647,7 +649,7 @@ void Delaunay::print(Node *node)
 	edge = this->dcel->getRefEdge(edgeID-1);
 	std::cout << "Current edge:\t\t";
 	edge->print(std::cout);
-	edge = this->dcel->getRefEdge( this->dcel->getTwin(edgeID-1)-1);
+	edge = this->dcel->getRefEdge(this->dcel->getTwin(edgeID-1)-1);
 	std::cout << "\t\t\t";
 	edge->print(std::cout);
 
@@ -1062,13 +1064,12 @@ bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, do
 ***************************************************************************/
 bool Delaunay::findPath(Line &line, Set<int> &faces)
 {
-	bool found=false;			// Return value.
-	bool bothExternal=false;	// Both points in external face.
-	int	 initialFace=0;			// Initial face in the path.
-	int	 finalFace=0;			// Final face in the path.
-	int	 edgeId=0;				// Line id in the convex hull.
-	int	 tempFace=0;			// Temporary face.
-	Point<TYPE> origin, dest;	// Line extreme points.
+	bool found=false;				// Return value.
+	bool bothExternal=false;		// Both points in external face.
+	int	 initialFace=0;				// Initial face in the path.
+	int	 finalFace=0;				// Final face in the path.
+	Set<int> intersectEdges(2);		// Set of edges that intersect convex hull.
+	Point<TYPE> origin, dest;		// Line extreme points.
 
 	// Get origin and destination points.
 	origin = line.getOrigin();
@@ -1077,66 +1078,199 @@ bool Delaunay::findPath(Line &line, Set<int> &faces)
 	// Get extreme point faces.
 	if (this->findFace(origin, initialFace) && this->findFace(dest, finalFace))
 	{
-		// Check if both faces are external to convex hull.
-		if (this->dcel->imaginaryFace(initialFace) && this->dcel->imaginaryFace(finalFace))
+#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
+		Logging::buildText(__FUNCTION__, __FILE__, "Faces are ");
+		Logging::buildText(__FUNCTION__, __FILE__, initialFace);
+		Logging::buildText(__FUNCTION__, __FILE__, " and ");
+		Logging::buildText(__FUNCTION__, __FILE__, finalFace);
+		Logging::write(true, Info);
+#endif
+		// Check if convex hull has not been computed.
+		if (!this->isConvexHullComputed())
 		{
+			this->convexHull();
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-			Logging::buildText(__FUNCTION__, __FILE__, "Both points in imaginary faces.");
+			Logging::buildText(__FUNCTION__, __FILE__, "Computing convex hull.");
 			Logging::write(true, Info);
+			this->getConvexHullEdges()->print();
 #endif
-			// Check if convex hull has not been computed.
-			if (!this->isConvexHullComputed())
-			{
-				this->convexHull();
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Computing convex hull.");
-				Logging::write(true, Info);
-				this->getConvexHullEdges()->print();
-#endif
-			}
-
-			// Check if line intersects convex hull.
-			if (!this->getConvexHull()->intersect(line, edgeId))
-			{
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull is NOT intersected.");
-				Logging::write(true, Info);
-#endif
-				// Points in the same face and both are external.
-				bothExternal = true;
-				found = false;
-			}
-			else
-			{
-				// Find first face in the convex hull that intersects line.
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull is intersected in edge ");
-				Logging::buildText(__FUNCTION__, __FILE__, edgeId);
-				Logging::write(true, Info);
-#endif
-				// Swap faces.
-				if (this->getDCEL()->getFace(edgeId-1) != initialFace)
-				{
-					tempFace = initialFace;
-					initialFace = finalFace;
-					finalFace = tempFace;
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-					Logging::buildText(__FUNCTION__, __FILE__, "Swapping faces.");
-					Logging::write(true, Info);
-#endif
-				}
-			}
 		}
 
-		// Check if both points are external.
+		// Line intersects convex hull.
+		if (this->getConvexHull()->getIntersections(line, intersectEdges))
+		{
+			this->getInitialFaces(line, intersectEdges, initialFace, finalFace);
+		}
+		// Both points are internal or external.
+		else
+		{
+			// If one point is external -> both points are external.
+			origin = line.getOrigin();
+			bothExternal = !this->getConvexHull()->isInternal(origin);
+		}
+
+		// If both points are external -> no path to compute.
 		if (!bothExternal)
 		{
 			// Find path.
 			found = this->getDCEL()->findPath(initialFace, finalFace, line, faces);
 		}
+#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
+		else
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Both points are external.");
+			Logging::write(true, Info);
+		}
+#endif
 	}
+#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
+	else
+	{
+		Logging::buildText(__FUNCTION__, __FILE__, "Points faces not found.");
+		Logging::write(true, Error);
+	}
+#endif
 
 	return(found);
+}
+
+/***************************************************************************
+* Name: 	getInitialFaces
+* IN:		line			line whose extreme points must be located
+* 			edgesSet		set of edges that intersect convex hull.
+* OUT:		NONE
+* IN/OUT:	initialFace		first face into the DCEL convex hull
+* 			finalFace		last face into the DCEL convex hull
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	at least one of the line extreme points is not into the
+* 				convex hull. PENDING
+***************************************************************************/
+void Delaunay::getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace)
+{
+	int			i=0;			// Loop counter.
+	Point<TYPE>	point;			// Line extreme point.
+	Set<int> 	edgesIndex;		// Set of edges index.
+
+	//PENDING REMOVE this->dcel->print(std::cout);
+	// Get real edges ID in DCEL.
+	for (i=0; i<edgesSet.getNElements() ;i++)
+	{
+		edgesIndex.add((*this->getConvexHullEdges()->at(*edgesSet.at(i))) - 1);
+#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+		Logging::buildText(__FUNCTION__, __FILE__, "Intersected edge index ");
+		Logging::buildText(__FUNCTION__, __FILE__, *edgesIndex.at(i));
+		Logging::write(true, Info);
+#endif
+	}
+
+#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+	Logging::buildText(__FUNCTION__, __FILE__, "Initial faces are ");
+	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
+	Logging::buildText(__FUNCTION__, __FILE__, " and ");
+	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
+	Logging::write(true, Info);
+#endif
+
+	if (this->dcel->isBottomMostFace(initialFace))
+	{
+		if (this->dcel->getFace(*edgesIndex.at(0)) == finalFace)
+		{
+			initialFace = this->dcel->getFace(*edgesIndex.at(1));
+		}
+		else
+		{
+			initialFace = this->dcel->getFace(*edgesIndex.at(0));
+		}
+	}
+	else if (this->dcel->isBottomMostFace(finalFace))
+	{
+		if (this->dcel->getFace(*edgesIndex.at(0)) == initialFace)
+		{
+			finalFace = this->dcel->getFace(*edgesIndex.at(1));
+		}
+		else
+		{
+			finalFace = this->dcel->getFace(*edgesIndex.at(0));
+		}
+	}
+#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+	Logging::buildText(__FUNCTION__, __FILE__, "Corrected faces are ");
+	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
+	Logging::buildText(__FUNCTION__, __FILE__, " and ");
+	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
+	Logging::write(true, Info);
+#endif
+
+	// Check if origin extreme point is internal to the convex hull.
+	point = line.getOrigin();
+	if (!this->getConvexHull()->isInternal(point))
+	{
+#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+		Logging::buildText(__FUNCTION__, __FILE__, "Origin is external to convex hull");
+		Logging::write(true, Info);
+#endif
+		this->getInternalFace(line, edgesIndex, initialFace);
+	}
+
+	// Check if origin extreme point is internal to the convex hull.
+	point = line.getDest();
+	if (!this->getConvexHull()->isInternal(point))
+	{
+#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+		Logging::buildText(__FUNCTION__, __FILE__, "Destination is external to convex hull");
+		Logging::write(true, Info);
+#endif
+		this->getInternalFace(line, edgesIndex, finalFace);
+	}
+}
+
+
+/***************************************************************************
+* Name: 	getInternalFace
+* IN:		edgesIndex		set of edges to check
+* OUT:		NONE
+* IN/OUT:	face			face to be updated
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	get the face that is in the convex hull that is a twin face
+* 				of the external input "face".
+***************************************************************************/
+void Delaunay::getInternalFace(Line &line, Set<int> &edgesIndex, int &face)
+{
+	int		i=0;				// Loop counter.
+	bool	found=false;		// Loop control flag.
+	int		edgeIndex=0;		// Edge index.
+
+	// Initialize loop variables.
+	i=0;
+	found = false;
+
+	// Loop until all edges checked or face found.
+	while ((i < edgesIndex.getNElements()) && (!found))
+	{
+		// Get next edge.
+		edgeIndex = *edgesIndex.at(i);
+#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
+		Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
+		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+		Logging::write(true, Info);
+#endif
+
+		// Check if edge face is equal to input face.
+		if (this->dcel->getFace(edgeIndex) == face)
+		{
+			// Twin face is the internal face searched.
+			found = true;
+			face = this->dcel->getFace(this->dcel->getTwin(edgeIndex)-1);
+#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
+			Logging::buildText(__FUNCTION__, __FILE__, "Edge found and face is ");
+			Logging::buildText(__FUNCTION__, __FILE__, face);
+			Logging::write(true, Info);
+#endif
+		}
+		i++;
+	}
 }
 
 /***************************************************************************
