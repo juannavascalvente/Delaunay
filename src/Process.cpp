@@ -25,23 +25,23 @@ Process::Process(int argc, char **argv, bool printData)
 
 	// Initialize configuration.
 	fileName = argv[2];
-	this->config = new Config( fileName);
+	this->config = new Config(fileName);
 
 	// Check flag to print data to screen.
 	this->log = new Logging("log.txt", printData);
 
 	// Initialize drawer and menu.
-	this->drawer = this->drawer->getInstance( argc, argv, &this->dcel,
+	this->drawer = this->drawer->getInstance(argc, argv, &this->dcel,
 												&this->delaunay,
 												&this->triangulation,
 												&this->voronoi,
 												&this->gabriel,
 												&this->status,
 												this->config);
-	this->m = Menu( &this->status);
+	this->m = Menu(&this->status);
 
 	// Function to execute by GLUT.
-	glutDisplayFunc( executeWrapper);
+	glutDisplayFunc(executeWrapper);
 }
 
 Process::~Process()
@@ -189,7 +189,7 @@ bool Process::readData(int option)
 		{
 			// PENDING: What to allow in menu if only voronoi is read.
 			success = this->gabriel.readBinary(this->config->getOutGabrielFilename());
-			this->status.setGabrielCreated( true);
+			this->status.setGabrielCreated(true);
 			break;
 		}
 	}
@@ -300,7 +300,7 @@ bool Process::findPath(Delaunay &delaunay, Line &line, Set<int> &faces)
 	bool found=false;			// Return value.
 
 	// Find triangles path.
-	found = delaunay.findPath( line, faces);
+	found = delaunay.findPath(line, faces);
 
 	return(found);
 }
@@ -317,7 +317,7 @@ bool Process::findPath(Delaunay &delaunay, Line &line, Set<int> &faces)
 * Description: 	finds the list of faces in the "dcel"between "line"
 * 				extreme points.
 ***************************************************************************/
-bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, Set<int> &faces)
+bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, Set<int> &pathFaces)
 {
 	bool found=false;			// Return value.
 	int	 initialFace=0;			// Initial face in the path.
@@ -325,17 +325,22 @@ bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, Set<int
 	Point<TYPE> origin, dest;	// Line extreme points.
 	Point<TYPE> closest;		// Closest point.
 	double distance=0.0;		// Distance between points.
+	Set<int> extremeFaces(2);	// First and last faces in the path.
 
 	// Get origin and destination points.
 	origin = line.getOrigin();
 	dest = line.getDest();
 
 	// Get extreme point faces.
-	if (delaunay.findClosestPoint( origin, voronoi, closest, initialFace, distance) &&
-		delaunay.findClosestPoint( dest, voronoi, closest, finalFace, distance))
+	if (delaunay.findClosestPoint(origin, voronoi, closest, initialFace, distance) &&
+		delaunay.findClosestPoint(dest, voronoi, closest, finalFace, distance))
 	{
+		// Add faces to set.
+		extremeFaces.add(initialFace);
+		extremeFaces.add(finalFace);
+
 		// Find path.
-		found = voronoi.getRefDcel()->findPath( initialFace, finalFace, line, faces);
+		found = voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces);
 	}
 
 	return(found);
@@ -363,11 +368,11 @@ bool Process::findTwoClosest(int &index1, int &index2)
 	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
 	if (this->status.isDelaunayCreated())
 	{
-		found = this->delaunay.findTwoClosest( index1, index2);
+		found = this->delaunay.findTwoClosest(index1, index2);
 	}
 	else
 	{
-		found = this->triangulation.findTwoClosest( index1, index2);
+		found = this->triangulation.findTwoClosest(index1, index2);
 	}
 
 	return(found);
@@ -386,7 +391,7 @@ bool Process::findTwoClosest(int &index1, int &index2)
 * 				algorithm to locate the points. Otherwise uses a brute force
 * 				algorithm.
 ***************************************************************************/
-bool Process::findFace( Point<TYPE> &point, int &faceId)
+bool Process::findFace(Point<TYPE> &point, int &faceId)
 {
 	bool found=true;		// Return value.
 
@@ -395,11 +400,11 @@ bool Process::findFace( Point<TYPE> &point, int &faceId)
 	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
 	if (this->status.isDelaunayCreated())
 	{
-		found = this->delaunay.findFace( point, faceId);
+		found = this->delaunay.findFace(point, faceId);
 	}
 	else
 	{
-		found = this->triangulation.findFace( point, faceId);
+		found = this->triangulation.findFace(point, faceId);
 	}
 
 	return(found);
@@ -418,7 +423,7 @@ bool Process::findFace( Point<TYPE> &point, int &faceId)
 * 				algorithm to locate the points. Otherwise uses a brute force
 * 				algorithm.
 ***************************************************************************/
-bool Process::findClosest( Point<TYPE> &p, Point<TYPE> &q, double &distance)
+bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 {
 	bool found=true;		// Return value.
 	int	pointIndex=0;		// Index of the closest point.
@@ -429,18 +434,18 @@ bool Process::findClosest( Point<TYPE> &p, Point<TYPE> &q, double &distance)
 		// Find node that surrounds input point p.
 		if (this->status.isVoronoiCreated())
 		{
-			found = this->delaunay.findClosestPoint( p, this->voronoi, q, pointIndex, distance);
+			found = this->delaunay.findClosestPoint(p, this->voronoi, q, pointIndex, distance);
 		}
 		else
 		{
 			printf("PENDING TO IMPLEMENT.\n");
-			found = this->delaunay.findClosestPoint( p, this->config->getNAnchors(), q, distance);
+			found = this->delaunay.findClosestPoint(p, this->config->getNAnchors(), q, distance);
 		}
 	}
 	else
 	{
 		// Find closest using brute force.
-		found = this->triangulation.findClosestPoint( p, q, distance);
+		found = this->triangulation.findClosestPoint(p, q, distance);
 	}
 
 	return(found);
@@ -470,14 +475,14 @@ void Process::getPointToLocate(Point<TYPE> &point)
 	if (point.getX() == INVALID)
 	{
 		// Get min and max coordiantes.
-		config->getScreenCoordinates( minX, minY, maxX, maxY);
+		config->getScreenCoordinates(minX, minY, maxX, maxY);
 
 		// Generate seed.
 		srand(time(NULL));
 
 		// Create a random point.
-		point.setX( rand() % (int) maxX);
-		point.setY( rand() % (int) maxY);
+		point.setX(rand() % (int) maxX);
+		point.setY(rand() % (int) maxY);
 	}
 }
 
@@ -556,7 +561,7 @@ void Process::execute(void)
 			if (!this->status.isDelaunayCreated())
 			{
 				// Build triangulation.
-				error = !this->buildTriangulation( option);
+				error = !this->buildTriangulation(option);
 			}
 
 			if (!error)
@@ -576,7 +581,7 @@ void Process::execute(void)
 			if (this->status.isDelaunayCreated())
 			{
 				// Initialize voronoi data.
-				error = this->voronoi.init( &this->dcel);
+				error = this->voronoi.init(&this->dcel);
 				if (!error)
 				{
 					// Compute Voronoi diagram.
@@ -587,14 +592,14 @@ void Process::execute(void)
 				if (!error)
 				{
 					int minX, minY, maxX, maxY;
-					this->config->getScreenCoordinates( minX, minY, maxX, maxY);
-					//this->voronoi.correctBorderPoints( minX, minY, maxX, maxY);
+					this->config->getScreenCoordinates(minX, minY, maxX, maxY);
+					//this->voronoi.correctBorderPoints(minX, minY, maxX, maxY);
 
 					// Draw Voronoi graph and the triangulation.
 					this->drawer->drawFigures(VORONOI_DRAW);
 
 					// Update execution status flags.
-					status.set( false, true, true, true, true, false);
+					status.set(false, true, true, true, true, false);
 
 					// Update menu entries.
 					m.updateMenu();
@@ -608,7 +613,7 @@ void Process::execute(void)
 				this->status.isVoronoiCreated())
 			{
 				// Build Gabriel graph.
-				this->gabriel.init( this->delaunay.getDCEL(), &this->voronoi);
+				this->gabriel.init(this->delaunay.getDCEL(), &this->voronoi);
 				error = !this->gabriel.build();
 				if (!error)
 				{
@@ -616,7 +621,7 @@ void Process::execute(void)
 					this->drawer->drawFigures(GABRIEL_DRAW);
 
 					// Update execution status flags.
-					status.set( false, true, true, true, true, true);
+					status.set(false, true, true, true, true, true);
 
 					// Update menu entries.
 					m.updateMenu();
@@ -637,21 +642,21 @@ void Process::execute(void)
 			{
 				// Generate random points.
 				//p1.random();
-				p1.setX( 463.825);
-				p1.setY( 9878.27);
+				p1.setX(463.825);
+				p1.setY(9878.27);
 				//p2.random();
-				p2.setX( 8585.68);
-				p2.setY( 2963.21);
-				line = Line( p1, p2);
+				p2.setX(8585.68);
+				p2.setY(2963.21);
+				line = Line(p1, p2);
 
 				// Compute triangles path between two points.
-				this->findPath( this->delaunay, line, faces);
+				this->findPath(this->delaunay, line, faces);
 
 				// Draw triangulation, segment and the path.
 				points.add(p1);
 				points.add(p2);
-				this->drawer->setPointsSet( &points);
-				this->drawer->setFacesSet( &faces);
+				this->drawer->setPointsSet(&points);
+				this->drawer->setFacesSet(&faces);
 				this->drawer->drawFigures(TRIANGULATION_PATH_DRAW);
 			}
 			break;
@@ -669,22 +674,22 @@ void Process::execute(void)
 			{
 				// Generate random points.
 				//p1.random();
-				p1.setX( 1000.0);
-				p1.setY( 5000.0);
+				p1.setX(1000.0);
+				p1.setY(5000.0);
 				//p2.random();
-				p2.setX( 9000.0);
-				p2.setY( 5000.0);
-				line = Line( p1, p2);
+				p2.setX(9000.0);
+				p2.setY(5000.0);
+				line = Line(p1, p2);
 
 				// Compute triangles path between two points.
-				error = !this->findPath( this->delaunay, this->voronoi, line, faces);
+				error = !this->findPath(this->delaunay, this->voronoi, line, faces);
 				if (!error)
 				{
 					// Draw triangulation, Voronoi, segment and the path.
 					points.add(p1);
 					points.add(p2);
-					this->drawer->setPointsSet( &points);
-					this->drawer->setFacesSet( &faces);
+					this->drawer->setPointsSet(&points);
+					this->drawer->setFacesSet(&faces);
 					this->drawer->drawFigures(VORONOI_PATH_DRAW);
 				}
 			}
@@ -711,16 +716,16 @@ void Process::execute(void)
 			Set<PointT> points(2);	// List of points.
 
 			// Check if input point parameter provided by user.
-			this->getPointToLocate( point);
+			this->getPointToLocate(point);
 
 			// Find closest point to point.
-			error = !this->findClosest( point, closest, distance);
+			error = !this->findClosest(point, closest, distance);
 			if (!error)
 			{
 				// Draw the triangulation, the point and the closest point.
 				points.add(point);
 				points.add(closest);
-				this->drawer->setPointsSet( &points);
+				this->drawer->setPointsSet(&points);
 				this->drawer->drawFigures(CLOSESTPOINT_DRAW);
 			}
 			break;
@@ -734,17 +739,17 @@ void Process::execute(void)
 			Set<PointT> points(1);	// List of points.
 
 			// Check if input point parameter provided by user.
-			this->getPointToLocate( point);
+			this->getPointToLocate(point);
 
 			// Find face.
-			error = !this->findFace( point, faceId);
+			error = !this->findFace(point, faceId);
 			if (!error)
 			{
 				// Draw the triangulation, the point and its face.
 				points.add(point);
 				faces.add(faceId);
-				this->drawer->setPointsSet( &points);
-				this->drawer->setFacesSet( &faces);
+				this->drawer->setPointsSet(&points);
+				this->drawer->setFacesSet(&faces);
 				this->drawer->drawFigures(FINDFACE_DRAW);
 			}
 			break;
@@ -755,13 +760,13 @@ void Process::execute(void)
 			Set<PointT> points(2);	// List of points.
 
 			// Compute the two closest point in the set of points.
-			error = !this->findTwoClosest( index1, index2);
+			error = !this->findTwoClosest(index1, index2);
 			if (!error)
 			{
 				// Draw the triangulation and the two closest points.
-				points.add( *this->dcel.getRefPoint(index1));
-				points.add( *this->dcel.getRefPoint(index2));
-				this->drawer->setPointsSet( &points);
+				points.add(*this->dcel.getRefPoint(index1));
+				points.add(*this->dcel.getRefPoint(index2));
+				this->drawer->setPointsSet(&points);
 				this->drawer->drawFigures(TWOCLOSEST_DRAW);
 			}
 			break;
@@ -823,31 +828,31 @@ void Process::execute(void)
 		// Write points to a flat file.
 		case WRITE_POINTS:
 		{
-			this->dcel.writePoints( this->config->getOutFlatFilename(), INVALID);
+			this->dcel.writePoints(this->config->getOutFlatFilename(), INVALID);
 			break;
 		}
 		// Write points to a DCEL file.
 		case WRITE_DCEL:
 		{
-			this->dcel.write( this->config->getOutDCELFilename(), false);
+			this->dcel.write(this->config->getOutDCELFilename(), false);
 			break;
 		}
 		// Write DCEL and graph files.
 		case WRITE_DELAUNAY:
 		{
-			this->delaunay.write( this->config->getOutDCELFilename(), this->config->getOutGraphFilename());
+			this->delaunay.write(this->config->getOutDCELFilename(), this->config->getOutGraphFilename());
 			break;
 		}
 		// Write voronoi DCEL file.
 		case WRITE_VORONOI:
 		{
-			this->voronoi.write( this->config->getOutVoronoiFilename());
+			this->voronoi.write(this->config->getOutVoronoiFilename());
 			break;
 		}
 		// Write Gabriel graph data.
 		case WRITE_GABRIEL:
 		{
-			this->gabriel.writeBinary( this->config->getOutGabrielFilename());
+			this->gabriel.writeBinary(this->config->getOutGabrielFilename());
 			break;
 		}
 		// Clear data.
