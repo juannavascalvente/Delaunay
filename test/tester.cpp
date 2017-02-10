@@ -30,7 +30,7 @@ void Tester::main()
 	TestPath testPath;
 
 	testPath.init();
-	//testPath.main();
+	testPath.main();
 	testPath.finish();
 
 	TestVoronoi testVoronoi;
