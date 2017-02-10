@@ -19,7 +19,7 @@
 //#define DEBUG_DRAW_GABRIEL
 //#define DEBUG_DRAW_POLYLINE
 //#define DEBUG_DRAW_DRAWEDGE
-#define DEBUG_DRAW_DRAWFACE
+//#define DEBUG_DRAW_DRAWFACE
 //#define DEBUG_DRAW_POINTS_INFO
 //#define DEBUG_DRAW_EDGES_INFO
 //#define DEBUG_DRAW_FACES_INFO
@@ -195,7 +195,10 @@ void Draw::drawFigures(enum drawingT type)
 			p = *this->pointsSet->at(0);
 			this->setColor(YELLOW);
 			this->draw( &p);
-			this->drawFace( *this->facesSet->at(0), this->dcel);
+			if (this->facesSet->getNElements() > 0)
+			{
+				this->drawFace( *this->facesSet->at(0), this->dcel);
+			}
 			break;
 		}
 		// Draw triangulation or Voronoi paths.
@@ -213,7 +216,6 @@ void Draw::drawFigures(enum drawingT type)
 			if (type == TRIANGULATION_PATH_DRAW)
 			{
 				// Draw faces.
-				printf("faces\n");
 				for (i=0; i<this->facesSet->getNElements() ;i++)
 				{
 					faceId = *this->facesSet->at(i);
@@ -224,6 +226,7 @@ void Draw::drawFigures(enum drawingT type)
 			{
 				// Draw voronoi and faces.
 				this->drawVoronoi();
+				this->setColor(YELLOW);
 				for (i=0; i<this->facesSet->getNElements() ;i++)
 				{
 					faceId = *this->facesSet->at(i);

@@ -11,8 +11,10 @@
 #include "Set.h"
 #include "testPath.h"
 
-#define N_POINTS_TEST_PATH	10
-#define N_TEST_PATH_TESTS	10
+#include <unistd.h>
+
+#define N_POINTS_TEST_PATH	4
+#define N_TEST_PATH_TESTS	600
 #define DEFAULT_QUEUE_SIZE	10
 
 typedef Point<TYPE> PointT;
@@ -23,12 +25,18 @@ void TestPath::init()
 
 void TestPath::main()
 {
+	this->DelaunayPath();
+}
+
+void TestPath::DelaunayPath()
+{
 	Dcel			dcel;		// Dcel data.
 	Delaunay		delaunay;	// Delaunay data.
 	bool error=false;			// Bool control flag.
 	int	nPoints=0;				// # points in set.
 	int	nTests=0;				// # test to execute.
 	int	testIndex=0;			// Test index.
+	int	failedTestIndex=1;		// Index of last failed test.
 
 	string baseFileName;
 	string fileName;
@@ -48,14 +56,14 @@ void TestPath::main()
 		if (!dcel.generateRandom(nPoints))
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
-			Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
+			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
 			Logging::write( true, Error);
 			error = true;
 		}
 		else if (!delaunay.incremental())
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay triangulation in iteration ");
-			Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
+			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
 			Logging::write( true, Error);
 			error = true;
 		}
@@ -66,6 +74,8 @@ void TestPath::main()
 			Set<PointT> points(1);					// List of points.
 			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
 			ostringstream convert;
+			string pointsFileName;	// Points file name.
+			string dcelFileName;	// DCEL file name.
 
 			// Generate random points.
 			p1.random();
@@ -73,9 +83,13 @@ void TestPath::main()
 			line = Line(p1, p2);
 
 			// Dump data.
-			convert << testIndex;
+			convert << failedTestIndex;
 			fileName = baseFileName + "_" + convert.str() + "_";
-			this->dump(fileName, p1, p2, dcel);
+
+			// Create file names.
+			pointsFileName = fileName + "Points.txt";
+			dcelFileName = fileName + "DCEL.txt";
+			this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
 
 			Logging::buildText(__FUNCTION__, __FILE__, "Start find path");
 			Logging::write( true, Info);
@@ -83,27 +97,126 @@ void TestPath::main()
 			// Compute triangles path between two points.
 			if (!delaunay.findPath(line, faces))
 			{
+				failedTestIndex++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Line does not intersect convex hull");
 			}
 			else
 			{
+				remove(pointsFileName.c_str());
+				remove(dcelFileName.c_str());
 				Logging::buildText(__FUNCTION__, __FILE__, "Faces set computed");
 			}
 			Logging::write( true, Info);
-			faces.write(fileName + "faces.txt");
 		}
+		sleep(1);
 	}
 }
 
-void TestPath::dump(string fileName, Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel)
+void TestPath::VoronoiPath()
+{
+	Dcel			dcel;		// Dcel data.
+	Delaunay		delaunay;	// Delaunay data.
+	Voronoi			voronoi;	// Voronoi data.
+	bool error=false;			// Bool control flag.
+	int	nPoints=0;				// # points in set.
+	int	nTests=0;				// # test to execute.
+	int	testIndex=0;			// Test index.
+	int	failedTestIndex=1;		// Index of last failed test.
+
+	string baseFileName;
+	string fileName;
+
+	// Initialize test data.
+	baseFileName = "/home/juan/projects/delaunay/code/data/samples/errors/paths/voronoiPath/findPathVoronoi";
+	nTests = N_TEST_PATH_TESTS;
+	nPoints = N_POINTS_TEST_PATH;
+	delaunay.setDCEL(&dcel);
+
+	while ((!error) && (testIndex < nTests))
+	{
+		cout << "Test " << (testIndex+1) << endl;
+		testIndex++;
+
+		// Execute current test.
+		if (!dcel.generateRandom(nPoints))
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
+			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
+			Logging::write(true, Error);
+			error = true;
+		}
+		else if (!delaunay.incremental())
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay triangulation in iteration ");
+			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
+			Logging::write(true, Error);
+			error = true;
+		}
+		else if (voronoi.init(&dcel))
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Error initializing Voronoi in iteration ");
+			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
+			Logging::write(true, Error);
+			error = true;
+		}
+		else if (voronoi.build())
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi in iteration ");
+			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
+			Logging::write(true, Error);
+			error = true;
+		}
+		else
+		{
+			Point<TYPE> p1, p2;						// Segment points.
+			Line line;								// Segment line.
+			Set<PointT> points(1);					// List of points.
+			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
+			ostringstream convert;
+
+			string pointsFileName;	// Points file name.
+			string dcelFileName;	// DCEL file name.
+
+			// Generate random points.
+			p1.random();
+			p2.random();
+			line = Line(p1, p2);
+
+			// Dump data.
+			convert << failedTestIndex;
+			fileName = baseFileName + "_" + convert.str() + "_";
+			pointsFileName = fileName + "Points.txt";
+			dcelFileName = fileName + "DCEL.txt";
+			this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
+
+			Logging::buildText(__FUNCTION__, __FILE__, "Start find Voronoi path");
+			Logging::write( true, Info);
+
+			// Compute triangles path between two points.
+			//if (!voronoi.findPath(line, faces))
+			if (1)
+			{
+				failedTestIndex++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in iteration ");
+			}
+			else
+			{
+				remove(pointsFileName.c_str());
+				remove(dcelFileName.c_str());
+				Logging::buildText(__FUNCTION__, __FILE__, "Voronoi path computed in iteration ");
+			}
+			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
+			Logging::write( true, Info);
+		}
+
+		// Reset voronoi data.
+		voronoi.reset();
+	}
+}
+
+void TestPath::dump(string pointsFileName, string dcelFileName, Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel)
 {
 	ofstream ofs;			// Output file.
-	string pointsFileName;	// Points file name.
-	string dcelFileName;	// DCEL file name.
-
-	// Create file names.
-	pointsFileName = fileName + "Points.txt";
-	dcelFileName = fileName + "DCEL.txt";
 
 	// Open file.
 	ofs.open(pointsFileName.c_str(), ios::out);

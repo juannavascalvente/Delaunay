@@ -22,7 +22,7 @@
 //#define DEBUG_VORONOI_INNERTOAREA
 //#define DEBUG_VORONOI_EDGE_INTERSECTION
 //#define DEBUG_VORONOI_CORRECTBORDER
-#define DEBUG_VORONOI_FIND_PATH
+//#define DEBUG_VORONOI_FIND_PATH
 #endif
 
 
@@ -57,7 +57,6 @@ Voronoi::~Voronoi()
 {
 	// Reset attributes and deallocate memory.
 	this->triangulation = NULL;
-	this->voronoi.~Dcel();
 	this->valid = false;
 }
 
@@ -80,7 +79,7 @@ int Voronoi::init( Dcel *dcel)
 {
 	bool	error=false;			// Return value.
 
-	// Ckec input parameter.
+	// Ckeck input parameter.
 	if (dcel != NULL)
 	{
 #ifdef DEBUG_VORONOI_INIT
@@ -100,11 +99,11 @@ int Voronoi::init( Dcel *dcel)
 		this->valid = true;
 #ifdef DEBUG_VORONOI_INIT
 		Logging::buildText(__FUNCTION__, __FILE__, "Allocating voronoi data.\n\t# Points ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->triangulation->getNFaces());
+		Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getSizeVertex());
 		Logging::buildText(__FUNCTION__, __FILE__, "\n\t# Edges.");
-		Logging::buildText(__FUNCTION__, __FILE__, this->triangulation->getNEdges());
+		Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getSizeEdges());
 		Logging::buildText(__FUNCTION__, __FILE__, "\n\t# Faces:");
-		Logging::buildText(__FUNCTION__, __FILE__, this->triangulation->getNVertex());
+		Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getSizeFaces());
 		Logging::write( true, Info);
 #endif
 	}
@@ -199,6 +198,8 @@ bool Voronoi::build()
 	// Check if there is a triangulation.
 	if (this->valid)
 	{
+		this->voronoi.addFace(INVALID);
+
 #ifdef DEBUG_VORONOI_BUILD
 		Logging::buildText(__FUNCTION__, __FILE__, "Start computing Voronoi diagram");
 		Logging::write( true, Info);
@@ -281,6 +282,9 @@ bool Voronoi::isInnerToArea( Point<TYPE> &p, int areaId)
 #endif
 	do
 	{
+		// Get origin and destination points.
+		origin = *this->voronoi.getRefPoint( this->voronoi.getOrigin(currentEdgeIndex)-1);
+		dest   = *this->voronoi.getRefPoint( this->voronoi.getOrigin(this->voronoi.getTwin(currentEdgeIndex)-1)-1);
 #ifdef DEBUG_VORONOI_INNERTOAREA
 		Logging::buildText(__FUNCTION__, __FILE__, "Edge ");
 		Logging::buildText(__FUNCTION__, __FILE__, currentEdgeIndex+1);
@@ -288,18 +292,25 @@ bool Voronoi::isInnerToArea( Point<TYPE> &p, int areaId)
 		Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getTwin(currentEdgeIndex));
 		Logging::buildText(__FUNCTION__, __FILE__, " whose extremes points are ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getOrigin(currentEdgeIndex));
-		Logging::buildText(__FUNCTION__, __FILE__, " whose origin is ");
+		Logging::buildText(__FUNCTION__, __FILE__, " and ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getOrigin(this->voronoi.getTwin(currentEdgeIndex)-1));
 		Logging::write( true, Info);
+		Logging::buildText(__FUNCTION__, __FILE__, "Origin point ");
+		Logging::buildText(__FUNCTION__, __FILE__, &origin);
+		Logging::buildText(__FUNCTION__, __FILE__, " and destination point is ");
+		Logging::buildText(__FUNCTION__, __FILE__, &dest);
+		Logging::buildText(__FUNCTION__, __FILE__, ". Checking point is ");
+		Logging::buildText(__FUNCTION__, __FILE__, &p);
+		Logging::write( true, Info);
 #endif
-		// Get origin and destination points.
-		origin = *this->voronoi.getRefPoint( this->voronoi.getOrigin(currentEdgeIndex)-1);
-		dest   = *this->voronoi.getRefPoint( this->voronoi.getOrigin(this->voronoi.getTwin(currentEdgeIndex)-1)-1);
-
 		// If right turn then it is not inner.
 		if (origin.check_Turn( dest, p) == RIGHT_TURN)
 		{
 			inner = false;
+#ifdef DEBUG_VORONOI_INNERTOAREA
+			Logging::buildText(__FUNCTION__, __FILE__, "Right turn -> is not interior.");
+			Logging::write( true, Info);
+#endif
 		}
 
 		// Get nexte edge.
@@ -308,84 +319,6 @@ bool Voronoi::isInnerToArea( Point<TYPE> &p, int areaId)
 
 	return(inner);
 }
-
-
-///***************************************************************************
-//* Name: 	getEdgeInserection
-//* IN:		line			line to check intersection.
-//* 			face			face to check all its edges.
-//* OUT:		edgeId			edge that intersects with line.
-//* RETURN:	true			if any face edge intersects "line".
-//* 			false			i.o.c.
-//* GLOBAL:	NONE
-//* Description: 	checks if any edge of the input "face" intersects input
-//* 				"line". If so then returns true and edgeId has the id of the
-//* 				intersected edge.
-//***************************************************************************/
-//bool Voronoi::getEdgeInserection(Line &line, int face, int &edgeId)
-//{
-//	bool intersect=false;		// Return value.
-//	int  edgeIndex=0;			// Edge index.
-//	int	 originId=0;
-//	int	 destId=0;
-//	Line voronoiLine;			// Voronoi line.
-//
-//	// Get first edge in face.
-//	edgeIndex = this->voronoi.getFaceEdge(face-1)-1;
-//#ifdef DEBUG_VORONOI_EDGE_INTERSECTION
-//	Logging::buildText(__FUNCTION__, __FILE__, "Starting in edge ");
-//	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-//	Logging::buildText(__FUNCTION__, __FILE__, " from face ");
-//	Logging::buildText(__FUNCTION__, __FILE__, face);
-//	Logging::write( true, Info);
-//#endif
-//
-//	// Loop until intersection found.
-//	do
-//	{
-//		// Get current edge extreme points.
-//		originId = this->voronoi.getOrigin(edgeIndex);
-//		destId = this->voronoi.getOrigin(this->voronoi.getTwin(edgeIndex)-1);
-//#ifdef DEBUG_VORONOI_EDGE_INTERSECTION
-//		Logging::buildText(__FUNCTION__, __FILE__, "Current edge ");
-//		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-//		Logging::buildText(__FUNCTION__, __FILE__, " and its twin ");
-//		Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getTwin(edgeIndex));
-//		Logging::buildText(__FUNCTION__, __FILE__, ". Origin point ");
-//		Logging::buildText(__FUNCTION__, __FILE__, originId);
-//		Logging::buildText(__FUNCTION__, __FILE__, " and destination point ");
-//		Logging::buildText(__FUNCTION__, __FILE__, destId);
-//		Logging::write( true, Info);
-//#endif
-//		// Check intersection.
-//		voronoiLine.setOrigin(this->voronoi.getRefPoint(originId-1));
-//		voronoiLine.setDestination(this->voronoi.getRefPoint(destId-1));
-//		if (line.intersect( voronoiLine))
-//		{
-//			// Update return value.
-//			edgeId = edgeIndex+1;
-//			intersect = true;
-//#ifdef DEBUG_VORONOI_EDGE_INTERSECTION
-//			Logging::buildText(__FUNCTION__, __FILE__, "Intersection found in edge ");
-//			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-//			Logging::write( true, Info);
-//#endif
-//		}
-//		else
-//		{
-//			// Next edge.
-//			edgeIndex = this->voronoi.getNext(edgeIndex)-1;
-//#ifdef DEBUG_VORONOI_EDGE_INTERSECTION
-//			Logging::buildText(__FUNCTION__, __FILE__, "Do not intersect. Next edge ");
-//			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-//			Logging::write( true, Info);
-//#endif
-//		}
-//	} while (!intersect);
-//
-//	return(intersect);
-//}
-
 
 /***************************************************************************
 * Name: 	print
@@ -495,8 +428,7 @@ void Voronoi::computeCircumcentres()
 			circle = Circle( &p, &q, &r);
 
 			// Add circumcentre.
-			this->voronoi.addVertex( circle.getRefCentre(), INVALID);
-
+			this->voronoi.addVertex(circle.getRefCentre(), INVALID);
 #ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
 			Logging::buildText( __FUNCTION__, __FILE__, "Real face ");
 			Logging::buildText( __FUNCTION__, __FILE__, faceId);
@@ -606,7 +538,7 @@ void Voronoi::computeCircumcentres()
 * IN:		pointIndex		index of the point whose area must be built
 * OUT:		NONE
 * RETURN:	NONE
-* GLOBAL:	this->voronoi
+* GLOBAL:	this
 * Description: 	computes the Voronoi area of the "pointIndex" point of the
 * 				triangulation and stores it in the "voronoi" DCEL.
 ***************************************************************************/
@@ -697,7 +629,7 @@ void Voronoi::buildArea( int pointIndex)
 #endif
 
 	// Get current face id.
-	newVoronoiFaceId = this->voronoi.getNFaces()+1;
+	newVoronoiFaceId = this->voronoi.getNFaces();
 
 	// Loop until all faces with "pointIndex" as vertex have been checked.
 	do
@@ -730,7 +662,7 @@ void Voronoi::buildArea( int pointIndex)
 			if (this->edgeExists( *edge))
 			{
 				// Get one of the edges of existing Voronoi face.
-				existingEdge = this->voronoi.getFaceEdge( this->triangulation->getOrigin( this->triangulation->getTwin(edgeIndex)-1)-1);
+				existingEdge = this->voronoi.getFaceEdge( this->triangulation->getOrigin( this->triangulation->getTwin(edgeIndex)-1));
 				existingEdgeIndex = existingEdge - 1;
 
 #ifdef DEBUG_VORONOI_BUILDAREA
@@ -826,13 +758,11 @@ void Voronoi::buildArea( int pointIndex)
 			Logging::write( true, Info);
 		}
 #endif
-
 		// Update current edge and its index.
 		currentEdge = this->triangulation->getTwin( this->triangulation->getPrevious(edgeIndex)-1);
 		edgeIndex = currentEdge - 1;
 
 	} while (currentEdge != firstEdge);
-
 #ifdef DEBUG_VORONOI_BUILDAREA
 	Logging::buildText(__FUNCTION__, __FILE__, "Closing external Voronoi area using edges ");
 	Logging::buildText(__FUNCTION__, __FILE__, firstEdgeInFace);
@@ -840,7 +770,6 @@ void Voronoi::buildArea( int pointIndex)
 	Logging::buildText(__FUNCTION__, __FILE__, previousEdge);
 	Logging::write( true, Info);
 #endif
-
 	// Update "previous" edge for first inserted edge.
 	this->voronoi.updateEdge( NO_UPDATE, NO_UPDATE, previousEdge, NO_UPDATE, NO_UPDATE, firstEdgeInFace-1);
 
@@ -849,13 +778,12 @@ void Voronoi::buildArea( int pointIndex)
 
 	// Add new face.
 	this->voronoi.addFace( firstEdgeInFace);
-
 #ifdef DEBUG_VORONOI_BUILDAREA
 	Logging::buildText(__FUNCTION__, __FILE__, "Voronoi area built.");
 	Logging::write( true, Info);
 	Face *face;
 	face = this->voronoi.getRefFace( this->voronoi.getNFaces()-1);
-	this->voronoi.print( face, std::cout);
+	face->print(std::cout);
 #endif
 }
 

@@ -17,7 +17,7 @@ using namespace std;
 #include <math.h>
 
 #ifdef DEBUG_GEOMETRICAL
-//#define DEBUG_CHECK_TURN
+//#define DEBUG_POINT_CHECK_TURN
 #endif
 
 //****************************************************************************
@@ -193,10 +193,14 @@ template <class A_Type> enum Turn_T Point<A_Type>::check_Turn( Point<A_Type> &p,
 	//area = signed_Area( p1, p2, p3);
 	area = this->signedArea( p, q);
 
+#ifdef DEBUG_POINT_CHECK_TURN
+	std::cout << "Area is " << area << std::endl;
+#endif
+
 	// Higher than zero -> turn left.
 	if (area > COLLINEAR_THRESHOLD)
 	{
-#ifdef DEBUG_CHECK_TURN
+#ifdef DEBUG_POINT_CHECK_TURN
 		std::cout << "LEFT" << std::endl;
 #endif
 		turn = LEFT_TURN;
@@ -204,7 +208,7 @@ template <class A_Type> enum Turn_T Point<A_Type>::check_Turn( Point<A_Type> &p,
 	// Lower than zero -> turn right.
 	else if (area < -COLLINEAR_THRESHOLD)
 	{
-#ifdef DEBUG_CHECK_TURN
+#ifdef DEBUG_POINT_CHECK_TURN
 		std::cout << "RIGHT" << std::endl;
 #endif
 		turn = RIGHT_TURN;
@@ -212,7 +216,7 @@ template <class A_Type> enum Turn_T Point<A_Type>::check_Turn( Point<A_Type> &p,
 	// If area is close to zero then points are collinear.
 	else
 	{
-#ifdef DEBUG_CHECK_TURN
+#ifdef DEBUG_POINT_CHECK_TURN
 		std::cout << "COLLINEAR" << std::endl;
 #endif
 		turn = COLLINEAR;

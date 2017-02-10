@@ -46,6 +46,12 @@ class Dcel
 	int		sizeFaces;
 	Face	*faces;
 
+	// Max and min X and Y coordinates for all points in the DCEL set.
+	TYPE	minX;
+	TYPE	minY;
+	TYPE	maxX;
+	TYPE	maxY;
+
 	//------------------------------------------------------------------------
 	//  Private functions.
 	//------------------------------------------------------------------------
@@ -103,6 +109,9 @@ public:
 	inline int getNVertex() { return(this->nVertex); };
 	inline int getNEdges()  { return(this->nEdges); };
 	inline int getNFaces()  { return(this->nFaces); };
+	inline int getSizeVertex() { return(this->sizeVertex); };
+	inline int getSizeEdges()  { return(this->sizeEdges); };
+	inline int getSizeFaces()  { return(this->sizeFaces); };
 
 	// Access to POINTS fields.
 	inline int getPointEdge(int pointIndex) { return(this->vertex[pointIndex].getOrigin()); };
@@ -148,7 +157,7 @@ public:
 
 	// Figures? PENDING. Move to another module?
 	bool 	getEdgeInserection(Line &line, int face, int &edgeId);
-	bool 	findPath(int firstFace, int lastFace, Line &line, Set<int> &faces);
+	bool 	findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces);
 
 	// I/O functions.
 	bool 	read(string fileName, bool isBinary);

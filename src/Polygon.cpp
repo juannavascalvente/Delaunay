@@ -9,8 +9,8 @@
 #include <string.h>
 
 //#define DEBUG_POLYGON_CENTROID
-#define DEBUG_POLYGON_INTERSECT
-#define DEBUG_POLYGON_IS_INTERNAL
+//#define DEBUG_POLYGON_INTERSECT
+//#define DEBUG_POLYGON_IS_INTERNAL
 
 //------------------------------------------------------------------------
 // Constructors / Destructor.

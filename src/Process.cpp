@@ -10,7 +10,8 @@
 #include "Process.h"
 #include "Triangle.h"
 
-#define DEBUG_PROCESS_FIND_CLOSESTPOINT
+//#define DEBUG_PROCESS_FIND_CLOSESTPOINT
+//#define DEBUG_PROCESS_FIND_PATH
 
 Process *Process::instance = 0;
 
@@ -198,6 +199,23 @@ bool Process::readData(int option)
 }
 
 /***************************************************************************
+* Name: 	resetData
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	resets the data of the process class.
+***************************************************************************/
+void Process::resetData()
+{
+	// Check if voronoi must be reset.
+	if (this->status.isVoronoiCreated())
+	{
+		this->voronoi.reset();
+	}
+}
+
+/***************************************************************************
 * Name: 	buildTriangulation
 * IN:		option				option selected in menu.
 * OUT:		NONE
@@ -287,27 +305,6 @@ bool Process::buildConvexHull()
 /***************************************************************************
 * Name: 	findPath
 * IN:		delaunay			Delaunay triangulation data.
-* 			line				line whose path must be searched.
-* OUT:		faces				queue where points are inserted.
-* RETURN:	true				if path found.
-* 			false				i.o.c.
-* GLOBAL:	NONE
-* Description: 	finds the list of faces in the "dcel"between "line"
-* 				extreme points.
-***************************************************************************/
-bool Process::findPath(Delaunay &delaunay, Line &line, Set<int> &faces)
-{
-	bool found=false;			// Return value.
-
-	// Find triangles path.
-	found = delaunay.findPath(line, faces);
-
-	return(found);
-}
-
-/***************************************************************************
-* Name: 	findPath
-* IN:		delaunay			Delaunay triangulation data.
 * 			voronoi				Voronoi data.
 * 			line				line whose path must be searched.
 * OUT:		faces				queue where points are inserted.
@@ -331,17 +328,40 @@ bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, Set<int
 	origin = line.getOrigin();
 	dest = line.getDest();
 
+#ifdef DEBUG_PROCESS_FIND_PATH
+	Logging::buildText(__FUNCTION__, __FILE__, "Line origin point is ");
+	Logging::buildText(__FUNCTION__, __FILE__, &origin);
+	Logging::buildText(__FUNCTION__, __FILE__, " and line destination point is ");
+	Logging::buildText(__FUNCTION__, __FILE__, &dest);
+	Logging::write(true, Info);
+#endif
+
 	// Get extreme point faces.
 	if (delaunay.findClosestPoint(origin, voronoi, closest, initialFace, distance) &&
 		delaunay.findClosestPoint(dest, voronoi, closest, finalFace, distance))
 	{
 		// Add faces to set.
-		extremeFaces.add(initialFace);
-		extremeFaces.add(finalFace);
+		extremeFaces.add(initialFace+1);
+		extremeFaces.add(finalFace+1);
+
+#ifdef DEBUG_PROCESS_FIND_PATH
+		Logging::buildText(__FUNCTION__, __FILE__, "Origin face is ");
+		Logging::buildText(__FUNCTION__, __FILE__, *extremeFaces.at(0));
+		Logging::buildText(__FUNCTION__, __FILE__, " and destination ");
+		Logging::buildText(__FUNCTION__, __FILE__, *extremeFaces.at(1));
+		Logging::write(true, Info);
+#endif
 
 		// Find path.
 		found = voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces);
 	}
+#ifdef DEBUG_PROCESS_FIND_PATH
+	else
+	{
+		Logging::buildText(__FUNCTION__, __FILE__, "Error computing initial faces");
+		Logging::write(true, Error);
+	}
+#endif
 
 	return(found);
 }
@@ -527,17 +547,19 @@ void Process::execute(void)
 		case READ_VORONOI:
 		case READ_GABRIEL:
 		{
+			this->resetData();
+
 			// Check option to generate/read set.
 			error = !this->readData(option);
 			if (!error)
 		    {
-				if (status.isVoronoiCreated())
+				if (this->status.isVoronoiCreated())
 				{
 					// Clear screen.
 					this->drawer->drawFigures(VORONOI_DRAW);
 				}
-				if (status.isDelaunayCreated() ||
-					status.isTriangulationCreated())
+				if (this->status.isDelaunayCreated() ||
+					this->status.isTriangulationCreated())
 				{
 					// Draw triangulation.
 					this->drawer->drawFigures(TRIANGULATION_DRAW);
@@ -591,8 +613,8 @@ void Process::execute(void)
 				// Check error and update status.
 				if (!error)
 				{
-					int minX, minY, maxX, maxY;
-					this->config->getScreenCoordinates(minX, minY, maxX, maxY);
+					//int minX, minY, maxX, maxY;
+					//this->config->getScreenCoordinates(minX, minY, maxX, maxY);
 					//this->voronoi.correctBorderPoints(minX, minY, maxX, maxY);
 
 					// Draw Voronoi graph and the triangulation.
@@ -641,23 +663,30 @@ void Process::execute(void)
 			if (this->status.isDelaunayCreated())
 			{
 				// Generate random points.
-				//p1.random();
-				p1.setX(463.825);
-				p1.setY(9878.27);
-				//p2.random();
-				p2.setX(8585.68);
-				p2.setY(2963.21);
+				p1.random();
+				p2.random();
+				//p1.setX(463.825);
+				//p1.setY(9878.27);
+				//p2.setX(8585.68);
+				//p2.setY(2963.21);
 				line = Line(p1, p2);
 
 				// Compute triangles path between two points.
-				this->findPath(this->delaunay, line, faces);
-
-				// Draw triangulation, segment and the path.
-				points.add(p1);
-				points.add(p2);
-				this->drawer->setPointsSet(&points);
-				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(TRIANGULATION_PATH_DRAW);
+				error = !this->delaunay.findPath(line, faces);
+				if (!error)
+				{
+					// Draw triangulation, segment and the path.
+					points.add(p1);
+					points.add(p2);
+					this->drawer->setPointsSet(&points);
+					this->drawer->setFacesSet(&faces);
+					this->drawer->drawFigures(TRIANGULATION_PATH_DRAW);
+				}
+				else
+				{
+					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Delaunay path");
+					Logging::write(true, Error);
+				}
 			}
 			break;
 		}
@@ -670,27 +699,32 @@ void Process::execute(void)
 			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
 
 			// Check Delaunay triangulation already created.
-			if (this->status.isDelaunayCreated())
+			if (this->status.isVoronoiCreated())
 			{
 				// Generate random points.
-				//p1.random();
-				p1.setX(1000.0);
-				p1.setY(5000.0);
-				//p2.random();
-				p2.setX(9000.0);
-				p2.setY(5000.0);
+				p1.random();
+				//p1.setX(1000.0);
+				//p1.setY(5000.0);
+				p2.random();
+				//p2.setX(9000.0);
+				//p2.setY(5000.0);
 				line = Line(p1, p2);
 
 				// Compute triangles path between two points.
 				error = !this->findPath(this->delaunay, this->voronoi, line, faces);
-				if (!error)
+
+				// Draw triangulation, Voronoi, segment and the path.
+				points.add(p1);
+				points.add(p2);
+				this->drawer->setPointsSet(&points);
+				this->drawer->setFacesSet(&faces);
+				this->drawer->drawFigures(VORONOI_PATH_DRAW);
+
+				// Check if an error must be printed.
+				if (error)
 				{
-					// Draw triangulation, Voronoi, segment and the path.
-					points.add(p1);
-					points.add(p2);
-					this->drawer->setPointsSet(&points);
-					this->drawer->setFacesSet(&faces);
-					this->drawer->drawFigures(VORONOI_PATH_DRAW);
+					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path");
+					Logging::write(true, Error);
 				}
 			}
 			break;
@@ -728,6 +762,11 @@ void Process::execute(void)
 				this->drawer->setPointsSet(&points);
 				this->drawer->drawFigures(CLOSESTPOINT_DRAW);
 			}
+			else
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Error closest point to a given point");
+				Logging::write(true, Error);
+			}
 			break;
 		}
 		// Locate face that surrounds input point.
@@ -747,8 +786,8 @@ void Process::execute(void)
 			{
 				// Draw the triangulation, the point and its face.
 				points.add(point);
-				faces.add(faceId);
 				this->drawer->setPointsSet(&points);
+				faces.add(faceId);
 				this->drawer->setFacesSet(&faces);
 				this->drawer->drawFigures(FINDFACE_DRAW);
 			}

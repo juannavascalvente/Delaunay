@@ -28,7 +28,7 @@ using namespace std;
 //#define DEBUG_SETHIGHEST_FIRST
 //#define DEBUG_SETLOWESTS_FIRST
 //#define DEBUG_GENERATE_CLUSTER
-#define DEBUG_GENERATE_RANDOM_DCEL
+//#define DEBUG_GENERATE_RANDOM_DCEL
 //#define DEBUG_SELECT_COLLINEAR_EDGE
 //#define DEBUG_HAS_NEGATIVE_VERTEX
 //#define DEBUG_IS_EXTERNAL_EDGE
@@ -44,8 +44,8 @@ using namespace std;
 //#define DEBUG_DCEL_BOTTOMMOSTFACE
 //#define DEBUG_DELAUNAY_FIND_PATH
 //#define DEBUG_DCEL_GET_EDGE_POINTS
-#define DEBUG_READBINARY_DCEL
-#define DEBUG_WRITEBINARY_DCEL
+//#define DEBUG_READBINARY_DCEL
+//#define DEBUG_WRITEBINARY_DCEL
 //#define DEBUG_DCEL_EDGE_INTERSECTION
 #endif
 
@@ -66,11 +66,21 @@ Dcel::Dcel()
 	this->nFaces = 0;
 	this->sizeFaces = 0;
 	this->faces = NULL;
+	this->minX = 0.0;
+	this->minY = 0.0;
+	this->maxX = 0.0;
+	this->maxY = 0.0;
 }
 
 
 Dcel::Dcel(int nPoints, int nEdges, int nFaces)
 {
+	// Initialize max and min X and Y coordinates.
+	this->minX = 0.0;
+	this->minY = 0.0;
+	this->maxX = 0.0;
+	this->maxY = 0.0;
+
     try
     {
     	this->incremental = false;
@@ -207,7 +217,8 @@ bool Dcel::imaginaryFace(int faceId)
 	// Get index edge from face.
 	edgeIndex = this->getFaceEdge(faceId) - 1;
 
-	if ((this->getOrigin(edgeIndex) < 0) ||
+	if ((faceId == EXTERNAL_FACE) ||
+		(this->getOrigin(edgeIndex) < 0) ||
 		(this->getOrigin(this->getNext(edgeIndex)-1) < 0) ||
 		(this->getOrigin(this->getPrevious(edgeIndex)-1) < 0))
 	{
@@ -1697,8 +1708,7 @@ bool Dcel::getEdgeInserection(Line &line, int face, int &edgeId)
 
 /***************************************************************************
 * Name: 	findPath
-* IN:		firstFace			origin face
-* 			lastFace			destination face
+* IN:		extremeFaces		set storing first and last faces.
 * 			line				line between both points
 * OUT:		face				list of faces between both points.
 * RETURN:	true				if path found.
@@ -1706,11 +1716,16 @@ bool Dcel::getEdgeInserection(Line &line, int face, int &edgeId)
 * GLOBAL:	NONE
 * Description: 	finds the list of faces where input line lays.
 ***************************************************************************/
-bool Dcel::findPath(int firstFace, int lastFace, Line &line, Set<int> &faces)
+bool Dcel::findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces)
 {
-	bool found=true;				// Return value.
-	int	edgeId=INVALID;				// Edge id.
+	bool found=true;		// Return value.
+	int	edgeId=INVALID;		// Edge id.
+	int firstFace=0;		// First face in path.
+	int lastFace=0;			// First face in path.
 
+	// Get origin and destination faces of the path.
+	firstFace = *extremeFaces.at(0);
+	lastFace = *extremeFaces.at(1);
 #ifdef DEBUG_DELAUNAY_FIND_PATH
 	Logging::buildText(__FUNCTION__, __FILE__, "Searching path between faces ");
 	Logging::buildText(__FUNCTION__, __FILE__, firstFace);
@@ -1771,7 +1786,8 @@ bool Dcel::findPath(int firstFace, int lastFace, Line &line, Set<int> &faces)
 	}
 #endif
 #ifdef DEBUG_DELAUNAY_FIND_PATH
-	Logging::buildText(__FUNCTION__, __FILE__, "Found last face.");
+	Logging::buildText(__FUNCTION__, __FILE__, "Added last face ");
+	Logging::buildText(__FUNCTION__, __FILE__, firstFace);
 	Logging::write(true, Info);
 #endif
 	// Insert last face.

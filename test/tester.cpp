@@ -9,6 +9,7 @@
 #include "test.h"
 #include "testSet.h"
 #include "testPath.h"
+#include "testVoronoi.h"
 
 void Tester::init()
 {
@@ -29,8 +30,14 @@ void Tester::main()
 	TestPath testPath;
 
 	testPath.init();
-	testPath.main();
+	//testPath.main();
 	testPath.finish();
+
+	TestVoronoi testVoronoi;
+
+	testVoronoi.init();
+	testVoronoi.main();
+	testVoronoi.finish();
 }
 
 void Tester::finish()

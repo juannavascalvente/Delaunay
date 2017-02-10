@@ -7,6 +7,7 @@
 
 #include "Line.h"
 #include <float.h>
+#include <limits.h>
 
 //#define DEBUG_EXTEND_SEGMENT
 //#define DEBUG_COMPUTE_SLOPE_N
@@ -171,7 +172,7 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 		// Line towards positive x coordinates values.
 		if ((direction == FROM_0_TO_90) || (direction == FROM_270_TO_360))
 		{
-			extreme.setX(MAX_X_COORD);
+			extreme.setX(INT_MAX);
 
 			// Set y value y=mx + n
 			extreme.setY(this->getSlope()*extreme.getX() + this->getN());
@@ -179,7 +180,7 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 		// Line towards negative x coordinates values.
 		else if ((direction == FROM_90_TO_180) || (direction == FROM_180_TO_270))
 		{
-			extreme.setX(-MAX_X_COORD);
+			extreme.setX(INT_MIN);
 
 			// Set y value y=mx + n
 			extreme.setY(this->getSlope()*extreme.getX() + this->getN());
@@ -187,26 +188,26 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 		// Line is parallel to X coordinates axis towards right.
 		else if (direction == HORIZONTAL_0)
 		{
-			extreme.setX(MAX_X_COORD);
+			extreme.setX(INT_MAX);
 			extreme.setY(this->origin.getY());
 		}
 		// Line is parallel to X coordinates axis towards left.
 		else if (direction == HORIZONTAL_180)
 		{
-			extreme.setX(-MAX_X_COORD);
+			extreme.setX(INT_MIN);
 			extreme.setY(this->origin.getY());
 		}
 		// Line is parallel to Y coordinates axis upwards.
 		else if (direction == VERTICAL_90)
 		{
 			extreme.setX(this->origin.getX());
-			extreme.setY(MAX_Y_COORD);
+			extreme.setY(INT_MAX);
 		}
 		// Line is parallel to Y coordinates axis downwards.
 		else
 		{
 			extreme.setX(this->origin.getX());
-			extreme.setY(-MAX_Y_COORD);
+			extreme.setY(INT_MIN);
 		}
     }
     else

@@ -18,7 +18,9 @@ class TestPath
 {
 	Logging log;			// Log file.
 
-	void dump(string fileName, Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel);
+	void dump(string fileName, string dcelFileName, Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel);
+	void DelaunayPath();
+	void VoronoiPath();
 
 public:
 	TestPath() : log("logTestPath.txt", false) {};
