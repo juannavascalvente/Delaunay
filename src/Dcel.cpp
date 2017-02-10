@@ -396,6 +396,10 @@ void Dcel::reset()
 	this->nVertex = 0;
 	this->nEdges = 0;
 	this->nFaces = 0;
+#ifdef DEBUG_DCEL_RESIZE
+	Logging::buildText(__FUNCTION__, __FILE__, "DCEL data reset");
+	Logging::write(true, Info);
+#endif
 }
 
 /***************************************************************************
@@ -414,6 +418,10 @@ void Dcel::resize(int size, bool copy)
 #ifdef DEBUG_DCEL_RESIZE
 		Logging::buildText(__FUNCTION__, __FILE__, "Resizing to size ");
 		Logging::buildText(__FUNCTION__, __FILE__, size);
+		Logging::buildText(__FUNCTION__, __FILE__, " and current size is ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->getSizeVertex());
+		Logging::buildText(__FUNCTION__, __FILE__, " and current # elements is ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->getNVertex());
 		Logging::write(true, Info);
 #endif
 		// Check if new size is higher than current.
@@ -515,6 +523,10 @@ void Dcel::resize(int size, bool copy)
 #ifdef DEBUG_DCEL_RESIZE
 		else
 		{
+			this->nVertex = 0;
+			this->nEdges = 0;
+			this->nFaces = 0;
+
 			Logging::buildText(__FUNCTION__, __FILE__, "No resize required. New size ");
 			Logging::buildText(__FUNCTION__, __FILE__, size);
 			Logging::buildText(__FUNCTION__, __FILE__, " is not higher than current ");
@@ -1188,18 +1200,26 @@ bool Dcel::generateRandom(int nPoints)
 	if (nPoints > 0)
 	{
 #ifdef DEBUG_GENERATE_RANDOM_DCEL
-		Logging::buildText(__FUNCTION__, __FILE__, "Generating random set of point. # points is ");
+		Logging::buildText(__FUNCTION__, __FILE__, "# points is to generate is ");
 		Logging::buildText(__FUNCTION__, __FILE__, nPoints);
 		Logging::write( true, Info);
 #endif
 		// Resize DCEL if new number of points is higher.
 		if (nPoints > this->sizeVertex)
 		{
+#ifdef DEBUG_GENERATE_RANDOM_DCEL
+			Logging::buildText(__FUNCTION__, __FILE__, "Resizing set of points.");
+			Logging::write( true, Info);
+#endif
 			this->resize(nPoints, false);
 		}
 		// Otherwise just reset the # of elements.
 		else
 		{
+#ifdef DEBUG_GENERATE_RANDOM_DCEL
+			Logging::buildText(__FUNCTION__, __FILE__, "Reseting set of points.");
+			Logging::write( true, Info);
+#endif
 			this->reset();
 		}
 
@@ -1214,7 +1234,8 @@ bool Dcel::generateRandom(int nPoints)
 			this->addVertex(&p, INVALID);
 		}
 #ifdef DEBUG_GENERATE_RANDOM_DCEL
-		Logging::buildText(__FUNCTION__, __FILE__, "Set of points generated.");
+		Logging::buildText(__FUNCTION__, __FILE__, "# points generated.");
+		Logging::buildText(__FUNCTION__, __FILE__, this->getNVertex());
 		Logging::write( true, Info);
 #endif
 	}
