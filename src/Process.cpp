@@ -147,7 +147,7 @@ bool Process::readData(int option)
 		// Generate clusters set.
 		case CLUSTER:
 		{
-			success = dcel.generateClusters(this->config->getNPoints(),
+			success = this->dcel.generateClusters(this->config->getNPoints(),
 					this->config->getNClusters(), this->config->getRadius());
 			this->status.set(false, true, false, false, false, false);
 			break;
