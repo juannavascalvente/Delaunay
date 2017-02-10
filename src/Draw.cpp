@@ -108,13 +108,15 @@ Draw::~Draw()
 /***************************************************************************
 * Name: 	drawFigures
 * IN:		type		type of drawing.
+* 			error		error flag from calling function
 * OUT:		NONE
 * RETURN:	NONE
 * GLOBAL:	NONE
 * Description: 	Draw depending on the type of figures to draw determined by
-* 				the input "type" parameter.
+* 				the input "type" parameter. If the "error" parameter is true
+* 				then some figures will not be completely displayed.
 ***************************************************************************/
-void Draw::drawFigures(enum drawingT type)
+void Draw::drawFigures(enum drawingT type, bool error)
 {
 	int	i=0;			// Loop counter.
 	int	faceId=0;		// Face identifier.
@@ -215,11 +217,14 @@ void Draw::drawFigures(enum drawingT type)
 			// Check type of path to draw.
 			if (type == TRIANGULATION_PATH_DRAW)
 			{
-				// Draw faces.
-				for (i=0; i<this->facesSet->getNElements() ;i++)
+				if (!error)
 				{
-					faceId = *this->facesSet->at(i);
-					this->drawFace( faceId, this->delaunay->getDCEL());
+					// Draw faces.
+					for (i=0; i<this->facesSet->getNElements() ;i++)
+					{
+						faceId = *this->facesSet->at(i);
+						this->drawFace( faceId, this->delaunay->getDCEL());
+					}
 				}
 			}
 			else
@@ -227,10 +232,13 @@ void Draw::drawFigures(enum drawingT type)
 				// Draw voronoi and faces.
 				this->drawVoronoi();
 				this->setColor(YELLOW);
-				for (i=0; i<this->facesSet->getNElements() ;i++)
+				if (!error)
 				{
-					faceId = *this->facesSet->at(i);
-					this->drawFace( faceId, this->voronoi->getRefDcel());
+					for (i=0; i<this->facesSet->getNElements() ;i++)
+					{
+						faceId = *this->facesSet->at(i);
+						this->drawFace( faceId, this->voronoi->getRefDcel());
+					}
 				}
 			}
 

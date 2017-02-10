@@ -151,6 +151,6 @@ public:
 	inline void setFacesSet(Set<int> *faces) { this->facesSet = faces; };
 
 	// Main function.
-	void drawFigures(enum drawingT type);
+	void drawFigures(enum drawingT type, bool error=false);
 };
 #endif /* DRAW_H_ */
