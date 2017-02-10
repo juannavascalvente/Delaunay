@@ -665,24 +665,20 @@ void Process::execute(void)
 				// Generate random points.
 				p1.random();
 				p2.random();
-				//p1.setX(463.825);
-				//p1.setY(9878.27);
-				//p2.setX(8585.68);
-				//p2.setY(2963.21);
 				line = Line(p1, p2);
 
 				// Compute triangles path between two points.
 				error = !this->delaunay.findPath(line, faces);
-				if (!error)
-				{
-					// Draw triangulation, segment and the path.
-					points.add(p1);
-					points.add(p2);
-					this->drawer->setPointsSet(&points);
-					this->drawer->setFacesSet(&faces);
-					this->drawer->drawFigures(TRIANGULATION_PATH_DRAW);
-				}
-				else
+
+				// Draw triangulation, segment and if no error, the path.
+				points.add(p1);
+				points.add(p2);
+				this->drawer->setPointsSet(&points);
+				this->drawer->setFacesSet(&faces);
+				this->drawer->drawFigures(TRIANGULATION_PATH_DRAW, error);
+
+				// Print error message.
+				if (error)
 				{
 					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Delaunay path");
 					Logging::write(true, Error);
@@ -703,11 +699,7 @@ void Process::execute(void)
 			{
 				// Generate random points.
 				p1.random();
-				//p1.setX(1000.0);
-				//p1.setY(5000.0);
 				p2.random();
-				//p2.setX(9000.0);
-				//p2.setY(5000.0);
 				line = Line(p1, p2);
 
 				// Compute triangles path between two points.
@@ -718,7 +710,7 @@ void Process::execute(void)
 				points.add(p2);
 				this->drawer->setPointsSet(&points);
 				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(VORONOI_PATH_DRAW);
+				this->drawer->drawFigures(VORONOI_PATH_DRAW, error);
 
 				// Check if an error must be printed.
 				if (error)
