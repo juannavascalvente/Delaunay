@@ -1104,7 +1104,7 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 			extremeFaces.add(faceId);
 			computePath = true;
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-			Logging::buildText(__FUNCTION__, __FILE__, "Initial face is imaginary.");
+			Logging::buildText(__FUNCTION__, __FILE__, "Initial face is real.");
 			Logging::write(true, Info);
 #endif
 		}
@@ -1113,7 +1113,7 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 			extremeFaces.add(finalFace);
 			computePath = true;
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-			Logging::buildText(__FUNCTION__, __FILE__, "Final face is imaginary.");
+			Logging::buildText(__FUNCTION__, __FILE__, "Final face is real.");
 			Logging::write(true, Info);
 #endif
 		}
@@ -1158,6 +1158,14 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 					Logging::write(true, Info);
 #endif
 				}
+			}
+			else
+			{
+#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
+				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull is not intersected.");
+				Logging::write(true, Info);
+#endif
+				found = true;
 			}
 		}
 
