@@ -25,7 +25,7 @@ void TestPath::init()
 
 void TestPath::main()
 {
-	this->DelaunayPath();
+	this->VoronoiPath();
 }
 
 void TestPath::DelaunayPath()
@@ -171,8 +171,15 @@ void TestPath::VoronoiPath()
 			Point<TYPE> p1, p2;						// Segment points.
 			Line line;								// Segment line.
 			Set<PointT> points(1);					// List of points.
-			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
+			Set<int> extremeFaces(DEFAULT_QUEUE_SIZE);		// Set of faces.
+			Set<int> pathFaces;
 			ostringstream convert;
+
+			Point<TYPE> closest;		// Closest point.
+			double distance=0.0;		// Distance between points.
+
+			int	 initialFace=0;			// Initial face in the path.
+			int	 finalFace=0;			// Final face in the path.
 
 			string pointsFileName;	// Points file name.
 			string dcelFileName;	// DCEL file name.
@@ -192,21 +199,28 @@ void TestPath::VoronoiPath()
 			Logging::buildText(__FUNCTION__, __FILE__, "Start find Voronoi path");
 			Logging::write( true, Info);
 
-			// Compute triangles path between two points.
-			//if (!voronoi.findPath(line, faces))
-			if (1)
+			if (delaunay.findClosestPoint(p1, voronoi, closest, initialFace, distance) &&
+				delaunay.findClosestPoint(p2, voronoi, closest, finalFace, distance))
 			{
-				failedTestIndex++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in iteration ");
+				// Add faces to set.
+				extremeFaces.add(initialFace+1);
+				extremeFaces.add(finalFace+1);
+
+				// Compute triangles path between two points.
+				if (!voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces))
+				{
+					failedTestIndex++;
+					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in iteration ");
+				}
+				else
+				{
+					remove(pointsFileName.c_str());
+					remove(dcelFileName.c_str());
+					Logging::buildText(__FUNCTION__, __FILE__, "Voronoi path computed in iteration ");
+				}
+				Logging::buildText(__FUNCTION__, __FILE__, testIndex);
+				Logging::write( true, Info);
 			}
-			else
-			{
-				remove(pointsFileName.c_str());
-				remove(dcelFileName.c_str());
-				Logging::buildText(__FUNCTION__, __FILE__, "Voronoi path computed in iteration ");
-			}
-			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
-			Logging::write( true, Info);
 		}
 
 		// Reset voronoi data.
