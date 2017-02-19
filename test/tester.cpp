@@ -13,7 +13,7 @@
 
 void Tester::init()
 {
-
+	//this->read();
 }
 
 void Tester::main()
@@ -26,18 +26,18 @@ void Tester::main()
 	// Execute Set class tests.
 	testSet.run();
 	*/
-
+	Test *test;
 	TestPath testPath;
 
-	testPath.init();
-	testPath.main();
-	testPath.finish();
+	test = &testPath;
 
+	test->run();
+/*
 	TestVoronoi testVoronoi;
 
 	testVoronoi.init();
 	testVoronoi.main();
-	testVoronoi.finish();
+	testVoronoi.finish();*/
 }
 
 void Tester::finish()

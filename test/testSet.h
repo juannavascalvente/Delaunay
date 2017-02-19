@@ -18,6 +18,13 @@ class TestSet: public Test
 	void checkDefaultConstructor();
 	void checkCustomConstructor();
 
+	void prepare();
+	void setDefault();
+	bool read();
+	void main();
+	void write();
+	void print();
+
 public:
 	TestSet() : Test("testSet.txt") {};
 	TestSet(const string fileName) : Test(fileName) {};

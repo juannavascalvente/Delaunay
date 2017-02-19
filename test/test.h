@@ -18,6 +18,16 @@ using namespace std;
 ****************************************************************************/
 class Test
 {
+	void init();
+	void finish();
+
+	virtual void prepare() {};
+	virtual void setDefault() {};
+	virtual bool read() {return(true);};
+	virtual void main() {};
+	virtual void write() {};
+	virtual void print() {};
+
 protected:
 	Logging logFile;		// Test log file.
 
@@ -26,9 +36,7 @@ public:
 	Test(const string logFilename) : logFile(logFilename, false) {};
 	virtual ~Test() {};
 
-	virtual void init() {};
-	virtual void main() {};
-	virtual void finish() {};
+	void run();
 };
 
 #endif /* CODE_TEST_TEST_H_ */
