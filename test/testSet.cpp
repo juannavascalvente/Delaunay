@@ -141,12 +141,18 @@ void TestSet::checkCustomConstructor()
 void TestSet::run()
 {
 	int	i=0;								// Loop counter.
+	int highest=0;
+	int highestIndex=0;
+	int updatedIndex=0;
+	int *element;
 
 	// Check is full and empty functions.
 	checkDefaultConstructor();
 
 	// Check is full and empty functions.
 	checkCustomConstructor();
+
+	cout << "PROBANDO" << endl;
 
 	// Add elements.
 	for (i=0; i<HALFSIZE ;i++)
@@ -291,5 +297,59 @@ void TestSet::run()
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 6. isFull \t\t\t\t\t\t\t\t\t\tOK.");
 		this->logFile.write( true, Info);
+	}
+
+	// Check get highest element.
+	for (i=0; i<DOUBLESIZE ;i++)
+	{
+		this->set.add(i+1);
+	}
+
+	highest = this->set.highest();
+	highestIndex = this->set.highestIndex();
+	if (highest != DOUBLESIZE)
+	{
+		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. Checking highest element. Should be ");
+		this->logFile.buildText(__FUNCTION__, __FILE__, DOUBLESIZE);
+		this->logFile.buildText(__FUNCTION__, __FILE__, " and is ");
+		this->logFile.buildText(__FUNCTION__, __FILE__, highest);
+		this->logFile.write( true, Error);
+	}
+	else if (highestIndex != (i-1))
+	{
+		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. Checking highest index element. Should be ");
+		this->logFile.buildText(__FUNCTION__, __FILE__, (i-1));
+		this->logFile.buildText(__FUNCTION__, __FILE__, " and is ");
+		this->logFile.buildText(__FUNCTION__, __FILE__, highestIndex);
+		this->logFile.write( true, Error);
+	}
+	else
+	{
+		updatedIndex = 3;
+		this->set.update(updatedIndex, DOUBLESIZE*2);
+		highest = this->set.highest();
+		highestIndex = this->set.highestIndex();
+		if (highest != DOUBLESIZE*2)
+		{
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. Checking highest element after updated. Should be ");
+			this->logFile.buildText(__FUNCTION__, __FILE__, DOUBLESIZE*2);
+			this->logFile.buildText(__FUNCTION__, __FILE__, " and is ");
+			this->logFile.buildText(__FUNCTION__, __FILE__, highest);
+			this->logFile.write( true, Error);
+			this->set.print();
+		}
+		else if (highestIndex != updatedIndex)
+		{
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. Checking highest index element after updated. Should be ");
+			this->logFile.buildText(__FUNCTION__, __FILE__, (updatedIndex-1));
+			this->logFile.buildText(__FUNCTION__, __FILE__, " and is ");
+			this->logFile.buildText(__FUNCTION__, __FILE__, highestIndex);
+			this->logFile.write( true, Error);
+			this->set.print();
+		}
+		{
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. highest \t\t\t\t\t\t\t\t\t\tOK.");
+			this->logFile.write( true, Info);
+		}
 	}
 }

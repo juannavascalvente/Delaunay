@@ -33,7 +33,7 @@ protected:
 
 public:
 	Test() {};
-	Test(const string logFilename) : logFile(logFilename, false) {};
+	Test(const string logFilename, bool printData = false) : logFile(logFilename, printData) {};
 	virtual ~Test() {};
 
 	void run();

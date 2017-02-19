@@ -11,23 +11,22 @@
 #include "Set.h"
 #include "test.h"
 
-class TestSet: public Test
+class TestSet : public Test
 {
 	Set<int> set;
 
 	void checkDefaultConstructor();
 	void checkCustomConstructor();
 
-	void prepare();
-	void setDefault();
-	bool read();
-	void main();
-	void write();
-	void print();
+	void prepare() {};
+	void setDefault() {};
+	bool read(){return(true);};
+	void main(){};
+	void write(){};
+	void print(){};
 
 public:
-	TestSet() : Test("testSet.txt") {};
-	TestSet(const string fileName) : Test(fileName) {};
+	TestSet() : Test("testSet.txt", true) {};
 	void run();
 };
 

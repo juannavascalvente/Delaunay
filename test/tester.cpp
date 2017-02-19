@@ -20,18 +20,17 @@ void Tester::main()
 {
 	/*
 	string testSetFilename = "testSet2.txt";
-
-	TestSet testSet;
-
-	// Execute Set class tests.
-	testSet.run();
-	*/
+*/
 	Test *test;
+	TestSet testSet;
 	TestPath testPath;
 
 	test = &testPath;
 
-	test->run();
+	//test->run();
+
+	// Execute Set class tests.
+	testSet.run();
 /*
 	TestVoronoi testVoronoi;
 

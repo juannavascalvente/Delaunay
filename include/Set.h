@@ -51,6 +51,7 @@ public:
 	bool isEmpty() { return(this->nElements == 0); };
 	bool isFull() { return(this->nElements == this->size); };
 	void add(ElementType element);
+	void update(int index, ElementType element);
 	ElementType *at(int index);
 
 	int getSize();
@@ -64,6 +65,9 @@ public:
 	void print();
 	int	 random(int nPoints);
 	void shake();
+
+	int highestIndex();
+	ElementType highest();
 };
 
 template <class ElementType> Set<ElementType>::Set()
@@ -126,6 +130,21 @@ template <class ElementType> void Set<ElementType>::add(ElementType element)
 	Logging::write(true, Info);
 #endif
 }
+
+template <class ElementType> void Set<ElementType>::update(int index, ElementType element)
+{
+	// Check if index out of bounds.
+	if (index < this->nElements)
+	{
+		this->data[index] = element;
+	}
+	else
+	{
+		// PENDING what exception to throw?.
+		throw;
+	}
+}
+
 
 template <class ElementType> ElementType* Set<ElementType>::at(int index)
 {
@@ -352,6 +371,44 @@ template <class ElementType> void Set<ElementType>::shake()
     {
     	data[this->nElements].shake();
     }
+}
+
+template <class ElementType> int Set<ElementType>::highestIndex()
+{
+	int	i=0;				// Loop counter.
+	int	index=0;			// Highest value index.
+
+	// Main loop.
+    for (i=1; i<this->nElements ;i++)
+    {
+		// Check if new element is higher than current.
+		if (this->data[i] > this->data[index])
+		{
+			// Update current highest value.
+			index = i;
+		}
+    }
+
+	return(index);
+}
+
+template <class ElementType> ElementType Set<ElementType>::highest()
+{
+	int	i=0;				// Loop counter.
+	int	index=0;			// Highest value index.
+
+	// Main loop.
+    for (i=1; i<this->nElements ;i++)
+    {
+		// Check if new element is higher than current.
+		if (this->data[i] > this->data[index])
+		{
+			// Update current highest value.
+			index = i;
+		}
+    }
+
+	return(this->data[index]);
 }
 
 #endif /* INCLUDE_SET_H_ */
