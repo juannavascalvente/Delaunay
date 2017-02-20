@@ -55,13 +55,13 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Config( string fileName);
+	Config(string fileName);
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
 	void setDefaultConfig(void);
-	int  readConfig( );
+	int  readConfig();
 
 	// GET functions.
 	void getScreenCoordinates( int &minX, int &minY, int &maxX, int &maxY);

@@ -87,11 +87,11 @@ using namespace std;
 /***************************************************************************
 * Private functions headers.
 ***************************************************************************/
-int	parse_Int( char *strValue, int *value);
-int	parse_TYPE( char *strValue, TYPE *value);
-int	parse_Two_Int( char *value, int *value1, int *value2);
-int	parse_Point( char *value, Point<TYPE> *p);
-int parse_Zoom( char *value, int *min_X, int *max_X, int *min_Y, int *max_Y);
+int	parse_Int(char *strValue, int *value);
+int	parse_TYPE(char *strValue, TYPE *value);
+int	parse_Two_Int(char *value, int *value1, int *value2);
+int	parse_Point(char *value, Point<TYPE> *p);
+int parse_Zoom(char *value, int *min_X, int *max_X, int *min_Y, int *max_Y);
 
 
 Config::Config(string fileName)
@@ -110,7 +110,7 @@ Config::Config(string fileName)
 	this->outGraphFileName = DEFAULT_OUTPUT_GRAPH_FILENAME;
 	this->outVoronoiFileName = DEFAULT_OUTPUT_VORONOI_FILENAME;
 	this->outGabrielFileName = DEFAULT_OUTPUT_GABRIEL_FILENAME;
-	this->closestPoint = Point<TYPE>( INVALID, INVALID);
+	this->closestPoint = Point<TYPE>(INVALID, INVALID);
 	this->nAnchors = INVALID;
 	this->minLengthEdge = FLT_MAX;
 
@@ -148,7 +148,7 @@ void	Config::setDefaultConfig(void)
 	this->outGraphFileName = DEFAULT_OUTPUT_GRAPH_FILENAME;
 	this->outVoronoiFileName = DEFAULT_OUTPUT_VORONOI_FILENAME;
 	this->outGabrielFileName = DEFAULT_OUTPUT_GABRIEL_FILENAME;
-	this->closestPoint = Point<TYPE>( INVALID, INVALID);
+	this->closestPoint = Point<TYPE>(INVALID, INVALID);
 	this->nAnchors = DEFAULT_ANCHORS;
 	this->minLengthEdge = FLT_MAX;
 
@@ -172,7 +172,7 @@ void	Config::setDefaultConfig(void)
 * Description: 	returns the screen coordinates if set in configuration file
 * 				or default value i.o.c.
 ***************************************************************************/
-void Config::getScreenCoordinates( int &minX, int &minY, int &maxX, int &maxY)
+void Config::getScreenCoordinates(int &minX, int &minY, int &maxX, int &maxY)
 {
 	if (this->initialized)
 	{
@@ -205,7 +205,7 @@ void Config::getScreenCoordinates( int &minX, int &minY, int &maxX, int &maxY)
 * 				If a wrong file is found then it is skipped and current
 * 				field value is kept.
 ***************************************************************************/
-int 	Config::readConfig( )
+int 	Config::readConfig()
 {
 	int	 ret=SUCCESS;				// Return value.
 	string	line = "";
@@ -218,13 +218,13 @@ int 	Config::readConfig( )
 	TYPE newValue=0.0;
 
 	// Open configuration file.
-	ifs.open( this->configFileName.c_str(), ios::in);
+	ifs.open(this->configFileName.c_str(), ios::in);
 
 	// Check file is opened.
 	if (ifs.is_open())
 	{
 		// Read lines until end of file.
-		while (getline( ifs, line))
+		while (getline(ifs, line))
 		{
 			// PENDING_REFACTOR: Create function that gets the value.
 			// Extract field and value.
@@ -311,12 +311,12 @@ int 	Config::readConfig( )
 				std::istringstream ss(value);
 				ss.imbue(std::locale::classic());
 				ss >> newValue;
-				this->closestPoint.setX( newValue);
+				this->closestPoint.setX(newValue);
 				value = field;
 				std::istringstream ss2(value);
 				ss2.imbue(std::locale::classic());
 				ss2 >> newValue;
-				this->closestPoint.setY( newValue);
+				this->closestPoint.setY(newValue);
 			}
 			// Check REMOVE_LOWER_EDGES parameter.
 			else if (field.compare(MIN_LENGTH_EDGE_PARAM) == 0)
@@ -393,11 +393,11 @@ int 	Config::readConfig( )
 	}
 	else
 	{
-		Logging::buildText( __FILE__, __FUNCTION__, "Cannot open configuration file ");
-		Logging::buildText( __FILE__, __FUNCTION__, this->configFileName);
-		Logging::write( true, Warning);
-		Logging::buildText( __FILE__, __FUNCTION__, "Applying default values.");
-		Logging::write( true, Warning);
+		Logging::buildText(__FILE__, __FUNCTION__, "Cannot open configuration file ");
+		Logging::buildText(__FILE__, __FUNCTION__, this->configFileName);
+		Logging::write(true, Warning);
+		Logging::buildText(__FILE__, __FUNCTION__, "Applying default values.");
+		Logging::write(true, Warning);
 		this->setDefaultConfig();
 		ret = FAILURE;
 	}
@@ -428,7 +428,7 @@ int 	Config::readConfig( )
 /***************************************************************************
 * Private functions bodies.
 ***************************************************************************/
-int	parse_Int( char *strValue, int *value)
+int	parse_Int(char *strValue, int *value)
 {
 	int ret=SUCCESS;		// Return value.
 
@@ -445,7 +445,7 @@ int	parse_Int( char *strValue, int *value)
 	return(ret);
 }
 
-int	parse_TYPE( char *strValue, TYPE *value)
+int	parse_TYPE(char *strValue, TYPE *value)
 {
 	int ret=SUCCESS;		// Return value.
 	char* pEnd;
@@ -463,7 +463,7 @@ int	parse_TYPE( char *strValue, TYPE *value)
 	return(ret);
 }
 
-int	parse_Two_Int( char *value, int *value1, int *value2)
+int	parse_Two_Int(char *value, int *value1, int *value2)
 {
 	int ret=SUCCESS;		// Return value.
 	char *pch=NULL;
@@ -493,8 +493,8 @@ int	parse_Two_Int( char *value, int *value1, int *value2)
 		printf("Input line contains , at position %d\n", length);
 #endif
 	    // Copy field.
-		strncpy( field, value, length);
-		if (parse_Int( field, value1) == FAILURE)
+		strncpy(field, value, length);
+		if (parse_Int(field, value1) == FAILURE)
 		{
 			printf("Error parsing first integer value %s\n", field);
 		}
@@ -504,8 +504,8 @@ int	parse_Two_Int( char *value, int *value1, int *value2)
 		printf("Input line field is %d\n", value1);
 #endif
 			// Copy value.
-			strncpy( field, &value[length + 1], strlen(value) - length - 1);
-			if (parse_Int( field, value2) == FAILURE)
+			strncpy(field, &value[length + 1], strlen(value) - length - 1);
+			if (parse_Int(field, value2) == FAILURE)
 			{
 				printf("Error parsing second integer value %s\n", field);
 			}
@@ -518,7 +518,7 @@ int	parse_Two_Int( char *value, int *value1, int *value2)
 	return(ret);
 }
 
-int	parse_Point( char *value, Point<TYPE> *p)
+int	parse_Point(char *value, Point<TYPE> *p)
 {
 	int ret=SUCCESS;		// Return value.
 	char *pch=NULL;
@@ -550,8 +550,8 @@ int	parse_Point( char *value, Point<TYPE> *p)
 		printf("Input line contains , at position %d\n", length);
 #endif
 	    // Copy field.
-		strncpy( field, value, length);
-		if (parse_TYPE( field, &value1) == FAILURE)
+		strncpy(field, value, length);
+		if (parse_TYPE(field, &value1) == FAILURE)
 		{
 			printf("Error parsing first TYPE value %s\n", field);
 		}
@@ -561,15 +561,15 @@ int	parse_Point( char *value, Point<TYPE> *p)
 			printf("Input line field is %f\n", value1);
 #endif
 			// Copy value.
-			strncpy( field, &value[length + 1], strlen(value) - length - 1);
-			if (parse_TYPE( field, &value2) == FAILURE)
+			strncpy(field, &value[length + 1], strlen(value) - length - 1);
+			if (parse_TYPE(field, &value2) == FAILURE)
 			{
 				printf("Error parsing second TYPE value %s\n", field);
 			}
 			else
 			{
-				p->setX( value1);
-				p->setY( value2);
+				p->setX(value1);
+				p->setY(value2);
 #ifdef DEBUG_PARSE_POINT
 				printf("Input line value is %f\n", value2);
 #endif
@@ -580,7 +580,7 @@ int	parse_Point( char *value, Point<TYPE> *p)
 	return(ret);
 }
 
-int parse_Zoom( char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
+int parse_Zoom(char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
 {
 	int 	ret=SUCCESS;			// Return value.
 	char 	*pch=NULL;				// Pointer to character in string.
@@ -594,7 +594,7 @@ int parse_Zoom( char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
 	nItems = 0;
 	pch = strtok (line,"=");
 	pch = strtok (line,",");
-	ret = parse_Int( pch, min_X);
+	ret = parse_Int(pch, min_X);
 	while (((pch = strtok (NULL,",")) != NULL) && (ret == SUCCESS))
 	{
 #ifdef DEBUG_PARSE_ZOOM
@@ -605,7 +605,7 @@ int parse_Zoom( char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
 		{
 			case 0:
 			{
-				if (parse_Int( pch, max_X) == FAILURE)
+				if (parse_Int(pch, max_X) == FAILURE)
 				{
 					ret = FAILURE;
 					printf("Error parsing max x coordinate string %s\n", pch);
@@ -614,7 +614,7 @@ int parse_Zoom( char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
 			}
 			case 1:
 			{
-				if (parse_Int( pch, min_Y) == FAILURE)
+				if (parse_Int(pch, min_Y) == FAILURE)
 				{
 					ret = FAILURE;
 					printf("Error parsing min Y coordinate string %s\n", pch);
@@ -623,7 +623,7 @@ int parse_Zoom( char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
 			}
 			case 2:
 			{
-				if (parse_Int( pch, max_Y) == FAILURE)
+				if (parse_Int(pch, max_Y) == FAILURE)
 				{
 					ret = FAILURE;
 					printf("Error parsing max Y coordinate string %s\n", pch);
