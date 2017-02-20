@@ -22,6 +22,8 @@ typedef Point<TYPE> PointT;
 
 void TestPath::prepare()
 {
+	cout << "PREPARE TEST PATH" << endl;
+
 	this->delaunay.setDCEL(&this->dcel);
 
 	// Check test type.

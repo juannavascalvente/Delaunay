@@ -138,13 +138,12 @@ void TestSet::checkCustomConstructor()
 	}
 }
 
-void TestSet::run()
+void TestSet::main()
 {
 	int	i=0;								// Loop counter.
 	int highest=0;
 	int highestIndex=0;
 	int updatedIndex=0;
-	int *element;
 
 	// Check is full and empty functions.
 	checkDefaultConstructor();

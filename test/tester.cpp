@@ -6,40 +6,108 @@
  */
 
 #include "tester.h"
-#include "test.h"
 #include "testSet.h"
 #include "testPath.h"
 #include "testVoronoi.h"
 
-void Tester::init()
+
+bool Tester::init()
 {
-	//this->read();
+	bool read=true;					// Return value.
+	bool finished=false; 			// Loop control flag.
+	ifstream ifs;					// Input file stream.
+	enum TesterTestType testType;	// Test type read from file.
+	Test 		*test;
+
+	// Open file.
+	ifs.open(this->fileName.c_str(), ios::in);
+	if (!ifs.is_open())
+	{
+		cout << "Error opening input test file " << this->fileName << endl;
+		read = false;
+	}
+	else
+	{
+		// Execute all tests.
+		finished = false;
+		while (!finished)
+		{
+			cout << "Reading test " << (this->tests.getNElements()+1) << endl;
+
+			// Check test type.
+			testType = this->readTestType();
+			switch(testType)
+			{
+				// Test Set class.
+				case TEST_SET:
+				{
+					cout << "Testing Set" << endl;
+					test = new TestSet();
+					finished = true;
+					break;
+				}
+				// Test Path computations.
+				case TEST_PATH:
+				{
+					cout << "Testing Path" << endl;
+					test = new TestPath();
+					break;
+				}
+				default:
+				{
+					cout << "Unknown test type. Value is " << testType << endl;
+					break;
+				}
+			}
+
+			// Initialize test.
+			test->init();
+			this->tests.add(test);
+		}
+
+		// Close input file.
+		ifs.close();
+
+		cout << "Finished reading tests." << endl;
+	}
+
+	return(read);
 }
 
 void Tester::main()
 {
-	/*
-	string testSetFilename = "testSet2.txt";
-*/
-	Test *test;
-	TestSet testSet;
-	TestPath testPath;
+	int	 i=0;						// Loop counter.
+	Test *currentTest;
 
-	test = &testPath;
+	// Initialize tester.
+	if (this->init())
+	{
+		// Execute all tests.
+		for(i=0; i<this->tests.getNElements() ;i++)
+		{
+			cout << "Executing test " << (i+1) << endl;
+			currentTest = *this->tests.at(i);
+			currentTest->run();
+		}
 
-	//test->run();
-
-	// Execute Set class tests.
-	testSet.run();
-/*
-	TestVoronoi testVoronoi;
-
-	testVoronoi.init();
-	testVoronoi.main();
-	testVoronoi.finish();*/
+		this->finish();
+	}
 }
 
 void Tester::finish()
 {
+
+}
+
+TesterTestType Tester::readTestType()
+{
+	static bool firstTime=true;
+	if (firstTime) {
+		firstTime=false;
+		return(TEST_SET);
+
+	} else {
+		return(TEST_PATH);
+	}
 
 }

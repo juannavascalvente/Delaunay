@@ -65,8 +65,8 @@ public:
 	~TestPath() {};
 
 	void prepare();
-	void main();
 	bool read();
+	void main();
 };
 
 #endif /* TEST_TESTPATH_H_ */

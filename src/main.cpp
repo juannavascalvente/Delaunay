@@ -32,7 +32,7 @@ using namespace std;
 
 int	getExecutionType(char *type);
 void printUsage(int type);
-int executeTests(int argc);
+int executeTests(int argc, char** argv);
 int executeVisual(int argc, char** argv);
 int	executeStatistics();
 int	executePerformance();
@@ -125,20 +125,21 @@ void printUsage(int type)
 /***************************************************************************
 * Name: 	executeTests
 * IN:		argc		input # arguments
+* 			argv		input configuration test file.
 * OUT:		NONE
 * RETURN:	SUCCESS 	if execution finished successfully
 * 			FAILURE		i.o.c.
 * GLOBAL:	NONE
 * Description: 	executes the application in test mode.
 ***************************************************************************/
-int executeTests(int argc)
+int executeTests(int argc, char** argv)
 {
 	int 	ret=SUCCESS;			// Return value.
 	Tester 	*tester;				// Test object.
 
 	if (argc == 3)
 	{
-		tester = new Tester();
+		tester = new Tester(argv[2]);
 		tester->main();
 		delete tester;
 	}
@@ -287,7 +288,7 @@ int main(int argc, char **argv)
 			// Run tests.
 			case TEST:
 			{
-				ret = executeTests(argc);
+				ret = executeTests(argc, argv);
 				break;
 			}
 			// Execute performance tests.

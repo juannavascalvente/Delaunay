@@ -18,8 +18,6 @@ using namespace std;
 ****************************************************************************/
 class Test
 {
-	void init();
-	void finish();
 
 	virtual void prepare() {};
 	virtual void setDefault() {};
@@ -36,6 +34,8 @@ public:
 	Test(const string logFilename, bool printData = false) : logFile(logFilename, printData) {};
 	virtual ~Test() {};
 
+	void init();
+	void finish();
 	void run();
 };
 

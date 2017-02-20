@@ -18,16 +18,15 @@ class TestSet : public Test
 	void checkDefaultConstructor();
 	void checkCustomConstructor();
 
-	void prepare() {};
-	void setDefault() {};
-	bool read(){return(true);};
-	void main(){};
-	void write(){};
+	void prepare() { cout << "PREPARE TEST SET" << endl; };
+	void setDefault() {cout << "SET DEFAULT TEST SET" << endl;};
+	bool read(){cout << "READ TEST SET" << endl; return(true);};
+	void write(){cout << "WRITE TEST SET" << endl;};
 	void print(){};
 
 public:
 	TestSet() : Test("testSet.txt", true) {};
-	void run();
+	void main();
 };
 
 #endif /* CODE_TEST_TESTSET_H_ */
