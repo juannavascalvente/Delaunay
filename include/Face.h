@@ -26,8 +26,8 @@ public:
 	  Constructor/Destructor.
 	------------------------------------------------------------------------*/
 	Face();
-	Face( int edge, bool imaginary);
-	Face( int edge);
+	Face(int edge, bool imaginary);
+	Face(int edge);
 
 	//------------------------------------------------------------------------
 	// Public functions.
@@ -35,8 +35,8 @@ public:
 	bool hasNegativeVertex();
 
 	// Get / Set.
-	inline void setEdge( int value) { this->edge = value; };
-	inline int 	getEdge( ) { return(this->edge); };
+	inline void setEdge(int value) { this->edge = value; };
+	inline int 	getEdge() { return(this->edge); };
 
 	// Operators.
 	friend istream &operator>>(istream &in, Face &face)
@@ -45,7 +45,7 @@ public:
 				{ out << face.edge; return(out);};
 
 	// I/O functions.
-	void 	print( std::ostream& out);
+	void 	print(std::ostream& out);
 	string 	toStr();
 };
 

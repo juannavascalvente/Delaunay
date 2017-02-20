@@ -30,26 +30,26 @@ public:
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
 	Edge();
-	Edge( int origin, int twin, int prev, int next, int face);
+	Edge(int origin, int twin, int prev, int next, int face);
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
-	void set( int origin, int twin, int	previous, int next, int face);
+	void set(int origin, int twin, int	previous, int next, int face);
 	void reset();
 
 	// Get / Set.
-	inline void setOrigin( int value) { this->origin = value; };
-	inline void setTwin( int value) { this->twin = value; };
-	inline void setPrevious( int value) { this->previous = value; };
-	inline void setNext( int value) { this->next = value; };
-	inline void setFace( int value) { this->face = value; };
+	inline void setOrigin(int value) { this->origin = value; };
+	inline void setTwin(int value) { this->twin = value; };
+	inline void setPrevious(int value) { this->previous = value; };
+	inline void setNext(int value) { this->next = value; };
+	inline void setFace(int value) { this->face = value; };
 
-	inline int getOrigin( ) { return(this->origin); };
-	inline int getTwin( ) { return(this->twin); };
-	inline int getPrevious( ) { return(this->previous); };
-	inline int getNext( ) { return(this->next); };
-	inline int getFace( ) { return(this->face); };
+	inline int getOrigin() { return(this->origin); };
+	inline int getTwin() { return(this->twin); };
+	inline int getPrevious() { return(this->previous); };
+	inline int getNext() { return(this->next); };
+	inline int getFace() { return(this->face); };
 
 	// Operators.
 	friend istream& operator>>(istream &in, Edge &edge)
@@ -74,8 +74,8 @@ public:
 	}
 
 	// I/O operations.
-	void print( std::ostream& out);
-	string toStr( );
+	void print(std::ostream& out);
+	string toStr();
 };
 
 

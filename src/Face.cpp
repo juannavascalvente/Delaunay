@@ -21,14 +21,14 @@ Face::Face()
 	//this->imaginaryFace = false;
 }
 
-//Face::Face( int edge, bool imaginary)
+//Face::Face(int edge, bool imaginary)
 //{
 //	// Update object attributes.
 //	this->edge = edge;
 //	this->imaginaryFace = imaginaryFace;
 //}
 
-Face::Face( int edge)
+Face::Face(int edge)
 {
 	// Update object attributes.
 	this->edge = edge;
@@ -47,7 +47,7 @@ Face::Face( int edge)
 //* GLOBAL:	NONE
 //* Description: updates face fields
 //***************************************************************************/
-//void Face::set( int edge, bool imaginaryFace)
+//void Face::set(int edge, bool imaginaryFace)
 //{
 //	// Update object attributes.
 //	this->edge = edge;
@@ -64,7 +64,7 @@ Face::Face( int edge)
 * GLOBAL:	NONE
 * Description: print face data.
 ***************************************************************************/
-void Face::print( std::ostream& out)
+void Face::print(std::ostream& out)
 {
 	out << this->edge << std::endl;
 }
@@ -83,7 +83,7 @@ string Face::toStr()
 	string text;
 
 	// Build file name.
-	this->print( oss);
+	this->print(oss);
 	text = oss.str();
 
 	return(text);

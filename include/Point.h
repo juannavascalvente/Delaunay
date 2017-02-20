@@ -59,11 +59,11 @@ class Point
 	Point(A_Type x, A_Type y) { this->x = x; this->y = y;}
 
 	// Set/Get operations.
-	inline void 	setX( const A_Type x) { this->x = x;};
-	inline void 	setY( const A_Type y) { this->y = y;};
+	inline void 	setX(const A_Type x) { this->x = x;};
+	inline void 	setY(const A_Type y) { this->y = y;};
 	inline A_Type 	getX() {return(this->x);};
 	inline A_Type 	getY() {return(this->y);};
-	inline void 	setOrigin( ) { this->x = 0.0; this->y = 0.0;};
+	inline void 	setOrigin() { this->x = 0.0; this->y = 0.0;};
 
 	//***********************************************************
 	// Interface.
@@ -78,21 +78,21 @@ class Point
 	int         lexicographic_Higher(struct Point_T *p1, struct Point_T *p2);
 
 	// Location interface.
-	//bool in_Circle( const Point *p1, const Point * p2, const Point * p3);
+	//bool in_Circle(const Point *p1, const Point * p2, const Point * p3);
 	bool		interior_Triangle(struct Point_T *p1, struct Point_T *p2, struct Point_T *p3, struct Point_T *q);
 	*/
 
 	// Distance.
-	A_Type distance( const Point &p);
-	double signedArea( const Point &p, const Point &q);
+	A_Type distance(const Point &p);
+	double signedArea(const Point &p, const Point &q);
 
 	// Location interface.
 	bool has_Extreme_Coordinates(void);
-	enum Turn_T	check_Turn( Point<A_Type> &p, Point<A_Type> &q);
-	static bool lowerY( Point<TYPE> *p, Point<TYPE> *q);
-	static bool lexicographicHigher( Point<TYPE> *p, Point<TYPE> *q);
-	static bool higher_Point( Point<TYPE> *p1, Point<TYPE> *p2, bool (*f)(Point<TYPE> *, Point<TYPE> *));
-	static bool inCircle( Point<TYPE> *p1, Point<TYPE> *p2, Point<TYPE> *q1, Point<TYPE> *q2);
+	enum Turn_T	check_Turn(Point<A_Type> &p, Point<A_Type> &q);
+	static bool lowerY(Point<TYPE> *p, Point<TYPE> *q);
+	static bool lexicographicHigher(Point<TYPE> *p, Point<TYPE> *q);
+	static bool higher_Point(Point<TYPE> *p1, Point<TYPE> *p2, bool (*f)(Point<TYPE> *, Point<TYPE> *));
+	static bool inCircle(Point<TYPE> *p1, Point<TYPE> *p2, Point<TYPE> *q1, Point<TYPE> *q2);
 	static void middlePoint(Point<TYPE> *p, Point<TYPE> *q, Point<TYPE> *middle);
 
 	void random();
@@ -100,23 +100,23 @@ class Point
 
 	// I/O interface
 	void print(std::ostream& out);
-	string toStr( );
+	string toStr();
 	void printFormatted(std::ostream& out);
 	void read(ifstream &ifs);
 	void write(ofstream &ofs);
 
 	// Operators.
-	inline Point& 	operator+( const Point& q){ this->x += q.x; this->y += q.y; return(*this); }
-	inline Point& 	operator-( const Point& q){ this->x -= q.x; this->y -= q.y; return(*this); }
-	inline Point& 	operator*( const TYPE value){ this->x *= value; this->y *= value; return(*this); }
-	inline Point& 	operator/( const TYPE value){ this->x /= value; this->y /= value; return(*this); }
-	inline bool 	operator==( const Point& q){ return ((this->x == q->x) && (this->y == q->y)); }
-	inline bool 	operator!=( const Point& q){ return ((this->x != q->x) || (this->y != q->y)); }
-	inline Point& 	operator=( const Point& other ) { this->x = other.x; this->y = other.y; return(*this);}
+	inline Point& 	operator+(const Point& q){ this->x += q.x; this->y += q.y; return(*this); }
+	inline Point& 	operator-(const Point& q){ this->x -= q.x; this->y -= q.y; return(*this); }
+	inline Point& 	operator*(const TYPE value){ this->x *= value; this->y *= value; return(*this); }
+	inline Point& 	operator/(const TYPE value){ this->x /= value; this->y /= value; return(*this); }
+	inline bool 	operator==(const Point& q){ return ((this->x == q->x) && (this->y == q->y)); }
+	inline bool 	operator!=(const Point& q){ return ((this->x != q->x) || (this->y != q->y)); }
+	inline Point& 	operator=(const Point& other ) { this->x = other.x; this->y = other.y; return(*this);}
 	friend istream &operator>>(istream &in, Point &p) { in >> p.x; in >> p.y; return(in); };
 	friend ostream &operator<<(ostream &out, Point &p) { out << p.x; out << " "; out << p.y; return(out); };
 
-	inline void shift( TYPE deltaX, TYPE deltaY) { this->x += deltaX; this->y += deltaY; };
+	inline void shift(TYPE deltaX, TYPE deltaY) { this->x += deltaX; this->y += deltaY; };
 };
 
 /*****************************************************************************
@@ -131,7 +131,7 @@ template <class A_Type> A_Type Point<A_Type>::distance(const Point &p)
 	 A_Type	dist=0.0;			// Return value.
 
 	 // Compute Euclidean distance.
-	dist = sqrt(pow( this->x - p.x, 2) + pow( this->y - p.y, 2));
+	dist = sqrt(pow(this->x - p.x, 2) + pow(this->y - p.y, 2));
 
 	return(dist);
 }
@@ -143,7 +143,7 @@ template <class A_Type> A_Type Point<A_Type>::distance(const Point &p)
  * Output: 		signed area enclosed by 3 points (self, p, q)
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> double Point<A_Type>::signedArea( const Point &p, const Point &q)
+template <class A_Type> double Point<A_Type>::signedArea(const Point &p, const Point &q)
 {
 	double area=0.0;	// Return value.
 
@@ -184,14 +184,14 @@ template <class A_Type> bool Point<A_Type>::has_Extreme_Coordinates(void)
  * Complexity:	O(1)
 *****************************************************************************/
 // PENDING CHANGE PARAMETERS TO BE reference.
-template <class A_Type> enum Turn_T Point<A_Type>::check_Turn( Point<A_Type> &p, Point<A_Type> &q)
+template <class A_Type> enum Turn_T Point<A_Type>::check_Turn(Point<A_Type> &p, Point<A_Type> &q)
 {
 	double          area=0.0;       // Signed area.
 	enum Turn_T     turn;           // Return value.
 
 	// Compute signed area of the triangle formed by p1, p2 and p3.
-	//area = signed_Area( p1, p2, p3);
-	area = this->signedArea( p, q);
+	//area = signed_Area(p1, p2, p3);
+	area = this->signedArea(p, q);
 
 #ifdef DEBUG_POINT_CHECK_TURN
 	std::cout << "Area is " << area << std::endl;
@@ -280,13 +280,13 @@ template <class A_Type> void Point<A_Type>::print(std::ostream& out)
 * GLOBAL:	NONE
 * Description: 	concat the point information as a string
 ***************************************************************************/
-template <class A_Type> string Point<A_Type>::toStr( )
+template <class A_Type> string Point<A_Type>::toStr()
 {
 	ostringstream oss;
 	string text;
 
 	// Build file name.
-	this->print( oss);
+	this->print(oss);
 	text = oss.str();
 
 	return(text);
@@ -320,9 +320,9 @@ template <class A_Type> void Point<A_Type>::read(ifstream &ifs)
 	{
 		// Read X and Y coordinate.
 		ifs >> value;
-		//this->setX( value);
+		//this->setX(value);
 		ifs >> value;
-		//this->setY( value);
+		//this->setY(value);
 	}
 	catch (std::exception &e)
 	{
@@ -359,7 +359,7 @@ template <class A_Type> void Point<A_Type>::write(ofstream &ofs)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> bool Point<A_Type>::lowerY( Point<TYPE> *p, Point<TYPE> *q)
+template <class A_Type> bool Point<A_Type>::lowerY(Point<TYPE> *p, Point<TYPE> *q)
 {
     bool lower=false;       // Return value.
 
@@ -380,7 +380,7 @@ template <class A_Type> bool Point<A_Type>::lowerY( Point<TYPE> *p, Point<TYPE> 
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> bool Point<A_Type>::lexicographicHigher( Point<TYPE> *p, Point<TYPE> *q)
+template <class A_Type> bool Point<A_Type>::lexicographicHigher(Point<TYPE> *p, Point<TYPE> *q)
 {
     bool higher=false;       // Return value.
 
@@ -410,10 +410,10 @@ template <class A_Type> bool Point<A_Type>::lexicographicHigher( Point<TYPE> *p,
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> bool Point<A_Type>::higher_Point( Point<TYPE> *p1,
+template <class A_Type> bool Point<A_Type>::higher_Point(Point<TYPE> *p1,
 					Point<TYPE> *p2, bool (*f)(Point<TYPE> *, Point<TYPE> *))
 {
-    return((*f)( p1, p2));
+    return((*f)(p1, p2));
 }
 
 /*****************************************************************************
@@ -428,7 +428,7 @@ template <class A_Type> bool Point<A_Type>::higher_Point( Point<TYPE> *p1,
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> bool Point<A_Type>::inCircle( Point<TYPE> *p1,
+template <class A_Type> bool Point<A_Type>::inCircle(Point<TYPE> *p1,
 						Point<TYPE> *p2, Point<TYPE> *p3, Point<TYPE> *q)
 {
 	bool inCircle=false;	// Return value.

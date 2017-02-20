@@ -24,7 +24,7 @@ Edge::Edge()
 	this->face = INVALID;
 }
 
-Edge::Edge( int origin, int twin, int prev, int next, int face)
+Edge::Edge(int origin, int twin, int prev, int next, int face)
 {
 	// Set input values.
 	this->origin = origin;
@@ -49,7 +49,7 @@ Edge::Edge( int origin, int twin, int prev, int next, int face)
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Edge::set( int origin, int twin, int previous, int next, int face)
+void Edge::set(int origin, int twin, int previous, int next, int face)
 {
 	// Set input values.
 	this->origin = origin;
@@ -87,7 +87,7 @@ void Edge::reset()
 * GLOBAL:	NONE
 * Description: prints edge data.
 ***************************************************************************/
-void Edge::print( std::ostream& out)
+void Edge::print(std::ostream& out)
 {
 	// Print edge information.
 	out << this->origin << " " << this->twin << " " << this->previous <<
@@ -108,7 +108,7 @@ string Edge::toStr()
 	string text;
 
 	// Build file name.
-	this->print( oss);
+	this->print(oss);
 	text = oss.str();
 
 	return(text);
