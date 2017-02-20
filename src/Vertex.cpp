@@ -48,12 +48,12 @@ void Vertex::shake()
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-int	Vertex::read( ifstream ifs)
+int	Vertex::read(ifstream ifs)
 {
 	int	ret=SUCCESS;		// Return value.
 
 	// Read point coordinates.
-	this->point.read( ifs);
+	this->point.read(ifs);
 
 	// Set edge as invalid.
 	this->originEdge = INVALID;
@@ -68,12 +68,12 @@ int	Vertex::read( ifstream ifs)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-int	Vertex::write( ofstream ofs)
+int	Vertex::write(ofstream ofs)
 {
 	int	ret=SUCCESS;		// Return value.
 
 	// Read point coordinates.
-	this->point.write( ofs);
+	this->point.write(ofs);
 
 	return(ret);
 }
@@ -85,7 +85,7 @@ int	Vertex::write( ofstream ofs)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-void Vertex::print( std::ostream& out)
+void Vertex::print(std::ostream& out)
 {
 	this->point.print(out);
 	out << " " << this->originEdge << std::endl;
@@ -98,7 +98,7 @@ void Vertex::print( std::ostream& out)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-void Vertex::printPoint( std::ostream& out)
+void Vertex::printPoint(std::ostream& out)
 {
 	// Print point.
 	this->point.print(out);

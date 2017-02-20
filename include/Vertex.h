@@ -30,28 +30,28 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	Vertex(){ this->originEdge = INVALID; this->point = Point<TYPE>( 0.0, 0.0); };
-	Vertex( int originEdge, Point<TYPE> p) { this->originEdge = originEdge; this->point = p; };
+	Vertex(){ this->originEdge = INVALID; this->point = Point<TYPE>(0.0, 0.0); };
+	Vertex(int originEdge, Point<TYPE> p) { this->originEdge = originEdge; this->point = p; };
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
 	// Get / Set.
-	inline void setOrigin( int value) { this->originEdge = value; };
-	inline void setPoint( Point<TYPE> *value) { this->point = *value; };
+	inline void setOrigin(int value) { this->originEdge = value; };
+	inline void setPoint(Point<TYPE> *value) { this->point = *value; };
 
 	void random();
 	void shake();
 
-	inline int getOrigin( ) { return(this->originEdge); };
-	inline Point<TYPE> getPoint( ) { return(this->point); };
-	inline Point<TYPE> *getRefPoint( ) { return(&this->point); };
+	inline int getOrigin() { return(this->originEdge); };
+	inline Point<TYPE> getPoint() { return(this->point); };
+	inline Point<TYPE> *getRefPoint() { return(&this->point); };
 
 	// I/O functions.
-	int		read( ifstream ifs);
-	int		write( ofstream ofs);
-	void 	print( std::ostream& out);
-	void 	printPoint( std::ostream& out);
+	int		read(ifstream ifs);
+	int		write(ofstream ofs);
+	void 	print(std::ostream& out);
+	void 	printPoint(std::ostream& out);
 
 	// Operators.
 	Vertex& operator=(Vertex other)
