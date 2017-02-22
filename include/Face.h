@@ -39,13 +39,19 @@ public:
 	inline int 	getEdge() { return(this->edge); };
 
 	// Operators.
+	Face& operator=(Face other)
+	{
+		this->edge = other.edge;
+		return(*this);
+	};
 	friend istream &operator>>(istream &in, Face &face)
 				{ in >> face.edge; return(in);};
 	friend ostream &operator<<(ostream &out, Face &face)
 				{ out << face.edge; return(out);};
+	inline bool operator==(const Face &other) const {return(this->edge == other.edge);};
 
 	// I/O functions.
-	void 	print(std::ostream& out);
+	void 	print(std::ostream& out) const;
 	string 	toStr();
 };
 

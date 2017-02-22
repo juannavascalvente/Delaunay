@@ -72,9 +72,28 @@ public:
 		out << edge.face << " " << std::endl;
 		return(out);
 	}
+	// Operators.
+	Edge& operator=(Edge other)
+	{
+		this->origin = other.origin;
+		this->twin = other.twin;
+		this->previous = other.previous;
+		this->next = other.next;
+		this->face = other.face;
+		return(*this);
+	};
+	bool  operator==(const Edge &other) const
+	{
+		return ((this->origin == other.origin) &&
+				(this->twin == other.twin) &&
+				(this->previous == other.previous) &&
+				(this->next == other.next) &&
+				(this->face == other.face) &&
+				(this->origin == other.origin));
+	}
 
 	// I/O operations.
-	void print(std::ostream& out);
+	void print(std::ostream& out) const;
 	string toStr();
 };
 

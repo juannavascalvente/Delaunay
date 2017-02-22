@@ -87,7 +87,7 @@ void Edge::reset()
 * GLOBAL:	NONE
 * Description: prints edge data.
 ***************************************************************************/
-void Edge::print(std::ostream& out)
+void Edge::print(std::ostream& out) const
 {
 	// Print edge information.
 	out << this->origin << " " << this->twin << " " << this->previous <<

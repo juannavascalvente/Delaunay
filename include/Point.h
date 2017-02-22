@@ -55,15 +55,15 @@ class Point
 	//***********************************************************
 	// Constructor/Destructor.
 	//***********************************************************
-	Point() { this->x = 0.0; this->y = 0.0;}
-	Point(A_Type x, A_Type y) { this->x = x; this->y = y;}
+	Point() {this->x = 0.0; this->y = 0.0;}
+	Point(A_Type x, A_Type y) {this->x = x; this->y = y;}
 
 	// Set/Get operations.
-	inline void 	setX(const A_Type x) { this->x = x;};
-	inline void 	setY(const A_Type y) { this->y = y;};
-	inline A_Type 	getX() {return(this->x);};
-	inline A_Type 	getY() {return(this->y);};
-	inline void 	setOrigin() { this->x = 0.0; this->y = 0.0;};
+	inline void 	setX(const A_Type x) {this->x = x;};
+	inline void 	setY(const A_Type y) {this->y = y;};
+	inline A_Type 	getX() const {return(this->x);};
+	inline A_Type 	getY() const {return(this->y);};
+	inline void 	setOrigin() {this->x = 0.0; this->y = 0.0;};
 
 	//***********************************************************
 	// Interface.
@@ -75,10 +75,8 @@ class Point
 	int			lower_X(struct Point_T *p1, struct Point_T *p2);
 	int			higher_X(struct Point_T *p1, struct Point_T *p2);
 	int			higher_Y(struct Point_T *p1, struct Point_T *p2);
-	int         lexicographic_Higher(struct Point_T *p1, struct Point_T *p2);
 
 	// Location interface.
-	//bool in_Circle(const Point *p1, const Point * p2, const Point * p3);
 	bool		interior_Triangle(struct Point_T *p1, struct Point_T *p2, struct Point_T *p3, struct Point_T *q);
 	*/
 
@@ -99,24 +97,24 @@ class Point
 	void shake();
 
 	// I/O interface
-	void print(std::ostream& out);
+	void print(std::ostream& out) const;
+	void printFormatted(std::ostream& out) const;
 	string toStr();
-	void printFormatted(std::ostream& out);
 	void read(ifstream &ifs);
 	void write(ofstream &ofs);
 
 	// Operators.
-	inline Point& 	operator+(const Point& q){ this->x += q.x; this->y += q.y; return(*this); }
-	inline Point& 	operator-(const Point& q){ this->x -= q.x; this->y -= q.y; return(*this); }
-	inline Point& 	operator*(const TYPE value){ this->x *= value; this->y *= value; return(*this); }
-	inline Point& 	operator/(const TYPE value){ this->x /= value; this->y /= value; return(*this); }
-	inline bool 	operator==(const Point& q){ return ((this->x == q->x) && (this->y == q->y)); }
-	inline bool 	operator!=(const Point& q){ return ((this->x != q->x) || (this->y != q->y)); }
-	inline Point& 	operator=(const Point& other ) { this->x = other.x; this->y = other.y; return(*this);}
-	friend istream &operator>>(istream &in, Point &p) { in >> p.x; in >> p.y; return(in); };
-	friend ostream &operator<<(ostream &out, Point &p) { out << p.x; out << " "; out << p.y; return(out); };
+	inline Point& 	operator+(const Point& q) {this->x += q.x; this->y += q.y; return(*this);}
+	inline Point& 	operator-(const Point& q) {this->x -= q.x; this->y -= q.y; return(*this);}
+	inline Point& 	operator*(const TYPE value) {this->x *= value; this->y *= value; return(*this);}
+	inline Point& 	operator/(const TYPE value) {this->x /= value; this->y /= value; return(*this);}
+	inline bool 	operator==(const Point& q) const {return ((this->x == q.x) && (this->y == q.y));}
+	inline bool 	operator!=(const Point& q) {return ((this->x != q.x) || (this->y != q.y));}
+	inline Point& 	operator=(const Point& other ) {this->x = other.x; this->y = other.y; return(*this);}
+	friend istream &operator>>(istream &in, Point &p) {in >> p.x; in >> p.y; return(in);};
+	friend ostream &operator<<(ostream &out, Point &p) {out << p.x; out << " "; out << p.y; return(out);};
 
-	inline void shift(TYPE deltaX, TYPE deltaY) { this->x += deltaX; this->y += deltaY; };
+	inline void shift(TYPE deltaX, TYPE deltaY) {this->x += deltaX; this->y += deltaY;};
 };
 
 /*****************************************************************************
@@ -266,7 +264,7 @@ template <class A_Type> void Point<A_Type>::shake(void)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> void Point<A_Type>::print(std::ostream& out)
+template <class A_Type> void Point<A_Type>::print(std::ostream& out) const
 {
 	// Print coordinates.
 	out << this->x << " " << this->y << " ";
@@ -299,7 +297,7 @@ template <class A_Type> string Point<A_Type>::toStr()
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> void Point<A_Type>::printFormatted(std::ostream& out)
+template <class A_Type> void Point<A_Type>::printFormatted(std::ostream& out) const
 {
 	// Print coordinates.
 	out << "(" << this->x << "," << this->y << ")";

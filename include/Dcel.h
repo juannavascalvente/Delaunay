@@ -65,9 +65,9 @@ class Dcel
 	void drawFacesInfo();
 
 	bool read(string fileName);
-	bool write(string fileName);
+	bool write(string fileName) const;
 	bool readBinary(string fileName);
-	bool writeBinary(string fileName);
+	bool writeBinary(string fileName)  const;
 
 public:
 	/*------------------------------------------------------------------------
@@ -95,50 +95,50 @@ public:
 	void updateFace(int edge_ID, int index);
 
 	// Check functions.
-	bool isExternalEdge(int edgeIndex);
-	bool hasNegativeVertex(int edgeID);
-	void getEdgeVertices(int edgeID, int &index1, int &index2);
+	bool isExternalEdge(int edgeIndex) const;
+	bool hasNegativeVertex(int edgeID) const;
+	void getEdgeVertices(int edgeID, int &index1, int &index2) const;
 	int	 getCollinear(int pointIndex, int edgeID);
 
 	//---------------------------------------------------------------------------
 	// Get/set functions.
 	//---------------------------------------------------------------------------
-	inline Point<TYPE> *getRefPoint(int index) { return(this->vertex[index].getRefPoint()); };
-	inline Edge *getRefEdge(int index) { return(&this->edges[index]); };
-	inline Face *getRefFace(int index) { return(&this->faces[index]); };
-	inline int getNVertex() { return(this->nVertex); };
-	inline int getNEdges()  { return(this->nEdges); };
-	inline int getNFaces()  { return(this->nFaces); };
-	inline int getSizeVertex() { return(this->sizeVertex); };
-	inline int getSizeEdges()  { return(this->sizeEdges); };
-	inline int getSizeFaces()  { return(this->sizeFaces); };
+	inline Point<TYPE> *getRefPoint(int index) const {return(this->vertex[index].getRefPoint());};
+	inline Edge *getRefEdge(int index) {return(&this->edges[index]);};
+	inline Face *getRefFace(int index) {return(&this->faces[index]);};
+	inline int getNVertex() const {return(this->nVertex);};
+	inline int getNEdges() const{return(this->nEdges);};
+	inline int getNFaces()  const{return(this->nFaces);};
+	inline int getSizeVertex() const{return(this->sizeVertex);};
+	inline int getSizeEdges() const {return(this->sizeEdges);};
+	inline int getSizeFaces() const {return(this->sizeFaces);};
 
 	// Access to POINTS fields.
-	inline int getPointEdge(int pointIndex) { return(this->vertex[pointIndex].getOrigin()); };
+	inline int getPointEdge(int pointIndex) {return(this->vertex[pointIndex].getOrigin());};
 	//void getNeighbors(int pointIndex, bool &checked, Queue<int> &queue);
 
 	// Access to EDGES fields.
-	inline int getOrigin(int edgeIndex) 	{ return(this->edges[edgeIndex].getOrigin()); };
-	inline int getTwin(int edgeIndex) 		{ return(this->edges[edgeIndex].getTwin()); };
-	inline int getPrevious(int edgeIndex) 	{ return(this->edges[edgeIndex].getPrevious()); };
-	inline int getNext(int edgeIndex) 		{ return(this->edges[edgeIndex].getNext()); };
-	inline int getFace(int edgeIndex) 		{ return(this->edges[edgeIndex].getFace()); };
-	inline int getNextNeighbor(int edgeIndex)  { return(this->edges[this->edges[edgeIndex].getPrevious()-1].getTwin()); };
-	inline void setOrigin(int edgeIndex, int v)   { this->edges[edgeIndex].setOrigin(v); };
-	inline void setTwin(int edgeIndex, int v) 	   { this->edges[edgeIndex].setTwin(v); };
-	inline void setPrevious(int edgeIndex, int v) { this->edges[edgeIndex].setPrevious(v); };
-	inline void setNext(int edgeIndex, int v) 	   { this->edges[edgeIndex].setNext(v); };
-	inline void setFace(int edgeIndex, int v) 	   { this->edges[edgeIndex].setFace(v); };
-	void getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest);
+	inline int getOrigin(int edgeIndex) const {return(this->edges[edgeIndex].getOrigin());};
+	inline int getTwin(int edgeIndex) const {return(this->edges[edgeIndex].getTwin());};
+	inline int getPrevious(int edgeIndex) const {return(this->edges[edgeIndex].getPrevious());};
+	inline int getNext(int edgeIndex) const {return(this->edges[edgeIndex].getNext());};
+	inline int getFace(int edgeIndex) const {return(this->edges[edgeIndex].getFace());};
+	inline int getNextNeighbor(int edgeIndex) const {return(this->edges[this->edges[edgeIndex].getPrevious()-1].getTwin());};
+	inline void setOrigin(int edgeIndex, int v) {this->edges[edgeIndex].setOrigin(v);};
+	inline void setTwin(int edgeIndex, int v) {this->edges[edgeIndex].setTwin(v);};
+	inline void setPrevious(int edgeIndex, int v) {this->edges[edgeIndex].setPrevious(v);};
+	inline void setNext(int edgeIndex, int v) {this->edges[edgeIndex].setNext(v);};
+	inline void setFace(int edgeIndex, int v) {this->edges[edgeIndex].setFace(v);};
+	void getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest) const;
 
 	// Access to FACES fields.
-	inline int  getFaceEdge(int faceId) { return(this->faces[faceId].getEdge()); };
-	inline void setFaceEdge(int faceIndex, int v) { this->faces[faceIndex].setEdge(v); };
-	bool imaginaryFace(int faceIndex);
-	bool isBottomMostFace(int faceIndex);
-	void getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces);
-	inline bool isExternalFace(int faceIndex) {return(faceIndex == EXTERNAL_FACE); };
-	void getFaceVertices(int faceIndex, int *ids);
+	inline int  getFaceEdge(int faceId) const {return(this->faces[faceId].getEdge());};
+	inline void setFaceEdge(int faceIndex, int v) {this->faces[faceIndex].setEdge(v);};
+	bool imaginaryFace(int faceIndex) const;
+	bool isBottomMostFace(int faceIndex) const;
+	void getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces) const;
+	inline bool isExternalFace(int faceIndex) const {return(faceIndex == EXTERNAL_FACE);};
+	void getFaceVertices(int faceIndex, int *ids) const;
 	void getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Point<TYPE> &r);
 
 	// Set functions.
@@ -161,11 +161,12 @@ public:
 
 	// I/O functions.
 	bool 	read(string fileName, bool isBinary);
-	bool 	write(string fileName, bool isBinary);
+	bool 	write(string fileName, bool isBinary) const;
 	bool 	readPoints(string fileName);
-	bool 	writePoints(string fileName, int nPoints);
+	bool 	writePoints(string fileName, int nPoints) const;
+	void 	print(std::ostream& out) const;
 
-	void 	print(std::ostream& out);
+	bool operator==(const Dcel& other) const;
 #ifdef TESTING
 	int		test(int nPoints);
 #endif

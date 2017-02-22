@@ -64,7 +64,7 @@ Face::Face(int edge)
 * GLOBAL:	NONE
 * Description: print face data.
 ***************************************************************************/
-void Face::print(std::ostream& out)
+void Face::print(std::ostream& out) const
 {
 	out << this->edge << std::endl;
 }

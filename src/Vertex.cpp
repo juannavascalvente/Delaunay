@@ -85,7 +85,7 @@ int	Vertex::write(ofstream ofs)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-void Vertex::print(std::ostream& out)
+void Vertex::print(std::ostream& out) const
 {
 	this->point.print(out);
 	out << " " << this->originEdge << std::endl;
@@ -98,9 +98,24 @@ void Vertex::print(std::ostream& out)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-void Vertex::printPoint(std::ostream& out)
+void Vertex::printPoint(std::ostream& out) const
 {
 	// Print point.
 	this->point.print(out);
 }
+
+/***************************************************************************
+* Name: 	==
+* IN:		v			vertex to compare to
+* OUT:		NONE
+* RETURN:	true 		if both vertex are equal
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	checks ifboth vertex are equals.
+***************************************************************************/
+bool Vertex::operator==(const Vertex &v) const
+{
+	return ((this->originEdge == v.originEdge) && (this->point == v.point));
+}
+
 

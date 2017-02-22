@@ -47,6 +47,7 @@ using namespace std;
 //#define DEBUG_READBINARY_DCEL
 //#define DEBUG_WRITEBINARY_DCEL
 //#define DEBUG_DCEL_EDGE_INTERSECTION
+#define DEBUG_DCEL_EQUAL
 #endif
 
 /*------------------------------------------------------------------------
@@ -177,7 +178,7 @@ Dcel::~Dcel()
 * 				index "edgeIndex".
 ***************************************************************************/
 // PENDING WHY IS OUT OF BOUNDS WHEN PRINTIN DCEL INFO?
-void Dcel::getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest)
+void Dcel::getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest) const
 {
 #ifdef DEBUG_OUTOFBOUNDS_EXCEPTION
 	if (edgeIndex >= this->getNEdges())
@@ -209,7 +210,7 @@ void Dcel::getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest)
 * Description: 	checks if any of the vertex of the face is imaginary (only
 * 				in incremental Delaunay triangulations).
 ***************************************************************************/
-bool Dcel::imaginaryFace(int faceId)
+bool Dcel::imaginaryFace(int faceId) const
 {
 	bool	imaginary=false;		// Return value.
 	int		edgeIndex=0;			// Edge index.
@@ -251,7 +252,7 @@ bool Dcel::imaginaryFace(int faceId)
 * Description: 	checks if input face is the bottom most face. This face has
 * 				2 imaginary vertices.
 ***************************************************************************/
-bool Dcel::isBottomMostFace(int faceId)
+bool Dcel::isBottomMostFace(int faceId) const
 {
 	int	nImaginaryFaces=0;		// # imaginary vertices.
 	int	edgeIndex=0;			// Edge index.
@@ -293,7 +294,7 @@ bool Dcel::isBottomMostFace(int faceId)
 * 				is the bottom most point and so it has only two neighbor
 * 				faces (the third is the external face).
 ***************************************************************************/
-void Dcel::getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces)
+void Dcel::getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces) const
 {
 	int	edgeIndex=0;		// Edge index.
 
@@ -334,7 +335,7 @@ void Dcel::getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces)
 * GLOBAL:	NONE
 * Description: 	returns the face identifiers of the "faceIndex" face.
 ***************************************************************************/
-void Dcel::getFaceVertices(int faceIndex, int *ids)
+void Dcel::getFaceVertices(int faceIndex, int *ids) const
 {
 	int		edgeIndex=0;			// Edge index.
 
@@ -937,7 +938,7 @@ void Dcel::updateFace(int edge_ID, int index)
 * 				FALSE i.o.c.
 * Description: 	Checks if edge at "index" position is in external face.
 ***************************************************************************/
-bool Dcel::isExternalEdge(int edgeIndex)
+bool Dcel::isExternalEdge(int edgeIndex) const
 {
 	bool isExternal=false;			// Return value.
 
@@ -997,7 +998,7 @@ bool Dcel::isExternalEdge(int edgeIndex)
 * Description: 	Checks if "edgeID" edge has an imaginary point as one of
 * 				its extreme vertex.
 ***************************************************************************/
-bool Dcel::hasNegativeVertex(int edgeID)
+bool Dcel::hasNegativeVertex(int edgeID) const
 {
     bool hasNegative=false;      // Return value.
 
@@ -1043,7 +1044,7 @@ bool Dcel::hasNegativeVertex(int edgeID)
 * GLOBAL:	NONE
 * Description: 	returns the edge vertex
 **************************************************************************/
-void Dcel::getEdgeVertices(int edgeID, int &index1, int &index2)
+void Dcel::getEdgeVertices(int edgeID, int &index1, int &index2) const
 {
 	// Get edge extreme points.
 	index1 = this->edges[edgeID-1].getOrigin();
@@ -1857,7 +1858,7 @@ bool Dcel::read(string fileName, bool isBinary)
 * Description:	writes the dcel data to a file in plain or binary format
 * 				depending on "isBinary" format.
 ***************************************************************************/
-bool Dcel::write(string fileName, bool isBinary)
+bool Dcel::write(string fileName, bool isBinary) const
 {
 	bool write=true;		// Return value.
 
@@ -1884,7 +1885,7 @@ bool Dcel::write(string fileName, bool isBinary)
 * GLOBAL:	NONE
 * Description: 	prints DCEL data to output stream.
 ***************************************************************************/
-void Dcel::print(std::ostream& out)
+void Dcel::print(std::ostream& out) const
 {
 	int	i=0;			// Loop counter.
 
@@ -1908,6 +1909,111 @@ void Dcel::print(std::ostream& out)
 	{
 		this->faces[i].print(std::cout);
 	}
+}
+
+/***************************************************************************
+* Name: 	readPoints
+* IN:		fileName	file name to write data into.
+* OUT:		NONE
+* RETURN:	true 		if file read.
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	writes the set of points in DCEL separated by spaces to
+* 				"fileName"
+***************************************************************************/
+bool Dcel::operator==(const Dcel& other) const
+{
+	int i=0;			// Loop counter
+	bool equal=true;	// Return value.
+
+	// Compare # vertex, edges and faces.
+	equal = (this->nVertex == other.nVertex) &&
+			(this->nEdges == other.nEdges) &&
+			(this->nFaces == other.nFaces);
+	if (equal)
+	{
+		// Vertex loop.
+		i=0;
+		while (equal && (i<this->nVertex))
+		{
+			// Compare vertex.
+			equal = this->vertex[i] == other.vertex[i];
+#ifdef DEBUG_DCEL_EQUAL
+			if (!equal)
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Different vertex at index ");
+				Logging::buildText(__FUNCTION__, __FILE__, i);
+				Logging::write(true, Info);
+			}
+#endif
+			i++;
+		}
+
+		// Edges loop.
+		i=0;
+		while (equal && i< this->nEdges)
+		{
+			// Compare edges.
+			equal = (this->edges[i] == other.edges[i]);
+#ifdef DEBUG_DCEL_EQUAL
+			if (!equal)
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Different edges at index ");
+				Logging::buildText(__FUNCTION__, __FILE__, i);
+				Logging::write(true, Info);
+			}
+#endif
+			i++;
+		}
+
+		// Faces loop.
+		i=0;
+		while (equal && i< this->nFaces)
+		{
+			// Compare faces.
+			equal = (this->faces[i] == other.faces[i]);
+#ifdef DEBUG_DCEL_EQUAL
+			if (!equal)
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Different faces at index ");
+				Logging::buildText(__FUNCTION__, __FILE__, i);
+				Logging::write(true, Info);
+			}
+#endif
+			i++;
+		}
+	}
+#ifdef DEBUG_DCEL_EQUAL
+	else
+	{
+		if (this->nVertex != other.nVertex)
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "# vertex is different. This # vertex is");
+			Logging::buildText(__FUNCTION__, __FILE__, this->nVertex);
+			Logging::buildText(__FUNCTION__, __FILE__, " and input dcel #vertex is ");
+			Logging::buildText(__FUNCTION__, __FILE__, other.nVertex);
+			Logging::write(true, Info);
+		}
+		if (this->nEdges != other.nEdges)
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "# edges is different. This # edges is");
+			Logging::buildText(__FUNCTION__, __FILE__, this->nEdges);
+			Logging::buildText(__FUNCTION__, __FILE__, " and input dcel #edges is ");
+			Logging::buildText(__FUNCTION__, __FILE__, other.nEdges);
+			Logging::write(true, Info);
+		}
+		if (this->nFaces != other.nFaces)
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "# faces is different. This # faces is");
+			Logging::buildText(__FUNCTION__, __FILE__, this->nFaces);
+			Logging::buildText(__FUNCTION__, __FILE__, " and input dcel #faces is ");
+			Logging::buildText(__FUNCTION__, __FILE__, other.nFaces);
+			Logging::write(true, Info);
+		}
+	}
+#endif
+
+	return(equal);
 }
 
 /***************************************************************************
@@ -1999,7 +2105,7 @@ bool Dcel::readPoints(string fileName)
 * 				"fileName". If nPoints is INVALID then write all DCEL
 * 				points. If not then write only "nPoints" points.
 ***************************************************************************/
-bool Dcel::writePoints(string fileName, int nPoints)
+bool Dcel::writePoints(string fileName, int nPoints) const
 {
 	bool written=true;	// Return value.
 	ofstream ofs;		// Output file.
@@ -2283,7 +2389,7 @@ bool Dcel::read(string fileName)
 * GLOBAL:	NONE
 * Description:	writes the dcel data to a file.
 ***************************************************************************/
-bool Dcel::write(string fileName)
+bool Dcel::write(string fileName) const
 {
 	bool written=true;	// Return value.
 	ofstream ofs;		// Output file.
@@ -2306,7 +2412,7 @@ bool Dcel::write(string fileName)
 		ofs << this->sizeVertex << std::endl;
 		for (i=0; i<this->sizeVertex ;i++)
 		{
-			ofs << this->vertex[i] << std::endl;
+			ofs << this->vertex[i];
 		}
 
 		// Get # edges to read and edges.
@@ -2431,7 +2537,7 @@ bool Dcel::readBinary(string fileName)
 * GLOBAL:	NONE
 * Description: 	writes DCEL data to output stream in binary format.
 ***************************************************************************/
-bool Dcel::writeBinary(string fileName)
+bool Dcel::writeBinary(string fileName) const
 {
 	bool written=true;	// Return value.
 	ofstream ofs;		// Output file.
