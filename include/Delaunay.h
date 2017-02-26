@@ -45,14 +45,14 @@ class Delaunay
 	// Private functions.
 	//------------------------------------------------------------------------
 	bool 	initializeGraph();
-	void 	checkEdge( int edge_ID);
-	void 	flipEdges( int edge_ID);
+	void 	checkEdge(int edge_ID);
+	void 	flipEdges(int edge_ID);
 	bool 	insertPoint(int index);
-	bool 	locateNode( Point<TYPE> &point, int &nodeIndex);
-	bool 	isInteriorToNode( Point<TYPE> &point, int nodeIndex);
-	bool 	isStrictlyInteriorToNode( Point<TYPE> &point, int nodeIndex);
-	void 	splitNode( int pointIndex, int nodeIndex, int nTriangles);
-	double	signedArea( Node *node);
+	bool 	locateNode(Point<TYPE> &point, int &nodeIndex);
+	bool 	isInteriorToNode(Point<TYPE> &point, int nodeIndex);
+	bool 	isStrictlyInteriorToNode(Point<TYPE> &point, int nodeIndex);
+	void 	splitNode(int pointIndex, int nodeIndex, int nTriangles);
+	double	signedArea(Node *node);
 
 	void 	getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace);
 	void 	getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
@@ -69,12 +69,12 @@ public:
 		this->graphAllocated = false;
 		this->convexHullComputed = false;
 	}
-	Delaunay( Dcel *dcel) : hull(DEFAUTL_CONVEXHULL_LEN), hullEdges(DEFAUTL_CONVEXHULL_LEN)
+	Delaunay(Dcel *dcel) : hull(DEFAUTL_CONVEXHULL_LEN), hullEdges(DEFAUTL_CONVEXHULL_LEN)
 	{
 		this->algorithm= NONE;
 		this->dcel = dcel;
 		this->graphAllocated = true;
-		this->graph = new Graph( this->dcel->getNVertex()*10);
+		this->graph = new Graph(this->dcel->getNVertex()*10);
 		this->convexHullComputed = false;
 	}
 	~Delaunay();
@@ -96,8 +96,8 @@ public:
 	bool internalToConvexHull(Point<TYPE> &p);
 	inline Polygon* getConvexHull() {return(&this->hull);};
 	inline Set<int>* getConvexHullEdges() {return(&this->hullEdges);};
-	bool findTwoClosest( int &first, int &second);
-	bool findFace( Point<TYPE> &point, int &faceId);
+	bool findTwoClosest(int &first, int &second);
+	bool findFace(Point<TYPE> &point, int &faceId);
 	bool findClosestPoint(Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
 															int	&poinIndex,
 															double &dist);
@@ -106,10 +106,10 @@ public:
 	bool findPath(Line &line, Set<int> &faces);
 
 	// GET/SET functions.
-	inline void setDCEL( Dcel *dcel) {this->dcel = dcel;};
+	inline void setDCEL(Dcel *dcel) {this->dcel = dcel;};
 	inline Dcel *getDCEL() {return(this->dcel); };
-	inline void setAlgorithm( enum Algorithm type) {this->algorithm = type;};
-	inline enum Algorithm getAlgorithm( ) {return(this->algorithm);};
+	inline void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
+	inline enum Algorithm getAlgorithm() {return(this->algorithm);};
 
 	// I/O functions.
 	void print();
