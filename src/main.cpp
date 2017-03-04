@@ -139,7 +139,7 @@ int executeTests(int argc, char** argv)
 
 	if (argc == 3)
 	{
-		tester = new Tester(argv[2]);
+		tester = new Tester(argv[2], true);
 		tester->main();
 		delete tester;
 	}

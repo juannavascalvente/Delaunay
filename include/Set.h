@@ -10,6 +10,10 @@
 
 #include "defines.h"
 #include "Logging.h"
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #include <string.h>
 #include <errno.h>
 #include <iostream>
@@ -395,20 +399,22 @@ template <class ElementType> int Set<ElementType>::highestIndex()
 template <class ElementType> ElementType Set<ElementType>::highest()
 {
 	int	i=0;				// Loop counter.
-	int	index=0;			// Highest value index.
+	int highestValue=0;
 
 	// Main loop.
+	highestValue = this->data[0];
+	#pragma omp parallel for default(none) private(i) reduction(max: highestValue)
     for (i=1; i<this->nElements ;i++)
     {
 		// Check if new element is higher than current.
-		if (this->data[i] > this->data[index])
+		if (this->data[i] > highestValue)
 		{
 			// Update current highest value.
-			index = i;
+			highestValue = this->data[i];
 		}
     }
 
-	return(this->data[index]);
+	return(highestValue);
 }
 
 #endif /* INCLUDE_SET_H_ */

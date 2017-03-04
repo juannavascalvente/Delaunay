@@ -60,13 +60,16 @@ class TestPath : public Test
 	void setDefault();
 
 public:
-	TestPath() : testType(TESTPATH_DELAUNAY_COMPARE_TO_GOLD), \
+	TestPath() : Test("logTestPath.txt"), testType(TESTPATH_DELAUNAY_COMPARE_TO_GOLD), \
 				 nTests(0), nSteps(0), step(0), nPoints(0) {};
 	~TestPath() {};
 
-	void prepare();
-	bool read();
+	bool prepare();
+	bool parseParameters(Set<Label> &labels);
 	void main();
+
+	int getTests() const {return nTests;}
+	void setTests(int tests) {nTests = tests;}
 };
 
 #endif /* TEST_TESTPATH_H_ */

@@ -20,8 +20,10 @@
 
 typedef Point<TYPE> PointT;
 
-void TestPath::prepare()
+bool TestPath::prepare()
 {
+	bool success=true;
+
 	cout << "PREPARE TEST PATH" << endl;
 
 	this->delaunay.setDCEL(&this->dcel);
@@ -71,9 +73,12 @@ void TestPath::prepare()
 					" and must be between " <<
 					TESTPATH_DELAUNAY_COMPARE_TO_GOLD << " and " <<
 					TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP << endl;
+			success = false;
 			break;
 		}
 	}
+
+	return(success);
 }
 
 void TestPath::main()
@@ -340,7 +345,7 @@ void TestPath::dump(string pointsFileName, string dcelFileName, Point<TYPE> &p1,
 	}
 }
 
-bool TestPath::read()
+bool TestPath::parseParameters(Set<Label> &labels)
 {
 	bool success=true;
 
@@ -380,6 +385,7 @@ bool TestPath::read()
 					" and must be between " <<
 					TESTPATH_DELAUNAY_COMPARE_TO_GOLD << " and " <<
 					TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP << endl;
+			success = false;
 			break;
 		}
 	}

@@ -18,14 +18,14 @@ class TestSet : public Test
 	void checkDefaultConstructor();
 	void checkCustomConstructor();
 
-	void prepare() { cout << "PREPARE TEST SET" << endl; };
-	void setDefault() {cout << "SET DEFAULT TEST SET" << endl;};
-	bool read(){cout << "READ TEST SET" << endl; return(true);};
-	void write(){cout << "WRITE TEST SET" << endl;};
-	void print(){};
+	bool prepare() {return(true);};
+	void setDefault() {};
+	bool parseParameters(Set<Label> &labels) {return(true);};
+	void write() {};
+	void print() {};
 
 public:
-	TestSet() : Test("testSet.txt", true) {};
+	TestSet() : Test("logTestSet.txt", false) {};
 	void main();
 };
 
