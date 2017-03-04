@@ -23,7 +23,7 @@ using namespace std;
 //#define DEBUG_DRAW_FACES_INFO
 //#define DEBUG_READPOINTS
 //#define DEBUG_WRITE_DCEL
-//#define DEBUG_READ_DCEL
+#define DEBUG_READ_DCEL
 //#define DEBUG_RETURN_TURN
 //#define DEBUG_SETHIGHEST_FIRST
 //#define DEBUG_SETLOWESTS_FIRST
@@ -397,6 +397,34 @@ void Dcel::reset()
 	this->nVertex = 0;
 	this->nEdges = 0;
 	this->nFaces = 0;
+#ifdef DEBUG_DCEL_RESIZE
+	Logging::buildText(__FUNCTION__, __FILE__, "DCEL data reset");
+	Logging::write(true, Info);
+#endif
+}
+
+/***************************************************************************
+* Name: 	clean
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	cleans all DCEL data but the points coordinates.
+***************************************************************************/
+void Dcel::clean()
+{
+	int	i=0;				// Loop counter.
+
+	// Clean vectors data.
+	for (i=0; i<this->nVertex; i++)
+	{
+		this->vertex[i].setOrigin(INVALID);
+	}
+	memset(this->edges, 0, sizeof(Vertex)*this->sizeVertex);
+	memset(this->faces, 0, sizeof(Face)*this->sizeFaces);
+
+	// Reset counters.
+	this->reset();
 #ifdef DEBUG_DCEL_RESIZE
 	Logging::buildText(__FUNCTION__, __FILE__, "DCEL data reset");
 	Logging::write(true, Info);
@@ -2304,6 +2332,7 @@ bool Dcel::read(string fileName)
 	bool read=true;		// Return value.
 	ifstream ifs;		// Input file.
 	int	i=0;			// Loop counter.
+	int 	nElements=0;// # elements to read.
 	Vertex 	vertex;		// Vertex to read.
 	Edge 	edge;		// Edge to read.
 	Face 	face;		// Face to read.
@@ -2319,13 +2348,13 @@ bool Dcel::read(string fileName)
 	if (ifs.is_open())
 	{
 		// Get # points to read.
-		ifs >> this->sizeVertex;
+		ifs >> nElements;
 #ifdef DEBUG_READ_DCEL
 		Logging::buildText(__FUNCTION__, __FILE__, "Number of vertex: ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
 		Logging::write(true, Info);
 #endif
-		this->resize(this->sizeVertex, false);
+		this->resize(nElements, false);
 
 		// Points loop.
 		for (i=0; i<this->sizeVertex ;i++)
