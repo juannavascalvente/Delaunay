@@ -2080,31 +2080,40 @@ bool Dcel::readPoints(string fileName)
 #endif
 		// Get # coordinates to read.
 		ifs >> nVertex;
-#ifdef DEBUG_READPOINTS
-		Logging::buildText(__FUNCTION__, __FILE__, "N vertex to read is ");
-		Logging::buildText(__FUNCTION__, __FILE__, nVertex);
-		Logging::write(true, Info);
-#endif
-		this->resize(nVertex, false);
-
-		// Points loop.
-		for (i=0; i<this->sizeVertex ;i++)
+		if (nVertex > 0)
 		{
-			ifs >> p;
-			this->addVertex(&p, INVALID);
 #ifdef DEBUG_READPOINTS
-			Logging::buildText(__FUNCTION__, __FILE__, "Point read ");
-			Logging::buildText(__FUNCTION__, __FILE__, p.toStr());
+			Logging::buildText(__FUNCTION__, __FILE__, "N vertex to read is ");
+			Logging::buildText(__FUNCTION__, __FILE__, nVertex);
+			Logging::write(true, Info);
+#endif
+			this->resize(nVertex, false);
+
+			// Points loop.
+			for (i=0; i<this->sizeVertex ;i++)
+			{
+				ifs >> p;
+				this->addVertex(&p, INVALID);
+#ifdef DEBUG_READPOINTS
+				Logging::buildText(__FUNCTION__, __FILE__, "Point read ");
+				Logging::buildText(__FUNCTION__, __FILE__, p.toStr());
+				Logging::write(true, Info);
+#endif
+			}
+
+#ifdef DEBUG_READPOINTS
+			Logging::buildText(__FUNCTION__, __FILE__, "N vertex read is ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->nVertex);
 			Logging::write(true, Info);
 #endif
 		}
-
-#ifdef DEBUG_READPOINTS
-		Logging::buildText(__FUNCTION__, __FILE__, "N vertex read is ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->nVertex);
-		Logging::write(true, Info);
-#endif
-
+		else
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Number of vertex must be positive and is: ");
+			Logging::buildText(__FUNCTION__, __FILE__, nVertex);
+			Logging::write(true, Error);
+			read = false;
+		}
 		// Close file.
 		ifs.close();
 	}
@@ -2349,48 +2358,58 @@ bool Dcel::read(string fileName)
 	{
 		// Get # points to read.
 		ifs >> nElements;
-#ifdef DEBUG_READ_DCEL
-		Logging::buildText(__FUNCTION__, __FILE__, "Number of vertex: ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
-		Logging::write(true, Info);
-#endif
-		this->resize(nElements, false);
-
-		// Points loop.
-		for (i=0; i<this->sizeVertex ;i++)
+		if (nElements > 0)
 		{
-			ifs >> vertex;
-			this->addVertex(&vertex);
-		}
-
-		// Get # edges to read.
-		ifs >> this->sizeEdges;
 #ifdef DEBUG_READ_DCEL
-		Logging::buildText(__FUNCTION__, __FILE__, "Number of edges: ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeEdges);
-		Logging::write(true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__, "Number of vertex: ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
+			Logging::write(true, Info);
 #endif
-		for (i=0; i<this->sizeEdges ;i++)
-		{
-			ifs >> edge;
-			this->addEdge(&edge);
-		}
+			this->resize(nElements, false);
 
-		// Get # faces to read.
-		ifs >> this->sizeFaces;
+			// Points loop.
+			for (i=0; i<this->sizeVertex ;i++)
+			{
+				ifs >> vertex;
+				this->addVertex(&vertex);
+			}
+
+			// Get # edges to read.
+			ifs >> this->sizeEdges;
 #ifdef DEBUG_READ_DCEL
-		Logging::buildText(__FUNCTION__, __FILE__, "Number of faces: ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeFaces);
-		Logging::write(true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__, "Number of edges: ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->sizeEdges);
+			Logging::write(true, Info);
 #endif
-		for (i=0; i<this->sizeFaces ;i++)
-		{
-			ifs >> face;
-			this->addFace(&face);
-		}
+			for (i=0; i<this->sizeEdges ;i++)
+			{
+				ifs >> edge;
+				this->addEdge(&edge);
+			}
 
-		// Close file.
-		ifs.close();
+			// Get # faces to read.
+			ifs >> this->sizeFaces;
+#ifdef DEBUG_READ_DCEL
+			Logging::buildText(__FUNCTION__, __FILE__, "Number of faces: ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->sizeFaces);
+			Logging::write(true, Info);
+#endif
+			for (i=0; i<this->sizeFaces ;i++)
+			{
+				ifs >> face;
+				this->addFace(&face);
+			}
+
+			// Close file.
+			ifs.close();
+		}
+		else
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Number of points must be positive and is: ");
+			Logging::buildText(__FUNCTION__, __FILE__, nElements);
+			Logging::write(true, Error);
+			read = false;
+		}
 	}
 	// Error opening file.
 	else
