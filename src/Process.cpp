@@ -153,9 +153,19 @@ bool Process::readData(int option)
 			break;
 		}
 		// Read set from flat file.
-		case READ_POINTS_FILE:
+		case READ_POINTS_FLAT_FILE:
+		case READ_POINTS_DCEL_FILE:
 		{
-			success = this->dcel.readPoints(this->config->getInFlatFilename());
+			// Read points from flat file.
+			if(option == READ_POINTS_FLAT_FILE)
+			{
+				success = this->dcel.readPoints(this->config->getInFlatFilename(), true);
+			}
+			// Read points from DCEL file.
+			else
+			{
+				success = this->dcel.readPoints(this->config->getInDCELFilename(), false);
+			}
 			this->status.set(false, success, false, false, false, false);
 			break;
 		}
@@ -164,7 +174,8 @@ bool Process::readData(int option)
 		{
 			// PENDING CHECK IF A DCEL IS CONSISTENT?
 			success = this->dcel.read(this->config->getInDCELFilename(), false);
-			this->status.set(false, true, !success, false, false, false);
+			this->delaunay.setDCEL(&this->dcel);
+			this->status.set(false, true, true, true, false, false);
 			break;
 		}
 		// Read Delaunay incremental algorithm files.
@@ -541,7 +552,8 @@ void Process::execute(void)
 		// New set of points (generated or read).
 		case RANDOMLY:
 		case CLUSTER:
-		case READ_POINTS_FILE:
+		case READ_POINTS_FLAT_FILE:
+		case READ_POINTS_DCEL_FILE:
 		case READ_DCEL:
 		case READ_DELAUNAY:
 		case READ_VORONOI:
@@ -724,11 +736,15 @@ void Process::execute(void)
 		case CONVEX_HULL:
 		{
 			// Computing convex hull.
-			error = !this->buildConvexHull();
-			if (!error)
+			if (this->buildConvexHull())
 			{
                 // Convex hull.
 				this->drawer->drawFigures(CONVEXHULL_DRAW);
+			}
+			else
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull not computed");
+				Logging::write(true, Error);
 			}
 			break;
 		}
@@ -744,8 +760,7 @@ void Process::execute(void)
 			this->getPointToLocate(point);
 
 			// Find closest point to point.
-			error = !this->findClosest(point, closest, distance);
-			if (!error)
+			if (this->findClosest(point, closest, distance))
 			{
 				// Draw the triangulation, the point and the closest point.
 				points.add(point);
@@ -772,8 +787,7 @@ void Process::execute(void)
 			this->getPointToLocate(point);
 
 			// Find face.
-			error = !this->findFace(point, faceId);
-			if (!error)
+			if (this->findFace(point, faceId))
 			{
 				// Draw the triangulation, the point and its face.
 				points.add(point);
@@ -781,6 +795,11 @@ void Process::execute(void)
 				faces.add(faceId);
 				this->drawer->setFacesSet(&faces);
 				this->drawer->drawFigures(FINDFACE_DRAW);
+			}
+			else
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Error face not found");
+				Logging::write(true, Error);
 			}
 			break;
 		}
@@ -790,14 +809,18 @@ void Process::execute(void)
 			Set<PointT> points(2);	// List of points.
 
 			// Compute the two closest point in the set of points.
-			error = !this->findTwoClosest(index1, index2);
-			if (!error)
+			if (this->findTwoClosest(index1, index2))
 			{
 				// Draw the triangulation and the two closest points.
 				points.add(*this->dcel.getRefPoint(index1));
 				points.add(*this->dcel.getRefPoint(index2));
 				this->drawer->setPointsSet(&points);
 				this->drawer->drawFigures(TWOCLOSEST_DRAW);
+			}
+			else
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "The two closest points not found");
+				Logging::write(true, Error);
 			}
 			break;
 		}

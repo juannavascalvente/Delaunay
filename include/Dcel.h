@@ -65,10 +65,13 @@ class Dcel
 	void drawFacesInfo();
 
 	bool read(string fileName);
-	bool write(string fileName) const;
 	bool readBinary(string fileName);
-	bool writeBinary(string fileName)  const;
+	bool readDcelPoints(string fileName);
+	bool readFlatPoints(string fileName);
+	bool readVertexSet(ifstream &ifs);
 
+	bool write(string fileName) const;
+	bool writeBinary(string fileName)  const;
 public:
 	/*------------------------------------------------------------------------
 	  Constructor/Destructor.
@@ -164,8 +167,8 @@ public:
 
 	// I/O functions.
 	bool 	read(string fileName, bool isBinary);
+	bool 	readPoints(string fileName, bool fromFlatFile);
 	bool 	write(string fileName, bool isBinary) const;
-	bool 	readPoints(string fileName);
 	bool 	writePoints(string fileName, int nPoints) const;
 	void 	print(std::ostream& out) const;
 

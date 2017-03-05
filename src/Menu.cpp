@@ -19,7 +19,8 @@ using namespace std;
 #define	INPUTSET_MENU_TEXT				"Data set"
 #define	INPUTSET_RANDOM_TEXT			"Generate randomly"
 #define	INPUTSET_CLUSTER_TEXT			"Generate clusters"
-#define	INPUTSET_READ_FLAT_TEXT			"Read flat file"
+#define	INPUTSET_READ_FLAT_TEXT			"Read points from flat file"
+#define	INPUTSET_READ_DCEL_POINTS_TEXT 	"Read points from DCEL file"
 #define	INPUTSET_READ_DCEL_TEXT			"Read DCEL file"
 #define	INPUTSET_READ_DELAUNAY_TEXT		"Read Delaunay files"
 #define	INPUTSET_READ_VORONOI_TEXT		"Read Voronoi file"
@@ -134,7 +135,8 @@ void Menu::updateMenu()
 		sub_Menu_Input = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_RANDOM_TEXT, RANDOMLY);
 		glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, CLUSTER);
-		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FILE);
+		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FLAT_FILE);
+		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, READ_POINTS_DCEL_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_TEXT, READ_DCEL);
 		glutAddMenuEntry(INPUTSET_READ_DELAUNAY_TEXT, READ_DELAUNAY);
 		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, READ_VORONOI);
@@ -158,7 +160,8 @@ void Menu::updateMenu()
 		sub_Menu_Input = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_RANDOM_TEXT, RANDOMLY);
 		glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, CLUSTER);
-		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FILE);
+		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FLAT_FILE);
+		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, READ_POINTS_DCEL_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_TEXT, READ_DCEL);
 		glutAddMenuEntry(INPUTSET_READ_DELAUNAY_TEXT, READ_DELAUNAY);
 		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, READ_VORONOI);

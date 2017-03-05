@@ -23,7 +23,8 @@ using namespace std;
 //#define DEBUG_DRAW_FACES_INFO
 //#define DEBUG_READPOINTS
 //#define DEBUG_WRITE_DCEL
-#define DEBUG_READ_DCEL
+//#define DEBUG_READ_DCEL_POINTS
+//#define DEBUG_READ_DCEL
 //#define DEBUG_RETURN_TURN
 //#define DEBUG_SETHIGHEST_FIRST
 //#define DEBUG_SETLOWESTS_FIRST
@@ -2055,22 +2056,44 @@ bool Dcel::operator==(const Dcel& other) const
 * RETURN:	true 		if file read.
 * 			false		i.o.c.
 * GLOBAL:	NONE
-* Description: 	writes the set of points in DCEL separated by spaces to
-* 				"fileName"
+* Description: 	read the set of points from a flat file or a DCEL file
+* 				depending on the "fromFlatFile· flag.
 ***************************************************************************/
-bool Dcel::readPoints(string fileName)
+bool Dcel::readPoints(string fileName, bool fromFlatFile)
 {
-	bool read=true;		// Return value.
+	bool success=true;		// Return value.
+
+	// Read points from flat points file.
+	if (fromFlatFile)
+	{
+		success = this->readFlatPoints(fileName);
+	}
+	// Read points from DCEL points file.
+	else
+	{
+		success = this->readDcelPoints(fileName);
+	}
+
+	return(success);
+}
+
+/***************************************************************************
+* Name: 	readFlatPoints
+* IN:		fileName	file name to write data into.
+* OUT:		NONE
+* RETURN:	true 		if file read.
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	read the set of points formatted from input file. The format
+* 				is NPOINTS x1 y1 x2 y2 x3 y3........xN yN
+***************************************************************************/
+bool Dcel::readFlatPoints(string fileName)
+{
+	bool success=true;	// Return value.
 	ifstream ifs;		// Output file.
 	int	i=0;			// Loop counter.
-	int	nVertex=0;		// # vertex valueread from file.
+	int	nVertex=0;		// # vertex read from file.
 	Point<TYPE>	p;		// Point read.
-
-#ifdef DEBUG_READPOINTS
-	Logging::buildText(__FUNCTION__, __FILE__, "Opening file: ");
-	Logging::buildText(__FUNCTION__, __FILE__, fileName);
-	Logging::write(true, Info);
-#endif
 
 	// Open file.
 	ifs.open(fileName.c_str(), ios::in);
@@ -2078,11 +2101,7 @@ bool Dcel::readPoints(string fileName)
 	// Check file is opened.
 	if (ifs.is_open())
 	{
-#ifdef DEBUG_READPOINTS
-		Logging::buildText(__FUNCTION__, __FILE__, "File open succesfully.");
-		Logging::write(true, Info);
-#endif
-		// Get # coordinates to read.
+		// Get # points to read.
 		ifs >> nVertex;
 		if (nVertex > 0)
 		{
@@ -2116,7 +2135,7 @@ bool Dcel::readPoints(string fileName)
 			Logging::buildText(__FUNCTION__, __FILE__, "Number of vertex must be positive and is: ");
 			Logging::buildText(__FUNCTION__, __FILE__, nVertex);
 			Logging::write(true, Error);
-			read = false;
+			success = false;
 		}
 		// Close file.
 		ifs.close();
@@ -2127,12 +2146,54 @@ bool Dcel::readPoints(string fileName)
 		Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
 		Logging::buildText(__FUNCTION__, __FILE__, fileName);
 		Logging::write(true, Error);
-		read = false;
+		success = false;
 	}
 
-	return(read);
+	return(success);
 }
 
+/***************************************************************************
+* Name: 	readDcelPoints
+* IN:		fileName	file name to write data into.
+* OUT:		NONE
+* RETURN:	true 		if file read.
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	reads the set of points from a DCEL format file.
+***************************************************************************/
+bool Dcel::readDcelPoints(string fileName)
+{
+	bool success=true;	// Return value.
+	ifstream ifs;		// Output file.
+
+	// Open file.
+	ifs.open(fileName.c_str(), ios::in);
+
+	// Check file is opened.
+	if (ifs.is_open())
+	{
+		// Read points.
+		if (!this->readVertexSet(ifs))
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of points from ");
+			Logging::buildText(__FUNCTION__, __FILE__, fileName);
+			Logging::write(true, Error);
+		}
+#ifdef DEBUG_READ_DCEL_POINTS
+		else
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Set of points read successfully from ");
+			Logging::buildText(__FUNCTION__, __FILE__, fileName);
+			Logging::write(true, Info);
+		}
+#endif
+
+		// Close file.
+		ifs.close();
+	}
+
+	return(success);
+}
 
 /***************************************************************************
 * Name: 	writePoints
@@ -2329,7 +2390,51 @@ void Dcel::swapVertex(int index1, int index2)
 	}
 }
 
+/***************************************************************************
+* Name: 	readVertexSet
+* IN:		ifs				file stream
+* OUT:		NONE
+* RETURN:	true			if read
+* 			false			i.o.c.
+* GLOBAL:	NONE
+* Description:	reads the set of points from the ifs file stream and resizes
+* 				the DCEL allocating memory for vertex, edges and faces.
+***************************************************************************/
+bool Dcel::readVertexSet(ifstream &ifs)
+{
+	int	 i=0;			// Loop counter.
+	int  nElements=0;	// # elements to read.
+	bool success=true;	// Return value.
+	Vertex 	vertex;		// Vertex to read.
 
+	// Get # points to read.
+	ifs >> nElements;
+	if (nElements > 0)
+	{
+#ifdef DEBUG_READ_DCEL
+		Logging::buildText(__FUNCTION__, __FILE__, "Number of vertex: ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
+		Logging::write(true, Info);
+#endif
+		this->resize(nElements, false);
+
+		// Points loop.
+		for (i=0; i<this->sizeVertex ;i++)
+		{
+			ifs >> vertex;
+			this->addVertex(&vertex);
+		}
+	}
+	else
+	{
+		Logging::buildText(__FUNCTION__, __FILE__, "Number of points is NOT positive: ");
+		Logging::buildText(__FUNCTION__, __FILE__, nElements);
+		Logging::write(true, Error);
+		success = false;
+	}
+
+	return(success);
+}
 
 /***************************************************************************
 * Name: 	read
@@ -2346,7 +2451,6 @@ bool Dcel::read(string fileName)
 	ifstream ifs;		// Input file.
 	int	i=0;			// Loop counter.
 	int 	nElements=0;// # elements to read.
-	Vertex 	vertex;		// Vertex to read.
 	Edge 	edge;		// Edge to read.
 	Face 	face;		// Face to read.
 
@@ -2360,24 +2464,9 @@ bool Dcel::read(string fileName)
 	ifs.open(fileName.c_str(), ios::in);
 	if (ifs.is_open())
 	{
-		// Get # points to read.
-		ifs >> nElements;
-		if (nElements > 0)
+		// Read points.
+		if (this->readVertexSet(ifs))
 		{
-#ifdef DEBUG_READ_DCEL
-			Logging::buildText(__FUNCTION__, __FILE__, "Number of vertex: ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
-			Logging::write(true, Info);
-#endif
-			this->resize(nElements, false);
-
-			// Points loop.
-			for (i=0; i<this->sizeVertex ;i++)
-			{
-				ifs >> vertex;
-				this->addVertex(&vertex);
-			}
-
 			// Get # edges to read.
 			ifs >> this->sizeEdges;
 			if (this->sizeEdges > 0)
@@ -2426,13 +2515,6 @@ bool Dcel::read(string fileName)
 				Logging::write(true, Error);
 				read = false;
 			}
-		}
-		else
-		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Number of points is NOT positive: ");
-			Logging::buildText(__FUNCTION__, __FILE__, nElements);
-			Logging::write(true, Error);
-			read = false;
 		}
 	}
 	// Error opening file.

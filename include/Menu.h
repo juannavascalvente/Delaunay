@@ -16,13 +16,12 @@
 #define	PARAMETERS				1
 #define RANDOMLY 				11
 #define CLUSTER					12
-#define READ_POINTS_FILE		13
-#define	READ_DCEL				14
-#define	READ_DELAUNAY			15
-#define	READ_VORONOI			16
-#define READ_GABRIEL 			17
-#define	SHAKE_POINTS			18
-#define	CHECK_DCEL  			19
+#define READ_POINTS_FLAT_FILE	13
+#define READ_POINTS_DCEL_FILE	14
+#define	READ_DCEL				15
+#define	READ_DELAUNAY			16
+#define	READ_VORONOI			17
+#define READ_GABRIEL 			18
 #define STAR_TRIANGULATION  	20
 #define CONVEX_HULL         	30
 #define DELAUNAY            	40
@@ -40,6 +39,8 @@
 #define DCEL_INFO         		71
 #define VORONOI_INFO          	72
 #define CLEAR               	80
+#define	SHAKE_POINTS			81
+#define	CHECK_DCEL  			82
 #define ZOOM 					90
 #define QUIT                	100
 

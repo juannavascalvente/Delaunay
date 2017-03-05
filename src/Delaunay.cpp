@@ -32,7 +32,7 @@
 //#define DEBUG_DELAUNAY_GET_INTERNAL_FACE
 //#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT
 //#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
-//#define DEBUG_DELAUNAY_FIND_TRIANG_PATH
+#define DEBUG_DELAUNAY_FIND_TRIANG_PATH
 #endif
 
 //------------------------------------------------------------------------
@@ -1135,7 +1135,6 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 				Logging::buildText(__FUNCTION__, __FILE__, "Computing convex hull.");
 				Logging::write(true, Info);
-				//this->getConvexHullEdges()->print();
 #endif
 			}
 
