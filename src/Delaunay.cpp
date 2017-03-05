@@ -99,6 +99,7 @@ Delaunay::~Delaunay()
 void Delaunay::reset()
 {
 	// Reset data flags.
+	this->algorithm = NONE;
 	this->setGraphAllocated(false);
 	this->setConvexHullComputed(false);
 }

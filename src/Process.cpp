@@ -678,8 +678,18 @@ void Process::execute(void)
 				p2.random();
 				line = Line(p1, p2);
 
-				// Compute triangles path between two points.
-				error = !this->delaunay.findPath(line, faces);
+				// Check incremental triangulation computed.
+				if (this->delaunay.getAlgorithm() == INCREMENTAL)
+				{
+					// Compute triangles path between two points.
+					error = !this->delaunay.findPath(line, faces);
+				}
+				else
+				{
+					Logging::buildText(__FUNCTION__, __FILE__,
+							"Triangulation path not implemented in normal triangulation");
+					Logging::write(true, Error);
+				}
 
 				// Draw triangulation, segment and if no error, the path.
 				points.add(p1);

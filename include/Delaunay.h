@@ -71,7 +71,7 @@ public:
 	}
 	Delaunay(Dcel *dcel) : hull(DEFAUTL_CONVEXHULL_LEN), hullEdges(DEFAUTL_CONVEXHULL_LEN)
 	{
-		this->algorithm= NONE;
+		this->algorithm = NONE;
 		this->dcel = dcel;
 		this->graphAllocated = true;
 		this->graph = new Graph(this->dcel->getNVertex()*10);
