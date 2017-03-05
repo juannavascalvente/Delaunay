@@ -64,8 +64,8 @@ public:
 	void resize(int size, bool copy);
 	void reset();
 
-	int	 read(string fileName);
-	int	 write(string fileName);
+	bool read(string fileName);
+	bool write(string fileName);
 	void print();
 	int	 random(int nPoints);
 	void shake();
@@ -254,89 +254,72 @@ template <class ElementType> void Set<ElementType>::reset()
 	this->nElements = 0;
 }
 
-template <class ElementType> int Set<ElementType>::read(string fileName)
+template <class ElementType> bool Set<ElementType>::read(string fileName)
 {
 	int		i=0;			// Loop counter.
-    int     ret=SUCCESS;  	// Return value.
-    int     nPoints=0;    	// Number of points of set.
-    ifstream inFile;    	// Input file.
+    bool success=true;  	// Return value.
+    ifstream ifs;    		// Input file.
+    ElementType	data;
 
     // Open file.
-    inFile.open(fileName.c_str(), std::ifstream::in);
+    ifs.open(fileName.c_str(), std::ifstream::in);
 
     // Check file is open.
-    if (!inFile.is_open())
+    if (!ifs.is_open())
 	{
 	    // Error opening input file.
 		Logging::buildText(__FUNCTION__, __FILE__, "Error opening input file ");
 		Logging::buildText(__FUNCTION__, __FILE__, fileName);
 		Logging::write(true, Error);
-		ret = FAILURE;
+		success = false;
 	}
 	else
 	{
-	    // Read number of points.
-		inFile >> nPoints;
-
-#ifdef DEBUG_READ_FLAT_FILE
-	    printf("# points %d\n", number_Points);
-#endif
-			// Resize set.
-	    if (this->size < nPoints)
-	    {
-	    	this->resize(nPoints, false);
-	    }
-
-	    // Read set of points.
-	    for (i=0; i<nPoints ;i++)
-        {
-	    	inFile >> this->data[i];
-        }
+	    // Read elements from file.
+		while (!ifs.eof())
+		{
+			ifs >> data;
+			this->add(data);
+		}
 
         // Close input file.
-	    inFile.close();
+	    ifs.close();
 	}
 
-	return(ret);
+	return(success);
 }
 
-template <class ElementType> int Set<ElementType>::write(string fileName)
+template <class ElementType> bool Set<ElementType>::write(string fileName)
 {
 	int		i=0;			// Loop counter.
-    int     ret=SUCCESS;  	// Return value.
-    ofstream outFile;    	// Output file.
+	bool success=true;  	// Return value.
+    ofstream ofs;    		// Output file.
 
     // Open file.
-    outFile.open(fileName.c_str(), std::ifstream::out);
+    ofs.open(fileName.c_str(), std::ifstream::out);
 
     // Check file is open.
-    if (!outFile.is_open())
+    if (!ofs.is_open())
 	{
 	    // Error opening input file.
-		Logging::buildText(__FUNCTION__, __FILE__, "Error opening input file ");
+		Logging::buildText(__FUNCTION__, __FILE__, "Error opening output file ");
 		Logging::buildText(__FUNCTION__, __FILE__, fileName);
 		Logging::write(true, Error);
-    	ret = FAILURE;
+		success = false;
 	}
 	else
 	{
-	    // Write number of points.
-		outFile << this->nElements;
-
-#ifdef DEBUG_READ_FLAT_FILE
-	    	printf("# points %d\n", number_Points);
-#endif
 	    // Write set of points.
 	    for (i=0; i<this->nElements ;i++)
         {
-	    	outFile << this->data[i];
+	    	ofs << this->data[i];
         }
 
         // Close output file.
-	    outFile.close();
+	    ofs.close();
 	}
 
-	return(ret);
+	return(success);
 }
 
 template <class ElementType> void Set<ElementType>::print()
