@@ -1,19 +1,16 @@
 /*
- * testVoronoi.cpp
  *
- *  Created on: Feb 8, 2017
+ *  Created on: Mar 4, 2017
  *      Author: juan
  */
+#include "testDelaunay.h"
 
 #include "Delaunay.h"
-#include "Voronoi.h"
-#include "testVoronoi.h"
-#include <stdio.h>
+#include "Label.h"
 #include <unistd.h>
 
-//#define DEBUG_TEST_VORONOI_BUILD_INIT
-//#define DEBUG_TEST_VORONOI_BUILD
-//#define DEBUG_TEST_VORONOI_COMPARE
+//#define DEBUG_DELAUNAY_COMPARE_PREPARE
+//#define DEBUG_TEST_DELAUNAY_BUILD_INIT
 
 /***************************************************************************
 * Name: 	initParameters
@@ -23,7 +20,7 @@
 * GLOBAL:	NONE
 * Description: 	registers the test parameters
 ***************************************************************************/
-void TestVoronoiBuild::initParameters()
+void TestDelaunayBuild::initParameters()
 {
 	// Add # points parameter.
 	NumericValidator *nPointsDefinition = new NumericValidator(3, INT_MAX);
@@ -44,7 +41,7 @@ void TestVoronoiBuild::initParameters()
 	NumericValidator *stepsDefinition = new NumericValidator(0, INT_MAX);
 	ParameterInt *stepsParameter = new ParameterInt(TYPE_N_STEPS_LABEL, stepsDefinition);
 	this->parameters.add(stepsParameter);
-#ifdef DEBUG_TEST_VORONOI_BUILD_INIT
+#ifdef DEBUG_TEST_DELAUNAY_BUILD_INIT
 	// Print parameters data.
 	this->printParameters();
 #endif
@@ -58,10 +55,10 @@ void TestVoronoiBuild::initParameters()
 * GLOBAL:	NONE
 * Description: 	prints the test parameters.
 ***************************************************************************/
-void TestVoronoiBuild::printParameters()
+void TestDelaunayBuild::printParameters()
 {
 	cout << "---------------------------------------------------" << endl;
-	cout << "Test Voronoi printParameters" << endl;
+	cout << "Test Delaunay printParameters" << endl;
 	cout << "---------------------------------------------------" << endl;
 	cout << "Number of points " << this->nPoints << endl;
 	cout << "Delta points " << this->deltaPoints << endl;
@@ -80,7 +77,7 @@ void TestVoronoiBuild::printParameters()
 * GLOBAL:	NONE
 * Description: 	set a class attribute to "value"
 ***************************************************************************/
-void TestVoronoiBuild::applyParameter(Parameter *parameter, string value)
+void TestDelaunayBuild::applyParameter(Parameter *parameter, string value)
 {
 	string parameterName;
 	int convertedValue=0;
@@ -136,11 +133,10 @@ void TestVoronoiBuild::applyParameter(Parameter *parameter, string value)
 * Description: 	builds several Delaunay triangulation using different set of
 * 				points and if any fails the dcel data is written to a file.
 ***************************************************************************/
-void TestVoronoiBuild::main()
+void TestDelaunayBuild::main()
 {
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
-	Voronoi		voronoi;			// Voronoi data.
 	int			failedTestIndex=1;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
@@ -170,15 +166,9 @@ void TestVoronoiBuild::main()
 				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
 				Logging::write(true, Error);
 			}
-			else if (!delaunay.incremental())
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay triangulation in iteration ");
-				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
-				Logging::write(true, Error);
-			}
 			else
 			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Start building voronoi diagram test ");
+				Logging::buildText(__FUNCTION__, __FILE__, "Start building Delaunay incremental test ");
 				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
 				Logging::buildText(__FUNCTION__, __FILE__, "/");
 				Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
@@ -190,33 +180,24 @@ void TestVoronoiBuild::main()
 				// Write test data.
 				ostringstream convert;
 				convert << failedTestIndex;
-				fileName = this->outputFolder + "Voronoi_" + convert.str() + ".txt";
+				fileName = this->outputFolder + "Delaunay_" + convert.str() + ".txt";
 				this->dump(fileName, dcel);
-				if (!voronoi.init(&dcel))
+				if (delaunay.incremental())
 				{
-					// Compute Voronoi diagram.
-					if (!voronoi.build())
-					{
-						Logging::buildText(__FUNCTION__, __FILE__, "Voronoi diagram built for test ");
-						remove(fileName.c_str());
-					}
-					else
-					{
-						failedTestIndex++;
-						Logging::buildText(__FUNCTION__, __FILE__, "Error building voronoi diagram in test ");
-					}
+					Logging::buildText(__FUNCTION__, __FILE__, "Delaunay diagram built for test ");
+					remove(fileName.c_str());
 				}
 				else
 				{
 					failedTestIndex++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error initializing voronoi in test ");
+					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay diagram in test ");
 				}
 				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
 				Logging::write(true, Info);
 				sleep(1);
 
-				// Reset voronoi data.
-				voronoi.reset();
+				// Reset Delaunay data.
+				delaunay.reset();
 			}
 		}
 
@@ -234,7 +215,7 @@ void TestVoronoiBuild::main()
 * GLOBAL:	NONE
 * Description: 	Writes to output files the data required to reproduce the fail
 ***************************************************************************/
-void TestVoronoiBuild::dump(string dcelFileName, Dcel &dcel)
+void TestDelaunayBuild::dump(string dcelFileName, Dcel &dcel)
 {
 	ofstream ofs;			// Output file.
 
@@ -266,8 +247,9 @@ void TestVoronoiBuild::dump(string dcelFileName, Dcel &dcel)
 * Description: 	free test resources. The data allocated are the parameters
 * 				and validators allocated in initParameters
 ***************************************************************************/
-void TestVoronoiBuild::deallocate()
+void TestDelaunayBuild::deallocate()
 {
+	cout << "Deallocating TestDelaunayBuild" << endl;
 	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
 	/*int	i=0;					// Loop counter.
 	Parameter *param;
@@ -287,13 +269,13 @@ void TestVoronoiBuild::deallocate()
 * GLOBAL:	NONE
 * Description: 	registers the test parameters
 ***************************************************************************/
-void TestVoronoiCompare::initParameters()
+void TestDelaunayCompare::initParameters()
 {
 	// Add files list parameter.
 	FileValidator *filesValidator = new FileValidator();
 	ParameterFile *fileParameter = new ParameterFile(TEST_FILE_LABEL, filesValidator);
 	this->parameters.add(fileParameter);
-#ifdef DEBUG_TEST_VORONOI_COMPARE
+#ifdef DEBUG_TEST_DELAUNAY_COMPARE
 	// Print parameters data.
 	this->printParameters();
 #endif
@@ -307,9 +289,9 @@ void TestVoronoiCompare::initParameters()
 * GLOBAL:	NONE
 * Description: 	prints the test parameters.
 ***************************************************************************/
-void TestVoronoiCompare::printParameters()
+void TestDelaunayCompare::printParameters()
 {
-	cout << "Test Voronoi printParameters" << endl;
+	cout << "Test Delaunay printParameters" << endl;
 	cout << "Files list: " << this->filesNamesFile << endl;
 }
 
@@ -322,7 +304,7 @@ void TestVoronoiCompare::printParameters()
 * GLOBAL:	NONE
 * Description: 	set a class attribute to "value"
 ***************************************************************************/
-void TestVoronoiCompare::applyParameter(Parameter *parameter, string value)
+void TestDelaunayCompare::applyParameter(Parameter *parameter, string value)
 {
 	string parameterName;
 
@@ -351,7 +333,7 @@ void TestVoronoiCompare::applyParameter(Parameter *parameter, string value)
 * Description: 	executes any previous checks or actions previous to the
 * 				tests execution
 ***************************************************************************/
-bool TestVoronoiCompare::prepare()
+bool TestDelaunayCompare::prepare()
 {
 	bool success=true;
 	string 	line;
@@ -380,10 +362,11 @@ bool TestVoronoiCompare::prepare()
 			// Check file exists.
 			if (fileTestIfs.is_open())
 			{
+#ifdef DEBUG_DELAUNAY_COMPARE_PREPARE
 				Logging::buildText(__FUNCTION__, __FILE__, "Adding file to list: ");
 				Logging::buildText(__FUNCTION__, __FILE__, line);
 				Logging::write(true, Info);
-
+#endif
 				this->filesList.add(line);
 				fileTestIfs.close();
 			}
@@ -409,14 +392,17 @@ bool TestVoronoiCompare::prepare()
 * RETURN:	true			if test prepared
 * 			false			i.o.c.
 * GLOBAL:	NONE
-* Description: 	compares the Voronoi read from input files with the voronoi
+* Description: 	compares the Delaunay read from input files with the Delaunay
 * 				computed using the points in the input files
 ***************************************************************************/
-void TestVoronoiCompare::main()
+void TestDelaunayCompare::main()
 {
-	int i=0;		// Loop counter.
-	ifstream ifs;	// File stream.
-	string fileName;
+	int 	i=0;				// Loop counter.
+	int		nFailedTests=0;		// # tests failed.
+	string 	fileName;			// File name.
+	Dcel	originalDcel;		// Original dcel data.
+	Dcel	dcel;				// Dcel data.
+	Delaunay	delaunay;		// Delaunay data.
 
 	// Print test parameters.
 	this->printParameters();
@@ -430,27 +416,64 @@ void TestVoronoiCompare::main()
 	{
 		// Open file.
 		fileName = *this->filesList.at(i);
-		ifs.open(fileName.c_str(), ios::in);
 
-		// Check file is opened.
-		if (!ifs.is_open())
+		Logging::buildText(__FUNCTION__, __FILE__, "Comparing with Delaunay from ");
+		Logging::buildText(__FUNCTION__, __FILE__, fileName);
+		Logging::write(true, Info);
+		if (!originalDcel.read(fileName, false))
 		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
+			Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
 			Logging::buildText(__FUNCTION__, __FILE__, fileName);
-			Logging::buildText(__FUNCTION__, __FILE__, " in iteration ");
-			Logging::buildText(__FUNCTION__, __FILE__, i);
+			Logging::write(true, Error);
+		}
+		else if (!dcel.read(fileName, false))
+		{
+			Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file: ");
+			Logging::buildText(__FUNCTION__, __FILE__, fileName);
 			Logging::write(true, Error);
 		}
 		else
 		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Comparing with Voronoi from ");
-			Logging::buildText(__FUNCTION__, __FILE__, fileName);
-			Logging::write(true, Info);
+			// Reset dcel to remove all data except point coordinates.
+			dcel.clean();
 
-			// Close file list.
-			ifs.close();
+			// Execute current test.
+			delaunay.setDCEL(&dcel);
+			if (!delaunay.incremental())
+			{
+				nFailedTests++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Failed test id: ");
+				Logging::buildText(__FUNCTION__, __FILE__, i+1);
+				Logging::write(true, Error);
+			}
+			else
+			{
+				if (dcel == originalDcel)
+				{
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK");
+					Logging::write(true, Info);
+				}
+				else
+				{
+					nFailedTests++;
+					Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
+					Logging::buildText(__FUNCTION__, __FILE__, i+1);
+					Logging::write(true, Error);
+				}
+			}
+
+			// Reset Delaunay data.
+			delaunay.reset();
+			originalDcel.reset();
+			dcel.reset();
 		}
 	}
+
+	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements()-nFailedTests);
+	Logging::buildText(__FUNCTION__, __FILE__, "/");
+	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
+	Logging::write(true, Info);
 }
 
 /***************************************************************************
@@ -462,10 +485,8 @@ void TestVoronoiCompare::main()
 * Description: 	free test resources. The data allocated are the parameters
 * 				and validators allocated in initParameters
 ***************************************************************************/
-void TestVoronoiCompare::deallocate()
+void TestDelaunayCompare::deallocate()
 {
-	cout << "Dealllocating TestVoronoiCompare" << endl;
+	cout << "Dealllocating TestDelaunayCompare" << endl;
 	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
 }
-
-

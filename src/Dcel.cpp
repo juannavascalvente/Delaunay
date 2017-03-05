@@ -2439,22 +2439,22 @@ bool Dcel::write(string fileName) const
 	if (ofs.is_open())
 	{
 		// Get # points to read and points.
-		ofs << this->sizeVertex << std::endl;
-		for (i=0; i<this->sizeVertex ;i++)
+		ofs << this->nVertex << std::endl;
+		for (i=0; i<this->nVertex ;i++)
 		{
 			ofs << this->vertex[i];
 		}
 
 		// Get # edges to read and edges.
-		ofs << this->sizeEdges << std::endl;
-		for (i=0; i<this->sizeEdges ;i++)
+		ofs << this->nEdges << std::endl;
+		for (i=0; i<this->nEdges ;i++)
 		{
 			ofs << this->edges[i];
 		}
 
 		// Get # faces to read and faces.
-		ofs << this->sizeFaces << std::endl;
-		for (i=0; i<this->sizeFaces ;i++)
+		ofs << this->nFaces << std::endl;
+		for (i=0; i<this->nFaces ;i++)
 		{
 			ofs << this->faces[i] << std::endl;
 		}

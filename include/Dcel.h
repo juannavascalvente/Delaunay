@@ -142,6 +142,7 @@ public:
 	void getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Point<TYPE> &r);
 
 	// Set functions.
+	void clean();
 	void reset();
 	void resize(int size, bool copy);		// PENDING Return false if FAILED?
 	void invalidate();

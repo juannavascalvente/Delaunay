@@ -9,7 +9,6 @@
 #define TEST_PARAMETER_H_
 
 #include "Label.h"
-#include "definesTest.h"
 #include "Validator.h"
 #include <regex.h>
 
@@ -57,6 +56,29 @@ public:
 	ParameterInt(string name, NumericValidator *val) : 	Parameter(name), \
 														validator(val) {};
 	~ParameterInt(){};
+
+	//------------------------------------------------------------------------
+	//  Public functions.
+	//------------------------------------------------------------------------
+	bool isValid(string value) {return(validator->isValid(value));};
+	void print();
+};
+
+class ParameterFile : public Parameter
+{
+	//------------------------------------------------------------------------
+	// Attributes.
+	//------------------------------------------------------------------------
+	FileValidator *validator;
+
+public:
+	//------------------------------------------------------------------------
+	// Constructor/Destructor.
+	//------------------------------------------------------------------------
+	ParameterFile() : Parameter(NULL_LABEL), validator(NULL) {};
+	ParameterFile(string name, FileValidator *val) : Parameter(name), \
+													 validator(val) {};
+	~ParameterFile(){};
 
 	//------------------------------------------------------------------------
 	//  Public functions.

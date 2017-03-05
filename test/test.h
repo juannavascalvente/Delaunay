@@ -24,9 +24,18 @@ using namespace std;
 enum TestType { UNKNOWN_TEST,
 				TEST_SET,
 				TEST_DELAUNAY,
+				TEST_DELAUNAY_COMPARE,
 				TEST_VORONOI_BUILD,
 				TEST_VORONOI_COMPARE,
 				TEST_PATH};
+
+// Test types in string format.
+#define TEST_SET_NAME				"TEST_SET"
+#define TEST_DELAUNAY_NAME			"TEST_DELAUNAY"
+#define TEST_DELAUNAY_COMPARE_NAME	"TEST_DELAUNAY_COMPARE"
+#define TEST_VORONOI_NAME			"TEST_VORONOI"
+#define TEST_VORONOI_COMPARE_NAME	"TEST_VORONOI_COMPARE"
+#define TEST_PATH_NAME				"TEST_PATH"
 
 /****************************************************************************
 // 							Test CLASS DEFITNION

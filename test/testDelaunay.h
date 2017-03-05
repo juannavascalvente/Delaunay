@@ -1,31 +1,33 @@
 /*
- * testVoronoi.h
  *
- *  Created on: Feb 8, 2017
+ *  Created on: Mar 4, 2017
  *      Author: juan
  */
 
-#ifndef TEST_TESTVORONOI_H_
-#define TEST_TESTVORONOI_H_
+#ifndef TEST_TESTDELAUNAY_H_
+#define TEST_TESTDELAUNAY_H_
 
-// Default parameters in Voronoi Build test.
-#define VORONOI_DEFAULT_N_POINTS		3
-#define VORONOI_DEFAULT_DELTA_POINTS	2
-#define VORONOI_DEFAULT_N_STEPS			5
-#define VORONOI_DEFAULT_N_TESTS			5
-#define VORONOI_DEFAULT_OUTPUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/voronoi/"
+// Default parameters in Delaunay Build test.
+#define DEFAULT_N_POINTS		3
+#define DEFAULT_DELTA_POINTS	2
+#define DEFAULT_N_STEPS			5
+#define DEFAULT_N_TESTS			5
+#define DEFAULT_OUTPUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/delaunay/"
 
-// Default parameters in Voronoi Compare test.
+// Default parameters in Delaunay Compare test.
 #define DEFAULT_N_FILES			20
 #define DEFAULT_FILE_LIST		"fileList.txt"
 
+#include "Dcel.h"
+#include "Parameter.h"
 #include "test.h"
+#include <string>
 using namespace std;
 
 /****************************************************************************
-// 						TestVoronoiBuild CLASS DEFITNION
+// 						TestDelaunayBuild CLASS DEFITNION
 ****************************************************************************/
-class TestVoronoiBuild : public Test
+class TestDelaunayBuild : public Test
 {
 	//------------------------------------------------------------------------
 	// Attributes.
@@ -49,14 +51,14 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestVoronoiBuild(string logFile, bool printData) :
-							Test(logFile, printData), \
-							nPoints(VORONOI_DEFAULT_N_POINTS), \
-							deltaPoints(VORONOI_DEFAULT_DELTA_POINTS), \
-							nSteps(VORONOI_DEFAULT_N_STEPS), \
-							nTests(VORONOI_DEFAULT_N_TESTS), \
-							outputFolder(VORONOI_DEFAULT_OUTPUT_FOLDER) {};
-	~TestVoronoiBuild() {};
+	TestDelaunayBuild(string logFile, bool printData) :
+									Test(logFile, printData), \
+									nPoints(DEFAULT_N_POINTS), \
+									deltaPoints(DEFAULT_DELTA_POINTS), \
+									nSteps(DEFAULT_N_STEPS), \
+									nTests(DEFAULT_N_TESTS), \
+									outputFolder(DEFAULT_OUTPUT_FOLDER) {};
+	~TestDelaunayBuild() {};
 
 	//------------------------------------------------------------------------
 	// Public functions
@@ -73,9 +75,9 @@ public:
 };
 
 /****************************************************************************
-// 						TestVoronoiCompare CLASS DEFITNION
+// 						TestDelaunayCompare CLASS DEFITNION
 ****************************************************************************/
-class TestVoronoiCompare : public Test
+class TestDelaunayCompare : public Test
 {
 	//------------------------------------------------------------------------
 	// Attributes.
@@ -94,12 +96,12 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestVoronoiCompare(string logFile, bool printData) :
+	TestDelaunayCompare(string logFile, bool printData) :
 							Test(logFile, printData), \
 							filesNamesFile(DEFAULT_FILE_LIST), \
 							filesList(DEFAULT_N_FILES) \
 							{};
-	~TestVoronoiCompare() {};
+	~TestDelaunayCompare() {};
 
 	//------------------------------------------------------------------------
 	//  Get/Set functions.
@@ -114,5 +116,4 @@ public:
 };
 
 
-
-#endif /* TEST_TESTVORONOI_H_ */
+#endif /* TEST_TESTDELAUNAY_H_ */

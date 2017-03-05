@@ -113,25 +113,39 @@ TestType Test::getTypeTest(string testName)
 {
 	TestType type=TestType(0);		// Return value.
 
-	if (testName.compare("JUAN") == 0)
+	// Test set.
+	if (testName.compare(TEST_SET_NAME) == 0)
 	{
 		type = TEST_SET;
 	}
-	else if (testName.compare("JUAN") == 0)
+	// Test Delaunay triangulation.
+	else if (testName.compare(TEST_DELAUNAY_NAME) == 0)
 	{
 		type = TEST_DELAUNAY;
 	}
-	else if (testName.compare("VORONOI_BUILD") == 0)
+	// Compare already built Delaunay.
+	else if (testName.compare(TEST_DELAUNAY_COMPARE_NAME) == 0)
+	{
+		type = TEST_DELAUNAY_COMPARE;
+	}
+	// Test build Voronoi areas.
+	else if (testName.compare(TEST_VORONOI_NAME) == 0)
 	{
 		type = TEST_VORONOI_BUILD;
 	}
-	else if (testName.compare("JUAN") == 0)
+	// Compare built and already computed Voronoi areas.
+	else if (testName.compare(TEST_VORONOI_COMPARE_NAME) == 0)
 	{
 		type = TEST_VORONOI_COMPARE;
 	}
-	else if (testName.compare("JUAN") == 0)
+	// Compare computed paths and new executions.
+	else if (testName.compare(TEST_PATH_NAME) == 0)
 	{
 		type = TEST_PATH;
+	}
+	else
+	{
+		cout << "Error: Unknown test name: " << testName << endl;
 	}
 
 	return(type);
@@ -173,9 +187,6 @@ bool Test::read(ifstream &ifs, Set<Label> &labels, TestType &testType)
 					{
 						if (label.isBeginLabel())
 						{
-#ifdef DEBUG_TEST_READ
-							cout << "YES BEGIN" << endl;
-#endif
 							if (label.getName().compare(TEST_LABEL) == 0)
 							{
 #ifdef DEBUG_TEST_READ
@@ -183,9 +194,6 @@ bool Test::read(ifstream &ifs, Set<Label> &labels, TestType &testType)
 #endif
 								status = READ_TYPE_STATUS;
 							}
-#ifdef DEBUG_TEST_READ
-							cout << "YES END BEGIN" << endl;
-#endif
 						}
 						else
 						{

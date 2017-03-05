@@ -5,14 +5,14 @@
  *      Author: juan
  */
 
-#include "definesTest.h"
 #include "Parameter.h"
 #include "tester.h"
-#include "testSet.h"
+#include "testDelaunay.h"
 #include "testPath.h"
+#include "testSet.h"
 #include "testVoronoi.h"
 
-//#define DEBUG_TESTER_MAIN
+#define DEBUG_TESTER_MAIN
 //#define DEBUG_TESTER_READTESTS
 //#define DEBUG_TESTER_CREATEINSTANCE
 
@@ -44,6 +44,7 @@ bool Tester::readTests()
 	bool testsToExecute=false;	// Return value.
 	TestType type;				// Test type label.
 	Test *test=NULL;			// Test data.
+	int	 testId=0;				// Test identifier.
 
 	// Open file.
 	this->ifs.open(this->fileName.c_str(), ios::in);
@@ -73,6 +74,10 @@ bool Tester::readTests()
 				this->tests.add(test);
 				testsToExecute = true;
 			}
+			else
+			{
+				cout << "Error reading test id: " << (testId+1) << endl;
+			}
 		}
 #ifdef DEBUG_TESTER_READTESTS
 		cout << "End reading test " << endl;
@@ -86,10 +91,7 @@ bool Tester::readTests()
 
 Test* Tester::createTestInstance(TestType type)
 {
-	Test *test;
-#ifdef DEBUG_TESTER_CREATEINSTANCE
-	cout << "Tester createTestInstance START" << endl;
-#endif
+	Test *test;			// Return value.
 	switch(type)
 	{
 		case TEST_SET:
@@ -105,7 +107,15 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DELAUNAY" << endl;
 #endif
-			test = NULL;
+			test = new TestDelaunayBuild("testDelaunay.txt", true);
+			break;
+		}
+		case TEST_DELAUNAY_COMPARE:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_DELAUNAY" << endl;
+#endif
+			test = new TestDelaunayCompare("testDelaunayCompare.txt", true);
 			break;
 		}
 		case TEST_VORONOI_BUILD:
@@ -113,7 +123,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_VORONOI_BUILD" << endl;
 #endif
-			test = new TestVoronoiBuild("testVoronoiBuild.txt", true);
+			test = new TestVoronoiBuild("testVoronoi.txt", true);
 			break;
 		}
 		case TEST_VORONOI_COMPARE:
@@ -121,7 +131,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_VORONOI_COMPARE" << endl;
 #endif
-			test = NULL;
+			test = new TestVoronoiCompare("testVoronoiCompare.txt", true);
 			break;
 		}
 		case TEST_PATH:
@@ -144,10 +154,13 @@ Test* Tester::createTestInstance(TestType type)
 void Tester::finish()
 {
 	int i=0;			// Loop counter.
+	Test *test;
 
 	cout << "Tester: finish" << endl;
 	for (i=0; i<this->tests.getNElements() ;i++)
 	{
-		cout << "Tester: deleting test " << (i+1) << endl;
+		cout << "Tester: deallocating test " << (i+1) << endl;
+		test = *this->tests.at(i);
+		test->finish();
 	}
 }
