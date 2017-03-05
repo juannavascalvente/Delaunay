@@ -686,6 +686,7 @@ void Process::execute(void)
 				}
 				else
 				{
+					// PENDING https://github.com/juannavascalvente/Delaunay/issues/10
 					Logging::buildText(__FUNCTION__, __FILE__,
 							"Triangulation path not implemented in normal triangulation");
 					Logging::write(true, Error);
