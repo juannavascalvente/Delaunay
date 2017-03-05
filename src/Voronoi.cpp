@@ -192,7 +192,7 @@ bool Voronoi::getCentre( int areaId, Point<TYPE> &centre)
 ***************************************************************************/
 bool Voronoi::build()
 {
-	bool built=false;		// Return value.
+	bool built=true;		// Return value.
 	int	 pointIndex=0;		// Loop counter.
 
 	// Check if there is a triangulation.
