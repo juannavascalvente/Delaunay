@@ -23,7 +23,7 @@ using namespace std;
 //#define DEBUG_DRAW_FACES_INFO
 //#define DEBUG_READPOINTS
 //#define DEBUG_WRITE_DCEL
-#define DEBUG_READ_DCEL
+//#define DEBUG_READ_DCEL
 //#define DEBUG_RETURN_TURN
 //#define DEBUG_SETHIGHEST_FIRST
 //#define DEBUG_SETLOWESTS_FIRST
@@ -47,7 +47,7 @@ using namespace std;
 //#define DEBUG_READBINARY_DCEL
 //#define DEBUG_WRITEBINARY_DCEL
 //#define DEBUG_DCEL_EDGE_INTERSECTION
-#define DEBUG_DCEL_EQUAL
+//#define DEBUG_DCEL_EQUAL
 #endif
 
 /*------------------------------------------------------------------------
@@ -397,7 +397,7 @@ void Dcel::reset()
 	this->nVertex = 0;
 	this->nEdges = 0;
 	this->nFaces = 0;
-#ifdef DEBUG_DCEL_RESIZE
+#ifdef DEBUG_DCEL_RESET
 	Logging::buildText(__FUNCTION__, __FILE__, "DCEL data reset");
 	Logging::write(true, Info);
 #endif
@@ -423,9 +423,10 @@ void Dcel::clean()
 	memset(this->edges, 0, sizeof(Vertex)*this->sizeVertex);
 	memset(this->faces, 0, sizeof(Face)*this->sizeFaces);
 
-	// Reset counters.
-	this->reset();
-#ifdef DEBUG_DCEL_RESIZE
+	// Reset edges and faces number of elements.
+	this->nEdges = 0;
+	this->nFaces = 0;
+#ifdef DEBUG_DCEL_CLEAN
 	Logging::buildText(__FUNCTION__, __FILE__, "DCEL data reset");
 	Logging::write(true, Info);
 #endif
@@ -2082,7 +2083,7 @@ bool Dcel::readPoints(string fileName)
 		ifs >> nVertex;
 #ifdef DEBUG_READPOINTS
 		Logging::buildText(__FUNCTION__, __FILE__, "N vertex to read is ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
+		Logging::buildText(__FUNCTION__, __FILE__, nVertex);
 		Logging::write(true, Info);
 #endif
 		this->resize(nVertex, false);
