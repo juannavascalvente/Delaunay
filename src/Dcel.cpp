@@ -23,7 +23,7 @@ using namespace std;
 //#define DEBUG_DRAW_FACES_INFO
 //#define DEBUG_READPOINTS
 //#define DEBUG_WRITE_DCEL
-//#define DEBUG_READ_DCEL
+#define DEBUG_READ_DCEL
 //#define DEBUG_RETURN_TURN
 //#define DEBUG_SETHIGHEST_FIRST
 //#define DEBUG_SETLOWESTS_FIRST
@@ -1176,18 +1176,22 @@ int	Dcel::getCollinear(int pointIndex, int edgeID)
 }
 
 /***************************************************************************
-* Name: 	getNeighbors
-* IN:		pointIndex		point whose neighbors are searched.
-* 			checked			array of points already checked.
-* OUT:		queue			structure where points are inserted.
-* RETURN:	NONE
+* Name: 	isValid
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	true		if the DCEL is valid
+* 			false		i.o.c.
 * GLOBAL:	NONE
-* Description: 	shake all points in DCEL.
+* Description: 	Checks all the data in the dcel. This functions checks:
+* 				1.-
+* 				2.-
+* 				3.-
+* https://github.com/juannavascalvente/Delaunay/issues/3
 ***************************************************************************/
-//void getNeighbors(int pointIndex, bool &checked, Queue<int> &queue)
-//{
-//
-//}
+bool Dcel::isValid()
+{
+	return(true);
+}
 
 /***************************************************************************
 * Name: 	shake
@@ -2376,36 +2380,56 @@ bool Dcel::read(string fileName)
 
 			// Get # edges to read.
 			ifs >> this->sizeEdges;
-#ifdef DEBUG_READ_DCEL
-			Logging::buildText(__FUNCTION__, __FILE__, "Number of edges: ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->sizeEdges);
-			Logging::write(true, Info);
-#endif
-			for (i=0; i<this->sizeEdges ;i++)
+			if (this->sizeEdges > 0)
 			{
-				ifs >> edge;
-				this->addEdge(&edge);
-			}
-
-			// Get # faces to read.
-			ifs >> this->sizeFaces;
 #ifdef DEBUG_READ_DCEL
-			Logging::buildText(__FUNCTION__, __FILE__, "Number of faces: ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->sizeFaces);
-			Logging::write(true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, "Number of edges: ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->sizeEdges);
+				Logging::write(true, Info);
 #endif
-			for (i=0; i<this->sizeFaces ;i++)
-			{
-				ifs >> face;
-				this->addFace(&face);
-			}
+				for (i=0; i<this->sizeEdges ;i++)
+				{
+					ifs >> edge;
+					this->addEdge(&edge);
+				}
 
-			// Close file.
-			ifs.close();
+				// Get # faces to read.
+				ifs >> this->sizeFaces;
+				if (this->sizeFaces > 0)
+				{
+#ifdef DEBUG_READ_DCEL
+					Logging::buildText(__FUNCTION__, __FILE__, "Number of faces: ");
+					Logging::buildText(__FUNCTION__, __FILE__, this->sizeFaces);
+					Logging::write(true, Info);
+#endif
+					for (i=0; i<this->sizeFaces ;i++)
+					{
+						ifs >> face;
+						this->addFace(&face);
+					}
+
+					// Close file.
+					ifs.close();
+				}
+				else
+				{
+					Logging::buildText(__FUNCTION__, __FILE__, "Number of faces is NOT positive: ");
+					Logging::buildText(__FUNCTION__, __FILE__, this->sizeFaces);
+					Logging::write(true, Error);
+					read = false;
+				}
+			}
+			else
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Number of edges is NOT positive: ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->sizeEdges);
+				Logging::write(true, Error);
+				read = false;
+			}
 		}
 		else
 		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Number of points must be positive and is: ");
+			Logging::buildText(__FUNCTION__, __FILE__, "Number of points is NOT positive: ");
 			Logging::buildText(__FUNCTION__, __FILE__, nElements);
 			Logging::write(true, Error);
 			read = false;

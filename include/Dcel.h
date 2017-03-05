@@ -147,6 +147,8 @@ public:
 	void resize(int size, bool copy);		// PENDING Return false if FAILED?
 	void invalidate();
 	void shake();
+	bool isValid();
+
 	// PENDING. Move to set? point?
 	bool generateRandom(int nPoints);
 	bool generateClusters(int nPoints, int nClusters, TYPE radius);
