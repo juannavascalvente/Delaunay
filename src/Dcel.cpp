@@ -550,20 +550,19 @@ void Dcel::resize(int size, bool copy)
 				this->created = true;
 			}
 		}
-#ifdef DEBUG_DCEL_RESIZE
 		else
 		{
 			this->nVertex = 0;
 			this->nEdges = 0;
 			this->nFaces = 0;
-
+#ifdef DEBUG_DCEL_RESIZE
 			Logging::buildText(__FUNCTION__, __FILE__, "No resize required. New size ");
 			Logging::buildText(__FUNCTION__, __FILE__, size);
 			Logging::buildText(__FUNCTION__, __FILE__, " is not higher than current ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
 			Logging::write(true, Info);
-		}
 #endif
+		}
 	}
 	catch (bad_alloc &ex)
 	{
