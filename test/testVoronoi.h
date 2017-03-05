@@ -13,11 +13,12 @@
 #define VORONOI_DEFAULT_DELTA_POINTS	2
 #define VORONOI_DEFAULT_N_STEPS			5
 #define VORONOI_DEFAULT_N_TESTS			5
-#define VORONOI_DEFAULT_OUTPUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/voronoi/"
+#define DEF_VORONOI_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/voronoi/build/"
 
 // Default parameters in Voronoi Compare test.
 #define DEFAULT_N_FILES			20
 #define DEFAULT_FILE_LIST		"fileList.txt"
+#define DEF_VORONOI_COMPARE_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/voronoi/compare/"
 
 #include "test.h"
 using namespace std;
@@ -34,7 +35,6 @@ class TestVoronoiBuild : public Test
 	int deltaPoints;
 	int nSteps;
 	int nTests;
-	string outputFolder;
 
 	//------------------------------------------------------------------------
 	// Private functions
@@ -50,12 +50,11 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestVoronoiBuild(string logFile, bool printData) :
-							Test(logFile, printData), \
-							nPoints(VORONOI_DEFAULT_N_POINTS), \
-							deltaPoints(VORONOI_DEFAULT_DELTA_POINTS), \
-							nSteps(VORONOI_DEFAULT_N_STEPS), \
-							nTests(VORONOI_DEFAULT_N_TESTS), \
-							outputFolder(VORONOI_DEFAULT_OUTPUT_FOLDER) {};
+					Test(logFile, DEF_VORONOI_OUT_FOLDER, printData), \
+					nPoints(VORONOI_DEFAULT_N_POINTS), \
+					deltaPoints(VORONOI_DEFAULT_DELTA_POINTS), \
+					nSteps(VORONOI_DEFAULT_N_STEPS), \
+					nTests(VORONOI_DEFAULT_N_TESTS) {};
 	~TestVoronoiBuild() {};
 
 	//------------------------------------------------------------------------
@@ -95,10 +94,9 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestVoronoiCompare(string logFile, bool printData) :
-							Test(logFile, printData), \
-							filesNamesFile(DEFAULT_FILE_LIST), \
-							filesList(DEFAULT_N_FILES) \
-							{};
+				Test(logFile, DEF_VORONOI_COMPARE_OUT_FOLDER, printData), \
+				filesNamesFile(DEFAULT_FILE_LIST), \
+				filesList(DEFAULT_N_FILES) {};
 	~TestVoronoiCompare() {};
 
 	//------------------------------------------------------------------------

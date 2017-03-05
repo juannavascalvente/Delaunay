@@ -25,7 +25,8 @@ class TestSet : public Test
 	void print() {};
 
 public:
-	TestSet() : Test("logTestSet.txt", false) {};
+	TestSet(string fileName, string outFolder, bool print) : \
+								Test(fileName, outFolder,print) {};
 	void main();
 };
 

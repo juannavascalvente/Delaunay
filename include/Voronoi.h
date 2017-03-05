@@ -47,7 +47,7 @@ public:
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
-	int 	init( Dcel *dcel);
+	bool 	init( Dcel *dcel);
 	void 	resize( int size, bool copy);
 	void 	reset();
 

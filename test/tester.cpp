@@ -134,10 +134,34 @@ Test* Tester::createTestInstance(TestType type)
 			test = new TestVoronoiCompare("testVoronoiCompare.txt", true);
 			break;
 		}
-		case TEST_PATH:
+		case TEST_PATH_DELAUNAY:
 		{
 #ifdef DEBUG_TESTER_CREATEINSTANCE
-			cout << "Creating TEST_PATH" << endl;
+			cout << "Creating TEST_PATH_DELAUNAY" << endl;
+#endif
+			test = new TestPathDelaunay("testDelaunayPath.txt", DEF_DELAUNAY_PATH_FOLDER, true);
+			break;
+		}
+		case TEST_PATH_DELAUNAY_COMPARE:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_PATH_DELAUNAY_COMPARE" << endl;
+#endif
+			test = NULL;
+			break;
+		}
+		case TEST_PATH_VORONOI:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_PATH_VORONOI" << endl;
+#endif
+			test = new TestPathVoronoi("testVoronoiPath.txt", DEF_VORONOI_PATH_FOLDER, true);
+			break;
+		}
+		case TEST_PATH_VORONOI_COMPARE:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_PATH_VORONOI" << endl;
 #endif
 			test = NULL;
 			break;

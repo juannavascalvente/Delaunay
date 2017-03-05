@@ -13,64 +13,95 @@
 #include "Point.h"
 #include "test.h"
 
+#define DEF_DELAUNAY_PATH_FOLDER	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/path/"
+#define DEF_VORONOI_PATH_FOLDER		"/home/juan/projects/delaunay/code/data/samples/test/output/voronoi/path/"
+
 /****************************************************************************
-// 							Data DEFITNION
+// 							TestExecution CLASS DEFITNION
 ****************************************************************************/
-// Types of tests to execute.
-enum enumTypeTest { TESTPATH_DELAUNAY_COMPARE_TO_GOLD,
-					TESTPATH_VORONOI_COMPARE_TO_GOLD,
-					TESTPATH_DELAUNAY_RANDOM_INCREMENTAL_STEP,
-					TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP
+class TestExecution : public Test
+{
+protected:
+	//------------------------------------------------------------------------
+	// Attributes.
+	//------------------------------------------------------------------------
+	int nTests;
+	int nSteps;
+	int deltaPoints;
+	int nPoints;
+
+	//------------------------------------------------------------------------
+	// Private functions
+	//------------------------------------------------------------------------
+	void initParameters();
+	void applyParameter(Parameter *parameter, string value);
+	void printParameters();
+	void deallocate();
+
+public:
+	//------------------------------------------------------------------------
+	// Constructor/Destructor.
+	//------------------------------------------------------------------------
+	TestExecution(string fileName, string outFolder, bool print) : \
+						Test(fileName, outFolder, print),
+						nTests(0), nSteps(0), deltaPoints(0), nPoints(0) {};
+	~TestExecution() {};
+
+	//------------------------------------------------------------------------
+	//  Get/Set functions.
+	//------------------------------------------------------------------------
+	void setDeltaPoints(int deltaPoints) {this->deltaPoints = deltaPoints;};
+	void setPoints(int points) {this->nPoints = points;};
+	void setSteps(int steps) {this->nSteps = steps;};
+	void setTests(int tests) {this->nTests = tests;};
+
+	//------------------------------------------------------------------------
+	//  Public functions.
+	//------------------------------------------------------------------------
+	virtual void main() {};
 };
 
 /****************************************************************************
 // 							TestPath CLASS DEFITNION
 ****************************************************************************/
-class TestPath : public Test
+class TestPathDelaunay : public TestExecution
 {
-	// Input/output files.
-	string baseFileName;
-	string fileName;
-
-	// Tests parameters.
-	enum enumTypeTest testType;
-	int	nTests;
-	int nSteps;
-	int	step;
-	int nPoints;
-
-	// Data attributes.
-	Dcel			dcel;		// Dcel data.
-	Delaunay		delaunay;	// Delaunay data.
-	Voronoi			voronoi;	// Voronoi data.
-
-	// Initialization functions.
-	bool createSet();
-	bool buildDelaunay();
-	bool buildVoronoi();
-
-	bool initializeDelaunay();
-	bool initializeVoronoi();
-
-	void dump(string fileName, string dcelFileName, Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel);
-	void DelaunayPath();
-	void VoronoiPath();
-
-	void print();
-	void setDefault();
-
 public:
-	TestPath() : Test("logTestPath.txt"), testType(TESTPATH_DELAUNAY_COMPARE_TO_GOLD), \
-				 nTests(0), nSteps(0), step(0), nPoints(0) {};
-	~TestPath() {};
+	//------------------------------------------------------------------------
+	// Constructor/Destructor.
+	//------------------------------------------------------------------------
+	TestPathDelaunay(string fileName, string outFolder, bool print) : \
+							TestExecution(fileName, outFolder, print) {};
+	~TestPathDelaunay() {};
 
-	bool prepare();
-	bool parseParameters(Set<Label> &labels);
+	//------------------------------------------------------------------------
+	//  Public functions.
+	//------------------------------------------------------------------------
+	void dump(string pointsFileName, string dcelFileName, Point<TYPE> &p1, \
+												Point<TYPE> &p2, Dcel &dcel);
 	void main();
+};
 
-	int getTests() const {return nTests;}
-	void setTests(int tests) {nTests = tests;}
+/****************************************************************************
+// 							TestPath CLASS DEFITNION
+****************************************************************************/
+class TestPathVoronoi : public TestExecution
+{
+public:
+	//------------------------------------------------------------------------
+	// Constructor/Destructor.
+	//------------------------------------------------------------------------
+	TestPathVoronoi(string fileName, string outFolder, bool print) : \
+							TestExecution(fileName, outFolder, print) {};
+	~TestPathVoronoi() {};
+
+	//------------------------------------------------------------------------
+	//  Public functions.
+	//------------------------------------------------------------------------
+	void dump(string pointsFileName, string dcelFileName, Point<TYPE> &p1, \
+												Point<TYPE> &p2, Dcel &dcel);
+	void main();
 };
 
 #endif /* TEST_TESTPATH_H_ */
-/*dcel.generateRandom(this->config->getNPoints()); */
+

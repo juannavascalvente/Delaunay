@@ -1821,16 +1821,16 @@ bool Dcel::findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces)
 				Logging::write(true, Info);
 #endif
 			}
-#ifdef DEBUG_DELAUNAY_FIND_PATH
 			else
 			{
+#ifdef DEBUG_DELAUNAY_FIND_PATH
 				found = false;
 				Logging::buildText(__FUNCTION__, __FILE__, "Current face ");
 				Logging::buildText(__FUNCTION__, __FILE__, firstFace);
 				Logging::buildText(__FUNCTION__, __FILE__, " does not intersect line.");
 				Logging::write(true, Info);
-			}
 #endif
+			}
 		} while ((firstFace != lastFace) && found);
 	}
 #ifdef DEBUG_DELAUNAY_FIND_PATH

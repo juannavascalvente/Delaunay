@@ -9,6 +9,7 @@
 #define CODE_TEST_TEST_H_
 
 #define DEFAULT_TEST_N_PARAMETERS		20
+#define	DEFAULT_OUTPUT_FOLDER			"."
 
 #include <string>
 using namespace std;
@@ -27,15 +28,21 @@ enum TestType { UNKNOWN_TEST,
 				TEST_DELAUNAY_COMPARE,
 				TEST_VORONOI_BUILD,
 				TEST_VORONOI_COMPARE,
-				TEST_PATH};
+				TEST_PATH_DELAUNAY,
+				TEST_PATH_DELAUNAY_COMPARE,
+				TEST_PATH_VORONOI,
+				TEST_PATH_VORONOI_COMPARE};
 
 // Test types in string format.
-#define TEST_SET_NAME				"TEST_SET"
-#define TEST_DELAUNAY_NAME			"TEST_DELAUNAY"
-#define TEST_DELAUNAY_COMPARE_NAME	"TEST_DELAUNAY_COMPARE"
-#define TEST_VORONOI_NAME			"TEST_VORONOI"
-#define TEST_VORONOI_COMPARE_NAME	"TEST_VORONOI_COMPARE"
-#define TEST_PATH_NAME				"TEST_PATH"
+#define TEST_SET_NAME						"TEST_SET"
+#define TEST_DELAUNAY_NAME					"TEST_DELAUNAY"
+#define TEST_DELAUNAY_COMPARE_NAME			"TEST_DELAUNAY_COMPARE"
+#define TEST_VORONOI_NAME					"TEST_VORONOI"
+#define TEST_VORONOI_COMPARE_NAME			"TEST_VORONOI_COMPARE"
+#define TEST_PATH_DELAUNAY_NAME				"TEST_PATH_DELAUNAY"
+#define TEST_PATH_DELAUNAY_COMPARE_NAME		"TEST_PATH_DELAUNAY_COMPARE"
+#define TEST_PATH_VORONOI_NAME				"TEST_PATH_VORONOI"
+#define TEST_PATH_VORONOI_COMPARE_NAME		"TEST_PATH_VORONOI_COMPARE"
 
 /****************************************************************************
 // 							Test CLASS DEFITNION
@@ -65,15 +72,19 @@ protected:
 	//------------------------------------------------------------------------
 	Logging logFile;		// Test log file.
 	Set<Parameter*> parameters;
+	string outputFolder;
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Test() {};
-	Test(const string logFilename, bool printData = false) : \
-			logFile(logFilename, printData), \
-			parameters(DEFAULT_TEST_N_PARAMETERS) {};
+	Test() : logFile("logTest.txt", false),
+			 parameters(DEFAULT_TEST_N_PARAMETERS), \
+			 outputFolder(DEFAULT_OUTPUT_FOLDER) {};
+	Test(const string fileName, string folder, bool printData = false) : \
+			logFile(fileName, printData), \
+			parameters(DEFAULT_TEST_N_PARAMETERS), \
+			outputFolder(folder) {};
 	virtual ~Test() {};
 
 	//------------------------------------------------------------------------

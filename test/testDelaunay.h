@@ -12,18 +12,16 @@
 #define DEFAULT_DELTA_POINTS	2
 #define DEFAULT_N_STEPS			5
 #define DEFAULT_N_TESTS			5
-#define DEFAULT_OUTPUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/delaunay/build/"
+#define DEF_OUT_FOLDER_DELAUNAY	"/home/juan/projects/delaunay/code/data/samples/errors/delaunay/build/"
 
 // Default parameters in Delaunay Compare test.
 #define DEFAULT_N_FILES			20
 #define DEFAULT_FILE_LIST		"fileList.txt"
-#define DEFAULT_OUTPUT_FOLDER_COMPARE	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/compare/"
+#define DEF_DELAUNAY_COMPARE_FOLDER	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/compare/"
 
 #include "Dcel.h"
 #include "Parameter.h"
 #include "test.h"
-#include <string>
-using namespace std;
 
 /****************************************************************************
 // 						TestDelaunayBuild CLASS DEFITNION
@@ -37,7 +35,6 @@ class TestDelaunayBuild : public Test
 	int deltaPoints;
 	int nSteps;
 	int nTests;
-	string outputFolder;
 
 	//------------------------------------------------------------------------
 	// Private functions
@@ -53,12 +50,11 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestDelaunayBuild(string logFile, bool printData) :
-									Test(logFile, printData), \
-									nPoints(DEFAULT_N_POINTS), \
-									deltaPoints(DEFAULT_DELTA_POINTS), \
-									nSteps(DEFAULT_N_STEPS), \
-									nTests(DEFAULT_N_TESTS), \
-									outputFolder(DEFAULT_OUTPUT_FOLDER) {};
+						Test(logFile, DEF_OUT_FOLDER_DELAUNAY, printData), \
+						nPoints(DEFAULT_N_POINTS), \
+						deltaPoints(DEFAULT_DELTA_POINTS), \
+						nSteps(DEFAULT_N_STEPS), \
+						nTests(DEFAULT_N_TESTS) {};
 	~TestDelaunayBuild() {};
 
 	//------------------------------------------------------------------------
@@ -85,7 +81,6 @@ class TestDelaunayCompare : public Test
 	//------------------------------------------------------------------------
 	string filesNamesFile;
 	Set<string> filesList;
-	string outputFolder;
 
 	//------------------------------------------------------------------------
 	//  Private functions.
@@ -100,11 +95,9 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestDelaunayCompare(string logFile, bool printData) :
-							Test(logFile, printData), \
-							filesNamesFile(DEFAULT_FILE_LIST), \
-							filesList(DEFAULT_N_FILES),
-							outputFolder(DEFAULT_OUTPUT_FOLDER_COMPARE) \
-							{};
+					Test(logFile, DEF_DELAUNAY_COMPARE_FOLDER, printData), \
+					filesNamesFile(DEFAULT_FILE_LIST), \
+					filesList(DEFAULT_N_FILES) {};
 	~TestDelaunayCompare() {};
 
 	//------------------------------------------------------------------------

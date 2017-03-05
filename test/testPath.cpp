@@ -4,7 +4,9 @@
  *  Created on: Jan 11, 2017
  *      Author: juan
  */
-
+#define DEBUG_FIND_DELAUNAY_PATH
+#define DEBUG_FIND_VORONOI_PATH
+#define DEFAULT_QUEUE_SIZE			20
 
 #include "Line.h"
 #include "Set.h"
@@ -12,310 +14,313 @@
 
 #include <unistd.h>
 
-#define DEFAULT_N_POINTS		4
-#define DEFAULT_N_TESTS			10
-#define DEFAULT_N_STEPS			10
-#define DEFAULT_STEP			2
-#define DEFAULT_QUEUE_SIZE		10
-
-typedef Point<TYPE> PointT;
-
-bool TestPath::prepare()
+/***************************************************************************
+* Name: 	initParameters
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	registers the test parameters
+***************************************************************************/
+void TestExecution::initParameters()
 {
-	bool success=true;
+	// Add # points parameter.
+	NumericValidator *nPointsDefinition = new NumericValidator(3, INT_MAX);
+	ParameterInt *nPointsParameter = new ParameterInt(TYPE_N_POINTS_LABEL, nPointsDefinition);
+	this->parameters.add(nPointsParameter);
 
-	cout << "PREPARE TEST PATH" << endl;
+	// Add # tests parameter.
+	NumericValidator *nTestsDefinition = new NumericValidator(1, INT_MAX);
+	ParameterInt *nTestsParameter = new ParameterInt(TYPE_N_TESTS_LABEL, nTestsDefinition);
+	this->parameters.add(nTestsParameter);
 
-	this->delaunay.setDCEL(&this->dcel);
+	// Add delta # points parameter.
+	NumericValidator *deltaPointsDefinition = new NumericValidator(1, 100);
+	ParameterInt *deltaPointsParameter = new ParameterInt(TYPE_DELTA_STEP_LABEL, deltaPointsDefinition);
+	this->parameters.add(deltaPointsParameter);
 
-	// Check test type.
-	switch(this->testType)
-	{
-		//
-		case TESTPATH_DELAUNAY_COMPARE_TO_GOLD:
-		{
-			cout << "Test 1" << endl;
-			// Input flat files
-			// Gold file folder.
-			break;
-		}
-		case TESTPATH_VORONOI_COMPARE_TO_GOLD:
-		{
-			cout << "Test 2" << endl;
-			// Input flat files
-			// Gold file folder.
-			break;
-		}
-		case TESTPATH_DELAUNAY_RANDOM_INCREMENTAL_STEP:
-		{
-			// Initialize test file basename.
-			this->baseFileName = "/home/juan/projects/delaunay/code/data/samples/errors/paths/delaunayPath/findPathDelaunay";
-			cout << "Test 3" << endl;
-
-			// Initialize Delaunay path test.
-			this->initializeDelaunay();
-			break;
-		}
-		case TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP:
-		{
-			cout << "Test 4" << endl;
-			// Initialize test file basename.
-			this->baseFileName = "/home/juan/projects/delaunay/code/data/samples/errors/paths/voronoiPath/findPathVoronoi";
-
-			// Initialize Voronoi path test.
-			this->initializeVoronoi();
-
-			break;
-		}
-		default:
-		{
-			cout << "Unknown test type. Value is " << this->testType << \
-					" and must be between " <<
-					TESTPATH_DELAUNAY_COMPARE_TO_GOLD << " and " <<
-					TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP << endl;
-			success = false;
-			break;
-		}
-	}
-
-	return(success);
+	// Add # steps parameter.
+	NumericValidator *stepsDefinition = new NumericValidator(0, INT_MAX);
+	ParameterInt *stepsParameter = new ParameterInt(TYPE_N_STEPS_LABEL, stepsDefinition);
+	this->parameters.add(stepsParameter);
+#ifdef DEBUG_TEST_DELAUNAY_BUILD_INIT
+	// Print parameters data.
+	this->printParameters();
+#endif
 }
 
-void TestPath::main()
+/***************************************************************************
+* Name: 	applyParameter
+* IN:		parameter		parameter to update
+* 			value			value to set
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	set a class attribute to "value"
+***************************************************************************/
+void TestExecution::applyParameter(Parameter *parameter, string value)
 {
-	cout << "Test PATH MAIN" << endl;
-	// Check test type.
-	switch(this->testType)
+	string parameterName;
+	int convertedValue=0;
+
+	// Get parameter label.
+	parameterName = parameter->getName();
+	if (parameterName == TYPE_N_POINTS_LABEL)
 	{
-		//
-		case TESTPATH_DELAUNAY_COMPARE_TO_GOLD:
-		{
-			break;
-		}
-		case TESTPATH_VORONOI_COMPARE_TO_GOLD:
-		{
-			break;
-		}
-		case TESTPATH_DELAUNAY_RANDOM_INCREMENTAL_STEP:
-		{
-			this->DelaunayPath();
-			break;
-		}
-		case TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP:
-		{
-			this->VoronoiPath();
-			break;
-		}
-		default:
-		{
-			cout << "Unknown test type. Value is " << this->testType << \
-					" and must be between " <<
-					TESTPATH_DELAUNAY_COMPARE_TO_GOLD << " and " <<
-					TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP << endl;
-			break;
-		}
+		// Convert string into integer.
+		stringstream str(value);
+		str >> convertedValue;
+		this->setPoints(convertedValue);
+	}
+	else if (parameterName == TYPE_N_TESTS_LABEL)
+	{
+		// Convert string into integer.
+		stringstream str(value);
+		str >> convertedValue;
+
+		this->setTests(convertedValue);
+	}
+	else if (parameterName == TYPE_DELTA_STEP_LABEL)
+	{
+		// Convert string into integer.
+		stringstream str(value);
+		str >> convertedValue;
+
+		this->setDeltaPoints(convertedValue);
+	}
+	else if (parameterName == TYPE_N_STEPS_LABEL)
+	{
+		// Convert string into integer.
+		stringstream str(value);
+		str >> convertedValue;
+
+		this->setSteps(convertedValue);
+	}
+	else
+	{
+		Logging::buildText(__FUNCTION__, __FILE__, "Unknown label parameter:");
+		Logging::buildText(__FUNCTION__, __FILE__, parameterName);
+		Logging::write(true, Error);
 	}
 }
 
-void TestPath::DelaunayPath()
+/***************************************************************************
+* Name: 	printParameters
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	prints the test parameters.
+***************************************************************************/
+void TestExecution::printParameters()
 {
-	bool error=false;			// Bool control flag.
-	int	testIndex=0;			// Test index.
-	int	failedTestIndex=1;		// Index of last failed test.
+	cout << "---------------------------------------------------" << endl;
+	cout << "Test parameters" << endl;
+	cout << "---------------------------------------------------" << endl;
+	cout << "Number of points " << this->nPoints << endl;
+	cout << "Delta points " << this->deltaPoints << endl;
+	cout << "Number of steps " << this->nSteps << endl;
+	cout << "Number of test  " << this->nTests << endl;
+	cout << "Output folder " << this->outputFolder << endl;
+	cout << "---------------------------------------------------" << endl;
+}
 
-	while ((!error) && (testIndex < this->nTests))
+/***************************************************************************
+* Name: 	deallocate
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	free test resources. The data allocated are the parameters
+* 				and validators allocated in initParameters
+***************************************************************************/
+void TestExecution::deallocate()
+{
+	cout << "Deallocating TestExecution" << endl;
+	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
+}
+
+/***************************************************************************
+* Name: 	dump
+* IN:		pointsFileName		points file name
+* 			dcelFileName		dcel file name
+* 			p1					first point
+* 			p2					second point
+* 			dcel				dcel data to write
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	Writes to output files the data required to reproduce the fail
+***************************************************************************/
+void TestPathDelaunay::dump(string pointsFileName, string dcelFileName, \
+								Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel)
+{
+	ofstream ofs;			// Output file.
+
+	// Open file.
+	ofs.open(pointsFileName.c_str(), ios::out);
+
+	// Check file is opened.
+	if (ofs.is_open())
 	{
-		cout << "Test " << (testIndex+1) << endl;
-		testIndex++;
+		// Points loop.
+		ofs << p1 << endl;
+		ofs << p2 << endl;
 
-		Point<TYPE> p1, p2;						// Segment points.
-		Line line;								// Segment line.
-		Set<PointT> points(1);					// List of points.
-		Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
-		ostringstream convert;
-		string pointsFileName;	// Points file name.
-		string dcelFileName;	// DCEL file name.
+		// Close file.
+		ofs.close();
 
-		// Generate random points.
-		p1.random();
-		p2.random();
-		line = Line(p1, p2);
-
-		// Dump data.
-		convert << failedTestIndex;
-		this->fileName = this->baseFileName + "_" + convert.str() + "_";
-
-		// Create file names.
-		pointsFileName = this->fileName + "Points.txt";
-		dcelFileName = this->fileName + "DCEL.txt";
-		this->dump(pointsFileName, dcelFileName, p1, p2, this->dcel);
-
-		Logging::buildText(__FUNCTION__, __FILE__, "Start find path");
-		Logging::write( true, Info);
-
-		// Compute triangles path between two points.
-		if (!this->delaunay.findPath(line, faces))
+		// Write DCEL data.
+		if (!dcel.writePoints(dcelFileName, dcel.getNVertex()))
 		{
-			failedTestIndex++;
-			Logging::buildText(__FUNCTION__, __FILE__, "Line does not intersect convex hull");
+			cout << "Cannot write to file " << dcelFileName << endl;
 		}
-		else
-		{
-			remove(pointsFileName.c_str());
-			remove(dcelFileName.c_str());
-			Logging::buildText(__FUNCTION__, __FILE__, "Faces set computed");
-		}
-		Logging::write( true, Info);
-
-		sleep(1);
+	}
+	// Error opening points file.
+	else
+	{
+		cout << "Cannot open file " << pointsFileName << endl;
 	}
 }
 
-void TestPath::VoronoiPath()
+/***************************************************************************
+* Name: 	main
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	true			if test prepared
+* 			false			i.o.c.
+* GLOBAL:	NONE
+* Description: 	builds a Delaunay triangulation, create two random points
+* 				and finds the set of faces of the triangulation from one
+* 				point to the other. If the path is not found then it writes
+* 				the points and the set of points of the triangulation.
+***************************************************************************/
+void TestPathDelaunay::main()
 {
-	bool error=false;			// Bool control flag.
-	int	testIndex=0;			// Test index.
-	int	failedTestIndex=1;		// Index of last failed test.
+	int			i=0;				// Loop counter.
+	Dcel		dcel;				// Dcel data.
+	Delaunay	delaunay;			// Delaunay data.
+	int			failedTestIndex=1;	// Index of last failed test.
+	int			testIndex=0;		// Current test index.
+	int			stepIndex=0;		// Current step index.
+	int			currentNPoints=0;
+	Point<TYPE> p1, p2;				// Segment points.
+	Line line;						// Segment line.
+	Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
+	string pointsFileName;			// Points file name.
+	string dcelFileName;			// DCEL file name.
 
-	while ((!error) && (testIndex < this->nTests))
+	// Print test parameters.
+	this->printParameters();
+
+	// Execute tests.
+	currentNPoints = this->nPoints;
+	for (stepIndex=0; stepIndex<this->nSteps ;stepIndex++)
 	{
-		cout << "Test " << (testIndex+1) << endl;
-		testIndex++;
+		Logging::buildText(__FUNCTION__, __FILE__, "Executing step ");
+		Logging::buildText(__FUNCTION__, __FILE__, (stepIndex+1));
+		Logging::buildText(__FUNCTION__, __FILE__, "/");
+		Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
+		Logging::write(true, Info);
 
-		Point<TYPE> p1, p2;						// Segment points.
-		Line line;								// Segment line.
-		Set<PointT> points(1);					// List of points.
-		Set<int> extremeFaces(DEFAULT_QUEUE_SIZE);		// Set of faces.
-		Set<int> pathFaces;
-		ostringstream convert;
-
-		Point<TYPE> closest;		// Closest point.
-		double distance=0.0;		// Distance between points.
-
-		int	 initialFace=0;			// Initial face in the path.
-		int	 finalFace=0;			// Final face in the path.
-
-		string pointsFileName;	// Points file name.
-		string dcelFileName;	// DCEL file name.
-
-		// Generate random points.
-		p1.random();
-		p2.random();
-		line = Line(p1, p2);
-
-		// Dump data.
-		convert << failedTestIndex;
-		this->fileName = this->baseFileName + "_" + convert.str() + "_";
-		pointsFileName = this->fileName + "Points.txt";
-		dcelFileName = this->fileName + "DCEL.txt";
-		this->dump(pointsFileName, dcelFileName, p1, p2, this->dcel);
-
-		Logging::buildText(__FUNCTION__, __FILE__, "Start find Voronoi path");
-		Logging::write( true, Info);
-
-		if (this->delaunay.findClosestPoint(p1, this->voronoi, closest, initialFace, distance) &&
-			this->delaunay.findClosestPoint(p2, this->voronoi, closest, finalFace, distance))
+		for (testIndex=0; testIndex< this->nTests ;testIndex++)
 		{
-			// Add faces to set.
-			extremeFaces.add(initialFace+1);
-			extremeFaces.add(finalFace+1);
-
-			// Compute triangles path between two points.
-			if (!this->voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces))
+			// Execute current test.
+			delaunay.setDCEL(&dcel);
+			if (!dcel.generateRandom(currentNPoints))
 			{
-				failedTestIndex++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in iteration ");
+				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
+				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
+				Logging::write(true, Error);
 			}
 			else
 			{
-				remove(pointsFileName.c_str());
-				remove(dcelFileName.c_str());
-				Logging::buildText(__FUNCTION__, __FILE__, "Voronoi path computed in iteration ");
+				Logging::buildText(__FUNCTION__, __FILE__, "Start Delaunay path test ");
+				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+				Logging::write(true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
+				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
+				Logging::write(true, Info);
+
+				// Generate random points.
+				p1.random();
+				p2.random();
+				line = Line(p1, p2);
+
+				// Write test data.
+				ostringstream convert;
+				convert << failedTestIndex;
+				pointsFileName = this->outputFolder + "Points_" + convert.str() + ".txt";
+				dcelFileName = this->outputFolder + "DCEL_" + convert.str() + ".txt";
+				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
+				if (delaunay.incremental())
+				{
+					Logging::buildText(__FUNCTION__, __FILE__, "Start find path");
+					Logging::write( true, Info);
+
+					// Compute triangles path between two points.
+					if (delaunay.findPath(line, faces))
+					{
+						// Remove files because test did not fail.
+						remove(pointsFileName.c_str());
+						remove(dcelFileName.c_str());
+
+						// Print test results
+#ifdef DEBUG_FIND_DELAUNAY_PATH
+						Logging::buildText(__FUNCTION__, __FILE__, "Faces in the path:");
+						for (i=0; i<faces.getNElements() ;i++)
+						{
+							Logging::buildText(__FUNCTION__, __FILE__, " ");
+							Logging::buildText(__FUNCTION__, __FILE__, *faces.at(i));
+						}
+						Logging::write( true, Info);
+#endif
+						Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
+						Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
+						Logging::write( true, Info);
+					}
+					else
+					{
+						failedTestIndex++;
+						Logging::buildText(__FUNCTION__, __FILE__, \
+										"Line does not intersect set of points");
+						Logging::write( true, Info);
+					}
+				}
+				else
+				{
+					failedTestIndex++;
+					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay");
+					Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
+					Logging::write(true, Error);
+				}
+
+				// Reset Delaunay data.
+				sleep(1);
+				delaunay.reset();
 			}
-			Logging::buildText(__FUNCTION__, __FILE__, testIndex);
-			Logging::write( true, Info);
 		}
 
-		// Reset voronoi data.
-		this->voronoi.reset();
-		sleep(1);
+		// Update # points to generate.
+		currentNPoints = currentNPoints*this->deltaPoints;
 	}
 }
 
-bool TestPath::createSet()
-{
-	bool created=true;
-	cout << "CREATE SET" << endl;
-
-	// Create set of points.
-	if (!this->dcel.generateRandom(this->nPoints))
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set.");
-		Logging::write(true, Error);
-		created = false;
-	}
-
-	return(created);
-}
-
-bool TestPath::buildDelaunay()
-{
-	bool built=true;
-
-	// Create set of points.
-	if (!this->delaunay.incremental())
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay triangulation.");
-		Logging::write(true, Error);
-		built = false;
-	}
-
-	return(built);
-}
-
-bool TestPath::buildVoronoi()
-{
-	bool built=true;
-
-	if (this->voronoi.init(&this->dcel))
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Error initializing Voronoi.");
-		Logging::write(true, Error);
-		built = false;
-	}
-	else if (!this->voronoi.build())
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi.");
-		Logging::write(true, Error);
-		built = false;
-	}
-
-	return(built);
-}
-
-bool TestPath::initializeDelaunay()
-{
-	bool built=true;
-	cout << "INITIALIZE DELAUNAY" << endl;
-
-	built = !this->createSet() ||
-			!this->buildDelaunay();
-
-	return(built);
-}
-
-bool TestPath::initializeVoronoi()
-{
-	bool built=true;
-	cout << "INITIALIZE VORONOI" << endl;
-
-	built = !this->initializeDelaunay() ||
-			!this->buildVoronoi();
-
-	return(built);
-}
-
-void TestPath::dump(string pointsFileName, string dcelFileName, Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel)
+/***************************************************************************
+* Name: 	dump
+* IN:		pointsFileName		points file name
+* 			dcelFileName		dcel file name
+* 			p1					first point
+* 			p2					second point
+* 			dcel				dcel data to write
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	Writes to output files the data required to reproduce the fail
+***************************************************************************/
+void TestPathVoronoi::dump(string pointsFileName, string dcelFileName, Point<TYPE> &p1, Point<TYPE> &p2, Dcel &dcel)
 {
 	ofstream ofs;			// Output file.
 
@@ -345,112 +350,167 @@ void TestPath::dump(string pointsFileName, string dcelFileName, Point<TYPE> &p1,
 	}
 }
 
-bool TestPath::parseParameters(Set<Label> &labels)
+/***************************************************************************
+* Name: 	main
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	true			if test prepared
+* 			false			i.o.c.
+* GLOBAL:	NONE
+* Description: 	builds a Voronoi diagram, create two random points
+* 				and finds the set of faces of the diagram from one
+* 				point to the other. If the path is not found then it writes
+* 				the points and the set of points of the ------------------------------------------------------------------------.
+***************************************************************************/
+void TestPathVoronoi::main()
 {
-	bool success=true;
+	int			i=0;				// Loop counter.
+	Dcel		dcel;				// Dcel data.
+	Delaunay	delaunay;			// Delaunay data.
+	Voronoi		voronoi;			// Voronoi data.
+	int			failedTestIndex=1;	// Index of last failed test.
+	int			testIndex=0;		// Current test index.
+	int			stepIndex=0;		// Current step index.
+	int			currentNPoints=0;
+	Point<TYPE> p1, p2;				// Segment points.
+	Line line;						// Segment line.
+	Point<TYPE> closest;		// Closest point.
+	double distance=0.0;		// Distance between points.
+	int	 initialFace=0;			// Initial face in the path.
+	int	 finalFace=0;			// Final face in the path.
+	Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
+	Set<int> extremeFaces(DEFAULT_QUEUE_SIZE);		// Set of faces.
+	Set<int> pathFaces;
+	string pointsFileName;			// Points file name.
+	string dcelFileName;			// DCEL file name.
 
-	cout << "Test PATH READ" << endl;
+	// Print test parameters.
+	this->printParameters();
 
-	// Check test type.
-	switch(this->testType)
+	// Execute tests.
+	currentNPoints = this->nPoints;
+	for (stepIndex=0; stepIndex<this->nSteps ;stepIndex++)
 	{
-		//
-		case TESTPATH_DELAUNAY_COMPARE_TO_GOLD:
+		Logging::buildText(__FUNCTION__, __FILE__, "Executing step ");
+		Logging::buildText(__FUNCTION__, __FILE__, (stepIndex+1));
+		Logging::buildText(__FUNCTION__, __FILE__, "/");
+		Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
+		Logging::write(true, Info);
+
+		for (testIndex=0; testIndex< this->nTests ;testIndex++)
 		{
-			// Input flat files
-			// Gold file folder.
-			break;
+			// Execute current test.
+			delaunay.setDCEL(&dcel);
+			if (!dcel.generateRandom(currentNPoints))
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
+				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
+				Logging::write(true, Error);
+			}
+			else
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Start Voronoi path test ");
+				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+				Logging::write(true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
+				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
+				Logging::write(true, Info);
+
+				// Generate random points.
+				p1.random();
+				p2.random();
+				line = Line(p1, p2);
+
+				// Write test data.
+				ostringstream convert;
+				convert << failedTestIndex;
+				pointsFileName = this->outputFolder + "Points_" + convert.str() + ".txt";
+				dcelFileName = this->outputFolder + "DCEL_" + convert.str() + ".txt";
+				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
+
+				// Create Delaunay triangulation.
+				if (delaunay.incremental())
+				{
+					// Initialize Voronoi.
+					if (!voronoi.init(&dcel))
+					{
+						Logging::buildText(__FUNCTION__, __FILE__, "Error initializing Voronoi.");
+						Logging::write(true, Error);
+					}
+					// Build Voronoi.
+					else if (!voronoi.build())
+					{
+						Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi.");
+						Logging::write(true, Error);
+					}
+					else
+					{
+#ifdef DEBUG_FIND_VORONOI_PATH
+						Logging::buildText(__FUNCTION__, __FILE__, "Locating initial faces");
+						Logging::write(true, Info);
+#endif
+						extremeFaces.reset();
+						if (delaunay.findClosestPoint(p1, voronoi, closest, initialFace, distance) &&
+							delaunay.findClosestPoint(p2, voronoi, closest, finalFace, distance))
+						{
+							// Add faces to set.
+							extremeFaces.add(initialFace+1);
+							extremeFaces.add(finalFace+1);
+#ifdef DEBUG_FIND_VORONOI_PATH
+							Logging::buildText(__FUNCTION__, __FILE__, "Computing Voronoi path");
+							Logging::write(true, Info);
+#endif
+							// Compute triangles path between two points.
+							pathFaces.reset();
+							if (voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces))
+							{
+								// Remove files because test did not fail.
+								remove(pointsFileName.c_str());
+								remove(dcelFileName.c_str());
+
+								// Print test results
+#ifdef DEBUG_FIND_VORONOI_PATH
+								Logging::buildText(__FUNCTION__, __FILE__, "Faces in the path:");
+								for (i=0; i<pathFaces.getNElements() ;i++)
+								{
+									Logging::buildText(__FUNCTION__, __FILE__, " ");
+									Logging::buildText(__FUNCTION__, __FILE__, *pathFaces.at(i));
+								}
+								Logging::write( true, Info);
+#endif
+								Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
+								Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
+								Logging::write( true, Info);
+							}
+							else
+							{
+								failedTestIndex++;
+								Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in iteration ");
+								Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
+								Logging::write( true, Info);
+							}
+						}
+					}
+				}
+				else
+				{
+					failedTestIndex++;
+					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay");
+					Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
+					Logging::write(true, Error);
+				}
+
+				// Reset Delaunay data.
+				sleep(1);
+				delaunay.reset();
+				voronoi.reset();
+			}
 		}
-		case TESTPATH_VORONOI_COMPARE_TO_GOLD:
-		{
-			// Input flat files
-			// Gold file folder.
-			break;
-		}
-		case TESTPATH_DELAUNAY_RANDOM_INCREMENTAL_STEP:
-		{
-			// Initialize test file basename.
-			this->baseFileName = "/home/juan/projects/delaunay/code/data/samples/errors/paths/delaunayPath/findPathDelaunay";
-			break;
-		}
-		case TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP:
-		{
-			// Initialize test file basename.
-			this->baseFileName = "/home/juan/projects/delaunay/code/data/samples/errors/paths/voronoiPath/findPathVoronoi";
-			break;
-		}
-		default:
-		{
-			cout << "Unknown test type. Value is " << this->testType << \
-					" and must be between " <<
-					TESTPATH_DELAUNAY_COMPARE_TO_GOLD << " and " <<
-					TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP << endl;
-			success = false;
-			break;
-		}
+
+		// Update # points to generate.
+		currentNPoints = currentNPoints*this->deltaPoints;
 	}
-
-	return(success);
 }
 
-void TestPath::print()
-{
-	cout << "Test Path parameters"<< endl;
-	cout << "Test type " << this->testType << endl;
-
-	// Check test type.
-	switch(this->testType)
-	{
-		//
-		case TESTPATH_DELAUNAY_COMPARE_TO_GOLD:
-		{
-			// Input flat files
-			// Gold file folder.
-			break;
-		}
-		case TESTPATH_VORONOI_COMPARE_TO_GOLD:
-		{
-			// Input flat files
-			// Gold file folder.
-			break;
-		}
-		case TESTPATH_DELAUNAY_RANDOM_INCREMENTAL_STEP:
-		{
-			cout << "# tests " << this->nTests << endl;
-			cout << "# points " << this->nPoints << endl;
-			cout << "# steps " << this->nSteps << endl;
-			cout << "Step " << this->step << endl;
-			cout << "BaseFileName" << this->baseFileName << endl;
-			break;
-		}
-		case TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP:
-		{
-			cout << "# tests " << this->nTests << endl;
-			cout << "# points " << this->nPoints << endl;
-			cout << "# steps " << this->nSteps << endl;
-			cout << "Step " << this->step << endl;
-			cout << "BaseFileName" << this->baseFileName << endl;
-			break;
-		}
-		default:
-		{
-			cout << "Unknown test type. Value is " << this->testType << \
-					" and must be between " <<
-					TESTPATH_DELAUNAY_COMPARE_TO_GOLD << " and " <<
-					TESTPATH_VORONOI_RANDOM_INCREMENTAL_STEP << endl;
-			break;
-		}
-	}
-}
-
-void TestPath::setDefault()
-{
-	cout << "DEFAULT" << endl;
-
-	// Initialize test data.
-	this->testType = TESTPATH_DELAUNAY_RANDOM_INCREMENTAL_STEP;
-	this->nTests = DEFAULT_N_TESTS;
-	this->nPoints = DEFAULT_N_POINTS;
-	this->nSteps = DEFAULT_N_STEPS;
-	this->step = DEFAULT_STEP;
-}

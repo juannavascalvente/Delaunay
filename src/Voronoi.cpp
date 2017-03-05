@@ -74,10 +74,9 @@ Voronoi::~Voronoi()
 * GLOBAL:	this->voronoi		resize to new size.
 * Description: 	resizes the "voronoi" DCEL attribute.
 ***************************************************************************/
-// PENDING CHANGE TO BOOL
-int Voronoi::init( Dcel *dcel)
+bool Voronoi::init( Dcel *dcel)
 {
-	bool	error=false;			// Return value.
+	bool	initialized=true;			// Return value.
 
 	// Ckeck input parameter.
 	if (dcel != NULL)
@@ -111,10 +110,10 @@ int Voronoi::init( Dcel *dcel)
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Input dcel is null. Voronoi cannot be created.");
 		Logging::write( true, Info);
-		error = true;
+		initialized = false;
 	}
 
-	return(error);
+	return(initialized);
 }
 
 /***************************************************************************

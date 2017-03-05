@@ -155,7 +155,7 @@ bool buildVoronoi(int failedTestIndex, Dcel& dcel, Voronoi &voronoi)
 	}
 	else
 	{
-		if (!voronoi.init(&dcel))
+		if (voronoi.init(&dcel))
 		{
 			// Compute Voronoi diagram.
 			if (!voronoi.build())

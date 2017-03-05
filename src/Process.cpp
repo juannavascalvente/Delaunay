@@ -614,7 +614,7 @@ void Process::execute(void)
 			if (this->status.isDelaunayCreated())
 			{
 				// Initialize voronoi data.
-				error = this->voronoi.init(&this->dcel);
+				error = !this->voronoi.init(&this->dcel);
 				if (!error)
 				{
 					// Compute Voronoi diagram.

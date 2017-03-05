@@ -139,9 +139,24 @@ TestType Test::getTypeTest(string testName)
 		type = TEST_VORONOI_COMPARE;
 	}
 	// Compare computed paths and new executions.
-	else if (testName.compare(TEST_PATH_NAME) == 0)
+	else if (testName.compare(TEST_PATH_DELAUNAY_NAME) == 0)
 	{
-		type = TEST_PATH;
+		type = TEST_PATH_DELAUNAY;
+	}
+	// Compare computed paths and new executions.
+	else if (testName.compare(TEST_PATH_DELAUNAY_COMPARE_NAME) == 0)
+	{
+		type = TEST_PATH_DELAUNAY_COMPARE;
+	}
+	// Compare computed paths and new executions.
+	else if (testName.compare(TEST_PATH_VORONOI_NAME) == 0)
+	{
+		type = TEST_PATH_VORONOI;
+	}
+	// Compare computed paths and new executions.
+	else if (testName.compare(TEST_PATH_VORONOI_COMPARE_NAME) == 0)
+	{
+		type = TEST_PATH_VORONOI_COMPARE;
 	}
 	else
 	{

@@ -32,7 +32,7 @@
 //#define DEBUG_DELAUNAY_GET_INTERNAL_FACE
 //#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT
 //#define DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
-#define DEBUG_DELAUNAY_FIND_TRIANG_PATH
+//#define DEBUG_DELAUNAY_FIND_TRIANG_PATH
 #endif
 
 //------------------------------------------------------------------------
