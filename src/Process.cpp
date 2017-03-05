@@ -141,7 +141,7 @@ bool Process::readData(int option)
 		case RANDOMLY:
 		{
 			success = this->dcel.generateRandom(this->config->getNPoints());
-			this->status.set(false, true, false, false, false, false);
+			this->status.set(false, success, false, false, false, false);
 			break;
 		}
 		// Generate clusters set.
@@ -149,14 +149,14 @@ bool Process::readData(int option)
 		{
 			success = this->dcel.generateClusters(this->config->getNPoints(),
 					this->config->getNClusters(), this->config->getRadius());
-			this->status.set(false, true, false, false, false, false);
+			this->status.set(false, success, false, false, false, false);
 			break;
 		}
 		// Read set from flat file.
 		case READ_POINTS_FILE:
 		{
 			success = this->dcel.readPoints(this->config->getInFlatFilename());
-			this->status.set(false, true, false, false, false, false);
+			this->status.set(false, success, false, false, false, false);
 			break;
 		}
 		// Read dcel file.
@@ -550,8 +550,7 @@ void Process::execute(void)
 			this->resetData();
 
 			// Check option to generate/read set.
-			error = !this->readData(option);
-			if (!error)
+			if (this->readData(option))
 		    {
 				if (this->status.isVoronoiCreated())
 				{
