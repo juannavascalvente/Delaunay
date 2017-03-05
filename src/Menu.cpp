@@ -131,7 +131,7 @@ void Menu::updateMenu()
 		}
 
 		// Input points sub-menu.
-		sub_Menu_Input = glutCreateMenu( menu_level_1);
+		sub_Menu_Input = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_RANDOM_TEXT, RANDOMLY);
 		glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, CLUSTER);
 		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FILE);
@@ -142,12 +142,12 @@ void Menu::updateMenu()
 
 		// Main menu.
 		menu_Id = glutCreateMenu(menu_level_1);
-		glutAddSubMenu( INPUTSET_MENU_TEXT, sub_Menu_Input);
-		glutAddMenuEntry( PARAMETERS_MENU_TEXT, PARAMETERS);
-		glutAddMenuEntry( QUIT_MENU_TEXT, QUIT);
+		glutAddSubMenu(INPUTSET_MENU_TEXT, sub_Menu_Input);
+		glutAddMenuEntry(PARAMETERS_MENU_TEXT, PARAMETERS);
+		glutAddMenuEntry(QUIT_MENU_TEXT, QUIT);
 		glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-		this->status->setFirstTime( false);
+		this->status->setFirstTime(false);
 	}
 	else
 	{
@@ -231,28 +231,28 @@ void Menu::updateMenu()
 
 		// Main menu.
 		menu_Id = glutCreateMenu(menu_level_1);
-		glutAddSubMenu( INPUTSET_MENU_TEXT, sub_Menu_Input);
-		glutAddMenuEntry( PARAMETERS_MENU_TEXT, PARAMETERS);
+		glutAddSubMenu(INPUTSET_MENU_TEXT, sub_Menu_Input);
+		glutAddMenuEntry(PARAMETERS_MENU_TEXT, PARAMETERS);
 		if (this->status->isSetCreated())
 		{
-			glutAddSubMenu( TRIANGULATIONS_MENU_TEXT, sub_Menu_Id2);
+			glutAddSubMenu(TRIANGULATIONS_MENU_TEXT, sub_Menu_Id2);
 		}
 		if (this->status->isTriangulationCreated() || this->status->isDelaunayCreated())
 		{
-			glutAddSubMenu( FIGURES_MENU_TEXT, sub_Menu_Id3);
+			glutAddSubMenu(FIGURES_MENU_TEXT, sub_Menu_Id3);
 		}
 		if (this->status->isSetCreated())
 		{
-			glutAddSubMenu( EXPORT_MENU_TEXT, sub_Menu_Id4);
+			glutAddSubMenu(EXPORT_MENU_TEXT, sub_Menu_Id4);
 		}
 		if (this->status->isSetCreated())
 		{
-			glutAddSubMenu( INFORMATION_MENU_TEXT, sub_Menu_Id5);
+			glutAddSubMenu(INFORMATION_MENU_TEXT, sub_Menu_Id5);
 		}
 		glutAddMenuEntry(CLEAR_MENU_TEXT, CLEAR);
-		glutAddMenuEntry( ZOOM_MENU_TEXT, ZOOM);
-		glutAddMenuEntry( QUIT_MENU_TEXT, QUIT);
-		glutAttachMenu( GLUT_RIGHT_BUTTON);
+		glutAddMenuEntry(ZOOM_MENU_TEXT, ZOOM);
+		glutAddMenuEntry(QUIT_MENU_TEXT, QUIT);
+		glutAttachMenu(GLUT_RIGHT_BUTTON);
 	}
 }
 
@@ -266,7 +266,7 @@ void Menu::setMenuOption(int value)
 	menu_Option = value;
 }
 
-void Menu::resetMenuOption( )
+void Menu::resetMenuOption()
 {
 	menu_Option = DEFAULT_OPTION;
 }
