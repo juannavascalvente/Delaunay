@@ -14,6 +14,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <sstream>
 using namespace std;
@@ -92,6 +93,7 @@ int	parse_TYPE(char *strValue, TYPE *value);
 int	parse_Two_Int(char *value, int *value1, int *value2);
 int	parse_Point(char *value, Point<TYPE> *p);
 int parse_Zoom(char *value, int *min_X, int *max_X, int *min_Y, int *max_Y);
+std::string trim(std::string const& str);
 
 
 Config::Config(string fileName)
@@ -226,165 +228,170 @@ int 	Config::readConfig()
 		// Read lines until end of file.
 		while (getline(ifs, line))
 		{
-			// PENDING_REFACTOR: Create function that gets the value.
-			// Extract field and value.
-			while ((pos = line.find(delimiter)) != std::string::npos)
+			// Trim line and skip blank lines.
+			line = trim(line);
+			if (line.length() > 0)
 			{
-				field = line.substr(0, pos);
-			    line.erase(0, pos + delimiter.length());
-			}
-			value = line;
+				// PENDING_REFACTOR: Create function that gets the value.
+				// Extract field and value.
+				while ((pos = line.find(delimiter)) != std::string::npos)
+				{
+					field = line.substr(0, pos);
+					line.erase(0, pos + delimiter.length());
+				}
+				value = line;
 
-			// PENDING_REFACTOR: Create a function that gets the parameter
-			// option as an integer and remove elfis by a switch.
-			if (field.compare(N_POINTS_PARAM) == 0)
-			{
-				// Get input value.
-				std::istringstream ss(value);
-				ss.imbue(std::locale::classic());
-				ss >> this->nPoints;
-			}
-			else if (field.compare(INPUT_FLAT_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->inFlatFileName = value;
-			}
-			else if (field.compare(INPUT_DCEL_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->inDcelFileName = value;
-			}
-			else if (field.compare(INPUT_GRAPH_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->inGraphFileName = value;
-			}
-			else if (field.compare(INPUT_VORONOI_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->inVoronoiFileName = value;
-			}
-			else if (field.compare(INPUT_GABRIEL_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->inGabrielFileName = value;
-			}
-			else if (field.compare(OUTPUT_FLAT_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->outFlatFileName = value;
-			}
-			else if (field.compare(OUTPUT_DCEL_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->outDcelFileName = value;
-			}
-			else if (field.compare(OUTPUT_GRAPH_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->outGraphFileName = value;
-			}
-			else if (field.compare(OUTPUT_VORONOI_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->outVoronoiFileName = value;
-			}
-			else if (field.compare(OUTPUT_GABRIEL_FILE_PARAM) == 0)
-			{
-				// Get input value.
-				this->outGabrielFileName = value;
-			}
-			else if (field.compare(N_ANCHORS_PARAM) == 0)
-			{
-				std::istringstream ss(value);
-				ss.imbue(std::locale::classic());
-				ss >> this->nAnchors;
-			}
-			// Get # anchors to locate point.
-			else if (field.compare(CLOSEST_POINT_PARAM) == 0)
-			{
-				// Extract two values.
-				field = value;
-				pos = field.find(separator);
-				value = field.substr(0, pos);
-				field.erase(0, pos + separator.length());
-				std::istringstream ss(value);
-				ss.imbue(std::locale::classic());
-				ss >> newValue;
-				this->closestPoint.setX(newValue);
-				value = field;
-				std::istringstream ss2(value);
-				ss2.imbue(std::locale::classic());
-				ss2 >> newValue;
-				this->closestPoint.setY(newValue);
-			}
-			// Check REMOVE_LOWER_EDGES parameter.
-			else if (field.compare(MIN_LENGTH_EDGE_PARAM) == 0)
-			{
-				// Get input value.
-				std::istringstream ss(value);
-				ss.imbue(std::locale::classic());
-				ss >> this->minLengthEdge;
-			}
-			// Check ZOOM parameter.
-			else if (field.compare(ZOOM_PARAM) == 0)
-			{
-				// Extract two values.
-				field = value;
-				pos = field.find(separator);
-				value = field.substr(0, pos);
-				field.erase(0, pos + separator.length());
-				std::istringstream ss(value);
-				ss.imbue(std::locale::classic());
-				ss >> newValue;
-				this->minX = newValue;
-
-
-				pos = field.find(separator);
-				value = field.substr(0, pos);
-				field.erase(0, pos + separator.length());
-				std::istringstream ss2(value);
-				ss2.imbue(std::locale::classic());
-				ss2 >> newValue;
-				this->maxX = newValue;
-
-				pos = field.find(separator);
-				value = field.substr(0, pos);
-				field.erase(0, pos + separator.length());
-				std::istringstream ss3(value);
-				ss3.imbue(std::locale::classic());
-				ss3 >> newValue;
-				this->minY = newValue;
+				// PENDING_REFACTOR: Create a function that gets the parameter
+				// option as an integer and remove elfis by a switch.
+				if (field.compare(N_POINTS_PARAM) == 0)
+				{
+					// Get input value.
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> this->nPoints;
+				}
+				else if (field.compare(INPUT_FLAT_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->inFlatFileName = value;
+				}
+				else if (field.compare(INPUT_DCEL_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->inDcelFileName = value;
+				}
+				else if (field.compare(INPUT_GRAPH_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->inGraphFileName = value;
+				}
+				else if (field.compare(INPUT_VORONOI_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->inVoronoiFileName = value;
+				}
+				else if (field.compare(INPUT_GABRIEL_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->inGabrielFileName = value;
+				}
+				else if (field.compare(OUTPUT_FLAT_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->outFlatFileName = value;
+				}
+				else if (field.compare(OUTPUT_DCEL_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->outDcelFileName = value;
+				}
+				else if (field.compare(OUTPUT_GRAPH_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->outGraphFileName = value;
+				}
+				else if (field.compare(OUTPUT_VORONOI_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->outVoronoiFileName = value;
+				}
+				else if (field.compare(OUTPUT_GABRIEL_FILE_PARAM) == 0)
+				{
+					// Get input value.
+					this->outGabrielFileName = value;
+				}
+				else if (field.compare(N_ANCHORS_PARAM) == 0)
+				{
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> this->nAnchors;
+				}
+				// Get # anchors to locate point.
+				else if (field.compare(CLOSEST_POINT_PARAM) == 0)
+				{
+					// Extract two values.
+					field = value;
+					pos = field.find(separator);
+					value = field.substr(0, pos);
+					field.erase(0, pos + separator.length());
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> newValue;
+					this->closestPoint.setX(newValue);
+					value = field;
+					std::istringstream ss2(value);
+					ss2.imbue(std::locale::classic());
+					ss2 >> newValue;
+					this->closestPoint.setY(newValue);
+				}
+				// Check REMOVE_LOWER_EDGES parameter.
+				else if (field.compare(MIN_LENGTH_EDGE_PARAM) == 0)
+				{
+					// Get input value.
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> this->minLengthEdge;
+				}
+				// Check ZOOM parameter.
+				else if (field.compare(ZOOM_PARAM) == 0)
+				{
+					// Extract two values.
+					field = value;
+					pos = field.find(separator);
+					value = field.substr(0, pos);
+					field.erase(0, pos + separator.length());
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> newValue;
+					this->minX = newValue;
 
 
-				value = field;
-				std::istringstream ss4(value);
-				ss4.imbue(std::locale::classic());
-				ss4 >> newValue;
-				this->maxY = newValue;
-			}
-			else if (field.compare(CLUSTER_SET_PARAM) == 0)
-			{
-				// Extract two values.
-				field = value;
-				pos = field.find(separator);
-				value = field.substr(0, pos);
-				field.erase(0, pos + separator.length());
-				std::istringstream ss(value);
-				ss.imbue(std::locale::classic());
-				ss >> newValue;
-				this->nClusters = newValue;
-				value = field;
-				std::istringstream ss2(value);
-				ss2.imbue(std::locale::classic());
-				ss2 >> newValue;
-				this->clusterRadius = newValue;
-			}
-			// Field does not exist.
-			else
-			{
-				std::cout << "Skipping line " << line << "Unknown parameter." << std:: endl;
-				ret = FAILURE;
+					pos = field.find(separator);
+					value = field.substr(0, pos);
+					field.erase(0, pos + separator.length());
+					std::istringstream ss2(value);
+					ss2.imbue(std::locale::classic());
+					ss2 >> newValue;
+					this->maxX = newValue;
+
+					pos = field.find(separator);
+					value = field.substr(0, pos);
+					field.erase(0, pos + separator.length());
+					std::istringstream ss3(value);
+					ss3.imbue(std::locale::classic());
+					ss3 >> newValue;
+					this->minY = newValue;
+
+
+					value = field;
+					std::istringstream ss4(value);
+					ss4.imbue(std::locale::classic());
+					ss4 >> newValue;
+					this->maxY = newValue;
+				}
+				else if (field.compare(CLUSTER_SET_PARAM) == 0)
+				{
+					// Extract two values.
+					field = value;
+					pos = field.find(separator);
+					value = field.substr(0, pos);
+					field.erase(0, pos + separator.length());
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> newValue;
+					this->nClusters = newValue;
+					value = field;
+					std::istringstream ss2(value);
+					ss2.imbue(std::locale::classic());
+					ss2 >> newValue;
+					this->clusterRadius = newValue;
+				}
+				// Field does not exist.
+				else if (field.length() > 0)
+				{
+					std::cout << "Unknown parameter. Skipping line " << line << std:: endl;
+					ret = FAILURE;
+				}
 			}
 		}
 
@@ -655,4 +662,13 @@ int parse_Zoom(char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
 #endif
 
 	return(ret);
+}
+
+std::string trim(std::string const& str)
+{
+    std::string word;
+    std::stringstream stream(str);
+    stream >> word;
+
+    return word;
 }
