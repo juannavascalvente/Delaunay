@@ -283,7 +283,7 @@ bool TestPath::buildVoronoi()
 		Logging::write(true, Error);
 		built = false;
 	}
-	else if (this->voronoi.build())
+	else if (!this->voronoi.build())
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi.");
 		Logging::write(true, Error);
