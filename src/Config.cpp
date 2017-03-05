@@ -8,6 +8,7 @@
 #include "Config.h"
 #include <errno.h>
 #include <float.h>
+#include "generic.h"
 #include "Logging.h"
 #include <stdio.h>
 #include <string.h>
@@ -93,8 +94,6 @@ int	parse_TYPE(char *strValue, TYPE *value);
 int	parse_Two_Int(char *value, int *value1, int *value2);
 int	parse_Point(char *value, Point<TYPE> *p);
 int parse_Zoom(char *value, int *min_X, int *max_X, int *min_Y, int *max_Y);
-std::string trim(std::string const& str);
-
 
 Config::Config(string fileName)
 {
@@ -664,11 +663,3 @@ int parse_Zoom(char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
 	return(ret);
 }
 
-std::string trim(std::string const& str)
-{
-    std::string word;
-    std::stringstream stream(str);
-    stream >> word;
-
-    return word;
-}

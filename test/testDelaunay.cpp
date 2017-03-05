@@ -6,6 +6,7 @@
 #include "testDelaunay.h"
 
 #include "Delaunay.h"
+#include "generic.h"
 #include "Label.h"
 #include <unistd.h>
 
@@ -356,25 +357,30 @@ bool TestDelaunayCompare::prepare()
 		// Check all files exist.
 		while (getline(ifs, line))
 		{
-			// Open file.
-			fileTestIfs.open(line.c_str(), ios::in);
+			// Skip empty lines.
+			line = trim(line);
+			if (line.length() > 0)
+			{
+				// Open file.
+				fileTestIfs.open(line.c_str(), ios::in);
 
-			// Check file exists.
-			if (fileTestIfs.is_open())
-			{
+				// Check file exists.
+				if (fileTestIfs.is_open())
+				{
 #ifdef DEBUG_DELAUNAY_COMPARE_PREPARE
-				Logging::buildText(__FUNCTION__, __FILE__, "Adding file to list: ");
-				Logging::buildText(__FUNCTION__, __FILE__, line);
-				Logging::write(true, Info);
+					Logging::buildText(__FUNCTION__, __FILE__, "Adding file to list: ");
+					Logging::buildText(__FUNCTION__, __FILE__, line);
+					Logging::write(true, Info);
 #endif
-				this->filesList.add(line);
-				fileTestIfs.close();
-			}
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Skip file that does not exist: ");
-				Logging::buildText(__FUNCTION__, __FILE__, line);
-				Logging::write(true, Error);
+					this->filesList.add(line);
+					fileTestIfs.close();
+				}
+				else
+				{
+					Logging::buildText(__FUNCTION__, __FILE__, "Skip file that does not exist: ");
+					Logging::buildText(__FUNCTION__, __FILE__, line);
+					Logging::write(true, Error);
+				}
 			}
 		}
 
