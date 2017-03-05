@@ -141,7 +141,7 @@ public:
 							 Gabriel *gabriel,
 							 Status *status,
 							 Config *config);
-	Draw() {};
+	Draw() : windowID(0), pointsSet(NULL), facesSet(NULL) {} ;
 	~Draw() {};
 
 	//------------------------------------------------------------------------
