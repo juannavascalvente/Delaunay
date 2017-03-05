@@ -82,7 +82,7 @@ public:
 		this->face = other.face;
 		return(*this);
 	};
-	bool  operator==(const Edge &other) const
+	bool operator==(const Edge &other) const
 	{
 		return ((this->origin == other.origin) &&
 				(this->twin == other.twin) &&
