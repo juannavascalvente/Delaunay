@@ -91,7 +91,7 @@ void TestExecution::applyParameter(Parameter *parameter, string value)
 	}
 	else
 	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Unknown label parameter:");
+		Logging::buildText(__FUNCTION__, __FILE__, "Unknown label parameter: ");
 		Logging::buildText(__FUNCTION__, __FILE__, parameterName);
 		Logging::write(true, Error);
 	}
