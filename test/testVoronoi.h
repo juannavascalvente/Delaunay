@@ -42,7 +42,7 @@ class TestVoronoiBuild : public Test
 	void initParameters();
 	void applyParameter(Parameter *parameter, string value);
 	void printParameters();
-	void dump(string dcelFileName, Dcel &dcel);
+	static void dump(string dcelFileName, Dcel &dcel);
 	void deallocate();
 
 public:

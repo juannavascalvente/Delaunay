@@ -12,11 +12,12 @@
 #define DEFAULT_DELTA_POINTS	2
 #define DEFAULT_N_STEPS			5
 #define DEFAULT_N_TESTS			5
-#define DEFAULT_OUTPUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/delaunay/"
+#define DEFAULT_OUTPUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/delaunay/build/"
 
 // Default parameters in Delaunay Compare test.
 #define DEFAULT_N_FILES			20
 #define DEFAULT_FILE_LIST		"fileList.txt"
+#define DEFAULT_OUTPUT_FOLDER_COMPARE	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/compare/"
 
 #include "Dcel.h"
 #include "Parameter.h"
@@ -84,6 +85,7 @@ class TestDelaunayCompare : public Test
 	//------------------------------------------------------------------------
 	string filesNamesFile;
 	Set<string> filesList;
+	string outputFolder;
 
 	//------------------------------------------------------------------------
 	//  Private functions.
@@ -91,6 +93,7 @@ class TestDelaunayCompare : public Test
 	void initParameters();
 	void printParameters();
 	void applyParameter(Parameter *parameter, string value);
+	void dump(string dcelFileName, Dcel &dcel);
 	void deallocate();
 public:
 	//------------------------------------------------------------------------
@@ -99,7 +102,8 @@ public:
 	TestDelaunayCompare(string logFile, bool printData) :
 							Test(logFile, printData), \
 							filesNamesFile(DEFAULT_FILE_LIST), \
-							filesList(DEFAULT_N_FILES) \
+							filesList(DEFAULT_N_FILES),
+							outputFolder(DEFAULT_OUTPUT_FOLDER_COMPARE) \
 							{};
 	~TestDelaunayCompare() {};
 

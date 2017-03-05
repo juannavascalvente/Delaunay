@@ -456,6 +456,14 @@ void TestDelaunayCompare::main()
 				else
 				{
 					nFailedTests++;
+
+					// Write test data.
+					ostringstream convert;
+					convert << nFailedTests;
+					fileName = this->outputFolder + "Delaunay_" + convert.str() + ".txt";
+					this->dump(fileName, dcel);
+
+					// Print log error.
 					Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
 					Logging::buildText(__FUNCTION__, __FILE__, i+1);
 					Logging::write(true, Error);
@@ -474,6 +482,38 @@ void TestDelaunayCompare::main()
 	Logging::buildText(__FUNCTION__, __FILE__, "/");
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
 	Logging::write(true, Info);
+}
+
+/***************************************************************************
+* Name: 	dump
+* IN:		dcelFileName	dcelFilefile where dcel points are written
+* 			dcel			dcel data to write
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	Writes to output files the data required to reproduce the fail
+***************************************************************************/
+void TestDelaunayCompare::dump(string dcelFileName, Dcel &dcel)
+{
+	ofstream ofs;			// Output file.
+
+	// Open file.
+	ofs.open(dcelFileName.c_str(), ios::out);
+
+	// Check file is opened.
+	if (ofs.is_open())
+	{
+		// Write DCEL data.
+		if (!dcel.write(dcelFileName, false))
+		{
+			cout << "Cannot open file " << dcelFileName << " to write dcel data" << endl;
+		}
+	}
+	// Error opening points file.
+	else
+	{
+		cout << "Cannot open file " << dcelFileName << " to write points" << endl;
+	}
 }
 
 /***************************************************************************
