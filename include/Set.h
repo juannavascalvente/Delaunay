@@ -31,15 +31,15 @@ using namespace std;
 //****************************************************************************
 //                           	SET CLASS
 //****************************************************************************
-template <class ElementType>
+template <class T>
 class Set
 {
 	//------------------------------------------------------------------------
 	// Attributes
 	//------------------------------------------------------------------------
-	int				nElements;		// # elements in the set.
-	int				size;			// Allocated size of set.
-	ElementType		*data;			// Set elements vector.
+	int	nElements;		// # elements in the set.
+	int	size;			// Allocated size of set.
+	T	*data;			// Set elements vector.
 
 public:
 	//------------------------------------------------------------------------
@@ -54,9 +54,9 @@ public:
 	//------------------------------------------------------------------------
 	bool isEmpty() { return(this->nElements == 0); };
 	bool isFull() { return(this->nElements == this->size); };
-	void add(ElementType element);
-	void update(int index, ElementType element);
-	ElementType *at(int index);
+	void add(T element);
+	void update(int index, T element);
+	T *at(int index);
 
 	int getSize();
 	int getNElements();
@@ -71,10 +71,11 @@ public:
 	void shake();
 
 	int highestIndex();
-	ElementType highest();
+	T highest();
+	bool  operator==(Set<T> &other);
 };
 
-template <class ElementType> Set<ElementType>::Set()
+template <class T> Set<T>::Set()
 {
 	// Initialize size attributes.
 	this->size = 0;
@@ -84,17 +85,17 @@ template <class ElementType> Set<ElementType>::Set()
 	this->data = NULL;
 }
 
-template <class ElementType> Set<ElementType>::Set(int size)
+template <class T> Set<T>::Set(int size)
 {
 	// Initialize size attributes.
 	this->size = size;
 	this->nElements = 0;
 
 	// Allocate data.
-	this->data = new ElementType[size];
+	this->data = new T[size];
 }
 
-template <class ElementType> Set<ElementType>::~Set()
+template <class T> Set<T>::~Set()
 {
 	// Reset attributes.
 	this->size = 0;
@@ -107,7 +108,7 @@ template <class ElementType> Set<ElementType>::~Set()
 	}
 }
 
-template <class ElementType> void Set<ElementType>::add(ElementType element)
+template <class T> void Set<T>::add(T element)
 {
 	// Check if set is full.
 	if (this->isFull())
@@ -135,7 +136,7 @@ template <class ElementType> void Set<ElementType>::add(ElementType element)
 #endif
 }
 
-template <class ElementType> void Set<ElementType>::update(int index, ElementType element)
+template <class T> void Set<T>::update(int index, T element)
 {
 	// Check if index out of bounds.
 	if (index < this->nElements)
@@ -150,9 +151,9 @@ template <class ElementType> void Set<ElementType>::update(int index, ElementTyp
 }
 
 
-template <class ElementType> ElementType* Set<ElementType>::at(int index)
+template <class T> T* Set<T>::at(int index)
 {
-	ElementType* ret;		// Return value.
+	T* ret;		// Return value.
 
 	// Check if index out of bounds.
 	if (index < this->nElements)
@@ -168,19 +169,19 @@ template <class ElementType> ElementType* Set<ElementType>::at(int index)
 	return(ret);
 }
 
-template <class ElementType> int Set<ElementType>::getSize()
+template <class T> int Set<T>::getSize()
 {
 	return(this->size);
 }
 
-template <class ElementType> int Set<ElementType>::getNElements()
+template <class T> int Set<T>::getNElements()
 {
 	return(this->nElements);
 }
 
-template <class ElementType> void Set<ElementType>::resize(int size, bool copy)
+template <class T> void Set<T>::resize(int size, bool copy)
 {
-	ElementType	*tmp;		// Temporary vector.
+	T	*tmp;		// Temporary vector.
 
 	try
 	{
@@ -218,13 +219,13 @@ template <class ElementType> void Set<ElementType>::resize(int size, bool copy)
 		}
 
 		// Allocate new set.
-		tmp = new ElementType[this->size];
+		tmp = new T[this->size];
 
 		// Check if copy required.
 		if (copy)
 		{
 			// Copy current set elements.
-			memcpy(tmp, this->data, sizeof(ElementType)*this->nElements);
+			memcpy(tmp, this->data, sizeof(T)*this->nElements);
 #ifdef DEBUG_RESIZE_SET
 			Logging::buildText(__FILE__, __FUNCTION__, "Number of elements to copy ");
 			Logging::buildText(__FILE__, __FUNCTION__, this->nElements);
@@ -249,17 +250,16 @@ template <class ElementType> void Set<ElementType>::resize(int size, bool copy)
 	}
 }
 
-template <class ElementType> void Set<ElementType>::reset()
+template <class T> void Set<T>::reset()
 {
 	this->nElements = 0;
 }
 
-template <class ElementType> bool Set<ElementType>::read(string fileName)
+template <class T> bool Set<T>::read(string fileName)
 {
-	int		i=0;			// Loop counter.
     bool success=true;  	// Return value.
     ifstream ifs;    		// Input file.
-    ElementType	data;
+    T	data;
 
     // Open file.
     ifs.open(fileName.c_str(), std::ifstream::in);
@@ -289,7 +289,7 @@ template <class ElementType> bool Set<ElementType>::read(string fileName)
 	return(success);
 }
 
-template <class ElementType> bool Set<ElementType>::write(string fileName)
+template <class T> bool Set<T>::write(string fileName)
 {
 	int		i=0;			// Loop counter.
 	bool success=true;  	// Return value.
@@ -322,7 +322,7 @@ template <class ElementType> bool Set<ElementType>::write(string fileName)
 	return(success);
 }
 
-template <class ElementType> void Set<ElementType>::print()
+template <class T> void Set<T>::print()
 {
 	int	i=0;			// Loop counter.
 
@@ -333,7 +333,7 @@ template <class ElementType> void Set<ElementType>::print()
     }
 }
 
-template <class ElementType> int Set<ElementType>::random(int nPoints)
+template <class T> int Set<T>::random(int nPoints)
 {
 	int	i=0;			// Loop counter.
 	int ret=SUCCESS;  	// Return value.
@@ -349,7 +349,7 @@ template <class ElementType> int Set<ElementType>::random(int nPoints)
 }
 
 // PENDING: REMOVE TO POINTS.
-template <class ElementType> void Set<ElementType>::shake()
+template <class T> void Set<T>::shake()
 {
 	int	i=0;			// Loop counter.
 
@@ -360,7 +360,7 @@ template <class ElementType> void Set<ElementType>::shake()
     }
 }
 
-template <class ElementType> int Set<ElementType>::highestIndex()
+template <class T> int Set<T>::highestIndex()
 {
 	int	i=0;				// Loop counter.
 	int	index=0;			// Highest value index.
@@ -379,7 +379,7 @@ template <class ElementType> int Set<ElementType>::highestIndex()
 	return(index);
 }
 
-template <class ElementType> ElementType Set<ElementType>::highest()
+template <class T> T Set<T>::highest()
 {
 	int	i=0;				// Loop counter.
 	int highestValue=0;
@@ -398,6 +398,34 @@ template <class ElementType> ElementType Set<ElementType>::highest()
     }
 
 	return(highestValue);
+}
+
+/***************************************************************************
+* Name: 	==
+* IN:		v			vertex to compare to
+* OUT:		NONE
+* RETURN:	true 		if both vertex are equal
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	checks ifboth vertex are equals.
+***************************************************************************/
+template <class T> bool Set<T>::operator==(Set<T> &other)
+{
+	bool equal=false;		// Return value.
+	int	i=0;				// Loop counter.
+
+	if (this->getNElements() == other.getNElements())
+	{
+		equal = true;
+		i = 0;
+		while ((i<this->getNElements()) && equal)
+		{
+			equal = (*this->at(i) == *other.at(i));
+			i++;
+		}
+	}
+
+	return (equal);
 }
 
 #endif /* INCLUDE_SET_H_ */
