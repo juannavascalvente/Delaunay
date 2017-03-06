@@ -2450,7 +2450,6 @@ bool Dcel::read(string fileName)
 	bool read=true;		// Return value.
 	ifstream ifs;		// Input file.
 	int	i=0;			// Loop counter.
-	int 	nElements=0;// # elements to read.
 	Edge 	edge;		// Edge to read.
 	Face 	face;		// Face to read.
 
