@@ -122,18 +122,15 @@ template <class T> void Set<T>::add(T element)
 	}
 
 #ifdef DEBUG_ADD_SET
-	Logging::buildText(__FILE__, __FUNCTION__, "Adding element to set.");
+	Logging::buildText(__FILE__, __FUNCTION__, "Adding element to set ");
+	Logging::buildText(__FILE__, __FUNCTION__, this->nElements+1);
+	Logging::buildText(__FILE__, __FUNCTION__, "/");
+	Logging::buildText(__FILE__, __FUNCTION__, this->size);
 	Logging::write(true, Info);
 #endif
 	// Insert element.
 	this->data[this->nElements] = element;
 	this->nElements++;
-
-#ifdef DEBUG_ADD_SET
-	Logging::buildText(__FILE__, __FUNCTION__, "Element added. # points is ");
-	Logging::buildText(__FILE__, __FUNCTION__, this->nElements);
-	Logging::write(true, Info);
-#endif
 }
 
 template <class T> void Set<T>::update(int index, T element)
@@ -181,7 +178,7 @@ template <class T> int Set<T>::getNElements()
 
 template <class T> void Set<T>::resize(int size, bool copy)
 {
-	T	*tmp;		// Temporary vector.
+	T *tmp; // Temporary vector.
 
 	try
 	{
@@ -279,7 +276,10 @@ template <class T> bool Set<T>::read(string fileName)
 		while (!ifs.eof())
 		{
 			ifs >> data;
-			this->add(data);
+			if (!ifs.eof())
+			{
+				this->add(data);
+			}
 		}
 
         // Close input file.
@@ -312,7 +312,7 @@ template <class T> bool Set<T>::write(string fileName)
 	    // Write set of points.
 	    for (i=0; i<this->nElements ;i++)
         {
-	    	ofs << this->data[i];
+	    	ofs << this->data[i] << " ";
         }
 
         // Close output file.
@@ -329,8 +329,9 @@ template <class T> void Set<T>::print()
     // Print elements.
     for (i=0; i<this->nElements ;i++)
     {
-    	std::cout << data[i] << std::endl;
+    	cout << data[i] << " ";
     }
+    cout << endl;
 }
 
 template <class T> int Set<T>::random(int nPoints)
