@@ -147,7 +147,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_PATH_DELAUNAY_COMPARE" << endl;
 #endif
-			test = NULL;
+			test = new TestPathDelaunayCompare("testVoronoiPath.txt", DEF_DELAUNAY_PATH_COMPARE_FOLDER, true);
 			break;
 		}
 		case TEST_PATH_VORONOI:
@@ -163,7 +163,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_PATH_VORONOI" << endl;
 #endif
-			test = NULL;
+			test = new TestPathVoronoiCompare("testVoronoiPathCompare.txt", DEF_VORONOI_PATH_COMPARE_FOLDER, true);
 			break;
 		}
 		default:

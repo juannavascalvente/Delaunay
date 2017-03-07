@@ -9,7 +9,7 @@
 #define TEST_TESTCOMPARE_H_
 
 #define DEFAULT_FILE_LIST_COMPARE		"fileList.txt"
-#define DEFAULT_N_FILES_COMPARE			20
+#define DEFAULT_N_FILES_COMPARE			50
 
 #include "Dcel.h"
 #include "test.h"
@@ -19,6 +19,7 @@
 ****************************************************************************/
 class TestCompare : public Test
 {
+protected:
 	//------------------------------------------------------------------------
 	// Attributes.
 	//------------------------------------------------------------------------

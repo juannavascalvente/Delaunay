@@ -42,8 +42,11 @@ void TestCompare::initParameters()
 ***************************************************************************/
 void TestCompare::printParameters()
 {
-	cout << "Test Delaunay printParameters" << endl;
+	cout << "---------------------------------------------------" << endl;
+	cout << "Test parameters" << endl;
+	cout << "---------------------------------------------------" << endl;
 	cout << "Files list: " << this->filesNamesFile << endl;
+	cout << "---------------------------------------------------" << endl;
 }
 
 /***************************************************************************
@@ -90,7 +93,11 @@ bool TestCompare::prepare()
 	string 	line;
 	ifstream ifs;
 	ifstream fileTestIfs;
-
+#ifdef DEBUG_TEST_COMPARE_PREPARE
+	Logging::buildText(__FUNCTION__, __FILE__, "Opening file: ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->filesNamesFile);
+	Logging::write(true, Info);
+#endif
 	// Open configuration file.
 	ifs.open(this->filesNamesFile.c_str(), ios::in);
 
