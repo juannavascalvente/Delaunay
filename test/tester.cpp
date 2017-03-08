@@ -67,7 +67,7 @@ bool Tester::readTests()
 			if (type != UNKNOWN_TEST)
 			{
 #ifdef DEBUG_TESTER_READTESTS
-				cout << "Initializing test" << endl;
+				cout << "Initializing test id: " << (testId+1) << endl;
 #endif
 				test = this->createTestInstance(type);
 				test->init(labels);
@@ -78,6 +78,10 @@ bool Tester::readTests()
 			{
 				cout << "Error reading test id: " << (testId+1) << endl;
 			}
+
+			// Update test counter.
+			testId++;
+			labels.reset();
 		}
 #ifdef DEBUG_TESTER_READTESTS
 		cout << "End reading test " << endl;
