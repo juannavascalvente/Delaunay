@@ -72,7 +72,7 @@ protected:
 	//------------------------------------------------------------------------
 	Logging logFile;		// Test log file.
 	Set<Parameter*> parameters;
-	string outputFolder;
+	string outFolder;
 
 public:
 	//------------------------------------------------------------------------
@@ -80,11 +80,11 @@ public:
 	//------------------------------------------------------------------------
 	Test() : logFile("logTest.txt", false),
 			 parameters(DEFAULT_TEST_N_PARAMETERS), \
-			 outputFolder(DEFAULT_OUTPUT_FOLDER) {};
+			 outFolder(DEFAULT_OUTPUT_FOLDER) {};
 	Test(const string fileName, string folder, bool printData = false) : \
 			logFile(fileName, printData), \
 			parameters(DEFAULT_TEST_N_PARAMETERS), \
-			outputFolder(folder) {};
+			outFolder(folder) {};
 	virtual ~Test() {};
 
 	//------------------------------------------------------------------------
@@ -94,6 +94,9 @@ public:
 	void init(Set<Label> &labels);
 	void run();
 	void finish();
+
+	const string& getOutFolder() const {return outFolder;}
+	void setOutFolder(const string& outFolder) {this->outFolder = outFolder;}
 };
 
 #endif /* CODE_TEST_TEST_H_ */
