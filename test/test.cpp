@@ -212,7 +212,15 @@ bool Test::read(ifstream &ifs, Set<Label> &labels, TestType &testType)
 						}
 						else
 						{
-							cout << "Expected TEST label" << endl;
+							cout << "Expected TEST label and found: ";
+							if (label.isBeginLabel())
+							{
+								cout << label.getBeginLabel() << endl;
+							}
+							else
+							{
+								cout << label.getEndLabel() << endl;
+							}
 						}
 						break;
 					}
