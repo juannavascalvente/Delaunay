@@ -72,6 +72,8 @@ public:
 	//------------------------------------------------------------------------
 	const string& getName() const {return this->name;}
 	const string& getValue() const {return this->value;}
+	const string& getBeginLabel() const {return beginLabel;}
+	const string& getEndLabel() const {return endLabel;}
 	bool isBeginLabel() {return(this->type == BEGIN_LABEL);};
 	bool isEndLabel() {return(this->type == END_LABEL);};
 	bool isDataLabel() {return(this->type == DATA_LABEL);};
