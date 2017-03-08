@@ -114,7 +114,7 @@ void TestExecution::printParameters()
 	cout << "Delta points " << this->deltaPoints << endl;
 	cout << "Number of steps " << this->nSteps << endl;
 	cout << "Number of test  " << this->nTests << endl;
-	cout << "Output folder " << this->outputFolder << endl;
+	cout << "Output folder " << this->outFolder << endl;
 	cout << "---------------------------------------------------" << endl;
 }
 

@@ -143,8 +143,8 @@ void TestPathDelaunay::main()
 				// Write test data.
 				ostringstream convert;
 				convert << failedTestIndex;
-				pointsFileName = this->outputFolder + "Points_" + convert.str() + ".txt";
-				dcelFileName = this->outputFolder + "DCEL_" + convert.str() + ".txt";
+				pointsFileName = this->outFolder + "Points_" + convert.str() + ".txt";
+				dcelFileName = this->outFolder + "DCEL_" + convert.str() + ".txt";
 				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
 				if (delaunay.incremental())
 				{
@@ -495,8 +495,8 @@ void TestPathVoronoi::main()
 				// Write test data.
 				ostringstream convert;
 				convert << failedTestIndex;
-				pointsFileName = this->outputFolder + "Points_" + convert.str() + ".txt";
-				dcelFileName = this->outputFolder + "DCEL_" + convert.str() + ".txt";
+				pointsFileName = this->outFolder + "Points_" + convert.str() + ".txt";
+				dcelFileName = this->outFolder + "DCEL_" + convert.str() + ".txt";
 				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
 
 				// Create Delaunay triangulation.

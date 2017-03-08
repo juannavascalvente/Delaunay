@@ -28,7 +28,10 @@ void Tester::main()
 		for(i=0; i<this->tests.getNElements() ;i++)
 		{
 #ifdef DEBUG_TESTER_MAIN
+			cout << endl << endl << endl << endl;
+			cout << "**********************************************" << endl;
 			cout << "Executing test " << (i+1) << endl;
+			cout << "**********************************************" << endl;
 #endif
 			currentTest = *this->tests.at(i);
 			currentTest->run();

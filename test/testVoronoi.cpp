@@ -70,7 +70,7 @@ void TestVoronoiBuild::printParameters()
 	cout << "Delta points " << this->deltaPoints << endl;
 	cout << "Number of steps " << this->nSteps << endl;
 	cout << "Number of test  " << this->nTests << endl;
-	cout << "Output folder " << this->outputFolder << endl;
+	cout << "Output folder " << this->outFolder << endl;
 	cout << "---------------------------------------------------" << endl;
 }
 
@@ -234,7 +234,7 @@ void TestVoronoiBuild::main()
 				string 	fileName;
 				ostringstream convert;
 				convert << failedTestIndex;
-				fileName = outputFolder + "Voronoi_" + convert.str() + ".txt";
+				fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
 				this->dump(fileName, dcel);
 
 				// Build Voronoi area.
