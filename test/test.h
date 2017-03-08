@@ -58,7 +58,6 @@ class Test
 	virtual bool prepare() {return(true);};
 	virtual void main() {};
 	virtual void write() {};
-	virtual void deallocate() {};
 
 	//------------------------------------------------------------------------
 	// Private functions.
@@ -73,6 +72,7 @@ protected:
 	Logging logFile;		// Test log file.
 	Set<Parameter*> parameters;
 	string outFolder;
+	string testName;
 
 public:
 	//------------------------------------------------------------------------
@@ -80,12 +80,14 @@ public:
 	//------------------------------------------------------------------------
 	Test() : logFile("logTest.txt", false),
 			 parameters(DEFAULT_TEST_N_PARAMETERS), \
-			 outFolder(DEFAULT_OUTPUT_FOLDER) {};
-	Test(const string fileName, string folder, bool printData = false) : \
-			logFile(fileName, printData), \
+			 outFolder(DEFAULT_OUTPUT_FOLDER), \
+			 testName("") {};
+	Test(string name, const string file, string folder, bool print=false):\
+			logFile(file, print), \
 			parameters(DEFAULT_TEST_N_PARAMETERS), \
-			outFolder(folder) {};
-	virtual ~Test() {};
+			outFolder(folder),
+			testName(name) {};
+	virtual ~Test();
 
 	//------------------------------------------------------------------------
 	// Public functions.
@@ -97,6 +99,7 @@ public:
 
 	const string& getOutFolder() const {return outFolder;}
 	void setOutFolder(const string& outFolder) {this->outFolder = outFolder;}
+	const string& getTestName() const {return testName;}
 };
 
 #endif /* CODE_TEST_TEST_H_ */

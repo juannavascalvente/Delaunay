@@ -33,13 +33,13 @@ protected:
 	void printParameters();
 	void applyParameter(Parameter *parameter, string value);
 	void dump(string dcelFileName, Dcel &dcel);
-	void deallocate();
+
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestCompare(string logFile, string outFolder, bool printData) :
-					Test(logFile, outFolder, printData), \
+	TestCompare(string name, string logFile, string outFolder, bool print) :
+					Test(name, logFile, outFolder, print), \
 					filesNamesFile(DEFAULT_FILE_LIST_COMPARE), \
 					filesList(DEFAULT_N_FILES_COMPARE) {};
 	~TestCompare() {};

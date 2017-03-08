@@ -43,14 +43,13 @@ class TestDelaunayBuild : public Test
 	void applyParameter(Parameter *parameter, string value);
 	void printParameters();
 	void dump(string dcelFileName, Dcel &dcel);
-	void deallocate();
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestDelaunayBuild(string logFile, bool printData) :
-						Test(logFile, DEF_OUT_FOLDER_DELAUNAY, printData), \
+						Test("Delaunay Build", logFile, DEF_OUT_FOLDER_DELAUNAY, printData), \
 						nPoints(DEFAULT_N_POINTS), \
 						deltaPoints(DEFAULT_DELTA_POINTS), \
 						nSteps(DEFAULT_N_STEPS), \
@@ -89,13 +88,13 @@ class TestDelaunayCompare : public Test
 	void printParameters();
 	void applyParameter(Parameter *parameter, string value);
 	void dump(string dcelFileName, Dcel &dcel);
-	void deallocate();
+
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestDelaunayCompare(string logFile, bool printData) :
-					Test(logFile, DEF_DELAUNAY_COMPARE_FOLDER, printData), \
+					Test("Delaunay compare", logFile, DEF_DELAUNAY_COMPARE_FOLDER, printData), \
 					filesNamesFile(DEFAULT_FILE_LIST), \
 					filesList(DEFAULT_N_FILES) {};
 	~TestDelaunayCompare() {};

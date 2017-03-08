@@ -43,18 +43,17 @@ class TestVoronoiBuild : public Test
 	void applyParameter(Parameter *parameter, string value);
 	void printParameters();
 	static void dump(string dcelFileName, Dcel &dcel);
-	void deallocate();
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestVoronoiBuild(string logFile, bool printData) :
-					Test(logFile, DEF_VORONOI_OUT_FOLDER, printData), \
-					nPoints(VORONOI_DEFAULT_N_POINTS), \
-					deltaPoints(VORONOI_DEFAULT_DELTA_POINTS), \
-					nSteps(VORONOI_DEFAULT_N_STEPS), \
-					nTests(VORONOI_DEFAULT_N_TESTS) {};
+		Test("Voronoi Build", logFile, DEF_VORONOI_OUT_FOLDER, printData), \
+		nPoints(VORONOI_DEFAULT_N_POINTS), \
+		deltaPoints(VORONOI_DEFAULT_DELTA_POINTS), \
+		nSteps(VORONOI_DEFAULT_N_STEPS), \
+		nTests(VORONOI_DEFAULT_N_TESTS) {};
 	~TestVoronoiBuild() {};
 
 	//------------------------------------------------------------------------
@@ -88,15 +87,15 @@ class TestVoronoiCompare : public Test
 	void initParameters();
 	void printParameters();
 	void applyParameter(Parameter *parameter, string value);
-	void deallocate();
+
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestVoronoiCompare(string logFile, bool printData) :
-				Test(logFile, DEF_VORONOI_COMPARE_OUT_FOLDER, printData), \
-				filesNamesFile(DEFAULT_FILE_LIST), \
-				filesList(DEFAULT_N_FILES) {};
+	TestVoronoiCompare(string logFile, bool print) :
+		Test("Voronoi compare", logFile, DEF_VORONOI_COMPARE_OUT_FOLDER, print), \
+		filesNamesFile(DEFAULT_FILE_LIST), \
+			filesList(DEFAULT_N_FILES) {};
 	~TestVoronoiCompare() {};
 
 	//------------------------------------------------------------------------

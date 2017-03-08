@@ -765,13 +765,11 @@ void TestPathVoronoiCompare::main()
 				testCounter++;
 			}
 		}
-#ifdef DEBUG_FIND_VORONOI_PATH_COMPARE
 		Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
 		Logging::buildText(__FUNCTION__, __FILE__, totalTests-nFailedTests);
 		Logging::buildText(__FUNCTION__, __FILE__, "/");
 		Logging::buildText(__FUNCTION__, __FILE__, totalTests);
 		Logging::write(true, Info);
-#endif
 	}
 	else
 	{

@@ -34,6 +34,7 @@ public:
 	//------------------------------------------------------------------------
 	const string& getName() const {return name;}
 	virtual bool isValid(string value) {cout<< "DEFAULT"<<endl;return(false);};
+	virtual void deleteValidator() {};
 
 	//------------------------------------------------------------------------
 	//  Public functions.
@@ -62,6 +63,7 @@ public:
 	//------------------------------------------------------------------------
 	bool isValid(string value) {return(validator->isValid(value));};
 	void print();
+	void deleteValidator() {delete validator;};
 };
 
 class ParameterFile : public Parameter
@@ -85,6 +87,7 @@ public:
 	//------------------------------------------------------------------------
 	bool isValid(string value) {return(validator->isValid(value));};
 	void print();
+	void deleteValidator() {delete validator;};
 };
 
 

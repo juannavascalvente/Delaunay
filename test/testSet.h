@@ -26,7 +26,7 @@ class TestSet : public Test
 
 public:
 	TestSet(string fileName, string outFolder, bool print) : \
-								Test(fileName, outFolder,print) {};
+						Test("Set", fileName, outFolder,print) {};
 	void main();
 };
 

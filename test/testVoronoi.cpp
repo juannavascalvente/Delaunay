@@ -295,28 +295,6 @@ void TestVoronoiBuild::dump(string dcelFileName, Dcel &dcel)
 }
 
 /***************************************************************************
-* Name: 	deallocate
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	free test resources. The data allocated are the parameters
-* 				and validators allocated in initParameters
-***************************************************************************/
-void TestVoronoiBuild::deallocate()
-{
-	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
-	/*int	i=0;					// Loop counter.
-	Parameter *param;
-	NumericValidator *validator;
-	for (i=0; i<this->parameters.getNElements() ;i++)
-	{
-		param = *this->parameters.at(i);
-	}
-	*/
-}
-
-/***************************************************************************
 * Name: 	initParameters
 * IN:		NONE
 * OUT:		NONE
@@ -527,20 +505,4 @@ void TestVoronoiCompare::main()
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
 	Logging::write(true, Info);
 }
-
-/***************************************************************************
-* Name: 	deallocate
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	free test resources. The data allocated are the parameters
-* 				and validators allocated in initParameters
-***************************************************************************/
-void TestVoronoiCompare::deallocate()
-{
-	cout << "Dealllocating TestVoronoiCompare" << endl;
-	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
-}
-
 

@@ -42,11 +42,10 @@ void TestCompare::initParameters()
 ***************************************************************************/
 void TestCompare::printParameters()
 {
-	cout << "---------------------------------------------------" << endl;
 	cout << "Test parameters" << endl;
-	cout << "---------------------------------------------------" << endl;
+	cout << "----------------------------------------------" << endl;
 	cout << "Files list: " << this->filesNamesFile << endl;
-	cout << "---------------------------------------------------" << endl;
+	cout << "**********************************************" << endl;
 }
 
 /***************************************************************************
@@ -185,17 +184,3 @@ void TestCompare::dump(string dcelFileName, Dcel &dcel)
 	}
 }
 
-/***************************************************************************
-* Name: 	deallocate
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	free test resources. The data allocated are the parameters
-* 				and validators allocated in initParameters
-***************************************************************************/
-void TestCompare::deallocate()
-{
-	cout << "Deallocating TestCompare" << endl;
-	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
-}

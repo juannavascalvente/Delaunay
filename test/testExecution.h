@@ -30,14 +30,13 @@ protected:
 	void initParameters();
 	void applyParameter(Parameter *parameter, string value);
 	void printParameters();
-	void deallocate();
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestExecution(string fileName, string outFolder, bool print) : \
-						Test(fileName, outFolder, print),
+	TestExecution(string name, string fileName, string outFolder, bool print) : \
+						Test(name, fileName, outFolder, print),
 						nTests(0), nSteps(0), deltaPoints(0), nPoints(0) {};
 	~TestExecution() {};
 

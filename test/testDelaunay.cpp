@@ -240,29 +240,6 @@ void TestDelaunayBuild::dump(string dcelFileName, Dcel &dcel)
 }
 
 /***************************************************************************
-* Name: 	deallocate
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	free test resources. The data allocated are the parameters
-* 				and validators allocated in initParameters
-***************************************************************************/
-void TestDelaunayBuild::deallocate()
-{
-	cout << "Deallocating TestDelaunayBuild" << endl;
-	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
-	/*int	i=0;					// Loop counter.
-	Parameter *param;
-	NumericValidator *validator;
-	for (i=0; i<this->parameters.getNElements() ;i++)
-	{
-		param = *this->parameters.at(i);
-	}
-	*/
-}
-
-/***************************************************************************
 * Name: 	initParameters
 * IN:		NONE
 * OUT:		NONE
@@ -522,17 +499,3 @@ void TestDelaunayCompare::dump(string dcelFileName, Dcel &dcel)
 	}
 }
 
-/***************************************************************************
-* Name: 	deallocate
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	free test resources. The data allocated are the parameters
-* 				and validators allocated in initParameters
-***************************************************************************/
-void TestDelaunayCompare::deallocate()
-{
-	cout << "Dealllocating TestDelaunayCompare" << endl;
-	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
-}

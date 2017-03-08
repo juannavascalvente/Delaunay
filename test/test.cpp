@@ -15,6 +15,20 @@ enum READ_TEST_PROCESS	{READ_HEADER_STATUS,
 						 READ_PARAMETER_STATUS,
 						 UNKOWN_STATUS};
 
+Test::~Test()
+{
+	int i=0;			// Loop counter.
+	Parameter* param;	// Pointer to generic parameter.
+
+	// Deallocate parameters set.
+	for (i=0; i<this->parameters.getNElements() ;i++)
+	{
+		param = *this->parameters.at(i);
+		param->deleteValidator();
+		delete param;
+	}
+}
+
 bool Test::getParameterIndex(Label &label, int &index)
 {
 	bool found=false;				// Return value.
@@ -307,8 +321,6 @@ void Test::run()
 
 void Test::finish()
 {
-	cout << "Test: FINISH" << endl;
 	this->write();
-	this->deallocate();
 }
 

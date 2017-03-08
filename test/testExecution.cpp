@@ -118,20 +118,3 @@ void TestExecution::printParameters()
 	cout << "---------------------------------------------------" << endl;
 }
 
-/***************************************************************************
-* Name: 	deallocate
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	free test resources. The data allocated are the parameters
-* 				and validators allocated in initParameters
-***************************************************************************/
-void TestExecution::deallocate()
-{
-	cout << "Deallocating TestExecution" << endl;
-	// PENDING https://github.com/juannavascalvente/Delaunay/issues/2
-}
-
-
-

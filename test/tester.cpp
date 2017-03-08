@@ -12,28 +12,28 @@
 #include "testSet.h"
 #include "testVoronoi.h"
 
-#define DEBUG_TESTER_MAIN
 //#define DEBUG_TESTER_READTESTS
 //#define DEBUG_TESTER_CREATEINSTANCE
 
 void Tester::main()
 {
 	int	 i=0;						// Loop counter.
-	Test *currentTest;
+	Test *currentTest;				// Pointer to current test.
+	int	nTests=0;					// # tests to execute.
 
 	// Read tests.
 	if (this->readTests())
 	{
 		// Execute all tests.
-		for(i=0; i<this->tests.getNElements() ;i++)
+		nTests = this->tests.getNElements();
+		for(i=0; i<nTests ;i++)
 		{
-#ifdef DEBUG_TESTER_MAIN
+			currentTest = *this->tests.at(i);
 			cout << endl << endl << endl << endl;
 			cout << "**********************************************" << endl;
-			cout << "Executing test " << (i+1) << endl;
+			cout << "Executing test " << (i+1) << "/" << nTests << endl;
+			cout << "Test name: " <<  currentTest->getTestName() << endl;
 			cout << "**********************************************" << endl;
-#endif
-			currentTest = *this->tests.at(i);
 			currentTest->run();
 		}
 
@@ -187,11 +187,10 @@ void Tester::finish()
 	int i=0;			// Loop counter.
 	Test *test;
 
-	cout << "Tester: finish" << endl;
 	for (i=0; i<this->tests.getNElements() ;i++)
 	{
-		cout << "Tester: deallocating test " << (i+1) << endl;
 		test = *this->tests.at(i);
 		test->finish();
+		delete test;
 	}
 }

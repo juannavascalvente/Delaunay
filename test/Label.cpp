@@ -94,6 +94,11 @@ LabelType Label::extractType(string &line)
 		type = UNKNOWN_LABEL;
 	}
 
+	// Deallocate regular expressions.
+	regfree(&beginRegex);
+	regfree(&endRegex);
+	regfree(&dataRegex);
+
 	return(type);
 }
 

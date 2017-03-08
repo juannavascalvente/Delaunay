@@ -33,7 +33,7 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestPathDelaunay(string fileName, string outFolder, bool print) : \
-							TestExecution(fileName, outFolder, print) {};
+			TestExecution("Path Delaunay", fileName, outFolder, print) {};
 	~TestPathDelaunay() {};
 
 	//------------------------------------------------------------------------
@@ -54,7 +54,7 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestPathDelaunayCompare(string fileName, string outFolder, bool print) : \
-								TestCompare(fileName, outFolder, print) {};
+		TestCompare("Path Delaunay Compare", fileName, outFolder, print) {};
 	~TestPathDelaunayCompare() {};
 
 	//------------------------------------------------------------------------
@@ -73,7 +73,7 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestPathVoronoi(string fileName, string outFolder, bool print) : \
-							TestExecution(fileName, outFolder, print) {};
+			TestExecution("Path Voronoi", fileName, outFolder, print) {};
 	~TestPathVoronoi() {};
 
 	//------------------------------------------------------------------------
@@ -94,7 +94,7 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestPathVoronoiCompare(string fileName, string outFolder, bool print) : \
-								TestCompare(fileName, outFolder, print) {};
+			TestCompare("Path Voronoi Compare", fileName, outFolder, print) {};
 	~TestPathVoronoiCompare() {};
 
 	//------------------------------------------------------------------------
