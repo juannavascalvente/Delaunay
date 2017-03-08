@@ -65,7 +65,7 @@ void TestDelaunayBuild::printParameters()
 	cout << "Delta points " << this->deltaPoints << endl;
 	cout << "Number of steps " << this->nSteps << endl;
 	cout << "Number of test  " << this->nTests << endl;
-	cout << "Output folder " << this->outputFolder << endl;
+	cout << "Output folder " << this->outFolder << endl;
 	cout << "---------------------------------------------------" << endl;
 }
 
@@ -181,7 +181,7 @@ void TestDelaunayBuild::main()
 				// Write test data.
 				ostringstream convert;
 				convert << failedTestIndex;
-				fileName = this->outputFolder + "Delaunay_" + convert.str() + ".txt";
+				fileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
 				this->dump(fileName, dcel);
 				if (delaunay.incremental())
 				{
@@ -466,7 +466,7 @@ void TestDelaunayCompare::main()
 					// Write test data.
 					ostringstream convert;
 					convert << nFailedTests;
-					fileName = this->outputFolder + "Delaunay_" + convert.str() + ".txt";
+					fileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
 					this->dump(fileName, dcel);
 
 					// Print log error.
