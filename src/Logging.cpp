@@ -254,7 +254,9 @@ void Logging::write( bool print, enum MessageCategory category)
 	// Settings colors.
 	std::string red = "\x1B[31m";
 	std::string yellow = "\x1B[33m";
+	std::string green = "\x1B[32m";
 	std::string reset = "\x1B[0m";
+
 
 	// Check log file is already open.
 	if (opened)
@@ -275,6 +277,12 @@ void Logging::write( bool print, enum MessageCategory category)
 			case Warning:
 			{
 				std::cout << file << "\t\tFunction " << function << "():\t\t" << yellow << message << reset << std::endl;
+				break;
+			}
+			// Successfule. Print green for test successfully executions.
+			case Successful:
+			{
+				std::cout << file << "\t\tFunction " << function << "():\t\t" << green << message << reset << std::endl;
 				break;
 			}
 			default:

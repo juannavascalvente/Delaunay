@@ -19,7 +19,7 @@ using namespace std;
 // 							Data types definition
 //****************************************************************************
 // Type of information to print.
-enum MessageCategory {Info=1, Warning=2, Error=3};
+enum MessageCategory {Info=1, Warning=2, Error=3, Successful=4};
 
 /****************************************************************************
 // 						Logging CLASS DEFITNION
