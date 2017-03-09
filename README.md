@@ -8,3 +8,5 @@ world applications: location points, modelling surfaces and others.
 Some of the diagrams that can be easily obtained from the Delaunay triangulation are Voronoi diagram, Gabriel graph, convex hull of a set of points and many others.
 
 This tool is in continuos evolution and new features area added periodically.
+
+A full description of the application and a user manual can be obtained in the wiki.
