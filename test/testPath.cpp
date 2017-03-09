@@ -80,7 +80,7 @@ void TestPathDelaunay::main()
 {
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
-	int			failedTestIndex=1;	// Index of last failed test.
+	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
@@ -173,7 +173,7 @@ void TestPathDelaunay::main()
 						Logging::buildText(__FUNCTION__, __FILE__, testCounter);
 						Logging::buildText(__FUNCTION__, __FILE__, "/");
 						Logging::buildText(__FUNCTION__, __FILE__, totalTests);
-						Logging::write( true, Info);
+						Logging::write( true, Successful);
 					}
 					else
 					{
@@ -202,6 +202,19 @@ void TestPathDelaunay::main()
 
 		// Update test counter.
 		testCounter++;
+	}
+
+	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
+	Logging::buildText(__FUNCTION__, __FILE__, testIndex-failedTestIndex);
+	Logging::buildText(__FUNCTION__, __FILE__, "/");
+	Logging::buildText(__FUNCTION__, __FILE__, testIndex);
+	if (failedTestIndex == 0)
+	{
+		Logging::write(true, Successful);
+	}
+	else
+	{
+		Logging::write(true, Error);
 	}
 }
 
@@ -317,7 +330,7 @@ void TestPathDelaunayCompare::main()
 							Logging::buildText(__FUNCTION__, __FILE__, testCounter);
 							Logging::buildText(__FUNCTION__, __FILE__, "/");
 							Logging::buildText(__FUNCTION__, __FILE__, totalTests);
-							Logging::write( true, Info);
+							Logging::write( true, Successful);
 						}
 						else
 						{
@@ -354,7 +367,14 @@ void TestPathDelaunayCompare::main()
 		Logging::buildText(__FUNCTION__, __FILE__, testIndex-nFailedTests);
 		Logging::buildText(__FUNCTION__, __FILE__, "/");
 		Logging::buildText(__FUNCTION__, __FILE__, testIndex);
-		Logging::write(true, Info);
+		if (nFailedTests == 0)
+		{
+			Logging::write(true, Successful);
+		}
+		else
+		{
+			Logging::write(true, Error);
+		}
 	}
 	else
 	{
@@ -427,7 +447,7 @@ void TestPathVoronoi::main()
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
 	Voronoi		voronoi;			// Voronoi data.
-	int			failedTestIndex=1;	// Index of last failed test.
+	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
@@ -442,14 +462,14 @@ void TestPathVoronoi::main()
 	Set<int> pathFaces;
 	string pointsFileName;			// Points file name.
 	string dcelFileName;			// DCEL file name.
-	int			totalTests=0;		// Total # of tests.
+	int			nTests=0;		// Total # of tests.
 	int			testCounter=0;
 #ifdef DEBUG_FIND_VORONOI_PATH
 	int			i=0;				// Loop counter.
 #endif
 
 	testCounter = 1;
-	totalTests = this->nSteps*this->nTests;
+	nTests = this->nSteps*this->nTests;
 
 	// Print test parameters.
 	this->printParameters();
@@ -552,8 +572,8 @@ void TestPathVoronoi::main()
 								Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
 								Logging::buildText(__FUNCTION__, __FILE__, testCounter);
 								Logging::buildText(__FUNCTION__, __FILE__, "/");
-								Logging::buildText(__FUNCTION__, __FILE__, totalTests);
-								Logging::write( true, Info);
+								Logging::buildText(__FUNCTION__, __FILE__, nTests);
+								Logging::write( true, Successful);
 							}
 							else
 							{
@@ -585,6 +605,19 @@ void TestPathVoronoi::main()
 
 		// Update test counter.
 		testCounter++;
+	}
+
+	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
+	Logging::buildText(__FUNCTION__, __FILE__, nTests-failedTestIndex);
+	Logging::buildText(__FUNCTION__, __FILE__, "/");
+	Logging::buildText(__FUNCTION__, __FILE__, nTests);
+	if (failedTestIndex == 0)
+	{
+		Logging::write(true, Successful);
+	}
+	else
+	{
+		Logging::write(true, Error);
 	}
 }
 
@@ -728,7 +761,7 @@ void TestPathVoronoiCompare::main()
 								Logging::buildText(__FUNCTION__, __FILE__, testCounter);
 								Logging::buildText(__FUNCTION__, __FILE__, "/");
 								Logging::buildText(__FUNCTION__, __FILE__, totalTests);
-								Logging::write( true, Info);
+								Logging::write( true, Successful);
 							}
 							else
 							{
@@ -769,7 +802,14 @@ void TestPathVoronoiCompare::main()
 		Logging::buildText(__FUNCTION__, __FILE__, totalTests-nFailedTests);
 		Logging::buildText(__FUNCTION__, __FILE__, "/");
 		Logging::buildText(__FUNCTION__, __FILE__, totalTests);
-		Logging::write(true, Info);
+		if (nFailedTests == 0)
+		{
+			Logging::write(true, Successful);
+		}
+		else
+		{
+			Logging::write(true, Error);
+		}
 	}
 	else
 	{

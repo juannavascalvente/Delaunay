@@ -134,7 +134,7 @@ void Test::parseParameters(Set<Label> &labels)
 ***************************************************************************/
 void Test::removeExistingFiles()
 {
-	string command = "exec rm -r " + this->outFolder + "/*.txt";
+	string command = "exec rm -r " + this->outFolder + "*.txt";
 	system(command.c_str());
 }
 

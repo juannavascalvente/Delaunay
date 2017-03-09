@@ -13,12 +13,12 @@
 #define VORONOI_DEFAULT_DELTA_POINTS	2
 #define VORONOI_DEFAULT_N_STEPS			5
 #define VORONOI_DEFAULT_N_TESTS			5
-#define DEF_VORONOI_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/voronoi/build/"
+#define DEF_VORONOI_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/test/output/voronoi/build/"
 
 // Default parameters in Voronoi Compare test.
 #define DEFAULT_N_FILES			20
 #define DEFAULT_FILE_LIST		"fileList.txt"
-#define DEF_VORONOI_COMPARE_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/errors/voronoi/compare/"
+#define DEF_VORONOI_COMPARE_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/test/output/voronoi/compare/"
 
 #include "test.h"
 using namespace std;

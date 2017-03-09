@@ -12,7 +12,7 @@
 #define DEFAULT_DELTA_POINTS	2
 #define DEFAULT_N_STEPS			5
 #define DEFAULT_N_TESTS			5
-#define DEF_OUT_FOLDER_DELAUNAY	"/home/juan/projects/delaunay/code/data/samples/errors/delaunay/build/"
+#define DEF_OUT_FOLDER_DELAUNAY	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/build/"
 
 // Default parameters in Delaunay Compare test.
 #define DEFAULT_N_FILES			20

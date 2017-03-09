@@ -63,15 +63,24 @@ void TestVoronoiBuild::initParameters()
 ***************************************************************************/
 void TestVoronoiBuild::printParameters()
 {
-	cout << "---------------------------------------------------" << endl;
-	cout << "Test Voronoi printParameters" << endl;
-	cout << "---------------------------------------------------" << endl;
-	cout << "Number of points " << this->nPoints << endl;
-	cout << "Delta points " << this->deltaPoints << endl;
-	cout << "Number of steps " << this->nSteps << endl;
-	cout << "Number of test  " << this->nTests << endl;
-	cout << "Output folder " << this->outFolder << endl;
-	cout << "---------------------------------------------------" << endl;
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of points ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nPoints);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Delta points ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->deltaPoints);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of steps ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of test ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Output folder ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->outFolder);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, \
+						"**********************************************");
+	Logging::write(true, Info);
 }
 
 /***************************************************************************
@@ -191,10 +200,14 @@ void TestVoronoiBuild::main()
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
 	Voronoi		voronoi;			// Voronoi data.
-	int			failedTestIndex=1;	// Index of last failed test.
+	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
+	int			nTests=0;
+	int			testId=1;
+
+	nTests = this->nSteps*this->nTests;
 
 	// Print test parameters.
 	this->printParameters();
@@ -203,14 +216,16 @@ void TestVoronoiBuild::main()
 	currentNPoints = this->nPoints;
 	for (stepIndex=0; stepIndex<this->nSteps ;stepIndex++)
 	{
+#ifdef DEBUG_TEST_VORONOI_BUILD
 		Logging::buildText(__FUNCTION__, __FILE__, "Executing step ");
 		Logging::buildText(__FUNCTION__, __FILE__, (stepIndex+1));
 		Logging::buildText(__FUNCTION__, __FILE__, "/");
 		Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
 		Logging::write(true, Info);
-
+#endif
 		for (testIndex=0; testIndex< this->nTests ;testIndex++)
 		{
+#ifdef DEBUG_TEST_VORONOI_BUILD
 			Logging::buildText(__FUNCTION__, __FILE__," Start building voronoi diagram test ");
 			Logging::buildText(__FUNCTION__, __FILE__, testIndex + 1);
 			Logging::buildText(__FUNCTION__, __FILE__, "/");
@@ -219,7 +234,7 @@ void TestVoronoiBuild::main()
 			Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
 			Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
 			Logging::write(true, Info);
-
+#endif
 			// Generate random set of points.
 			if (!dcel.generateRandom(currentNPoints))
 			{
@@ -241,24 +256,41 @@ void TestVoronoiBuild::main()
 				if (buildVoronoi(failedTestIndex, dcel, voronoi))
 				{
 					remove(fileName.c_str());
-					Logging::buildText(__FUNCTION__, __FILE__,
-							"Voronoi diagram successfully built for test ");
-					Logging::buildText(__FUNCTION__, __FILE__, testIndex + 1);
-					Logging::write(true, Info);
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+					Logging::buildText(__FUNCTION__, __FILE__, testId);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, nTests);
+					Logging::write(true, Successful);
 				}
 				else
 				{
 					failedTestIndex++;
-					Logging::buildText(__FUNCTION__, __FILE__,
-							"Error building voronoi diagram in test ");
-					Logging::buildText(__FUNCTION__, __FILE__, testIndex + 1);
+					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi diagram in test ");
+					Logging::buildText(__FUNCTION__, __FILE__, testId);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, nTests);
 					Logging::write(true, Error);
 				}
 			}
+
+			testId++;
 		}
 
 		// Update # points to generate.
 		currentNPoints = currentNPoints*this->deltaPoints;
+	}
+
+	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
+	Logging::buildText(__FUNCTION__, __FILE__, nTests-failedTestIndex);
+	Logging::buildText(__FUNCTION__, __FILE__, "/");
+	Logging::buildText(__FUNCTION__, __FILE__, nTests);
+	if (failedTestIndex == 0)
+	{
+		Logging::write(true, Successful);
+	}
+	else
+	{
+		Logging::write(true, Error);
 	}
 }
 
@@ -324,8 +356,11 @@ void TestVoronoiCompare::initParameters()
 ***************************************************************************/
 void TestVoronoiCompare::printParameters()
 {
-	cout << "Test Voronoi printParameters" << endl;
-	cout << "Files list: " << this->filesNamesFile << endl;
+	Logging::buildText(__FUNCTION__, __FILE__, "Files list: ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->filesNamesFile);
+	Logging::buildText(__FUNCTION__, __FILE__, \
+						"**********************************************");
+	Logging::write(true, Info);
 }
 
 /***************************************************************************
@@ -508,9 +543,16 @@ void TestVoronoiCompare::main()
 	}
 
 	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements()-nFailedTests);
+	Logging::buildText(__FUNCTION__, __FILE__, nTests-nFailedTests);
 	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
-	Logging::write(true, Successful);
+	Logging::buildText(__FUNCTION__, __FILE__, nTests);
+	if (nFailedTests == 0)
+	{
+		Logging::write(true, Successful);
+	}
+	else
+	{
+		Logging::write(true, Error);
+	}
 }
 

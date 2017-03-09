@@ -107,14 +107,23 @@ void TestExecution::applyParameter(Parameter *parameter, string value)
 ***************************************************************************/
 void TestExecution::printParameters()
 {
-	cout << "---------------------------------------------------" << endl;
-	cout << "Test parameters" << endl;
-	cout << "---------------------------------------------------" << endl;
-	cout << "Number of points " << this->nPoints << endl;
-	cout << "Delta points " << this->deltaPoints << endl;
-	cout << "Number of steps " << this->nSteps << endl;
-	cout << "Number of test  " << this->nTests << endl;
-	cout << "Output folder " << this->outFolder << endl;
-	cout << "---------------------------------------------------" << endl;
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of points ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nPoints);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Delta points ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->deltaPoints);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of steps ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of test ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Output folder ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->outFolder);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, \
+						"**********************************************");
+	Logging::write(true, Info);
 }
 

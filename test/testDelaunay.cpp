@@ -12,6 +12,7 @@
 
 //#define DEBUG_DELAUNAY_COMPARE_PREPARE
 //#define DEBUG_TEST_DELAUNAY_BUILD_INIT
+//#define DEBUG_TEST_DELAUNAY_BUILD
 
 /***************************************************************************
 * Name: 	initParameters
@@ -58,15 +59,24 @@ void TestDelaunayBuild::initParameters()
 ***************************************************************************/
 void TestDelaunayBuild::printParameters()
 {
-	cout << "---------------------------------------------------" << endl;
-	cout << "Test Delaunay printParameters" << endl;
-	cout << "---------------------------------------------------" << endl;
-	cout << "Number of points " << this->nPoints << endl;
-	cout << "Delta points " << this->deltaPoints << endl;
-	cout << "Number of steps " << this->nSteps << endl;
-	cout << "Number of test  " << this->nTests << endl;
-	cout << "Output folder " << this->outFolder << endl;
-	cout << "---------------------------------------------------" << endl;
+	Logging::buildText("", "", "Number of points ");
+	Logging::buildText("", "", this->nPoints);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Delta points ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->deltaPoints);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of steps ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of test ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Output folder ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->outFolder);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, \
+						"**********************************************");
+	Logging::write(true, Info);
 }
 
 /***************************************************************************
@@ -138,11 +148,15 @@ void TestDelaunayBuild::main()
 {
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
-	int			failedTestIndex=1;	// Index of last failed test.
+	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	string 		fileName;
 	int			currentNPoints=0;
+	int			nTests=0;
+	int			testId=1;
+
+	nTests = this->nSteps*this->nTests;
 
 	// Print test parameters.
 	this->printParameters();
@@ -151,13 +165,14 @@ void TestDelaunayBuild::main()
 	currentNPoints = this->nPoints;
 	for (stepIndex=0; stepIndex<this->nSteps ;stepIndex++)
 	{
+#ifdef DEBUG_TEST_DELAUNAY_BUILD
 		Logging::buildText(__FUNCTION__, __FILE__, "Executing step ");
 		Logging::buildText(__FUNCTION__, __FILE__, (stepIndex+1));
 		Logging::buildText(__FUNCTION__, __FILE__, "/");
 		Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
 		Logging::write(true, Info);
-
-		for (testIndex=0; testIndex< this->nTests ;testIndex++)
+#endif
+		for (testIndex=0; testIndex<this->nTests ;testIndex++)
 		{
 			// Execute current test.
 			delaunay.setDCEL(&dcel);
@@ -169,6 +184,7 @@ void TestDelaunayBuild::main()
 			}
 			else
 			{
+#ifdef DEBUG_TEST_DELAUNAY_BUILD
 				Logging::buildText(__FUNCTION__, __FILE__, "Start building Delaunay incremental test ");
 				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
 				Logging::buildText(__FUNCTION__, __FILE__, "/");
@@ -177,7 +193,7 @@ void TestDelaunayBuild::main()
 				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
 				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
 				Logging::write(true, Info);
-
+#endif
 				// Write test data.
 				ostringstream convert;
 				convert << failedTestIndex;
@@ -185,25 +201,45 @@ void TestDelaunayBuild::main()
 				this->dump(fileName, dcel);
 				if (delaunay.incremental())
 				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Delaunay diagram built for test ");
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+					Logging::buildText(__FUNCTION__, __FILE__, testId);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, nTests);
+					Logging::write(true, Successful);
 					remove(fileName.c_str());
 				}
 				else
 				{
 					failedTestIndex++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay diagram in test ");
+					Logging::buildText(__FUNCTION__, __FILE__, testId);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, nTests);
+					Logging::write(true, Error);
 				}
-				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
-				Logging::write(true, Info);
 				sleep(1);
 
 				// Reset Delaunay data.
 				delaunay.reset();
+				testId++;
 			}
 		}
 
 		// Update # points to generate.
 		currentNPoints = currentNPoints*this->deltaPoints;
+	}
+
+	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
+	Logging::buildText(__FUNCTION__, __FILE__, nTests-failedTestIndex);
+	Logging::buildText(__FUNCTION__, __FILE__, "/");
+	Logging::buildText(__FUNCTION__, __FILE__, nTests);
+	if (failedTestIndex == 0)
+	{
+		Logging::write(true, Successful);
+	}
+	else
+	{
+		Logging::write(true, Error);
 	}
 }
 
@@ -269,8 +305,12 @@ void TestDelaunayCompare::initParameters()
 ***************************************************************************/
 void TestDelaunayCompare::printParameters()
 {
-	cout << "Test Delaunay printParameters" << endl;
-	cout << "Files list: " << this->filesNamesFile << endl;
+	Logging::buildText(__FUNCTION__, __FILE__, "Files list: ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->filesNamesFile);
+	Logging::write(true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, \
+						"**********************************************");
+	Logging::write(true, Info);
 }
 
 /***************************************************************************
@@ -466,10 +506,17 @@ void TestDelaunayCompare::main()
 	}
 
 	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements()-nFailedTests);
+	Logging::buildText(__FUNCTION__, __FILE__, nTests-nFailedTests);
 	Logging::buildText(__FUNCTION__, __FILE__, "/");
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
-	Logging::write(true, Successful);
+	if (nFailedTests == 0)
+	{
+		Logging::write(true, Successful);
+	}
+	else
+	{
+		Logging::write(true, Error);
+	}
 }
 
 /***************************************************************************
