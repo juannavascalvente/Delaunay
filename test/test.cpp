@@ -136,8 +136,6 @@ void Test::removeExistingFiles()
 {
 	string command = "exec rm -r " + this->outFolder + "/*.txt";
 	system(command.c_str());
-	cout << "DELETING" << endl;
-	exit(0);
 }
 
 
