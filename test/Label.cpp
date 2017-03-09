@@ -40,7 +40,7 @@ Label::Label(string name, string value, LabelType type)
 			break;
 		}
 	}
-	// PENDING ADD VALIDATION LABEL TO CHECK BEGIN == END
+
 	isValid = true;
 }
 
