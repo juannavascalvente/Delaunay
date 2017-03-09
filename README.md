@@ -9,4 +9,4 @@ Some of the diagrams that can be easily obtained from the Delaunay triangulation
 
 This tool is in continuos evolution and new features area added periodically.
 
-A full description of the application and the user manual can be obtained in the wiki.
+A full description of the application and the user manual can be obtained in the link:wiki.
