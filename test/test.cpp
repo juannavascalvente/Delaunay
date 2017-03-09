@@ -5,6 +5,7 @@
  *      Author: juan
  */
 #include "test.h"
+#include <stdlib.h>
 
 //#define DEBUG_TEST_READ
 //#define DEBUG_TEST_GET_PARAM_INDEX
@@ -123,6 +124,33 @@ void Test::parseParameters(Set<Label> &labels)
 	}
 }
 
+/***************************************************************************
+* Name: 	removeExistingFiles
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: removes all files in output folder.
+***************************************************************************/
+void Test::removeExistingFiles()
+{
+	string command = "exec rm -r " + this->outFolder + "/*.txt";
+	system(command.c_str());
+	cout << "DELETING" << endl;
+	exit(0);
+}
+
+
+/***************************************************************************
+* Name: 	getTypeTest
+* IN:		testName
+* OUT:		NONE
+* RETURN:	test type 		if the test is valid.
+* GLOBAL:	NONE
+* Description: Checks if the input string matches any test name. If so then
+* 				it returns the enum value for such test. Otherwise it
+* 				returns the UNKNOWN test value.
+***************************************************************************/
 TestType Test::getTypeTest(string testName)
 {
 	TestType type=TestType(0);		// Return value.
@@ -311,6 +339,7 @@ void Test::init(Set<Label> &labels)
 {
 	this->initParameters();
 	this->parseParameters(labels);
+	this->removeExistingFiles();
 }
 
 void Test::run()
