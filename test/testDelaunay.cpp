@@ -386,6 +386,10 @@ void TestDelaunayCompare::main()
 	Dcel	originalDcel;		// Original dcel data.
 	Dcel	dcel;				// Dcel data.
 	Delaunay	delaunay;		// Delaunay data.
+	int		nTests=0;
+	int		testId=1;
+
+	nTests = this->filesList.getNElements();
 
 	// Print test parameters.
 	this->printParameters();
@@ -399,17 +403,13 @@ void TestDelaunayCompare::main()
 	{
 		// Open file.
 		fileName = *this->filesList.at(i);
-
-		Logging::buildText(__FUNCTION__, __FILE__, "Comparing with Delaunay from ");
-		Logging::buildText(__FUNCTION__, __FILE__, fileName);
-		Logging::write(true, Info);
 		if (!originalDcel.read(fileName, false))
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
 			Logging::buildText(__FUNCTION__, __FILE__, fileName);
 			Logging::write(true, Error);
 		}
-		else if (!dcel.read(fileName, false))
+		else if (!dcel.readPoints(fileName, false))
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file: ");
 			Logging::buildText(__FUNCTION__, __FILE__, fileName);
@@ -433,8 +433,11 @@ void TestDelaunayCompare::main()
 			{
 				if (dcel == originalDcel)
 				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Test OK");
-					Logging::write(true, Info);
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+					Logging::buildText(__FUNCTION__, __FILE__, testId);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, nTests);
+					Logging::write(true, Successful);
 				}
 				else
 				{
@@ -444,16 +447,18 @@ void TestDelaunayCompare::main()
 					ostringstream convert;
 					convert << nFailedTests;
 					fileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
+					cout << "CREATING " << fileName << endl;
 					this->dump(fileName, dcel);
 
 					// Print log error.
 					Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
-					Logging::buildText(__FUNCTION__, __FILE__, i+1);
+					Logging::buildText(__FUNCTION__, __FILE__, testId);
 					Logging::write(true, Error);
 				}
 			}
 
 			// Reset Delaunay data.
+			testId++;
 			delaunay.reset();
 			originalDcel.reset();
 			dcel.reset();
@@ -464,7 +469,7 @@ void TestDelaunayCompare::main()
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements()-nFailedTests);
 	Logging::buildText(__FUNCTION__, __FILE__, "/");
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
-	Logging::write(true, Info);
+	Logging::write(true, Successful);
 }
 
 /***************************************************************************

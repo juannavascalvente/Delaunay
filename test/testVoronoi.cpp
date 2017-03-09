@@ -436,6 +436,10 @@ void TestVoronoiCompare::main()
 	Dcel	originalDcel;		// Original dcel data.
 	Dcel	dcel;				// Dcel data.
 	Voronoi voronoi;
+	int		nTests=0;
+	int		testId=1;
+
+	nTests = this->filesList.getNElements();
 
 	// Print test parameters.
 	this->printParameters();
@@ -475,8 +479,11 @@ void TestVoronoiCompare::main()
 			{
 				if ((*voronoi.getRefDcel()) == originalDcel)
 				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Test OK");
-					Logging::write(true, Info);
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+					Logging::buildText(__FUNCTION__, __FILE__, testId);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, nTests);
+					Logging::write(true, Successful);
 				}
 				else
 				{
@@ -496,6 +503,7 @@ void TestVoronoiCompare::main()
 			// Reset Delaunay data.
 			originalDcel.reset();
 			dcel.reset();
+			testId++;
 		}
 	}
 
@@ -503,6 +511,6 @@ void TestVoronoiCompare::main()
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements()-nFailedTests);
 	Logging::buildText(__FUNCTION__, __FILE__, "/");
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
-	Logging::write(true, Info);
+	Logging::write(true, Successful);
 }
 
