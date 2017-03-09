@@ -46,7 +46,9 @@ public:
 	static void buildText( string func, string f, string text);
 	static void buildText( string func, string f, int value);
 	static void buildText( string func, string f, TYPE value);
+#ifdef FLOAT_TYPE
 	static void buildText( string func, string f, double value);
+#endif
 	static void buildText( string func, string f, Point<TYPE> *point);
 	static void buildRange( string func, string f, int start, int end);
 	static void write( bool print, enum MessageCategory category);

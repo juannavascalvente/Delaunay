@@ -153,6 +153,7 @@ void Logging::buildText( string func, string f, TYPE value)
 * GLOBAL:	NONE
 * Description: writes a double to the logging file
 ***************************************************************************/
+#ifdef FLOAT_TYPE
 void Logging::buildText( string func, string f, double value)
 {
 	string Result;
@@ -173,6 +174,7 @@ void Logging::buildText( string func, string f, double value)
 		concat = true;
 	}
 }
+#endif
 
 /***************************************************************************
 * Name: 	buildText
