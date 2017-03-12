@@ -2,7 +2,7 @@
 CC=g++
 CFLAGS=
 RM= rm -f
-EXEC=Delaunay
+EXEC=geometric
 LIBRARY=-lglut -lgomp -lGLU -lGL
 SRCEXT=cpp
 
