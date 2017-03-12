@@ -40,6 +40,9 @@ class Config
 	Point<TYPE>	closestPoint;
 	TYPE		minLengthEdge;
 
+	Point<TYPE>	originPoint;		// Line origin point.
+	Point<TYPE>	destinationPoint;	// Line destination point.
+
 	int		nClusters;		// # clusters in set when generating cluster set.
 	int 	clusterRadius;	// Cluster radius.
 
@@ -80,7 +83,9 @@ public:
 	inline string getOutGraphFilename() { return(this->outGraphFileName); };
 	inline string getOutVoronoiFilename() { return(this->outVoronoiFileName); };
 	inline string getOutGabrielFilename() { return(this->outGabrielFileName); };
-	inline TYPE getMinLengthEdge() { return(this->minLengthEdge);};
+	inline TYPE getMinLengthEdge() {return (this->minLengthEdge);}
+	Point<TYPE> getDestinationPoint() const {return this->destinationPoint;}
+	Point<TYPE> getOriginPoint() const {return this->originPoint;}
 };
 
 #endif /* CONFIG_H_ */

@@ -45,7 +45,7 @@ using namespace std;
 #define DEFAULT_MAX_Y					5000
 #define DEFAULT_ANCHORS					1
 #define DEFAULT_NCLUSTERS				1
-#define DEFAULT_CLUSTER_RADIUS				100
+#define DEFAULT_CLUSTER_RADIUS			100
 
 // Fields in configuration file.
 #define N_POINTS_PARAM				"N_POINTS"
@@ -60,31 +60,13 @@ using namespace std;
 #define OUTPUT_VORONOI_FILE_PARAM	"OUTPUT_VORONOI_FILE"
 #define OUTPUT_GABRIEL_FILE_PARAM	"OUTPUT_GABRIEL_FILE"
 #define CLOSEST_POINT_PARAM			"CLOSEST_POINT"
+#define ORIGIN_POINT_PARAM			"ORIGIN_POINT"
+#define DESTINATION_POINT_PARAM		"DESTINATION_POINT"
 #define N_ANCHORS_PARAM				"N_ANCHORS"
 #define MIN_LENGTH_EDGE_PARAM		"MIN_LENGTH_EDGE"
 #define ZOOM_PARAM					"ZOOM"
 #define CLUSTER_SET_PARAM			"CLUSTER_SET"
-
-#define	PARAMETERS_NPOINTS		1
-#define	PARAMETERS_IN_FLAT		2
-#define	PARAMETERS_IN_DCEL		3
-#define	PARAMETERS_OUT_FLAT		4
-#define	PARAMETERS_OUT_DCEL		5
-#define	PARAMETERS_CLOSEST		6
-#define	PARAMETERS_MIN_EDGE_LEN	7
-#define	PARAMETERS_ZOOM			8
-#define	PARAMETERS_CLUSTER		9
-#define	PARAMETERS_NANCHORS		10
-#define	PARAMETERS_IN_GRAPH		11
-#define	PARAMETERS_OUT_GRAPH	12
-#define	PARAMETERS_IN_VORONOI	13
-#define	PARAMETERS_OUT_VORONOI	14
-#define	PARAMETERS_IN_GABRIEL	15
-#define	PARAMETERS_OUT_GABRIEL	16
-#define	PARAMETERS_ALL			100
-
-#define MAX_LINE_LENGTH		200
-
+#define MAX_LINE_LENGTH				200
 
 /***************************************************************************
 * Private functions headers.
@@ -112,6 +94,8 @@ Config::Config(string fileName)
 	this->outVoronoiFileName = DEFAULT_OUTPUT_VORONOI_FILENAME;
 	this->outGabrielFileName = DEFAULT_OUTPUT_GABRIEL_FILENAME;
 	this->closestPoint = Point<TYPE>(INVALID, INVALID);
+	this->originPoint = Point<TYPE>(INVALID, INVALID);
+	this->destinationPoint = Point<TYPE>(INVALID, INVALID);
 	this->nAnchors = INVALID;
 	this->minLengthEdge = FLT_MAX;
 
@@ -150,6 +134,8 @@ void	Config::setDefaultConfig(void)
 	this->outVoronoiFileName = DEFAULT_OUTPUT_VORONOI_FILENAME;
 	this->outGabrielFileName = DEFAULT_OUTPUT_GABRIEL_FILENAME;
 	this->closestPoint = Point<TYPE>(INVALID, INVALID);
+	this->originPoint = Point<TYPE>(INVALID, INVALID);
+	this->destinationPoint = Point<TYPE>(INVALID, INVALID);
 	this->nAnchors = DEFAULT_ANCHORS;
 	this->minLengthEdge = FLT_MAX;
 
@@ -305,7 +291,7 @@ int 	Config::readConfig()
 					ss.imbue(std::locale::classic());
 					ss >> this->nAnchors;
 				}
-				// Get # anchors to locate point.
+				// Get point to locate.
 				else if (field.compare(CLOSEST_POINT_PARAM) == 0)
 				{
 					// Extract two values.
@@ -322,6 +308,42 @@ int 	Config::readConfig()
 					ss2.imbue(std::locale::classic());
 					ss2 >> newValue;
 					this->closestPoint.setY(newValue);
+				}
+				// Get origin point of the line.
+				else if (field.compare(ORIGIN_POINT_PARAM) == 0)
+				{
+					// Extract two values.
+					field = value;
+					pos = field.find(separator);
+					value = field.substr(0, pos);
+					field.erase(0, pos + separator.length());
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> newValue;
+					this->originPoint.setX(newValue);
+					value = field;
+					std::istringstream ss2(value);
+					ss2.imbue(std::locale::classic());
+					ss2 >> newValue;
+					this->originPoint.setY(newValue);
+				}
+				// Get destination point of the line.
+				else if (field.compare(DESTINATION_POINT_PARAM) == 0)
+				{
+					// Extract two values.
+					field = value;
+					pos = field.find(separator);
+					value = field.substr(0, pos);
+					field.erase(0, pos + separator.length());
+					std::istringstream ss(value);
+					ss.imbue(std::locale::classic());
+					ss >> newValue;
+					this->destinationPoint.setX(newValue);
+					value = field;
+					std::istringstream ss2(value);
+					ss2.imbue(std::locale::classic());
+					ss2 >> newValue;
+					this->destinationPoint.setY(newValue);
 				}
 				// Check REMOVE_LOWER_EDGES parameter.
 				else if (field.compare(MIN_LENGTH_EDGE_PARAM) == 0)

@@ -56,6 +56,7 @@ class Process
 	bool findFace( Point<TYPE> &point, int &faceId);
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
 	void getPointToLocate(Point<TYPE> &point);
+	void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
 
 protected:
 	static Process *instance;

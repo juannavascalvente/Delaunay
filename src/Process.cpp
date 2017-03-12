@@ -482,9 +482,6 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 	return(found);
 }
 
-
-
-
 /***************************************************************************
 * Name: 	getPointToLocate
 * IN:		NONE
@@ -517,7 +514,40 @@ void Process::getPointToLocate(Point<TYPE> &point)
 	}
 }
 
+/***************************************************************************
+* Name: 	getPointToLocate
+* IN:		NONE
+* OUT:		point		point to locate.
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	if a point was set in the configuration file then this
+* 				method sets in the output parameter that point. Otherwise
+* 				it is generated randomly.
+***************************************************************************/
+void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
+{
+	int minX, minY, maxX, maxY;
 
+	// Get point from configuration.
+	p1 = config->getOriginPoint();
+	p2 = config->getDestinationPoint();
+
+	// Check if input point parameter provided by user.
+	if ((p1.getX() == INVALID) || (p2.getX() == INVALID))
+	{
+		// Get min and max coordiantes.
+		config->getScreenCoordinates(minX, minY, maxX, maxY);
+
+		// Generate seed.
+		srand(time(NULL));
+
+		// Create a random points.
+		p1.setX(rand() % (int) maxX);
+		p1.setY(rand() % (int) maxY);
+		p2.setX(rand() % (int) maxX);
+		p2.setY(rand() % (int) maxY);
+	}
+}
 
 /***************************************************************************
 * Name: execute
@@ -673,9 +703,8 @@ void Process::execute(void)
 			// Check Delaunay triangulation already created.
 			if (this->status.isDelaunayCreated())
 			{
-				// Generate random points.
-				p1.random();
-				p2.random();
+				// Get points.
+				this->getLineToLocate(p1, p2);
 				line = Line(p1, p2);
 
 				// Check incremental triangulation computed.
@@ -719,11 +748,9 @@ void Process::execute(void)
 			// Check Delaunay triangulation already created.
 			if (this->status.isVoronoiCreated())
 			{
-				// Generate random points.
-				p1.random();
-				p2.random();
+				// Get points.
+				this->getLineToLocate(p1, p2);
 				line = Line(p1, p2);
-
 
 				// Check incremental triangulation computed.
 				if (this->delaunay.getAlgorithm() == INCREMENTAL)
