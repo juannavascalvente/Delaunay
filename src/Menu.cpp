@@ -16,15 +16,17 @@ using namespace std;
 * 							Defines section
 **************************************************************************/
 // Input points set menu entries text.
-#define	INPUTSET_MENU_TEXT				"Data set"
-#define	INPUTSET_RANDOM_TEXT			"Generate randomly"
-#define	INPUTSET_CLUSTER_TEXT			"Generate clusters"
-#define	INPUTSET_READ_FLAT_TEXT			"Read points from flat file"
-#define	INPUTSET_READ_DCEL_POINTS_TEXT 	"Read points from DCEL file"
-#define	INPUTSET_READ_DCEL_TEXT			"Read DCEL file"
-#define	INPUTSET_READ_DELAUNAY_TEXT		"Read Delaunay files"
-#define	INPUTSET_READ_VORONOI_TEXT		"Read Voronoi file"
-#define INPUTSET_READ_GABRIEL_TEXT		"Read Gabriel file"
+#define	INPUTSET_MENU_TEXT				"Input"
+#define	GENERATE_MENU_TEXT				"Generate"
+#define	INPUTSET_RANDOM_TEXT			"Randomly"
+#define	INPUTSET_CLUSTER_TEXT			"Clusters"
+#define	READ_MENU_TEXT					"Read"
+#define	INPUTSET_READ_FLAT_TEXT			"Flat file"
+#define	INPUTSET_READ_DCEL_POINTS_TEXT 	"Points DCEL file"
+#define	INPUTSET_READ_DCEL_TEXT			"DCEL file"
+#define	INPUTSET_READ_DELAUNAY_TEXT		"Delaunay files"
+#define	INPUTSET_READ_VORONOI_TEXT		"Voronoi file"
+#define INPUTSET_READ_GABRIEL_TEXT		"Gabriel file"
 #define	INPUTSET_SHAKE_DCEL_TEXT		"Shake points"
 
 // Parameters menu entries text.
@@ -47,13 +49,13 @@ using namespace std;
 #define	FIGURES_TRIANGULATION_PATH_TEXT	"Triangulation path"
 
 // Location menu entries.
-#define LOCATION_MENU_TEXT					"Location"
-#define	LOCATION_CLOSEST_POINTS_TEXT		"Closest to a given"
-#define	LOCATION_2CLOSEST_POINTS_TEXT		"Two closest"
-#define	LOCATION_FIND_FACE_TEXT				"Locate face"
+#define LOCATION_MENU_TEXT				"Location"
+#define	LOCATION_CLOSEST_POINTS_TEXT	"Closest to a given"
+#define	LOCATION_2CLOSEST_POINTS_TEXT	"Two closest"
+#define	LOCATION_FIND_FACE_TEXT			"Locate face"
 
 // Export menu entries text.
-#define	EXPORT_MENU_TEXT				"Export"
+#define	EXPORT_MENU_TEXT				"Write"
 #define EXPORT_FLAT_FILE				"Write flat file"
 #define EXPORT_DCEL_FILE				"Write DCEL file"
 #define EXPORT_DELAUNAY_FILE			"Write Delaunay files"
@@ -96,6 +98,8 @@ Menu::Menu()
 	this->sub_Menu_Id3 = 0;
 	this->sub_Menu_Id4 = 0;
 	this->sub_Menu_Id5 = 0;
+	this->subMenuRead = 0;
+	this->subMenuGenerate = 0;
 	this->status = 0;
 	menu_Option = DEFAULT_OPTION;
 };
@@ -110,6 +114,8 @@ Menu::Menu(Status *status)
 	this->sub_Menu_Id3 = 0;
 	this->sub_Menu_Id4 = 0;
 	this->sub_Menu_Id5 = 0;
+	this->subMenuRead = 0;
+	this->subMenuGenerate = 0;
 	this->status = status;
 
 	updateMenu();
@@ -131,16 +137,24 @@ void Menu::updateMenu()
 			glutDestroyMenu(menu_Id);
 		}
 
-		// Input points sub-menu.
-		sub_Menu_Input = glutCreateMenu(menu_level_1);
+		// Add generate sub menu entries.
+		this->subMenuRead = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_RANDOM_TEXT, RANDOMLY);
 		glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, CLUSTER);
+
+		// Add read sub menu entries.
+		this->subMenuGenerate = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FLAT_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, READ_POINTS_DCEL_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_TEXT, READ_DCEL);
 		glutAddMenuEntry(INPUTSET_READ_DELAUNAY_TEXT, READ_DELAUNAY);
 		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, READ_VORONOI);
 		glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, READ_GABRIEL);
+
+		// Input points sub-menu.
+		sub_Menu_Input = glutCreateMenu(menu_level_1);
+		glutAddSubMenu(GENERATE_MENU_TEXT, this->subMenuRead);
+		glutAddSubMenu(READ_MENU_TEXT, this->subMenuGenerate);
 
 		// Main menu.
 		menu_Id = glutCreateMenu(menu_level_1);
@@ -156,18 +170,24 @@ void Menu::updateMenu()
 		// Clear current menu.
 		glutDestroyMenu(menu_Id);
 
-		// Input points submenu.
-		sub_Menu_Input = glutCreateMenu(menu_level_1);
+		// Add generate sub menu entries.
+		this->subMenuRead = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_RANDOM_TEXT, RANDOMLY);
 		glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, CLUSTER);
+
+		// Add read sub menu entries.
+		this->subMenuGenerate = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FLAT_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, READ_POINTS_DCEL_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_TEXT, READ_DCEL);
 		glutAddMenuEntry(INPUTSET_READ_DELAUNAY_TEXT, READ_DELAUNAY);
 		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, READ_VORONOI);
 		glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, READ_GABRIEL);
-		glutAddMenuEntry(INPUTSET_SHAKE_DCEL_TEXT, SHAKE_POINTS);
-		// PENDING glutAddMenuEntry("Check data set", CHECK_DCEL);
+
+		// Input points sub-menu.
+		sub_Menu_Input = glutCreateMenu(menu_level_1);
+		glutAddSubMenu(GENERATE_MENU_TEXT, this->subMenuRead);
+		glutAddSubMenu(READ_MENU_TEXT, this->subMenuGenerate);
 
 		// Triangulations submenu.
 		if (this->status->isSetCreated())

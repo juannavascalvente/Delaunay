@@ -698,8 +698,6 @@ void Process::execute(void)
 				this->drawer->setPointsSet(&points);
 				this->drawer->setFacesSet(&faces);
 				this->drawer->drawFigures(TRIANGULATION_PATH_DRAW, error);
-				//points.write("/home/juan/projects/delaunay/code/data/samples/test/input/delaunay/comparePath/points.txt");
-				//faces.write("/home/juan/projects/delaunay/code/data/samples/test/input/delaunay/comparePath/faces.txt");
 
 				// Print error message.
 				if (error)
@@ -724,16 +722,22 @@ void Process::execute(void)
 				// Generate random points.
 				p1.random();
 				p2.random();
-				/*
-				p1.setX(6319.26);
-				p1.setY(5695.33);
-				p2.setX(8791.84);
-				p2.setY(8886.3);
-				*/
 				line = Line(p1, p2);
 
-				// Compute triangles path between two points.
-				error = !this->findPath(this->delaunay, this->voronoi, line, faces);
+
+				// Check incremental triangulation computed.
+				if (this->delaunay.getAlgorithm() == INCREMENTAL)
+				{
+					// Compute triangles path between two points.
+					error = !this->findPath(this->delaunay, this->voronoi, line, faces);
+				}
+				else
+				{
+					// PENDING https://github.com/juannavascalvente/Delaunay/issues/10
+					Logging::buildText(__FUNCTION__, __FILE__,
+							"Voronoi path not implemented in normal triangulation");
+					Logging::write(true, Error);
+				}
 
 				// Draw triangulation, Voronoi, segment and the path.
 				points.add(p1);
@@ -741,8 +745,6 @@ void Process::execute(void)
 				this->drawer->setPointsSet(&points);
 				this->drawer->setFacesSet(&faces);
 				this->drawer->drawFigures(VORONOI_PATH_DRAW, error);
-				//points.write("/home/juan/projects/delaunay/code/data/samples/test/input/voronoi/gold/comparePath/points.txt");
-				//faces.write("/home/juan/projects/delaunay/code/data/samples/test/input/voronoi/gold/comparePath/faces.txt");
 
 				// Check if an error must be printed.
 				if (error)

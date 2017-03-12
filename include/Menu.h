@@ -65,6 +65,8 @@ class Menu
 	int	sub_Menu_Id3;
 	int	sub_Menu_Id4;
 	int	sub_Menu_Id5;
+	int	subMenuRead;
+	int	subMenuGenerate;
 
 	Status	*status;
 public:
