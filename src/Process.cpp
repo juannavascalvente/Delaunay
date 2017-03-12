@@ -184,8 +184,9 @@ bool Process::readData(int option)
 			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
 			this->delaunay.setDCEL(&this->dcel);
 			success = this->delaunay.read(this->config->getInDCELFilename(),
-					this->config->getInGraphFilename());
-			this->status.set(false, true, !success, !success, false, false);
+											this->config->getInGraphFilename());
+			this->status.set(false, success, success, success, false, false);
+			this->delaunay.setAlgorithm(INCREMENTAL);
 			break;
 		}
 		// Read Voronoi file.
@@ -596,6 +597,7 @@ void Process::execute(void)
 		    {
 				if (this->status.isVoronoiCreated())
 				{
+					cout << "1" << endl;
 					// Clear screen.
 					this->drawer->drawFigures(VORONOI_DRAW);
 				}
@@ -603,10 +605,12 @@ void Process::execute(void)
 					this->status.isTriangulationCreated())
 				{
 					// Draw triangulation.
+					cout << "2" << endl;
 					this->drawer->drawFigures(TRIANGULATION_DRAW);
 				}
 				else
 				{
+					cout << "3" << endl;
 					// Draw set of points.
 					this->drawer->drawFigures(SET_DRAW);
 				}
