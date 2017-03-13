@@ -52,10 +52,10 @@ class Test
 	//------------------------------------------------------------------------
 	// Private virtual functions.
 	//------------------------------------------------------------------------
-	virtual void initParameters() {};
+	virtual void initParameters() { cout << "DEFAULT INIT PARAMETERS" << endl;};
 	virtual void applyParameter(Parameter *parameter, string value) {cout << "DEFAULT APPLY" << endl;};
 	virtual void printParameters() {};
-	virtual bool prepare() {return(true);};
+	virtual bool prepare() {cout << "DEFAULT PREPARE" << endl; return(true);};
 	virtual void main() {};
 	virtual void write() {};
 

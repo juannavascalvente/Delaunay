@@ -13,6 +13,7 @@
 #define HALFSIZE		5
 #define SIZE			HALFSIZE*2
 #define DOUBLESIZE		SIZE*2
+#define LONG_SET		10
 
 void TestSet::checkDefaultConstructor()
 {
@@ -28,8 +29,8 @@ void TestSet::checkDefaultConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 1. IsFull \t\t\t\t\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 1. IsFull OK.");
+		this->logFile.write(true, Successful);
 	}
 	if (!invalidSet.isEmpty())
 	{
@@ -40,8 +41,8 @@ void TestSet::checkDefaultConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 1. isEmpty \t\t\t\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 1. isEmpty OK.");
+		this->logFile.write(true, Successful);
 	}
 	// Check attributes initialization in default constructor.
 	if (Assert::assertNotEqual(invalidSet.getSize(), 0))
@@ -56,8 +57,8 @@ void TestSet::checkDefaultConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 1. Get size in empty set\t\t\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 1. Get size in empty set OK.");
+		this->logFile.write(true, Successful);
 	}
 	if (Assert::assertNotEqual(invalidSet.getNElements(), 0))
 	{
@@ -71,8 +72,8 @@ void TestSet::checkDefaultConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 1. Get # elements in empty set\t\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 1. Get # elements in empty set OK.");
+		this->logFile.write(true, Successful);
 	}
 }
 
@@ -90,8 +91,8 @@ void TestSet::checkCustomConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 2. IsFull \t\t\t\t\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 2. IsFull OK.");
+		this->logFile.write(true, Successful);
 	}
 	if (!newSet.isEmpty())
 	{
@@ -102,8 +103,8 @@ void TestSet::checkCustomConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 2. isEmpty \t\t\t\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 2. isEmpty OK.");
+		this->logFile.write(true, Successful);
 	}
 	// Check attributes initialization.
 	if (Assert::assertNotEqual(newSet.getSize(), HALFSIZE))
@@ -118,8 +119,8 @@ void TestSet::checkCustomConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 2. Get size in constructor set\t\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 2. Get size in constructor set OK.");
+		this->logFile.write(true, Successful);
 	}
 	if (Assert::assertNotEqual(newSet.getNElements(), 0))
 	{
@@ -133,8 +134,8 @@ void TestSet::checkCustomConstructor()
 	else
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__,
-				"TEST 2. Get # elements in constructor set\t\t\tOK.");
-		this->logFile.write(true, Info);
+				"TEST 2. Get # elements in constructor set OK.");
+		this->logFile.write(true, Successful);
 	}
 }
 
@@ -151,8 +152,6 @@ void TestSet::main()
 	// Check is full and empty functions.
 	checkCustomConstructor();
 
-	cout << "PROBANDO" << endl;
-
 	// Add elements.
 	for (i=0; i<HALFSIZE ;i++)
 	{
@@ -167,8 +166,8 @@ void TestSet::main()
 		}
 		else
 		{
-			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get size after adding element\t\t\t\t\t\t\tOK.");
-			this->logFile.write( true, Info);
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get size after adding element OK.");
+			this->logFile.write( true, Successful);
 		}
 		if (Assert::assertNotEqual( this->set.getNElements(), i+1))
 		{
@@ -181,8 +180,8 @@ void TestSet::main()
 		}
 		else
 		{
-			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get # elements after adding element\t\t\t\t\t\tOK.");
-			this->logFile.write( true, Info);
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get # elements after adding element OK.");
+			this->logFile.write( true, Successful);
 		}
 	}
 
@@ -200,8 +199,8 @@ void TestSet::main()
 		}
 		else
 		{
-			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get size after adding element\t\t\t\t\t\t\tOK.");
-			this->logFile.write( true, Info);
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get size after adding element OK.");
+			this->logFile.write( true, Successful);
 		}
 		if (Assert::assertNotEqual( this->set.getNElements(), i+1))
 		{
@@ -214,8 +213,8 @@ void TestSet::main()
 		}
 		else
 		{
-			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get # elements after adding element\t\t\t\t\t\tOK.");
-			this->logFile.write( true, Info);
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 3. Get # elements after adding element OK.");
+			this->logFile.write( true, Successful);
 		}
 	}
 
@@ -233,8 +232,8 @@ void TestSet::main()
 		}
 		else
 		{
-			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 4. At element \t\t\t\t\t\t\t\t\tOK.");
-			this->logFile.write( true, Info);
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 4. At element OK.");
+			this->logFile.write( true, Successful);
 		}
 	}
 
@@ -249,8 +248,8 @@ void TestSet::main()
 	}
 	else
 	{
-		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 5. isEmpty \t\t\t\t\t\t\t\t\tOK.");
-		this->logFile.write( true, Info);
+		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 5. isEmpty OK.");
+		this->logFile.write( true, Successful);
 	}
 	if (!this->set.isFull())
 	{
@@ -263,8 +262,8 @@ void TestSet::main()
 	}
 	else
 	{
-		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 5. isFull \t\t\t\t\t\t\t\t\t\tOK.");
-		this->logFile.write( true, Info);
+		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 5. isFull OK.");
+		this->logFile.write( true, Successful);
 	}
 
 	// Check reset.
@@ -280,8 +279,8 @@ void TestSet::main()
 	}
 	else
 	{
-		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 6. isEmpty \t\t\t\t\t\t\t\t\tOK.");
-		this->logFile.write( true, Info);
+		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 6. isEmpty OK.");
+		this->logFile.write( true, Successful);
 	}
 	if (!this->set.isEmpty())
 	{
@@ -294,8 +293,8 @@ void TestSet::main()
 	}
 	else
 	{
-		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 6. isFull \t\t\t\t\t\t\t\t\t\tOK.");
-		this->logFile.write( true, Info);
+		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 6. isFull OK.");
+		this->logFile.write( true, Successful);
 	}
 
 	// Check get highest element.
@@ -304,8 +303,8 @@ void TestSet::main()
 		this->set.add(i+1);
 	}
 
-	highest = this->set.highest();
-	highestIndex = this->set.highestIndex();
+	highest = this->set.getHighest();
+	highestIndex = this->set.getIndexHighest();
 	if (highest != DOUBLESIZE)
 	{
 		this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. Checking highest element. Should be ");
@@ -326,8 +325,8 @@ void TestSet::main()
 	{
 		updatedIndex = 3;
 		this->set.update(updatedIndex, DOUBLESIZE*2);
-		highest = this->set.highest();
-		highestIndex = this->set.highestIndex();
+		highest = this->set.getHighest();
+		highestIndex = this->set.getIndexHighest();
 		if (highest != DOUBLESIZE*2)
 		{
 			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. Checking highest element after updated. Should be ");
@@ -347,8 +346,78 @@ void TestSet::main()
 			this->set.print();
 		}
 		{
-			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. highest \t\t\t\t\t\t\t\t\t\tOK.");
-			this->logFile.write( true, Info);
+			this->logFile.buildText(__FUNCTION__, __FILE__, "TEST 7. highest OK.");
+			this->logFile.write( true, Successful);
 		}
 	}
+
+	// Test post == operator using openMP.
+	this->testEqualOpenMP();
+
+	// Test post increment opeartor using openMP.
+	this->testAddOpenMP();
+}
+
+bool TestSet::testEqualOpenMP()
+{
+	bool success=false;		// Return value.
+	int i=0;				// Loop counter.
+	Set<int>	currentSet(10);
+	Set<int>	final(10);
+
+	// Initialize set.
+	for (i=0; i<LONG_SET ;i++)
+	{
+		currentSet.add(i);
+		final.add(i+1);
+	}
+
+	// Check both sets are different
+	if (currentSet == final)
+	{
+		this->logFile.buildText(__FUNCTION__, __FILE__,
+				"TEST testEqualOpenMP FAILED");
+		this->logFile.write(true, Error);
+	}
+	else
+	{
+		success = true;
+		this->logFile.buildText(__FUNCTION__, __FILE__,
+				"TEST testEqualOpenMP OK");
+		this->logFile.write(true, Successful);
+	}
+
+	return(success);
+}
+
+bool TestSet::testAddOpenMP()
+{
+	bool success=false;		// Return value.
+	int i=0;				// Loop counter.
+	Set<int>	currentSet(10);
+	Set<int>	final(10);
+
+	// Initialize set.
+	for (i=0; i<LONG_SET ;i++)
+	{
+		currentSet.add(i);
+		final.add(i+1);
+	}
+
+	currentSet++;
+	if (currentSet == final)
+	{
+		success = true;
+		this->logFile.buildText(__FUNCTION__, __FILE__,
+				"TEST testAddOpenMP OK");
+		this->logFile.write(true, Successful);
+	}
+	else
+	{
+		this->logFile.buildText(__FUNCTION__, __FILE__,
+				"TEST testAddOpenMP FAILED");
+		this->logFile.write(true, Error);
+	}
+
+	return(success);
 }

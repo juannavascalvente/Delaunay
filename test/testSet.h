@@ -17,6 +17,8 @@ class TestSet : public Test
 
 	void checkDefaultConstructor();
 	void checkCustomConstructor();
+	bool testEqualOpenMP();
+	bool testAddOpenMP();
 
 	bool prepare() {return(true);};
 	void setDefault() {};
@@ -25,8 +27,8 @@ class TestSet : public Test
 	void print() {};
 
 public:
-	TestSet(string fileName, string outFolder, bool print) : \
-						Test("Set", fileName, outFolder,print) {};
+	TestSet(string fileName, bool print) : \
+						Test("Set", fileName, ".",print) {};
 	void main();
 };
 

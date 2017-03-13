@@ -11,9 +11,7 @@
 #include "defines.h"
 #include "Logging.h"
 
-#ifdef _OPENMP
 #include <omp.h>
-#endif
 #include <string.h>
 #include <errno.h>
 #include <iostream>
@@ -56,10 +54,10 @@ public:
 	bool isFull() { return(this->nElements == this->size); };
 	void add(T element);
 	void update(int index, T element);
-	T *at(int index);
+	T 	 *at(int index);
 
-	int getSize();
-	int getNElements();
+	int  getSize();
+	int  getNElements();
 
 	void resize(int size, bool copy);
 	void reset();
@@ -67,12 +65,14 @@ public:
 	bool read(string fileName);
 	bool write(string fileName);
 	void print();
-	int	 random(int nPoints);
+	void random(int nPoints);
 	void shake();
 
-	int highestIndex();
-	T highest();
-	bool  operator==(Set<T> &other);
+	int getIndexHighest();
+	T 	getHighest();
+
+	bool  	operator==(Set<T> &other);
+	Set<T>& operator++(int inc);
 };
 
 template <class T> Set<T>::Set()
@@ -108,6 +108,14 @@ template <class T> Set<T>::~Set()
 	}
 }
 
+/***************************************************************************
+* Name: 	add
+* IN:		element			element to add
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	adds a new element to the set.
+***************************************************************************/
 template <class T> void Set<T>::add(T element)
 {
 	// Check if set is full.
@@ -133,6 +141,15 @@ template <class T> void Set<T>::add(T element)
 	this->nElements++;
 }
 
+/***************************************************************************
+* Name: 	update
+* IN:		index			index to update.
+* 			element			element to updat
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	Updates the element at position index with element data.
+***************************************************************************/
 template <class T> void Set<T>::update(int index, T element)
 {
 	// Check if index out of bounds.
@@ -147,7 +164,14 @@ template <class T> void Set<T>::update(int index, T element)
 	}
 }
 
-
+/***************************************************************************
+* Name: 	at
+* IN:		index			index of the element to recover
+* OUT:		NONE
+* RETURN:	returns a reference to the element at index position
+* GLOBAL:	NONE
+* Description: 	returns a reference to the element at index position
+***************************************************************************/
 template <class T> T* Set<T>::at(int index)
 {
 	T* ret;		// Return value.
@@ -166,16 +190,44 @@ template <class T> T* Set<T>::at(int index)
 	return(ret);
 }
 
+/***************************************************************************
+* Name: 	getNElements
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	the size of the set
+* GLOBAL:	NONE
+* Description: 	returns the size of elements of the set
+***************************************************************************/
 template <class T> int Set<T>::getSize()
 {
 	return(this->size);
 }
 
+/***************************************************************************
+* Name: 	getNElements
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	the number of elements of the set
+* GLOBAL:	NONE
+* Description: 	returns the number of elements of the set
+***************************************************************************/
 template <class T> int Set<T>::getNElements()
 {
 	return(this->nElements);
 }
 
+/***************************************************************************
+* Name: 	resize
+* IN:		size			new size
+* 			copy			flag to copy current data to new location
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	resizes the set and copy the existing data to the new
+* 				location if the input copy parameter is true. The new size
+* 				will be the size input parameter, but if this value is
+* 				-1 then the size is doubled.
+***************************************************************************/
 template <class T> void Set<T>::resize(int size, bool copy)
 {
 	T *tmp; // Temporary vector.
@@ -252,6 +304,15 @@ template <class T> void Set<T>::reset()
 	this->nElements = 0;
 }
 
+/***************************************************************************
+* Name: 	read
+* IN:		fileName		input file name
+* OUT:		NONE
+* RETURN:	true			if file written
+* 			false			i.o.c.
+* GLOBAL:	NONE
+* Description: 	reads the set of elements from file named "fileName".
+***************************************************************************/
 template <class T> bool Set<T>::read(string fileName)
 {
     bool success=true;  	// Return value.
@@ -289,6 +350,15 @@ template <class T> bool Set<T>::read(string fileName)
 	return(success);
 }
 
+/***************************************************************************
+* Name: 	write
+* IN:		fileName		output file name
+* OUT:		NONE
+* RETURN:	true			if file written
+* 			false			i.o.c.
+* GLOBAL:	NONE
+* Description: 	writes the set of elements to an output file named "fileName".
+***************************************************************************/
 template <class T> bool Set<T>::write(string fileName)
 {
 	int		i=0;			// Loop counter.
@@ -322,6 +392,14 @@ template <class T> bool Set<T>::write(string fileName)
 	return(success);
 }
 
+/***************************************************************************
+* Name: 	print
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	prints all the elements of the set.
+***************************************************************************/
 template <class T> void Set<T>::print()
 {
 	int	i=0;			// Loop counter.
@@ -334,53 +412,106 @@ template <class T> void Set<T>::print()
     cout << endl;
 }
 
-template <class T> int Set<T>::random(int nPoints)
+/***************************************************************************
+* Name: 	random
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	generates a random set of nPoints.
+***************************************************************************/
+template <class T> void Set<T>::random(int nPoints)
 {
 	int	i=0;			// Loop counter.
-	int ret=SUCCESS;  	// Return value.
 
     // Generate random set of elements.
-    for (i=0; i<this->nElements ;i++)
+	#pragma omp parallel for default(none) private(i) shared(nPoints)
+    for (i=0; i<nPoints ;i++)
     {
-    	data[this->nElements].random();
-    	this->nElements++;
+    	data[i].random();
     }
-
-	return(ret);
 }
 
-// PENDING: REMOVE TO POINTS.
+/***************************************************************************
+* Name: 	shake
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	shake all the points off the set adding random delta values
+* 				to all the points of the set.
+***************************************************************************/
 template <class T> void Set<T>::shake()
 {
 	int	i=0;			// Loop counter.
+	int nElements=0;	// Loop upper bound.
 
     // Shake points.
-    for (i=0; i<this->nElements ;i++)
+	nElements = this->getNElements();
+	#pragma omp parallel for default(none) private(i)
+    for (i=0; i<nElements ;i++)
     {
     	data[this->nElements].shake();
     }
 }
 
-template <class T> int Set<T>::highestIndex()
+/***************************************************************************
+* Name: 	getIndexHighest
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	index of the highest element in the set.
+* GLOBAL:	NONE
+* Description: 	returns index of the highest element of the set
+***************************************************************************/
+template <class T> int Set<T>::getIndexHighest()
 {
-	int	i=0;				// Loop counter.
-	int	index=0;			// Highest value index.
+	int i=0;			// Loop counter.
+	int nElements=0;	// Loop upper bound.
+	int *indexes;
+	int bestIndex=0;	// Return value.
+	int	nThreads=0;
+
+	nThreads = omp_get_max_threads();
+	indexes = new int[nThreads];
+	memset(indexes, 0, sizeof(int)*nThreads);
 
 	// Main loop.
-    for (i=1; i<this->nElements ;i++)
-    {
+	nElements = this->getNElements();
+	#pragma omp parallel for default(none) private(i) shared(nElements, indexes)
+	for (i=0; i<nElements ;i++)
+	{
 		// Check if new element is higher than current.
-		if (this->data[i] > this->data[index])
+		if (this->data[i] > this->data[indexes[omp_get_thread_num()]])
 		{
 			// Update current highest value.
-			index = i;
+			indexes[omp_get_thread_num()] = i;
 		}
-    }
+	}
 
-	return(index);
+	bestIndex = indexes[0];
+	for (i=1; i<nThreads ;i++)
+	{
+		if (this->data[bestIndex] < this->data[indexes[i]])
+		{
+			bestIndex = indexes[i];
+		}
+	}
+
+	// Deallocate memory.
+	delete[] indexes;
+
+	return(bestIndex);
 }
 
-template <class T> T Set<T>::highest()
+/***************************************************************************
+* Name: 	getHighest
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	highest element in the set.
+* GLOBAL:	NONE
+* Description: 	returns the highest element of the set
+***************************************************************************/
+template <class T> T Set<T>::getHighest()
 {
 	int	i=0;				// Loop counter.
 	int highestValue=0;
@@ -408,18 +539,20 @@ template <class T> T Set<T>::highest()
 * RETURN:	true 		if both vertex are equal
 * 			false		i.o.c.
 * GLOBAL:	NONE
-* Description: 	checks ifboth vertex are equals.
+* Description: 	checks if both sets are equals.
 ***************************************************************************/
 template <class T> bool Set<T>::operator==(Set<T> &other)
 {
 	bool equal=false;		// Return value.
 	int	i=0;				// Loop counter.
+	int nElements=0;		// Loop upper bound.
 
 	if (this->getNElements() == other.getNElements())
 	{
 		equal = true;
-		i = 0;
-		while ((i<this->getNElements()) && equal)
+		nElements = this->getNElements();
+		#pragma omp parallel for default(none), private (i), shared(nElements, other), reduction(&:equal)
+		for (i=0; i<nElements ;i++)
 		{
 			equal = (*this->at(i) == *other.at(i));
 			i++;
@@ -427,6 +560,29 @@ template <class T> bool Set<T>::operator==(Set<T> &other)
 	}
 
 	return (equal);
+}
+
+/***************************************************************************
+* Name: 	++
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	adds 1 to all elements of the set.
+***************************************************************************/
+template <class T> Set<T>& Set<T>::operator++(int inc)
+{
+	int	i=0;				// Loop counter.
+	int nElements=0;		// Loop upper bound.
+
+	nElements = this->getNElements();
+	#pragma omp parallel for default(none), private (i), shared(nElements)
+	for (i=0; i<nElements ;i++)
+	{
+		this->data[i]++;
+	}
+
+    return *this;
 }
 
 #endif /* INCLUDE_SET_H_ */

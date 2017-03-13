@@ -106,7 +106,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_SET" << endl;
 #endif
-			test = NULL;
+			test = new TestSet("testSet.txt", true);
 			break;
 		}
 		case TEST_DELAUNAY:

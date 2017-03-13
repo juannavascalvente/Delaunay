@@ -342,6 +342,7 @@ void Test::init(Set<Label> &labels)
 
 void Test::run()
 {
+	cout << "RUNNING" << endl;
 	this->prepare();
 	this->main();
 }
