@@ -158,6 +158,11 @@ TestType Test::getTypeTest(string testName)
 	{
 		type = TEST_SET;
 	}
+	// Test dcel.
+	if (testName.compare(TEST_DCEL_NAME) == 0)
+	{
+		type = TEST_DCEL;
+	}
 	// Test Delaunay triangulation.
 	else if (testName.compare(TEST_DELAUNAY_NAME) == 0)
 	{

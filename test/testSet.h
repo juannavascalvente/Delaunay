@@ -8,13 +8,10 @@
 #ifndef CODE_TEST_TESTSET_H_
 #define CODE_TEST_TESTSET_H_
 
-//#include "Set.h"
 #include "test.h"
 
 class TestSet : public Test
 {
-	Set<int> set;
-
 	void checkDefaultConstructor();
 	void checkCustomConstructor();
 	bool testEqualOpenMP();
@@ -27,8 +24,8 @@ class TestSet : public Test
 	void print() {};
 
 public:
-	TestSet(string fileName, bool print) : \
-						Test("Test Set", fileName, ".",print) {};
+	TestSet(string fileName, string outFolder, bool print) : \
+					Test("Test Set", fileName, outFolder, print) {};
 	void main();
 };
 

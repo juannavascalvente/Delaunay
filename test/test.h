@@ -24,6 +24,7 @@ using namespace std;
 // Types of tests to execute.
 enum TestType { UNKNOWN_TEST,
 				TEST_SET,
+				TEST_DCEL,
 				TEST_DELAUNAY,
 				TEST_DELAUNAY_COMPARE,
 				TEST_VORONOI_BUILD,
@@ -35,6 +36,7 @@ enum TestType { UNKNOWN_TEST,
 
 // Test types in string format.
 #define TEST_SET_NAME						"TEST_SET"
+#define TEST_DCEL_NAME						"TEST_DCEL"
 #define TEST_DELAUNAY_NAME					"TEST_DELAUNAY"
 #define TEST_DELAUNAY_COMPARE_NAME			"TEST_DELAUNAY_COMPARE"
 #define TEST_VORONOI_NAME					"TEST_VORONOI"

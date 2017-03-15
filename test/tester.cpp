@@ -7,10 +7,14 @@
 
 #include "Parameter.h"
 #include "tester.h"
+#include "testDcel.h"
 #include "testDelaunay.h"
 #include "testPath.h"
 #include "testSet.h"
 #include "testVoronoi.h"
+
+#define OUT_FOLDER_DCEL		"./data/tests/log/dcelTest/"
+#define OUT_FOLDER_SET		"./data/tests/log/setTest/"
 
 //#define DEBUG_TESTER_READTESTS
 //#define DEBUG_TESTER_CREATEINSTANCE
@@ -106,7 +110,15 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_SET" << endl;
 #endif
-			test = new TestSet("testSet.txt", true);
+			test = new TestSet("testSet.txt", OUT_FOLDER_SET, true);
+			break;
+		}
+		case TEST_DCEL:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_DCEL" << endl;
+#endif
+			test = new TestDcel("testDcel.txt", OUT_FOLDER_DCEL, true);
 			break;
 		}
 		case TEST_DELAUNAY:
