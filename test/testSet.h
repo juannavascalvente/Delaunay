@@ -8,7 +8,7 @@
 #ifndef CODE_TEST_TESTSET_H_
 #define CODE_TEST_TESTSET_H_
 
-#include "Set.h"
+//#include "Set.h"
 #include "test.h"
 
 class TestSet : public Test
@@ -28,7 +28,7 @@ class TestSet : public Test
 
 public:
 	TestSet(string fileName, bool print) : \
-						Test("Set", fileName, ".",print) {};
+						Test("Test Set", fileName, ".",print) {};
 	void main();
 };
 
