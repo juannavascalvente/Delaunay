@@ -21,95 +21,47 @@
 
 #include "Dcel.h"
 #include "Parameter.h"
-#include "test.h"
+#include "testCompare.h"
+#include "testExecution.h"
 
 /****************************************************************************
 // 						TestDelaunayBuild CLASS DEFITNION
 ****************************************************************************/
-class TestDelaunayBuild : public Test
+class TestDelaunayBuild : public TestExecution
 {
-	//------------------------------------------------------------------------
-	// Attributes.
-	//------------------------------------------------------------------------
-	int nPoints;
-	int deltaPoints;
-	int nSteps;
-	int nTests;
-
-	//------------------------------------------------------------------------
-	// Private functions
-	//------------------------------------------------------------------------
-	void initParameters();
-	void applyParameter(Parameter *parameter, string value);
-	void printParameters();
-	void dump(string dcelFileName, Dcel &dcel);
-
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestDelaunayBuild(string logFile, bool printData) :
-						Test("Delaunay Build", logFile, DEF_OUT_FOLDER_DELAUNAY, printData), \
-						nPoints(DEFAULT_N_POINTS), \
-						deltaPoints(DEFAULT_DELTA_POINTS), \
-						nSteps(DEFAULT_N_STEPS), \
-						nTests(DEFAULT_N_TESTS) {};
+	TestDelaunayBuild(string fileName, string outFolder, bool print) : \
+			TestExecution("Delaunay Build", fileName, outFolder, print) {};
 	~TestDelaunayBuild() {};
 
 	//------------------------------------------------------------------------
-	// Public functions
+	//  Public functions.
 	//------------------------------------------------------------------------
+	void dump(string dcelFileName, Dcel &dcel);
 	void main();
-
-	//------------------------------------------------------------------------
-	// Get/Set functions.
-	//------------------------------------------------------------------------
-	void setPoints(int points) {nPoints = points;}
-	void setDeltaPoints(int deltaPoints) {this->deltaPoints = deltaPoints;}
-	void setSteps(int steps) {nSteps = steps;}
-	void setTests(int tests) {nTests = tests;}
 };
 
 /****************************************************************************
 // 						TestDelaunayCompare CLASS DEFITNION
 ****************************************************************************/
-class TestDelaunayCompare : public Test
+class TestDelaunayCompare : public TestCompare
 {
-	//------------------------------------------------------------------------
-	// Attributes.
-	//------------------------------------------------------------------------
-	string filesNamesFile;
-	Set<string> filesList;
-
-	//------------------------------------------------------------------------
-	//  Private functions.
-	//------------------------------------------------------------------------
-	void initParameters();
-	void printParameters();
-	void applyParameter(Parameter *parameter, string value);
-	void dump(string dcelFileName, Dcel &dcel);
-
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestDelaunayCompare(string logFile, bool printData) :
-					Test("Delaunay compare", logFile, DEF_DELAUNAY_COMPARE_FOLDER, printData), \
-					filesNamesFile(DEFAULT_FILE_LIST), \
-					filesList(DEFAULT_N_FILES) {};
+	TestDelaunayCompare(string fileName, string outFolder, bool print) : \
+		TestCompare("Delaunay Compare", fileName, outFolder, print) {};
 	~TestDelaunayCompare() {};
-
-	//------------------------------------------------------------------------
-	//  Get/Set functions.
-	//------------------------------------------------------------------------
-	void setFileNamesFile(string value) {this->filesNamesFile = value;};
 
 	//------------------------------------------------------------------------
 	//  Public functions.
 	//------------------------------------------------------------------------
-	bool prepare();
 	void main();
+	void dump(string dcelFileName, Dcel &dcel);
 };
-
 
 #endif /* TEST_TESTDELAUNAY_H_ */

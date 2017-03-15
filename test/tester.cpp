@@ -114,7 +114,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DELAUNAY" << endl;
 #endif
-			test = new TestDelaunayBuild("testDelaunay.txt", true);
+			test = new TestDelaunayBuild("testDelaunay.txt", DEF_OUT_FOLDER_DELAUNAY, true);
 			break;
 		}
 		case TEST_DELAUNAY_COMPARE:
@@ -122,7 +122,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DELAUNAY" << endl;
 #endif
-			test = new TestDelaunayCompare("testDelaunayCompare.txt", true);
+			test = new TestDelaunayCompare("testDelaunayCompare.txt", DEF_DELAUNAY_COMPARE_FOLDER, true);
 			break;
 		}
 		case TEST_VORONOI_BUILD:
@@ -130,7 +130,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_VORONOI_BUILD" << endl;
 #endif
-			test = new TestVoronoiBuild("testVoronoi.txt", true);
+			test = new TestVoronoiBuild("testVoronoi.txt", DEF_VORONOI_OUT_FOLDER, true);
 			break;
 		}
 		case TEST_VORONOI_COMPARE:
@@ -138,7 +138,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_VORONOI_COMPARE" << endl;
 #endif
-			test = new TestVoronoiCompare("testVoronoiCompare.txt", true);
+			test = new TestVoronoiCompare("testVoronoiCompare.txt", DEF_VORONOI_COMPARE_OUT_FOLDER, true);
 			break;
 		}
 		case TEST_PATH_DELAUNAY:

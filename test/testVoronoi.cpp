@@ -19,126 +19,6 @@
 bool buildVoronoi(int failedTestIndex, Dcel& dcel, Voronoi &voronoi);
 
 /***************************************************************************
-* Name: 	initParameters
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	registers the test parameters
-***************************************************************************/
-void TestVoronoiBuild::initParameters()
-{
-	// Add # points parameter.
-	NumericValidator *nPointsDefinition = new NumericValidator(3, INT_MAX);
-	ParameterInt *nPointsParameter = new ParameterInt(TYPE_N_POINTS_LABEL, nPointsDefinition);
-	this->parameters.add(nPointsParameter);
-
-	// Add # tests parameter.
-	NumericValidator *nTestsDefinition = new NumericValidator(1, INT_MAX);
-	ParameterInt *nTestsParameter = new ParameterInt(TYPE_N_TESTS_LABEL, nTestsDefinition);
-	this->parameters.add(nTestsParameter);
-
-	// Add delta # points parameter.
-	NumericValidator *deltaPointsDefinition = new NumericValidator(1, 100);
-	ParameterInt *deltaPointsParameter = new ParameterInt(TYPE_DELTA_STEP_LABEL, deltaPointsDefinition);
-	this->parameters.add(deltaPointsParameter);
-
-	// Add # steps parameter.
-	NumericValidator *stepsDefinition = new NumericValidator(0, INT_MAX);
-	ParameterInt *stepsParameter = new ParameterInt(TYPE_N_STEPS_LABEL, stepsDefinition);
-	this->parameters.add(stepsParameter);
-#ifdef DEBUG_TEST_VORONOI_BUILD_INIT
-	// Print parameters data.
-	this->printParameters();
-#endif
-}
-
-/***************************************************************************
-* Name: 	printParameters
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	prints the test parameters.
-***************************************************************************/
-void TestVoronoiBuild::printParameters()
-{
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of points ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->nPoints);
-	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Delta points ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->deltaPoints);
-	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of steps ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
-	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of test ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
-	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Output folder ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->outFolder);
-	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, \
-						"**********************************************");
-	Logging::write(true, Info);
-}
-
-/***************************************************************************
-* Name: 	applyParameter
-* IN:		parameter		parameter to update
-* 			value			value to set
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	set a class attribute to "value"
-***************************************************************************/
-void TestVoronoiBuild::applyParameter(Parameter *parameter, string value)
-{
-	string parameterName;
-	int convertedValue=0;
-
-	// Get parameter label.
-	parameterName = parameter->getName();
-	if (parameterName == TYPE_N_POINTS_LABEL)
-	{
-		// Convert string into integer.
-		stringstream str(value);
-		str >> convertedValue;
-		this->setPoints(convertedValue);
-	}
-	else if (parameterName == TYPE_N_TESTS_LABEL)
-	{
-		// Convert string into integer.
-		stringstream str(value);
-		str >> convertedValue;
-
-		this->setTests(convertedValue);
-	}
-	else if (parameterName == TYPE_DELTA_STEP_LABEL)
-	{
-		// Convert string into integer.
-		stringstream str(value);
-		str >> convertedValue;
-
-		this->setDeltaPoints(convertedValue);
-	}
-	else if (parameterName == TYPE_N_STEPS_LABEL)
-	{
-		// Convert string into integer.
-		stringstream str(value);
-		str >> convertedValue;
-
-		this->setSteps(convertedValue);
-	}
-	else
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Unknown label parameter:");
-		Logging::buildText(__FUNCTION__, __FILE__, parameterName);
-		Logging::write(true, Error);
-	}
-}
-
-/***************************************************************************
 * Name: 	buildVoronoi
 * IN:		failedTestIndex		file index to create if test fails
 * 			dcel				dcel data that stores initial set of points
@@ -327,133 +207,6 @@ void TestVoronoiBuild::dump(string dcelFileName, Dcel &dcel)
 }
 
 /***************************************************************************
-* Name: 	initParameters
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	registers the test parameters
-***************************************************************************/
-void TestVoronoiCompare::initParameters()
-{
-	// Add files list parameter.
-	FileValidator *filesValidator = new FileValidator();
-	ParameterFile *fileParameter = new ParameterFile(TEST_FILE_LABEL, filesValidator);
-	this->parameters.add(fileParameter);
-#ifdef DEBUG_TEST_VORONOI_COMPARE
-	// Print parameters data.
-	this->printParameters();
-#endif
-}
-
-/***************************************************************************
-* Name: 	printParameters
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	prints the test parameters.
-***************************************************************************/
-void TestVoronoiCompare::printParameters()
-{
-	Logging::buildText(__FUNCTION__, __FILE__, "Files list: ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->filesNamesFile);
-	Logging::buildText(__FUNCTION__, __FILE__, \
-						"**********************************************");
-	Logging::write(true, Info);
-}
-
-/***************************************************************************
-* Name: 	applyParameter
-* IN:		parameter		parameter to update
-* 			value			value to set
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	set a class attribute to "value"
-***************************************************************************/
-void TestVoronoiCompare::applyParameter(Parameter *parameter, string value)
-{
-	string parameterName;
-
-	// Get parameter label.
-	parameterName = parameter->getName();
-	if (parameterName == TEST_FILE_LABEL)
-	{
-		// Copy file name list.
-		this->setFileNamesFile(value);
-	}
-	else
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Unknown label parameter:");
-		Logging::buildText(__FUNCTION__, __FILE__, parameterName);
-		Logging::write(true, Error);
-	}
-}
-
-/***************************************************************************
-* Name: 	prepare
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	true			if test prepared
-* 			false			i.o.c.
-* GLOBAL:	NONE
-* Description: 	executes any previous checks or actions previous to the
-* 				tests execution
-***************************************************************************/
-bool TestVoronoiCompare::prepare()
-{
-	bool success=true;
-	string 	line;
-	ifstream ifs;
-	ifstream fileTestIfs;
-
-	// Open configuration file.
-	ifs.open(this->filesNamesFile.c_str(), ios::in);
-
-	// Check file is opened.
-	if (!ifs.is_open())
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->filesNamesFile.c_str());
-		Logging::write(true, Error);
-		success = false;
-	}
-	else
-	{
-		// Check all files exist.
-		while (getline(ifs, line))
-		{
-			// Open file.
-			fileTestIfs.open(line.c_str(), ios::in);
-
-			// Check file exists.
-			if (fileTestIfs.is_open())
-			{
-#ifdef DEBUG_VORONOI_COMPARE_PREPARE
-				Logging::buildText(__FUNCTION__, __FILE__, "Adding file to list: ");
-				Logging::buildText(__FUNCTION__, __FILE__, line);
-				Logging::write(true, Info);
-#endif
-				this->filesList.add(line);
-				fileTestIfs.close();
-			}
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Skip file that does not exist: ");
-				Logging::buildText(__FUNCTION__, __FILE__, line);
-				Logging::write(true, Error);
-			}
-		}
-
-		// Close file list.
-		ifs.close();
-	}
-
-	return(success);
-}
-
-/***************************************************************************
 * Name: 	main
 * IN:		NONE
 * OUT:		NONE
@@ -467,41 +220,47 @@ void TestVoronoiCompare::main()
 {
 	int 	i=0;				// Loop counter.
 	int		nFailedTests=0;		// # tests failed.
-	string 	fileName;			// File name.
-	Dcel	originalDcel;		// Original dcel data.
+	string 	voronoiFileName;	// Voronoi file name.
+	string 	dcelFileName;		// DCEL file name.
+	Dcel	voronoiDcel;		// Original dcel data.
 	Dcel	dcel;				// Dcel data.
 	Voronoi voronoi;
 	int		nTests=0;
 	int		testId=1;
 
-	nTests = this->filesList.getNElements();
+	nTests = this->filesList.getNElements() / 2;
 
+	if ((this->filesList.getNElements() % 2) == 0)
+	{
+#ifdef DEBUG_TEST_VORONOI_COMPARE
 	// Print test parameters.
 	this->printParameters();
 
 	Logging::buildText(__FUNCTION__, __FILE__, "Number of files to compare: ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
 	Logging::write(true, Info);
-
+#endif
 	// Read all files.
-	for (i=0; i<this->filesList.getNElements() ;i++)
+	for (i=0; i<this->filesList.getNElements() ;i=i+2)
 	{
 		// Open file.
-		fileName = *this->filesList.at(i);
-
-		Logging::buildText(__FUNCTION__, __FILE__, "Comparing with Delaunay from ");
-		Logging::buildText(__FUNCTION__, __FILE__, fileName);
+		voronoiFileName = *this->filesList.at(i);
+		dcelFileName = *this->filesList.at(i+1);
+#ifdef DEBUG_TEST_VORONOI_COMPARE
+		Logging::buildText(__FUNCTION__, __FILE__, "Comparing with Voronoi from ");
+		Logging::buildText(__FUNCTION__, __FILE__, voronoiFileName);
 		Logging::write(true, Info);
-		if (!originalDcel.read(fileName, false))
+#endif
+		if (!voronoiDcel.read(voronoiFileName, false))
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
-			Logging::buildText(__FUNCTION__, __FILE__, fileName);
+			Logging::buildText(__FUNCTION__, __FILE__, voronoiFileName);
 			Logging::write(true, Error);
 		}
-		else if (!dcel.read(fileName, false))
+		else if (!dcel.readPoints(dcelFileName, false))
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file: ");
-			Logging::buildText(__FUNCTION__, __FILE__, fileName);
+			Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
 			Logging::write(true, Error);
 		}
 		else
@@ -512,7 +271,7 @@ void TestVoronoiCompare::main()
 			// Execute current test.
 			if (buildVoronoi(nFailedTests, dcel, voronoi))
 			{
-				if ((*voronoi.getRefDcel()) == originalDcel)
+				if ((*voronoi.getRefDcel()) == voronoiDcel)
 				{
 					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
 					Logging::buildText(__FUNCTION__, __FILE__, testId);
@@ -526,20 +285,42 @@ void TestVoronoiCompare::main()
 					Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
 					Logging::buildText(__FUNCTION__, __FILE__, i+1);
 					Logging::write(true, Error);
+
+					// Write test data.
+					string 	fileName;
+					ostringstream convert;
+					convert << nFailedTests;
+					fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
+					cout << fileName << endl;
+					//this->dump(fileName, voronoi.getRefDcel());
 				}
 			}
 			else
 			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi reading file ");
-				Logging::buildText(__FUNCTION__, __FILE__, fileName);
+				nFailedTests++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi");
 				Logging::write(true, Error);
+
+				// Write test data.
+				string 	fileName;
+				ostringstream convert;
+				convert << nFailedTests;
+				fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
+				this->dump(fileName, dcel);
 			}
 
 			// Reset Delaunay data.
-			originalDcel.reset();
+			voronoiDcel.reset();
 			dcel.reset();
 			testId++;
 		}
+	}
+	}
+	else
+	{
+		Logging::buildText(__FUNCTION__, __FILE__, "Number of files must be multiple of 2 and is ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
+		Logging::write(true, Error);
 	}
 
 	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
@@ -556,3 +337,34 @@ void TestVoronoiCompare::main()
 	}
 }
 
+/***************************************************************************
+* Name: 	dump
+* IN:		dcelFileName	dcelFilefile where dcel points are written
+* 			dcel			dcel data to write
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	Writes to output files the data required to reproduce the fail
+***************************************************************************/
+void TestVoronoiCompare::dump(string dcelFileName, Dcel &dcel)
+{
+	ofstream ofs;			// Output file.
+
+	// Open file.
+	ofs.open(dcelFileName.c_str(), ios::out);
+
+	// Check file is opened.
+	if (ofs.is_open())
+	{
+		// Write DCEL data.
+		if (!dcel.writePoints(dcelFileName, dcel.getNVertex()))
+		{
+			cout << "Cannot open file " << dcelFileName << " to write dcel data" << endl;
+		}
+	}
+	// Error opening points file.
+	else
+	{
+		cout << "Cannot open file " << dcelFileName << " to write points" << endl;
+	}
+}
