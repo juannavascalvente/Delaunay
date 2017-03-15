@@ -1434,26 +1434,22 @@ void Dcel::sort()
 
 
 // PENDING SPEC.
-void Dcel::setLowestFirst(bool (*f)(Point<TYPE> *, Point<TYPE> *))
+int Dcel::getIndexLowest(bool (*f)(Point<TYPE> *, Point<TYPE> *))
 {
     int     i=0;            // Loop counter.
-    int     lowestIndex=0;	// Index of highest point.
+    int     index=0;	// Index of highest point.
 
     // Get number of vertexes.
-    lowestIndex = 0;
+    index = 0;
 
     // Find index of highest point.
     for (i=1; i<this->nVertex ;i++)
     {
-    	if ((*f) (this->vertex[i].getRefPoint(), this->vertex[lowestIndex].getRefPoint()))
+    	if ((*f) (this->vertex[i].getRefPoint(), this->vertex[index].getRefPoint()))
         {
-    		lowestIndex = i;
+    		index = i;
         }
     }
-
-    // Swap highest vertex and vertex at position 0.
-    swapVertex(0, lowestIndex);
-
 #ifdef DEBUG_SETLOWESTS_FIRST
 	Logging::buildText(__FUNCTION__, __FILE__, "Lowest point at position ");
 	Logging::buildText(__FUNCTION__, __FILE__, highest_Index);
@@ -1461,11 +1457,12 @@ void Dcel::setLowestFirst(bool (*f)(Point<TYPE> *, Point<TYPE> *))
 	Logging::buildText(__FUNCTION__, __FILE__, this->vertex[0].getPoint().toStr());
 	Logging::write(true, Info);
 #endif
+	return(index);
 }
 
 
 /***************************************************************************
-* Name: 	setHighestFirst
+* Name: 	getIndexHighest
 * IN:		f			function to select point
 * OUT:		NONE
 * RETURN:	NONE
@@ -1473,33 +1470,31 @@ void Dcel::setLowestFirst(bool (*f)(Point<TYPE> *, Point<TYPE> *))
 * Description: 	searches highest point in the DCEL vertex set and places
 * 				it in the first position of the array.
 ***************************************************************************/
-void Dcel::setHighestFirst(bool (*f)(Point<TYPE> *, Point<TYPE> *))
+int Dcel::getIndexHighest(bool (*f)(Point<TYPE> *, Point<TYPE> *))
 {
     int     i=0;                // Loop counter.
-    int     highest_Index=0;    // Index of highest point.
+    int     index=0;    // Index of highest point.
 
     // Get number of vertexes.
-    highest_Index=0;
+    index=0;
 
     // Find index of highest point.
     for (i=1; i<this->nVertex ;i++)
     {
-    	if ((*f) (this->vertex[i].getRefPoint(), this->vertex[highest_Index].getRefPoint()))
+    	if ((*f) (this->vertex[i].getRefPoint(), this->vertex[index].getRefPoint()))
         {
-            highest_Index = i;
+            index = i;
         }
     }
-
-    // Swap highest vertex and vertex at position 0.
-    swapVertex(0, highest_Index);
-
 #ifdef DEBUG_SETHIGHEST_FIRST
 	Logging::buildText(__FUNCTION__, __FILE__, "Highest point at position ");
-	Logging::buildText(__FUNCTION__, __FILE__, highest_Index);
+	Logging::buildText(__FUNCTION__, __FILE__, index);
 	Logging::buildText(__FUNCTION__, __FILE__, " coordinates ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->vertex[0].getPoint().toStr());
 	Logging::write(true, Info);
 #endif
+
+    return(index);
 }
 
 

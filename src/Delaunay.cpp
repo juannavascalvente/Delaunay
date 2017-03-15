@@ -121,6 +121,7 @@ bool Delaunay::incremental()
 	bool	inserted=true;	// Point inserted flag.
 	int  	pointIndex=0;	// Points loop counter.
 	int	 	nPoints=0;		// Loop upper bound.
+	int  	highestPointIndex=0;	// Index of the highest point.
 
 	// Set type of algorithm.
 	this->setAlgorithm(INCREMENTAL);
@@ -145,7 +146,8 @@ bool Delaunay::incremental()
 			delaunay_Stat.nFlipped = 0;
 #endif
 			// Set highest point at first position of the DCEL vertex array.
-			this->dcel->setHighestFirst(&Point<TYPE>::lexicographicHigher);
+			highestPointIndex = this->dcel->getIndexHighest(&Point<TYPE>::lexicographicHigher);
+			this->dcel->swapVertex(0, highestPointIndex);
 
 			// Insert root node.
 			Node node(1, P_MINUS_2, P_MINUS_1, 1);

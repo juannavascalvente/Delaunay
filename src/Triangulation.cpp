@@ -273,6 +273,8 @@ bool Triangulation::build()
 	int		originVertex1=0, originVertex2=0;
 	int		originVertexIndex1=0, originVertexIndex2=0;
 
+	int		lowestPointIndex=0;			// Index of the lowest point.
+
 	bool	finished=false;				// Loop control flag.
 
 	// Check if DCEL data is referenced.
@@ -292,7 +294,8 @@ bool Triangulation::build()
 		this->hull->reset();
 
 		// Set lowest Y coordinates point first.
-		this->dcel->setLowestFirst( &Point<TYPE>::lowerY);
+		lowestPointIndex = this->dcel->getIndexLowest(&Point<TYPE>::lowerY);
+		this->dcel->swapVertex(0, lowestPointIndex);
 
 		// Sort DCEl set of points.
 		this->dcel->sort();

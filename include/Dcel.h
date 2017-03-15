@@ -58,7 +58,6 @@ class Dcel
 	void clutter();
 	void quicksort(Vertex *origin, Vertex *list, int first, int last);
 	int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
-	void swapVertex(int index1, int index2);
 
 	void drawPointsInfo();
 	void drawEdgesInfo();
@@ -88,6 +87,7 @@ public:
 	void addVertex(const Vertex *vertex);
 	void updateVertex(int edge_ID, int index);
 	void updateVertex(Point<TYPE> *p, int index);
+	void swapVertex(int index1, int index2);
 
 	void addEdge(const Edge *edge);
 	void addEdge(int origin, int	twin, int previou, int next, int face);
@@ -156,8 +156,8 @@ public:
 	bool generateRandom(int nPoints);
 	bool generateClusters(int nPoints, int nClusters, TYPE radius);
 	void sort();
-	void 		setLowestFirst(bool (*f)(Point<TYPE> *, Point<TYPE> *));
-	void 		setHighestFirst(bool (*f)(Point<TYPE> *, Point<TYPE> *));
+	int  getIndexLowest(bool (*f)(Point<TYPE> *, Point<TYPE> *));
+	int  getIndexHighest(bool (*f)(Point<TYPE> *, Point<TYPE> *));
 	enum Turn_T returnTurn(Point<TYPE> *p, int sourcePoint, int destPoint);
 	double 		signedArea(int id1, int id2, int id3);
 
