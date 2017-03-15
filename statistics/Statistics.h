@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
-#include <time.h>
+#include <sys/time.h>
 #include <stdio.h>
 
 #ifndef INCLUDE_STATISTICS_H_
