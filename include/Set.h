@@ -43,8 +43,10 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Set();
-	Set(int size);
+	Set() : nElements(0), size(DEFAULT_SIZE)
+			{this->data = new T[size];};
+	Set(int size) : nElements(0), size(size)
+			{this->data = new T[size];};
 	~Set();
 
 	//------------------------------------------------------------------------
@@ -75,32 +77,8 @@ public:
 	Set<T>& operator++(int inc);
 };
 
-template <class T> Set<T>::Set()
-{
-	// Initialize size attributes.
-	this->size = 0;
-	this->nElements = 0;
-
-	// Allocate data.
-	this->data = NULL;
-}
-
-template <class T> Set<T>::Set(int size)
-{
-	// Initialize size attributes.
-	this->size = size;
-	this->nElements = 0;
-
-	// Allocate data.
-	this->data = new T[size];
-}
-
 template <class T> Set<T>::~Set()
 {
-	// Reset attributes.
-	this->size = 0;
-	this->nElements = 0;
-
 	// Deallocate data.
 	if (this->data != NULL)
 	{
