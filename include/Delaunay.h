@@ -61,21 +61,16 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Delaunay() : hull(DEFAUTL_CONVEXHULL_LEN), hullEdges(DEFAUTL_CONVEXHULL_LEN)
+	Delaunay() : dcel(NULL), graph(NULL), graphAllocated(false), \
+					convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), \
+					hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
+	Delaunay(Dcel *inDcel) : graphAllocated(true), convexHullComputed(false), \
+							hull(DEFAUTL_CONVEXHULL_LEN), \
+							hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE) \
+
 	{
-		this->algorithm = NONE;
-		this->dcel = NULL;
-		this->graph = NULL;
-		this->graphAllocated = false;
-		this->convexHullComputed = false;
-	}
-	Delaunay(Dcel *dcel) : hull(DEFAUTL_CONVEXHULL_LEN), hullEdges(DEFAUTL_CONVEXHULL_LEN)
-	{
-		this->algorithm = NONE;
-		this->dcel = dcel;
-		this->graphAllocated = true;
+		this->dcel = inDcel;
 		this->graph = new Graph(this->dcel->getNVertex()*10);
-		this->convexHullComputed = false;
 	}
 	~Delaunay();
 
