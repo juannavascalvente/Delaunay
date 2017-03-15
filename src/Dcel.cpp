@@ -1970,11 +1970,12 @@ bool Dcel::operator==(const Dcel& other) const
 		while (equal && (i<this->nVertex))
 		{
 			// Compare vertex.
-			equal = this->vertex[i] == other.vertex[i];
+			equal = this->vertex[i].getOrigin() == other.vertex[i].getOrigin();
 #ifdef DEBUG_DCEL_EQUAL
 			if (!equal)
 			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Different vertex at index ");
+				Logging::buildText(__FUNCTION__, __FILE__,
+						"Different origin vertx edge at index ");
 				Logging::buildText(__FUNCTION__, __FILE__, i);
 				Logging::write(true, Info);
 			}
