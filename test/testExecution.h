@@ -30,7 +30,7 @@ protected:
 	void initParameters();
 	void applyParameter(Parameter *parameter, string value);
 	void printParameters();
-
+	bool prepare();
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.

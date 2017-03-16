@@ -78,6 +78,9 @@ protected:
 	string outFolder;
 	string testName;
 
+	int	totalTests;				// Total # of tests.
+	int	testCounter;			// Current test.
+
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
@@ -85,12 +88,10 @@ public:
 	Test() : logFile("logTest.txt", false),
 			 parameters(DEFAULT_TEST_N_PARAMETERS), \
 			 outFolder(DEFAULT_OUTPUT_FOLDER), \
-			 testName("") {};
+			 testName(""), totalTests(0), testCounter(0) {};
 	Test(string name, const string file, string folder, bool print=false):\
-			logFile(file, print), \
-			parameters(DEFAULT_TEST_N_PARAMETERS), \
-			outFolder(folder),
-			testName(name) {};
+			logFile(file, print), parameters(DEFAULT_TEST_N_PARAMETERS), \
+			outFolder(folder),testName(name),totalTests(0),testCounter(0){};
 	virtual ~Test();
 
 	//------------------------------------------------------------------------

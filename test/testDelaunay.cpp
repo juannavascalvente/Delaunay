@@ -32,14 +32,11 @@ void TestDelaunayBuild::main()
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
 	string		dcelFileName;		// DCEL file name.
-	int			totalTests=0;		// Total # of tests.
-	int			testCounter=0;
 
-	testCounter = 1;
-	totalTests = this->nSteps*this->nTests;
-
+#ifdef DEBUG_TEST_DELAUNAY_BUILD
 	// Print test parameters.
 	this->printParameters();
+#endif
 
 	// Execute tests.
 	currentNPoints = this->nPoints;
@@ -69,7 +66,7 @@ void TestDelaunayBuild::main()
 				Logging::buildText(__FUNCTION__, __FILE__, "Start building Delaunay incremental test ");
 				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
 				Logging::buildText(__FUNCTION__, __FILE__, "/");
-				Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 				Logging::write(true, Info);
 				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
 				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
@@ -83,9 +80,9 @@ void TestDelaunayBuild::main()
 				if (delaunay.incremental())
 				{
 					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-					Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 					Logging::write(true, Successful);
 					remove(dcelFileName.c_str());
 				}
@@ -93,16 +90,16 @@ void TestDelaunayBuild::main()
 				{
 					failedTestIndex++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay diagram in test ");
-					Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 					Logging::write(true, Error);
 				}
 				sleep(1);
 
 				// Reset Delaunay data.
 				delaunay.reset();
-				testCounter++;
+				this->testCounter++;
 			}
 
 			// Update # points to generate.
@@ -110,9 +107,9 @@ void TestDelaunayBuild::main()
 		}
 	}
 	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, testCounter-1-failedTestIndex);
+	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-failedTestIndex);
 	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 	if (failedTestIndex == 0)
 	{
 		Logging::write(true, Successful);
@@ -175,16 +172,13 @@ void TestDelaunayCompare::main()
 	Dcel	 originalDcel;		// Original dcel data.
 	Dcel	 dcel;				// Dcel data.
 	Delaunay delaunay;			// Delaunay data.
-	int		 totalTests=0;		// Total # of tests.
-	int		 testCounter=0;
 
-	testCounter = 1;
-	totalTests = filesList.getNElements();
-
-	// Print test parameters.
-	this->printParameters();
+	this->testCounter = 1;
+	this->totalTests = filesList.getNElements();
 
 #ifdef DEBUG_DELAUNAY_COMPARE_PREPARE
+	// Print test parameters.
+	this->printParameters();
 	Logging::buildText(__FUNCTION__, __FILE__, "Number of files to compare: ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
 	Logging::write(true, Info);
@@ -225,9 +219,9 @@ void TestDelaunayCompare::main()
 				if (dcel == originalDcel)
 				{
 					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-					Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 					Logging::write(true, Successful);
 				}
 				else
@@ -242,13 +236,13 @@ void TestDelaunayCompare::main()
 
 					// Print log error.
 					Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
-					Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::write(true, Error);
 				}
 			}
 
 			// Reset Delaunay data.
-			testCounter++;
+			this->testCounter++;
 			delaunay.reset();
 			originalDcel.reset();
 			dcel.reset();
@@ -256,9 +250,9 @@ void TestDelaunayCompare::main()
 	}
 
 	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, testCounter-1-nFailedTests);
+	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-nFailedTests);
 	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 	if (nFailedTests == 0)
 	{
 		Logging::write(true, Successful);

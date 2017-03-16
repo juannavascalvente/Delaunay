@@ -26,10 +26,6 @@ void TestCompare::initParameters()
 	FileValidator *filesValidator = new FileValidator();
 	ParameterFile *fileParameter = new ParameterFile(TEST_FILE_LABEL, filesValidator);
 	this->parameters.add(fileParameter);
-#ifdef DEBUG_TEST_COMPARE_INIT
-	// Print parameters data.
-	this->printParameters();
-#endif
 }
 
 /***************************************************************************
@@ -42,10 +38,12 @@ void TestCompare::initParameters()
 ***************************************************************************/
 void TestCompare::printParameters()
 {
+#ifdef DEBUG_TEST_COMPARE
 	cout << "Test parameters" << endl;
 	cout << "----------------------------------------------" << endl;
 	cout << "Files list: " << this->filesNamesFile << endl;
 	cout << "**********************************************" << endl;
+#endif
 }
 
 /***************************************************************************

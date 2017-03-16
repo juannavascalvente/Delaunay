@@ -107,6 +107,7 @@ void TestExecution::applyParameter(Parameter *parameter, string value)
 ***************************************************************************/
 void TestExecution::printParameters()
 {
+#ifdef DEBUG_TEST_EXECUTION
 	Logging::buildText(__FUNCTION__, __FILE__, "Number of points ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->nPoints);
 	Logging::write(true, Info);
@@ -122,8 +123,29 @@ void TestExecution::printParameters()
 	Logging::buildText(__FUNCTION__, __FILE__, "Output folder ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->outFolder);
 	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, \
-						"**********************************************");
 	Logging::write(true, Info);
+#endif
 }
+
+/***************************************************************************
+* Name: 	prepare
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	Executes any previous action before the test is executed.
+* 				This operation are compute previous values, do previous
+* 				checks, etc...
+***************************************************************************/
+bool TestExecution::prepare()
+{
+	bool success=true;			// Return value.
+
+	// Initialize # tests and current test.
+	this->testCounter = 1;
+	this->totalTests = this->nSteps*this->nTests;
+
+	return(success);
+}
+
 
