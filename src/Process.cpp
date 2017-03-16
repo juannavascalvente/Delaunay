@@ -597,7 +597,6 @@ void Process::execute(void)
 		    {
 				if (this->status.isVoronoiCreated())
 				{
-					cout << "1" << endl;
 					// Clear screen.
 					this->drawer->drawFigures(VORONOI_DRAW);
 				}
@@ -605,12 +604,10 @@ void Process::execute(void)
 					this->status.isTriangulationCreated())
 				{
 					// Draw triangulation.
-					cout << "2" << endl;
 					this->drawer->drawFigures(TRIANGULATION_DRAW);
 				}
 				else
 				{
-					cout << "3" << endl;
 					// Draw set of points.
 					this->drawer->drawFigures(SET_DRAW);
 				}
