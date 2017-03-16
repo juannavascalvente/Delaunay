@@ -27,7 +27,6 @@ void TestDelaunayBuild::main()
 {
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
-	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
@@ -56,6 +55,7 @@ void TestDelaunayBuild::main()
 			delaunay.setDCEL(&dcel);
 			if (!dcel.generateRandom(currentNPoints))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
 				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
 				Logging::write(true, Error);
@@ -74,7 +74,7 @@ void TestDelaunayBuild::main()
 #endif
 				// Write test data.
 				ostringstream convert;
-				convert << failedTestIndex;
+				convert << this->nTestFailed;
 				dcelFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
 				this->dump(dcelFileName, dcel);
 				if (delaunay.incremental())
@@ -88,7 +88,7 @@ void TestDelaunayBuild::main()
 				}
 				else
 				{
-					failedTestIndex++;
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay diagram in test ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::buildText(__FUNCTION__, __FILE__, "/");
@@ -105,18 +105,6 @@ void TestDelaunayBuild::main()
 			// Update # points to generate.
 			currentNPoints = currentNPoints*this->deltaPoints;
 		}
-	}
-	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-failedTestIndex);
-	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-	if (failedTestIndex == 0)
-	{
-		Logging::write(true, Successful);
-	}
-	else
-	{
-		Logging::write(true, Error);
 	}
 }
 
@@ -166,7 +154,6 @@ void TestDelaunayBuild::dump(string dcelFileName, Dcel &dcel)
 void TestDelaunayCompare::main()
 {
 	int 	 i=0;				// Loop counter.
-	int		 nFailedTests=0;	// # tests failed.
 	string 	 dcelFileName;		// DCEL file name.
 	string 	 outFileName;		// Output file name.
 	Dcel	 originalDcel;		// Original dcel data.
@@ -190,12 +177,14 @@ void TestDelaunayCompare::main()
 		dcelFileName = *this->filesList.at(i);
 		if (!originalDcel.read(dcelFileName, false))
 		{
+			this->nTestFailed++;
 			Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
 			Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
 			Logging::write(true, Error);
 		}
 		else if (!dcel.readPoints(dcelFileName, false))
 		{
+			this->nTestFailed++;
 			Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file: ");
 			Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
 			Logging::write(true, Error);
@@ -209,7 +198,7 @@ void TestDelaunayCompare::main()
 			delaunay.setDCEL(&dcel);
 			if (!delaunay.incremental())
 			{
-				nFailedTests++;
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Failed test id: ");
 				Logging::buildText(__FUNCTION__, __FILE__, i+1);
 				Logging::write(true, Error);
@@ -226,11 +215,11 @@ void TestDelaunayCompare::main()
 				}
 				else
 				{
-					nFailedTests++;
+					this->nTestFailed++;
 
 					// Write test data.
 					ostringstream convert;
-					convert << nFailedTests;
+					convert << this->nTestFailed;
 					outFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
 					this->dump(outFileName, dcel);
 
@@ -247,19 +236,6 @@ void TestDelaunayCompare::main()
 			originalDcel.reset();
 			dcel.reset();
 		}
-	}
-
-	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-nFailedTests);
-	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-	if (nFailedTests == 0)
-	{
-		Logging::write(true, Successful);
-	}
-	else
-	{
-		Logging::write(true, Error);
 	}
 }
 

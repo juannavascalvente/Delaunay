@@ -80,7 +80,6 @@ void TestPathDelaunay::main()
 {
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
-	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
@@ -91,10 +90,10 @@ void TestPathDelaunay::main()
 	string dcelFileName;			// DCEL file name.
 #ifdef DEBUG_FIND_DELAUNAY_PATH
 	int			i=0;				// Loop counter.
-#endif
 
 	// Print test parameters.
 	this->printParameters();
+#endif
 
 	// Execute tests.
 	currentNPoints = this->nPoints;
@@ -114,6 +113,7 @@ void TestPathDelaunay::main()
 			delaunay.setDCEL(&dcel);
 			if (!dcel.generateRandom(currentNPoints))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
 				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
 				Logging::write(true, Error);
@@ -137,7 +137,7 @@ void TestPathDelaunay::main()
 
 				// Write test data.
 				ostringstream convert;
-				convert << failedTestIndex;
+				convert << this->nTestFailed;
 				pointsFileName = this->outFolder + "Points_" + convert.str() + ".txt";
 				dcelFileName = this->outFolder + "DCEL_" + convert.str() + ".txt";
 				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
@@ -172,7 +172,7 @@ void TestPathDelaunay::main()
 					}
 					else
 					{
-						failedTestIndex++;
+						this->nTestFailed++;
 						Logging::buildText(__FUNCTION__, __FILE__, \
 										"Line does not intersect set of points in test ");
 						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
@@ -181,7 +181,7 @@ void TestPathDelaunay::main()
 				}
 				else
 				{
-					failedTestIndex++;
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay in test ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::write(true, Error);
@@ -199,19 +199,6 @@ void TestPathDelaunay::main()
 		// Update test counter.
 		this->testCounter++;
 	}
-
-	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->testCounter-failedTestIndex);
-	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-	if (failedTestIndex == 0)
-	{
-		Logging::write(true, Successful);
-	}
-	else
-	{
-		Logging::write(true, Error);
-	}
 }
 
 /***************************************************************************
@@ -226,7 +213,6 @@ void TestPathDelaunay::main()
 void TestPathDelaunayCompare::main()
 {
 	int 	 i=0;				// Loop counter.
-	int		 nFailedTests=0;	// # tests failed.
 	string 	 dcelFileName;		// DCEL file name.
 	string 	 pointsFileName;	// Points file name.
 	string 	 facesFileName;		// Faces file name.
@@ -238,13 +224,11 @@ void TestPathDelaunayCompare::main()
 	Point<TYPE> p1, p2;				// Segment points.
 	Line line;						// Segment line.
 	int testIndex=0;
-	int			totalTests=0;		// Total # of tests.
-	int			testCounter=0;
 
 	if ((filesList.getNElements() % 3) == 0)
 	{
 		testCounter = 1;
-		totalTests = (filesList.getNElements()/3);
+		this->totalTests = (filesList.getNElements()/3);
 
 		// Print test parameters.
 		this->printParameters();
@@ -272,18 +256,21 @@ void TestPathDelaunayCompare::main()
 #endif
 			if (!dcel.readPoints(dcelFileName, false))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
 				Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
 				Logging::write(true, Error);
 			}
 			else if (!originalPointsSet.read(pointsFileName))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of points: ");
 				Logging::buildText(__FUNCTION__, __FILE__, pointsFileName);
 				Logging::write(true, Error);
 			}
 			else if (!originalFacesSet.read(facesFileName))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of faces: ");
 				Logging::buildText(__FUNCTION__, __FILE__, facesFileName);
 				Logging::write(true, Error);
@@ -301,7 +288,7 @@ void TestPathDelaunayCompare::main()
 				delaunay.setDCEL(&dcel);
 				if (!delaunay.incremental())
 				{
-					nFailedTests++;
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Cannot create Delaunay. Test id: ");
 					Logging::buildText(__FUNCTION__, __FILE__, i+1);
 					Logging::write(true, Error);
@@ -323,18 +310,18 @@ void TestPathDelaunayCompare::main()
 						if (facesSet == originalFacesSet)
 						{
 							Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
-							Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+							Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 							Logging::buildText(__FUNCTION__, __FILE__, "/");
-							Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+							Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 							Logging::write( true, Successful);
 						}
 						else
 						{
-							nFailedTests++;
+							this->nTestFailed++;
 							Logging::buildText(__FUNCTION__, __FILE__, "Faces sets are not equal. Test id: ");
-							Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+							Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 							Logging::buildText(__FUNCTION__, __FILE__, "/");
-							Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+							Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 							Logging::write(true, Error);
 							originalFacesSet.print();
 							facesSet.print();
@@ -342,7 +329,7 @@ void TestPathDelaunayCompare::main()
 					}
 					else
 					{
-						nFailedTests++;
+						this->nTestFailed++;
 						Logging::buildText(__FUNCTION__, __FILE__, \
 								"Line does not intersect set of points. Test id: ");
 						Logging::buildText(__FUNCTION__, __FILE__, testIndex);
@@ -357,23 +344,12 @@ void TestPathDelaunayCompare::main()
 			originalPointsSet.reset();
 			originalFacesSet.reset();
 			facesSet.reset();
-			testCounter++;
-		}
-		Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-		Logging::buildText(__FUNCTION__, __FILE__, testIndex-nFailedTests);
-		Logging::buildText(__FUNCTION__, __FILE__, "/");
-		Logging::buildText(__FUNCTION__, __FILE__, testIndex);
-		if (nFailedTests == 0)
-		{
-			Logging::write(true, Successful);
-		}
-		else
-		{
-			Logging::write(true, Error);
+			this->testCounter++;
 		}
 	}
 	else
 	{
+		this->nTestFailed = this->totalTests;
 		Logging::buildText(__FUNCTION__, __FILE__, "# files must be mulitple of three and is ");
 		Logging::buildText(__FUNCTION__, __FILE__, filesList.getNElements());
 		Logging::write(true, Error);
@@ -443,7 +419,6 @@ void TestPathVoronoi::main()
 	Dcel		dcel;				// Dcel data.
 	Delaunay	delaunay;			// Delaunay data.
 	Voronoi		voronoi;			// Voronoi data.
-	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
@@ -460,10 +435,10 @@ void TestPathVoronoi::main()
 	string dcelFileName;			// DCEL file name.
 #ifdef DEBUG_FIND_VORONOI_PATH
 	int			i=0;				// Loop counter.
-#endif
 
 	// Print test parameters.
 	this->printParameters();
+#endif
 
 	// Execute tests.
 	currentNPoints = this->nPoints;
@@ -482,6 +457,7 @@ void TestPathVoronoi::main()
 			delaunay.setDCEL(&dcel);
 			if (!dcel.generateRandom(currentNPoints))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
 				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
 				Logging::write(true, Error);
@@ -505,7 +481,7 @@ void TestPathVoronoi::main()
 
 				// Write test data.
 				ostringstream convert;
-				convert << failedTestIndex;
+				convert << this->nTestFailed;
 				pointsFileName = this->outFolder + "Points_" + convert.str() + ".txt";
 				dcelFileName = this->outFolder + "DCEL_" + convert.str() + ".txt";
 				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
@@ -516,12 +492,14 @@ void TestPathVoronoi::main()
 					// Initialize Voronoi.
 					if (!voronoi.init(&dcel))
 					{
+						this->nTestFailed++;
 						Logging::buildText(__FUNCTION__, __FILE__, "Error initializing Voronoi.");
 						Logging::write(true, Error);
 					}
 					// Build Voronoi.
 					else if (!voronoi.build())
 					{
+						this->nTestFailed++;
 						Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi.");
 						Logging::write(true, Error);
 					}
@@ -563,24 +541,31 @@ void TestPathVoronoi::main()
 								Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
 								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 								Logging::buildText(__FUNCTION__, __FILE__, "/");
-								Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+								Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 								Logging::write( true, Successful);
 							}
 							else
 							{
-								failedTestIndex++;
+								this->nTestFailed++;
 								Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in test ");
-								Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 								Logging::write( true, Error);
 							}
+						}
+						else
+						{
+							this->nTestFailed++;
+							Logging::buildText(__FUNCTION__, __FILE__, "Error finding initial faces in Voronoi path in test ");
+							Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+							Logging::write( true, Error);
 						}
 					}
 				}
 				else
 				{
-					failedTestIndex++;
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi path in test ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::write(true, Error);
 				}
 
@@ -597,19 +582,6 @@ void TestPathVoronoi::main()
 		// Update test counter.
 		this->testCounter++;
 	}
-
-	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-failedTestIndex);
-	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-	if (failedTestIndex == 0)
-	{
-		Logging::write(true, Successful);
-	}
-	else
-	{
-		Logging::write(true, Error);
-	}
 }
 
 
@@ -625,7 +597,6 @@ void TestPathVoronoi::main()
 void TestPathVoronoiCompare::main()
 {
 	int 	 i=0;				// Loop counter.
-	int		 nFailedTests=0;	// # tests failed.
 	string 	 dcelFileName;		// DCEL file name.
 	string 	 pointsFileName;	// Points file name.
 	string 	 facesFileName;		// Faces file name.
@@ -642,14 +613,14 @@ void TestPathVoronoiCompare::main()
 	int	 finalFace=0;			// Final face in the path.
 	double distance=0.0;		// Distance between points.
 	Set<int> pathFaces;
-	int			totalTests=0;		// Total # of tests.
-	int			testCounter=0;
 
-	testCounter = 1;
-	totalTests = filesList.getNElements() / 3;
+	this->testCounter = 1;
+	this->totalTests = filesList.getNElements() / 3;
 
+#ifdef DEBUG_FIND_VORONOI_PATH_COMPARE
 	// Print test parameters.
 	this->printParameters();
+#endif
 
 	if ((filesList.getNElements() % 3) == 0)
 	{
@@ -676,18 +647,21 @@ void TestPathVoronoiCompare::main()
 #endif
 			if (!dcel.readPoints(dcelFileName, false))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
 				Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
 				Logging::write(true, Error);
 			}
 			else if (!originalPointsSet.read(pointsFileName))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of points: ");
 				Logging::buildText(__FUNCTION__, __FILE__, pointsFileName);
 				Logging::write(true, Error);
 			}
 			else if (!originalFacesSet.read(facesFileName))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of faces: ");
 				Logging::buildText(__FUNCTION__, __FILE__, facesFileName);
 				Logging::write(true, Error);
@@ -705,7 +679,7 @@ void TestPathVoronoiCompare::main()
 				delaunay.setDCEL(&dcel);
 				if (!delaunay.incremental())
 				{
-					nFailedTests++;
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Cannot create Delaunay. Test id: ");
 					Logging::buildText(__FUNCTION__, __FILE__, i+1);
 					Logging::write(true, Error);
@@ -713,12 +687,14 @@ void TestPathVoronoiCompare::main()
 				// Initialize Voronoi.
 				else if (!voronoi.init(&dcel))
 				{
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error initializing Voronoi.");
 					Logging::write(true, Error);
 				}
 				// Build Voronoi.
 				else if (!voronoi.build())
 				{
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi.");
 					Logging::write(true, Error);
 				}
@@ -749,18 +725,18 @@ void TestPathVoronoiCompare::main()
 							if (pathFaces == originalFacesSet)
 							{
 								Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
-								Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 								Logging::buildText(__FUNCTION__, __FILE__, "/");
-								Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+								Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 								Logging::write( true, Successful);
 							}
 							else
 							{
-								nFailedTests++;
+								this->nTestFailed++;
 								Logging::buildText(__FUNCTION__, __FILE__, "Faces sets are not equal. Test id: ");
-								Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 								Logging::buildText(__FUNCTION__, __FILE__, "/");
-								Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+								Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 								Logging::write(true, Error);
 								originalFacesSet.print();
 								pathFaces.print();
@@ -768,11 +744,11 @@ void TestPathVoronoiCompare::main()
 						}
 						else
 						{
-							nFailedTests++;
+							this->nTestFailed++;
 							Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in test ");
-							Logging::buildText(__FUNCTION__, __FILE__, testCounter);
+							Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 							Logging::buildText(__FUNCTION__, __FILE__, "/");
-							Logging::buildText(__FUNCTION__, __FILE__, totalTests);
+							Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 							Logging::write( true, Error);
 						}
 					}
@@ -786,24 +762,13 @@ void TestPathVoronoiCompare::main()
 				originalFacesSet.reset();
 				facesSet.reset();
 				pathFaces.reset();
-				testCounter++;
+				this->testCounter++;
 			}
-		}
-		Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-		Logging::buildText(__FUNCTION__, __FILE__, totalTests-nFailedTests);
-		Logging::buildText(__FUNCTION__, __FILE__, "/");
-		Logging::buildText(__FUNCTION__, __FILE__, totalTests);
-		if (nFailedTests == 0)
-		{
-			Logging::write(true, Successful);
-		}
-		else
-		{
-			Logging::write(true, Error);
 		}
 	}
 	else
 	{
+		this->nTestFailed = this->totalTests;
 		Logging::buildText(__FUNCTION__, __FILE__, "# files must be mulitple of three and is ");
 		Logging::buildText(__FUNCTION__, __FILE__, filesList.getNElements());
 		Logging::write(true, Error);

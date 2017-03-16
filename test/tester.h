@@ -10,8 +10,10 @@
 
 #define DEFAULT_N_TESTS_TO_EXEC		20
 #define DEFAULT_N_LABELS			20
+#define DEFAULT_TEST_FILE_NAME		"test.txt"
 
 #include "Set.h"
+#include "Logging.h"
 #include "test.h"
 
 #include <iostream>
@@ -20,7 +22,7 @@
 using namespace std;
 
 /****************************************************************************
-// 							Test CLASS DEFITNION
+// 							Tester CLASS DEFITNION
 ****************************************************************************/
 class Tester
 {
@@ -31,7 +33,7 @@ class Tester
 	ifstream ifs;		// Input file stream.
 	Set<Test*> tests;	// Tests array.
 	Set<Label> labels;	// Set of labels.
-	bool 	printData;
+	Logging	log;
 
 	//------------------------------------------------------------------------
 	//  Private functions.
@@ -43,11 +45,10 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	Tester() : fileName("test.txt"), printData(false) {};
-	Tester(string fName, bool forcePrintData) : fileName(fName),
-												tests(DEFAULT_N_TESTS_TO_EXEC),
-												labels(DEFAULT_N_LABELS),
-												printData(forcePrintData) {};
+	Tester() : fileName(DEFAULT_TEST_FILE_NAME), log("logTest.txt", true) {};
+	Tester(string fName, string logFile, bool forcePrintData) : \
+			fileName(fName), tests(DEFAULT_N_TESTS_TO_EXEC),
+			labels(DEFAULT_N_LABELS), log(logFile, forcePrintData) {};
 	~Tester() {};
 
 	//------------------------------------------------------------------------

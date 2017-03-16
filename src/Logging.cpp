@@ -25,13 +25,13 @@ int	fileCounter;
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-Logging::Logging( const string fileName, bool force)
+Logging::Logging(const string fileName, bool force)
 {
 	// Initialize attributes.
 	concat = false;
 	ofs = new ofstream;
 	opened = true;
-	ofs->open( fileName.c_str(), std::ofstream::out);
+	ofs->open(fileName.c_str(), std::ofstream::out);
 	function = "";
 	file = "";
 	message = "";
@@ -54,6 +54,50 @@ Logging::~Logging()
 // Public functions.
 //------------------------------------------------------------------------
 /***************************************************************************
+* Name: 	buildText
+* IN:		text		text to print
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: adds a string to the message to print
+***************************************************************************/
+void Logging::buildText(string text)
+{
+	message = message + text;
+}
+
+/***************************************************************************
+* Name: 	buildTestHeader
+* IN:		testId		test id
+* 			nTest		number of tests to execute
+* 			testName	test name
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: updates function name and text to be printed.
+***************************************************************************/
+void Logging::buildTestHeader(int testId, int nTests, string testName)
+{
+	string ResultTestId;
+	ostringstream convertTestId;
+	convertTestId << testId;
+
+	string ResultnTests;
+	ostringstream convertnTests;
+	convertnTests << nTests;
+
+	Logging::buildText("**********************************************\n");
+	Logging::buildText("Executing test ");
+	Logging::buildText(convertTestId.str());
+	Logging::buildText("/");
+	Logging::buildText(convertnTests.str());
+	Logging::buildText("\nTest name: ");
+	Logging::buildText(testName);
+	Logging::buildText("\n**********************************************");
+	Logging::write(true, Testing);
+}
+
+/***************************************************************************
 * Name: buildText
 * IN:		function		function that writes the log
 * 			f				file where function is implemented
@@ -63,7 +107,7 @@ Logging::~Logging()
 * GLOBAL:	NONE
 * Description: updates function name and text to be printed.
 ***************************************************************************/
-void Logging::buildText( string func, string f, string text)
+void Logging::buildText(string func, string f, string text)
 {
 	// Check if text must be concatenated.
 	if (concat)
@@ -91,7 +135,7 @@ void Logging::buildText( string func, string f, string text)
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Logging::buildText( string func, string f, int value)
+void Logging::buildText(string func, string f, int value)
 {
 	string Result;
 	ostringstream convert;
@@ -122,7 +166,7 @@ void Logging::buildText( string func, string f, int value)
 * GLOBAL:	NONE
 * Description: writes TYPE to the logging file
 ***************************************************************************/
-void Logging::buildText( string func, string f, TYPE value)
+void Logging::buildText(string func, string f, TYPE value)
 {
 	string Result;
 	ostringstream convert;
@@ -154,7 +198,7 @@ void Logging::buildText( string func, string f, TYPE value)
 * Description: writes a double to the logging file
 ***************************************************************************/
 #ifdef FLOAT_TYPE
-void Logging::buildText( string func, string f, double value)
+void Logging::buildText(string func, string f, double value)
 {
 	string Result;
 	ostringstream convert;
@@ -186,7 +230,7 @@ void Logging::buildText( string func, string f, double value)
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Logging::buildText( string func, string f, Point<TYPE> *point)
+void Logging::buildText(string func, string f, Point<TYPE> *point)
 {
 	string Result;
 	ostringstream convert;
@@ -218,7 +262,7 @@ void Logging::buildText( string func, string f, Point<TYPE> *point)
 * GLOBAL:	NONE
 * Description: Writes range boundaries
 ***************************************************************************/
-void Logging::buildRange( string func, string f, int start, int end)
+void Logging::buildRange(string func, string f, int start, int end)
 {
 	string Result;
 	ostringstream convert;
@@ -249,12 +293,13 @@ void Logging::buildRange( string func, string f, int start, int end)
 * Description: 	writes data to the log file. Is "print" is true then it
 * 				also prints the data to standard output.
 ***************************************************************************/
-void Logging::write( bool print, enum MessageCategory category)
+void Logging::write(bool print, enum MessageCategory category)
 {
 	// Settings colors.
 	std::string red = "\x1B[31m";
 	std::string yellow = "\x1B[33m";
 	std::string green = "\x1B[32m";
+	std::string blue = "\x1b[34m";
 	std::string reset = "\x1B[0m";
 
 
@@ -279,10 +324,16 @@ void Logging::write( bool print, enum MessageCategory category)
 				std::cout << file << "\t\tFunction " << function << "():\t\t" << yellow << message << reset << std::endl;
 				break;
 			}
-			// Successfule. Print green for test successfully executions.
+			// Successful. Print green for test successfully executions.
 			case Successful:
 			{
-				std::cout << file << "\t\tFunction " << function << "():\t\t" << green << message << reset << std::endl;
+				std::cout << green << message << reset << std::endl;
+				break;
+			}
+			// Testing. Print blue for test headers executions.
+			case Testing:
+			{
+				std::cout << blue << message << reset << std::endl;
 				break;
 			}
 			default:

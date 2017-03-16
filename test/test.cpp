@@ -349,10 +349,31 @@ void Test::run()
 {
 	this->prepare();
 	this->main();
+	this->write();
+}
+
+void Test::write()
+{
+	Logging::buildText(__FUNCTION__, __FILE__, \
+			"----------------------------------------------\n");
+	Logging::buildText(__FUNCTION__, __FILE__, "Test summary\n");
+	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-this->nTestFailed);
+	Logging::buildText(__FUNCTION__, __FILE__, "/");
+	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+	Logging::buildText(__FUNCTION__, __FILE__,  \
+			"\n----------------------------------------------");
+	if (this->nTestFailed == 0)
+	{
+		Logging::write(true, Successful);
+	}
+	else
+	{
+		Logging::write(true, Error);
+	}
 }
 
 void Test::finish()
 {
-	this->write();
+
 }
 

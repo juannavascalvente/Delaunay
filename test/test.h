@@ -60,7 +60,7 @@ class Test
 	virtual void printParameters() {cout << "DEFAULT PRINT" << endl;};
 	virtual bool prepare() {cout << "DEFAULT PREPARE" << endl; return(true);};
 	virtual void main() {cout << "DEFAULT MAIN" << endl;};
-	virtual void write() {cout << "DEFAULT WRITE" << endl;};
+	void write();
 
 	//------------------------------------------------------------------------
 	// Private functions.
@@ -73,13 +73,13 @@ protected:
 	//------------------------------------------------------------------------
 	// Attributes.
 	//------------------------------------------------------------------------
-	Logging logFile;		// Test log file.
-	Set<Parameter*> parameters;
-	string outFolder;
-	string testName;
-
+	Logging logFile;			// Test log file.
+	Set<Parameter*> parameters;	// Test parameters.
+	string outFolder;			// Test output folder.
+	string testName;			// Test name.
 	int	totalTests;				// Total # of tests.
 	int	testCounter;			// Current test.
+	int	nTestFailed;			// # tests failed.
 
 public:
 	//------------------------------------------------------------------------
@@ -88,10 +88,11 @@ public:
 	Test() : logFile("logTest.txt", false),
 			 parameters(DEFAULT_TEST_N_PARAMETERS), \
 			 outFolder(DEFAULT_OUTPUT_FOLDER), \
-			 testName(""), totalTests(0), testCounter(0) {};
+			 testName(""), totalTests(0), testCounter(0), nTestFailed(0) {};
 	Test(string name, const string file, string folder, bool print=false):\
 			logFile(file, print), parameters(DEFAULT_TEST_N_PARAMETERS), \
-			outFolder(folder),testName(name),totalTests(0),testCounter(0){};
+			outFolder(folder), testName(name), totalTests(0), \
+			testCounter(0), nTestFailed(0){};
 	virtual ~Test();
 
 	//------------------------------------------------------------------------

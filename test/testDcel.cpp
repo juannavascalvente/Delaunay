@@ -62,6 +62,6 @@ void TestDcel::main()
 	TestSetHighestFirst		setHighestFirstTest;
 
 	test.add(&setHighestFirstTest);
-	test.execute();
+	test.execute(this->totalTests, this->nTestFailed);
 }
 

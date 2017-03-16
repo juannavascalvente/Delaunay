@@ -31,7 +31,7 @@ using namespace std;
 #define STATISTICS				4
 
 int	getExecutionType(char *type);
-void printUsage(int type);
+void printUsage(int type, char *exec);
 int executeTests(int argc, char** argv);
 int executeVisual(int argc, char** argv);
 int	executeStatistics();
@@ -87,13 +87,13 @@ int	 getExecutionType(char *type)
 * GLOBAL:	NONE
 * Description: 	prints application usage.
 ***************************************************************************/
-void printUsage(int type)
+void printUsage(int type, char *exec)
 {
 	switch(type)
 	{
 		case GENERAL:
 		{
-			std::cerr << "Usage: Geometrical type [configFile]" << std::endl;
+			std::cerr << "Usage: " << exec << " type [configFile]" << std::endl;
 			std::cerr << "type(enumerated):\t\tvisual (" << VISUAL_EXECUTION <<
 					") or test (" << TEST_EXECUTION << ")" << std::endl;
 			std::cerr << "configFile(string):\t\tconfiguration file (only " <<
@@ -103,14 +103,14 @@ void printUsage(int type)
 		}
 		case VISUAL:
 		{
-			std::cerr << "Usage: Geometrical visual configFile [";
+			std::cerr << "Usage: " << exec << " -visual configFile [";
 			std::cerr << PRINT_DEBUG_DATA << "]." << std::endl;
 			std::cerr << std::endl << std::endl;
 			break;
 		}
 		case TEST:
 		{
-			std::cerr << "Usage: Geometrical test configFile" << std::endl;
+			std::cerr << "Usage: " << exec << " -test configFile logFile" << std::endl;
 			std::cerr << std::endl << std::endl;
 			break;
 		}
@@ -137,9 +137,9 @@ int executeTests(int argc, char** argv)
 	int 	ret=SUCCESS;			// Return value.
 	Tester 	*tester;				// Test object.
 
-	if (argc == 3)
+	if (argc == 4)
 	{
-		tester = new Tester(argv[2], true);
+		tester = new Tester(argv[2], argv[3], true);
 		tester->main();
 		delete tester;
 	}
@@ -147,7 +147,7 @@ int executeTests(int argc, char** argv)
 	else
 	{
 		std::cerr << "Wrong number of arguments " << argc << std::endl;
-		printUsage(TEST);
+		printUsage(TEST, argv[0]);
 		ret = FAILURE;
 	}
 
@@ -211,7 +211,7 @@ int executeVisual(int argc, char** argv)
 	}
 	else
 	{
-		printUsage(VISUAL);
+		printUsage(VISUAL, argv[0]);
 	}
 
 	return ret;
@@ -311,7 +311,7 @@ int main(int argc, char **argv)
 						VISUAL_EXECUTION << "," << STATISTICS_EXECUTION << ","
 						<< PERFORMANCE_EXECUTION << std::endl << std::endl;
 				ret = FAILURE;
-				printUsage(GENERAL);
+				printUsage(GENERAL, argv[0]);
 				break;
 			}
 		}
@@ -320,7 +320,7 @@ int main(int argc, char **argv)
 	else
 	{
 		std::cout << "Wrong number of arguments " << argc << std::endl << std::endl;
-		printUsage(GENERAL);
+		printUsage(GENERAL, argv[0]);
 		ret = FAILURE;
 	}
 

@@ -229,6 +229,6 @@ void TestSet::main()
 	testSetClass.add(&testResize);
 	testSetClass.add(&testEmptyFull);
 	testSetClass.add(&testAddOpenMP);
-	testSetClass.execute();
+	testSetClass.execute(this->totalTests, this->nTestFailed);
 }
 

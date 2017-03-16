@@ -71,7 +71,8 @@ public:
 	// Public functions.
 	//------------------------------------------------------------------------
 	void add(testFunction<C> *func) {this->testSet.add(func);};
-	void execute();
+	void execute(int &nTests, int &nFailed);
+	const Set<testFunction<C> *>& getTestSet() const {return testSet;}
 };
 
 /***************************************************************************
@@ -82,32 +83,29 @@ public:
 * GLOBAL:	NONE
 * Description: 	executes all the tests.
 ***************************************************************************/
-template<class C> void ClassTests<C>::execute()
+template<class C> void ClassTests<C>::execute(int &nTests, int &nFailed)
 {
 	int i=0;	// Loop counter.
 	testFunction<C> *funcTest;
 
 	// Execute all the tests.
-	for (i=0; i<this->testSet.getNElements() ;i++)
+	nTests = this->testSet.getNElements();
+	for (i=0; i<nTests ;i++)
 	{
 		C c;
 
 		// Get test and execute it.
 		funcTest = *this->testSet.at(i);
+		Logging::buildText(funcTest->getTestName());
 		if (funcTest->executeTest(c))
 		{
-			string message = "Test " + funcTest->getTestName();
-			Logging::buildText(__FUNCTION__, __FILE__, message);
-			Logging::buildText(__FUNCTION__, __FILE__, "......TEST OK");
+			Logging::buildText("\t\t\t\t\tTEST OK");
 			Logging::write(true, Successful);
 		}
 		else
 		{
-			string message = "Test " + funcTest->getTestName();
-			Logging::buildText(__FUNCTION__, __FILE__, message);
-			Logging::buildText(__FUNCTION__, __FILE__, "......TEST FAILED");
-			Logging::write(true, Error);
-			Logging::buildText(__FUNCTION__, __FILE__, funcTest->getErrorMessage());
+			nFailed++;
+			Logging::buildText("\t\t\t\t\tTEST FAILED");
 			Logging::write(true, Error);
 		}
 	}

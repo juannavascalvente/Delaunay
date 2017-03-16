@@ -41,11 +41,7 @@ void Tester::main()
 		for(i=0; i<nTests ;i++)
 		{
 			currentTest = *this->tests.at(i);
-			cout << endl << endl << endl << endl;
-			cout << "**********************************************" << endl;
-			cout << "Executing test " << (i+1) << "/" << nTests << endl;
-			cout << "Test name: " <<  currentTest->getTestName() << endl;
-			cout << "**********************************************" << endl;
+			this->log.buildTestHeader((i+1), nTests, currentTest->getTestName());
 			currentTest->run();
 		}
 

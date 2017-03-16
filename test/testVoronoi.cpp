@@ -217,7 +217,6 @@ void TestVoronoiBuild::dump(string dcelFileName, Dcel &dcel)
 void TestVoronoiCompare::main()
 {
 	int 	i=0;				// Loop counter.
-	int		nFailedTests=0;		// # tests failed.
 	string 	voronoiFileName;	// Voronoi file name.
 	string 	dcelFileName;		// DCEL file name.
 	Dcel	voronoiDcel;		// Original dcel data.
@@ -266,7 +265,7 @@ void TestVoronoiCompare::main()
 				dcel.clean();
 
 				// Execute current test.
-				if (buildVoronoi(nFailedTests, dcel, voronoi))
+				if (buildVoronoi(this->nTestFailed, dcel, voronoi))
 				{
 					if ((*voronoi.getRefDcel()) == voronoiDcel)
 					{
@@ -278,7 +277,7 @@ void TestVoronoiCompare::main()
 					}
 					else
 					{
-						nFailedTests++;
+						this->nTestFailed++;
 						Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
 						Logging::buildText(__FUNCTION__, __FILE__, i+1);
 						Logging::write(true, Error);
@@ -286,7 +285,7 @@ void TestVoronoiCompare::main()
 						// Write test data.
 						string 	fileName;
 						ostringstream convert;
-						convert << nFailedTests;
+						convert << this->nTestFailed;
 						fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
 						cout << fileName << endl;
 						//this->dump(fileName, voronoi.getRefDcel());
@@ -294,14 +293,14 @@ void TestVoronoiCompare::main()
 				}
 				else
 				{
-					nFailedTests++;
+					this->nTestFailed++;
 					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi");
 					Logging::write(true, Error);
 
 					// Write test data.
 					string 	fileName;
 					ostringstream convert;
-					convert << nFailedTests;
+					convert << this->nTestFailed;
 					fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
 					this->dump(fileName, dcel);
 				}
@@ -317,19 +316,6 @@ void TestVoronoiCompare::main()
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Number of files must be multiple of 2 and is ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
-		Logging::write(true, Error);
-	}
-
-	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-nFailedTests);
-	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-	if (nFailedTests == 0)
-	{
-		Logging::write(true, Successful);
-	}
-	else
-	{
 		Logging::write(true, Error);
 	}
 }
