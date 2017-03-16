@@ -27,7 +27,8 @@ using namespace std;
 enum LabelType {UNKNOWN_LABEL,
 				BEGIN_LABEL,
 				END_LABEL,
-				DATA_LABEL};
+				DATA_LABEL,
+				COMMENT_LABEL};
 
 /****************************************************************************
 // 							Label CLASS DEFITNION

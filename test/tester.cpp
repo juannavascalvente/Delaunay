@@ -20,7 +20,7 @@
 #define OUT_FOLDER_VORONOI				"./data/tests/log/voronoi/"
 #define OUT_FOLDER_VORONOI_COMP			"./data/tests/log/voronoiCompare/"
 #define OUT_FOLDER_DELAUNAY_PATH		"./data/tests/log/delaunayPath/"
-#define OUT_FOLDER_DELAUNAY_PATH_COMP 	"./data/tests/log/voronoiPathCompare/"
+#define OUT_FOLDER_DELAUNAY_PATH_COMP 	"./data/tests/log/delaunayPathCompare/"
 #define OUT_FOLDER_VORONOI_PATH			"./data/tests/log/voronoiPath/"
 #define OUT_FOLDER_VORONOI_PATH_COMP	"./data/tests/log/voronoiPathCompare/"
 

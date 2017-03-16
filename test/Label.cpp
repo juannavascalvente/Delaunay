@@ -50,7 +50,7 @@ bool Label::validFormat(string &line)
 
 	type = Label::extractType(line);
 
-	return (type != UNKNOWN_LABEL);
+	return ((type != UNKNOWN_LABEL) && (type != COMMENT_LABEL));
 }
 
 LabelType Label::extractType(string &line)
@@ -59,10 +59,12 @@ LabelType Label::extractType(string &line)
 	regex_t beginRegex;
 	regex_t dataRegex;
 	regex_t endRegex;
+	regex_t comment;
 
 	regcomp(&beginRegex, "<.*>$", 0);
 	regcomp(&endRegex, "</.*>$", 0);
 	regcomp(&dataRegex, "<.*>.*</.*.>$", 0);
+	regcomp(&comment, "#.*", 0);
 
 	// Execute regular expression.
 	if (!regexec(&dataRegex, line.c_str(), 0, NULL, 0))
@@ -85,6 +87,13 @@ LabelType Label::extractType(string &line)
 		cout << "Label type is BEGIN_LABEL" << endl;
 #endif
 		type = BEGIN_LABEL;
+	}
+	else if (!regexec(&comment, line.c_str(), 0, NULL, 0))
+	{
+#ifdef LABEL_EXTRACT_TYPE
+		cout << "Line is a comment" << endl;
+#endif
+		type = COMMENT_LABEL;
 	}
 	else
 	{
