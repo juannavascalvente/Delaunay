@@ -18,7 +18,6 @@
 // Default parameters in Voronoi Compare test.
 #define DEFAULT_N_FILES			20
 #define DEFAULT_FILE_LIST		"fileList.txt"
-#define DEF_VORONOI_COMPARE_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/test/output/voronoi/compare/"
 
 #include "testCompare.h"
 #include "testExecution.h"

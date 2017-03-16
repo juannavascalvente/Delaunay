@@ -14,15 +14,6 @@
 #include "testCompare.h"
 #include "testExecution.h"
 
-#define DEF_DELAUNAY_PATH_FOLDER \
-	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/path/"
-#define DEF_VORONOI_PATH_FOLDER	\
-	"/home/juan/projects/delaunay/code/data/samples/test/output/voronoi/path/"
-#define DEF_DELAUNAY_PATH_COMPARE_FOLDER \
-	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/comparePath/"
-#define DEF_VORONOI_PATH_COMPARE_FOLDER	\
-	"/home/juan/projects/delaunay/code/data/samples/test/output/voronoi/comparePath/"
-
 /****************************************************************************
 // 							TestPathDelaunay CLASS DEFITNION
 ****************************************************************************/

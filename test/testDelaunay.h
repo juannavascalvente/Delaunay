@@ -12,12 +12,10 @@
 #define DEFAULT_DELTA_POINTS	2
 #define DEFAULT_N_STEPS			5
 #define DEFAULT_N_TESTS			5
-#define DEF_OUT_FOLDER_DELAUNAY	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/build/"
 
 // Default parameters in Delaunay Compare test.
 #define DEFAULT_N_FILES			20
 #define DEFAULT_FILE_LIST		"fileList.txt"
-#define DEF_DELAUNAY_COMPARE_FOLDER	"/home/juan/projects/delaunay/code/data/samples/test/output/delaunay/compare/"
 
 #include "Dcel.h"
 #include "Parameter.h"
