@@ -65,18 +65,18 @@ Draw* Draw::getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelauna
 		instance = new Draw();
 
 		// Initialize openGL.
-		glutInit( &argc, argv);
-		glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA);
-		glutInitWindowSize( 1100, 750);
-		glutInitWindowPosition( 100, 100);
-		instance->windowID = glutCreateWindow( "GEOMETRICAL");
-		glMatrixMode( GL_PROJECTION);
+		glutInit(&argc, argv);
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+		glutInitWindowSize(1100, 750);
+		glutInitWindowPosition(100, 100);
+		instance->windowID = glutCreateWindow("GEOMETRICAL");
+		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
 		// Set background color.
-		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f);
-		glMatrixMode( GL_MODELVIEW);
-		glutIdleFunc( refresh);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glMatrixMode(GL_MODELVIEW);
+		glutIdleFunc(refresh);
 
 		// Get reference to data to draw.
 		dcel = inDcel;
@@ -89,7 +89,7 @@ Draw* Draw::getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelauna
 
 		// Set x, y and z axis size.
 		config->getScreenCoordinates(minX, minY, maxX, maxY);
-		glOrtho( minX-100, maxX+100, minY-100, maxY+100, -1, 3);
+		glOrtho(minX-100, maxX+100, minY-100, maxY+100, -1, 3);
 		font = GLUT_BITMAP_TIMES_ROMAN_10;
 	}
 
@@ -186,7 +186,7 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			for (i=0; i<this->pointsSet->getNElements() ;i++)
 			{
 				p = *this->pointsSet->at(i);
-				this->draw( &p);
+				this->draw(&p);
 			}
 			break;
 		}
@@ -196,10 +196,10 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			this->drawDelaunay(INVALID);
 			p = *this->pointsSet->at(0);
 			this->setColor(YELLOW);
-			this->draw( &p);
+			this->draw(&p);
 			if (this->facesSet->getNElements() > 0)
 			{
-				this->drawFace( *this->facesSet->at(0), this->dcel);
+				this->drawFace(*this->facesSet->at(0), this->dcel);
 			}
 			break;
 		}
@@ -211,8 +211,8 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			this->setColor(YELLOW);
 			p = *this->pointsSet->at(0);
 			q = *this->pointsSet->at(1);
-			line = new Line( p, q);
-			this->draw( line);
+			line = new Line(p, q);
+			this->draw(line);
 
 			// Check type of path to draw.
 			if (type == TRIANGULATION_PATH_DRAW)
@@ -223,7 +223,7 @@ void Draw::drawFigures(enum drawingT type, bool error)
 					for (i=0; i<this->facesSet->getNElements() ;i++)
 					{
 						faceId = *this->facesSet->at(i);
-						this->drawFace( faceId, this->delaunay->getDCEL());
+						this->drawFace(faceId, this->delaunay->getDCEL());
 					}
 				}
 			}
@@ -237,7 +237,7 @@ void Draw::drawFigures(enum drawingT type, bool error)
 					for (i=0; i<this->facesSet->getNElements() ;i++)
 					{
 						faceId = *this->facesSet->at(i);
-						this->drawFace( faceId, this->voronoi->getRefDcel());
+						this->drawFace(faceId, this->voronoi->getRefDcel());
 					}
 				}
 			}
@@ -253,7 +253,7 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			for (i=0; i<this->pointsSet->getNElements() ;i++)
 			{
 				p = *this->pointsSet->at(i);
-				this->draw( &p);
+				this->draw(&p);
 			}
 			break;
 		}
@@ -261,21 +261,21 @@ void Draw::drawFigures(enum drawingT type, bool error)
 		case CIRCUMCENTRES_DRAW:
 		{
 			this->drawDelaunay(INVALID);
-			this->drawCircumcentres( this->dcel);
+			this->drawCircumcentres(this->dcel);
 			break;
 		}
 		// Draw the triangulation and the triangles circumcentres.
 		case EDGESCIRCLES_DRAW:
 		{
 			this->drawDelaunay(INVALID);
-			this->drawEdgesCircles( this->dcel);
+			this->drawEdgesCircles(this->dcel);
 			break;
 		}
 		// Draw triangulation information.
 		case DCEL_INFO_DRAW:
 		{
 			this->drawDelaunay(INVALID);
-			this->drawInfo( this->dcel);
+			this->drawInfo(this->dcel);
 			break;
 		}
 		// Draw Voronoi information.
@@ -283,7 +283,7 @@ void Draw::drawFigures(enum drawingT type, bool error)
 		{
 			this->drawDelaunay(INVALID);
 			this->drawVoronoi();
-			this->drawInfo( this->voronoi->getRefDcel());
+			this->drawInfo(this->voronoi->getRefDcel());
 			break;
 		}
 		// Unknown type of drawing.
@@ -313,7 +313,7 @@ void Draw::drawSet()
 	// Draw set of points.
 	this->setPointSize(1.0);
 	this->setColor(WHITE);
-	this->drawPoints( this->dcel);
+	this->drawPoints(this->dcel);
 }
 
 /***************************************************************************
@@ -328,7 +328,7 @@ void Draw::drawSet()
 void Draw::drawDelaunay(TYPE minLength)
 {
 	this->setColor(RED);
-	this->draw( this->dcel, minLength);
+	this->draw(this->dcel, minLength);
 }
 
 
@@ -344,7 +344,7 @@ void Draw::drawVoronoi()
 {
 	this->setPointSize(3.0);
 	this->setColor(LIGHT_BLUE);
-	this->draw( this->voronoi->getRefDcel(), INVALID);
+	this->draw(this->voronoi->getRefDcel(), INVALID);
 }
 
 /***************************************************************************
@@ -358,7 +358,7 @@ void Draw::drawVoronoi()
 void Draw::drawGabriel()
 {
 	this->setColor(GREEN);
-	this->draw( this->gabriel);
+	this->draw(this->gabriel);
 }
 
 /***************************************************************************
@@ -369,11 +369,11 @@ void Draw::drawGabriel()
 * GLOBAL:	NONE
 * Description: draws a point in the screen.
 ***************************************************************************/
-void Draw::draw( PointT *point)
+void Draw::draw(PointT *point)
 {
 	// Draw point.
 	this->startPoints();
-	glVertex2f( point->getX(), point->getY());
+	glVertex2f(point->getX(), point->getY());
 	this->finish();
 }
 
@@ -385,7 +385,7 @@ void Draw::draw( PointT *point)
 * GLOBAL:	NONE
 * Description: 	draws the set of vertex of the DCEL.
 ***************************************************************************/
-void Draw::drawPoints( Dcel *dcel)
+void Draw::drawPoints(Dcel *dcel)
 {
 	int	i=0;			// Loop counter.
 
@@ -394,7 +394,7 @@ void Draw::drawPoints( Dcel *dcel)
 	// Loop to draw points.
 	for (i=0; i<dcel->getNVertex() ;i++)
 	{
-		this->draw( dcel->getRefPoint(i));
+		this->draw(dcel->getRefPoint(i));
 	}
 
 	this->finish();
@@ -408,16 +408,16 @@ void Draw::drawPoints( Dcel *dcel)
 * GLOBAL:	NONE
 * Description: 	draw line between origin and destination points.
 ***************************************************************************/
-void Draw::draw( Line *line)
+void Draw::draw(Line *line)
 {
 	// Draw edges of current edge.
 	this->startLine();
 
 	// Draw first point.
-	glVertex2f( line->getOrigin().getX(), line->getOrigin().getY());
+	glVertex2f(line->getOrigin().getX(), line->getOrigin().getY());
 
 	// Draw second point.
-	glVertex2f( line->getDest().getX(), line->getDest().getY());
+	glVertex2f(line->getDest().getX(), line->getDest().getY());
 
 	this->finish();
 }
@@ -439,34 +439,34 @@ void Draw::draw(Polygon *polygon)
 	this->setColor(GREEN);
 
 #ifdef DEBUG_DRAW_POLYLINE
-	Logging::buildText( __FUNCTION__, __FILE__, "Number of points in convex hull:" );
-	Logging::buildText( __FUNCTION__, __FILE__, polygon->getNElements());
-	Logging::write( true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of points in convex hull:" );
+	Logging::buildText(__FUNCTION__, __FILE__, polygon->getNElements());
+	Logging::write(true, Info);
 #endif
 	// Computes distance between every pair of points.
 	for (i=0; i<(polygon->getNElements()-1) ;i++)
 	{
-		p = polygon->at( i);
-		q = polygon->at( i+1);
-		line = Line( *p, *q);
-		this->draw( &line);
+		p = polygon->at(i);
+		q = polygon->at(i+1);
+		line = Line(*p, *q);
+		this->draw(&line);
 #ifdef DEBUG_DRAW_POLYLINE
-		Logging::buildText( __FUNCTION__, __FILE__, "Drawing point " );
-		Logging::buildText( __FUNCTION__, __FILE__, i);
-		Logging::write( true, Info);
+		Logging::buildText(__FUNCTION__, __FILE__, "Drawing point " );
+		Logging::buildText(__FUNCTION__, __FILE__, i);
+		Logging::write(true, Info);
 #endif
 	}
 
 #ifdef DEBUG_DRAW_POLYLINE
-	Logging::buildText( __FUNCTION__, __FILE__, "Drawing last line" );
-	Logging::write( true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Drawing last line" );
+	Logging::write(true, Info);
 #endif
 
 	// Close polygon.
-	p = polygon->at( polygon->getNElements()-1);
-	q = polygon->at( 0);
-	line = Line( *p, *q);
-	this->draw( &line);
+	p = polygon->at(polygon->getNElements()-1);
+	q = polygon->at(0);
+	line = Line(*p, *q);
+	this->draw(&line);
 }
 
 /***************************************************************************
@@ -478,7 +478,7 @@ void Draw::draw(Polygon *polygon)
 * GLOBAL:		NONE
 * Description: 	draws circle.
 ***************************************************************************/
-void Draw::draw( Circle *circle, bool fill)
+void Draw::draw(Circle *circle, bool fill)
 {
 	int		i=0;
 	TYPE 	angle=0.0;
@@ -505,7 +505,7 @@ void Draw::draw( Circle *circle, bool fill)
 * 				if a minimum length is supplied then only the edges longer
 * 				then that length are drawn.
 ***************************************************************************/
-void Draw::draw( Dcel *dcel, TYPE minLength)
+void Draw::draw(Dcel *dcel, TYPE minLength)
 {
 	int		edgeIndex=0;		// Loop counter.
 	Point<TYPE> *vertex1;	    // First vertex.
@@ -513,15 +513,15 @@ void Draw::draw( Dcel *dcel, TYPE minLength)
 	TYPE	dist=0.0;			// Points distance.
 
 #ifdef DEBUG_DRAW_DCEL_TRIANGULATION
-	Logging::buildText( __FUNCTION__, __FILE__, "\n\nDrawing triangulation");
-	Logging::write( true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "\n\nDrawing triangulation");
+	Logging::write(true, Info);
 #endif
 
 	// Draw all edges.
 	for (edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
 	{
 		// Skip triangle if any vertex is P_MINUS_1 or P_MINUS_2.
-		if (!dcel->hasNegativeVertex( edgeIndex+1))
+		if (!dcel->hasNegativeVertex(edgeIndex+1))
 		{
 		    // Not draw edges whose twin has been already drawn.
 			if (edgeIndex < dcel->getTwin(edgeIndex)-1)
@@ -533,49 +533,49 @@ void Draw::draw( Dcel *dcel, TYPE minLength)
 				vertex2 = dcel->getRefPoint(dcel->getOrigin(dcel->getTwin(edgeIndex)-1)-1);
 				if (minLength != INVALID)
 				{
-					dist = vertex1->distance( *vertex2);
+					dist = vertex1->distance(*vertex2);
 				}
 #ifdef DEBUG_DRAW_DCEL_TRIANGULATION
-				Logging::buildText( __FUNCTION__, __FILE__, "Points are: ");
-				Logging::buildText( __FUNCTION__, __FILE__, vertex1);
-				Logging::buildText( __FUNCTION__, __FILE__, " ");
-				Logging::buildText( __FUNCTION__, __FILE__, vertex2);
-				Logging::write( true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, "Points are: ");
+				Logging::buildText(__FUNCTION__, __FILE__, vertex1);
+				Logging::buildText(__FUNCTION__, __FILE__, " ");
+				Logging::buildText(__FUNCTION__, __FILE__, vertex2);
+				Logging::write(true, Info);
 #endif
 				if ((minLength == INVALID) || (dist > minLength))
 				{
 #ifdef DEBUG_DRAW_DCEL_TRIANGULATION
-					Logging::buildText( __FUNCTION__, __FILE__, "Drawing edge ");
-					Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-					Logging::write( true, Info);
+					Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
+					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+					Logging::write(true, Info);
 #endif
 					// Draw edges of current edge.
 					this->startLine();
 
 					// Draw first point.
-					glVertex2f( vertex1->getX(), vertex1->getY());
+					glVertex2f(vertex1->getX(), vertex1->getY());
 
 					// Draw second point.
-					glVertex2f( vertex2->getX(), vertex2->getY());
+					glVertex2f(vertex2->getX(), vertex2->getY());
 
 					this->finish();
 				}
 #ifdef DEBUG_DRAW_DCEL_TRIANGULATION
 				else
 				{
-					Logging::buildText( __FUNCTION__, __FILE__, "Drawing edge ");
-					Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-					Logging::write( true, Info);
+					Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
+					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+					Logging::write(true, Info);
 				}
 #endif
             }
 #ifdef DEBUG_DRAW_DCEL_TRIANGULATION
             else
             {
-				Logging::buildText( __FUNCTION__, __FILE__, "Skipping edge " );
-				Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-				Logging::buildText( __FUNCTION__, __FILE__, " because twin is lower.");
-				Logging::write( true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, "Skipping edge " );
+				Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+				Logging::buildText(__FUNCTION__, __FILE__, " because twin is lower.");
+				Logging::write(true, Info);
             }
 #endif
 		}
@@ -583,21 +583,21 @@ void Draw::draw( Dcel *dcel, TYPE minLength)
 		else
 		{
 			int index1, index2;
-			dcel->getEdgeVertices( edgeIndex+1, index1, index2);
-			Logging::buildText( __FUNCTION__, __FILE__, "Imaginary points in edge ");
-			Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-			Logging::buildText( __FUNCTION__, __FILE__, " are ");
-			Logging::buildText( __FUNCTION__, __FILE__, index1);
-			Logging::buildText( __FUNCTION__, __FILE__, " and ");
-			Logging::buildText( __FUNCTION__, __FILE__, index2);
-			Logging::write( true, Info);
+			dcel->getEdgeVertices(edgeIndex+1, index1, index2);
+			Logging::buildText(__FUNCTION__, __FILE__, "Imaginary points in edge ");
+			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+			Logging::buildText(__FUNCTION__, __FILE__, " are ");
+			Logging::buildText(__FUNCTION__, __FILE__, index1);
+			Logging::buildText(__FUNCTION__, __FILE__, " and ");
+			Logging::buildText(__FUNCTION__, __FILE__, index2);
+			Logging::write(true, Info);
 		}
 #endif
 	}
 
 #ifdef DEBUG_DRAW_DCEL_TRIANGULATION
-	Logging::buildText( __FUNCTION__, __FILE__, "Finished drawing Delaunay triangulation");
-	Logging::write( true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Finished drawing Delaunay triangulation");
+	Logging::write(true, Info);
 #endif
 }
 
@@ -610,7 +610,7 @@ void Draw::draw( Dcel *dcel, TYPE minLength)
 * GLOBAL:	NONE
 * Description: 	Draws the edge of the DCEL whose position is "edgeIndex".
 ***************************************************************************/
-void Draw::drawEdge( int edgeIndex, Dcel *dcel)
+void Draw::drawEdge(int edgeIndex, Dcel *dcel)
 {
 	Point<TYPE> p1, p2;			// Points to draw.
 
@@ -618,24 +618,24 @@ void Draw::drawEdge( int edgeIndex, Dcel *dcel)
 	if (!dcel->hasNegativeVertex(edgeIndex+1))
 	{
 		// Get edge origin and destination points.
-		dcel->getEdgePoints( edgeIndex, p1, p2);
+		dcel->getEdgePoints(edgeIndex, p1, p2);
 
 		// Draw edge.
 		this->startLine();
 
 		// Draw first point.
-		glVertex2f( p1.getX(), p1.getY());
+		glVertex2f(p1.getX(), p1.getY());
 
 		// Draw second point.
-		glVertex2f( p2.getX(), p2.getY());
+		glVertex2f(p2.getX(), p2.getY());
 
 		this->finish();
 	}
 #ifdef DEBUG_DRAW_DRAWEDGE
 	else
 	{
-    	Logging::buildText( __FUNCTION__, __FILE__, "Skipping edge because has no real vertex");
-    	Logging::write( true, Error);
+    	Logging::buildText(__FUNCTION__, __FILE__, "Skipping edge because has no real vertex");
+    	Logging::write(true, Error);
 	}
 #endif
 }
@@ -650,14 +650,14 @@ void Draw::drawEdge( int edgeIndex, Dcel *dcel)
 * GLOBAL:	NONE
 * Description: 	draws the "faceId" face of the DCEL.
 ***************************************************************************/
-void Draw::drawFace( int faceId, Dcel *dcel)
+void Draw::drawFace(int faceId, Dcel *dcel)
 {
 	int	edgeIndex=0;		// Edge index.
 	int	firstEdgeIndex=0;
 #ifdef DEBUG_DRAW_DRAWFACE
-	Logging::buildText( __FUNCTION__, __FILE__, "Drawing face ");
-	Logging::buildText( __FUNCTION__, __FILE__, faceId);
-	Logging::write( true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Drawing face ");
+	Logging::buildText(__FUNCTION__, __FILE__, faceId);
+	Logging::write(true, Info);
 #endif
 	// Get edge in face.
 	firstEdgeIndex = dcel->getFaceEdge(faceId)-1;
@@ -667,9 +667,9 @@ void Draw::drawFace( int faceId, Dcel *dcel)
 	do
 	{
 #ifdef DEBUG_DRAW_DRAWFACE
-		Logging::buildText( __FUNCTION__, __FILE__, "Drawing edge ");
-		Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-		Logging::write( true, Info);
+		Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
+		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+		Logging::write(true, Info);
 #endif
 		// Draw edge.
 		this->drawEdge(edgeIndex, dcel);
@@ -690,51 +690,51 @@ void Draw::drawFace( int faceId, Dcel *dcel)
 * 				imaginary (incremental Delaunay algorithm) then the face
 * 				is not drawn.
 ***************************************************************************/
-void Draw::draw( Face *face, Dcel *dcel)
+void Draw::draw(Face *face, Dcel *dcel)
 {
 	// PENDING IS USED THIS FUNCTION?
 //	int	 	edgeIndex=0;		// Edge index.
 //	int		faceId=0;			// Face id.
 
 	// Get face id.
-	//faceId = dcel->getFace( face->getEdge()-1);
+	//faceId = dcel->getFace(face->getEdge()-1);
 
 	/*
 	// Check face is not imaginary.
-	if (!dcel->imaginaryFace( faceId))
+	if (!dcel->imaginaryFace(faceId))
 	{
 		// Get face edge.
 		edgeIndex = face->getEdge()-1;
-		draw( dcel->getRefEdge( edgeIndex), dcel);
+		draw(dcel->getRefEdge(edgeIndex), dcel);
 #ifdef DEBUG_DCEL_DRAW_FACE
-    	Logging::buildText( __FUNCTION__, __FILE__, "Drawing edge ");
-    	Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-    	Logging::write( true, Info);
+    	Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
+    	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+    	Logging::write(true, Info);
 #endif
 
 		// Get next edge.
 		edgeIndex = dcel->getNext(edgeIndex)-1;
-		draw( dcel->getRefEdge( edgeIndex), dcel);
+		draw(dcel->getRefEdge(edgeIndex), dcel);
 #ifdef DEBUG_DCEL_DRAW_FACE
-    	Logging::buildText( __FUNCTION__, __FILE__, "Drawing edge ");
-    	Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-    	Logging::write( true, Info);
+    	Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
+    	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+    	Logging::write(true, Info);
 #endif
 
 		// Get last edge.
 		edgeIndex = dcel->getNext(edgeIndex)-1;
-		draw( dcel->getRefEdge( edgeIndex), dcel);
+		draw(dcel->getRefEdge(edgeIndex), dcel);
 #ifdef DEBUG_DCEL_DRAW_FACE
-    	Logging::buildText( __FUNCTION__, __FILE__, "Drawing edge ");
-    	Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-    	Logging::write( true, Info);
+    	Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
+    	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+    	Logging::write(true, Info);
 #endif
 	}
 #ifdef DEBUG_DCEL_DRAW_FACE
 	else
 	{
-    	Logging::buildText( __FUNCTION__, __FILE__, "Skipping face because is not real");
-    	Logging::write( true, Error);
+    	Logging::buildText(__FUNCTION__, __FILE__, "Skipping face because is not real");
+    	Logging::write(true, Error);
 	}
 #endif*/
 }
@@ -748,7 +748,7 @@ void Draw::draw( Face *face, Dcel *dcel)
 * Description: 	draws the triangulation filtering edges that do not match
 * 				the Gabriel graph restriction.
 ***************************************************************************/
-void Draw::draw( Gabriel *gabriel)
+void Draw::draw(Gabriel *gabriel)
 {
 	int		edgeIndex=0;		// Loop counter.
 	Point<TYPE> *vertex1;	    // First vertex.
@@ -761,25 +761,25 @@ void Draw::draw( Gabriel *gabriel)
 		// Get reference to gabriel dcel.
 		dcel = gabriel->getDcel();
 #ifdef DEBUG_DRAW_GABRIEL
-		Logging::buildText( __FUNCTION__, __FILE__, "Drawing Gabriel graph. Length ");
-		Logging::buildText( __FUNCTION__, __FILE__, gabriel->getSize());
-		Logging::write( true, Info);
+		Logging::buildText(__FUNCTION__, __FILE__, "Drawing Gabriel graph. Length ");
+		Logging::buildText(__FUNCTION__, __FILE__, gabriel->getSize());
+		Logging::write(true, Info);
 #endif
 		// Draw Gabriel edges.
 		for (edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
 		{
 #ifdef DEBUG_DRAW_GABRIEL
-			Logging::buildText( __FUNCTION__, __FILE__, "Checking edge ");
-			Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-			Logging::write( true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
+			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+			Logging::write(true, Info);
 #endif
 			// Check if current edge mamtches Gabriel restriction.s
 			if (gabriel->isSet(edgeIndex))
 			{
 #ifdef DEBUG_DRAW_GABRIEL
-				Logging::buildText( __FUNCTION__, __FILE__, "Drawing edge ");
-				Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-				Logging::write( true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
+				Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+				Logging::write(true, Info);
 #endif
 				// Get origin vertex of edge.
 				vertex1 = dcel->getRefPoint(dcel->getOrigin(edgeIndex)-1);
@@ -791,19 +791,19 @@ void Draw::draw( Gabriel *gabriel)
 				this->startLine();
 
 				// Draw first point.
-				glVertex2f( vertex1->getX(), vertex1->getY());
+				glVertex2f(vertex1->getX(), vertex1->getY());
 
 				// Draw second point.
-				glVertex2f( vertex2->getX(), vertex2->getY());
+				glVertex2f(vertex2->getX(), vertex2->getY());
 
 				this->finish();
 			}
 #ifdef DEBUG_DRAW_GABRIEL
 			else
 			{
-				Logging::buildText( __FUNCTION__, __FILE__, "Non Gabriel edge ");
-				Logging::buildText( __FUNCTION__, __FILE__, edgeIndex+1);
-				Logging::write( true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, "Non Gabriel edge ");
+				Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+				Logging::write(true, Info);
 			}
 #endif
 		}
@@ -827,8 +827,8 @@ void Draw::drawCircumcentres(Dcel *dcel)
 	int		points[NPOINTS_TRIANGLE];	// Triangle points.
 
 	// Set circles color.
-	this->setColor( BLUE);
-	this->setLineSize( 1.0);
+	this->setColor(BLUE);
+	this->setLineSize(1.0);
 
 	// Draw all points of the set.
 	for (faceID=1; faceID<dcel->getNFaces() ;faceID++)
@@ -837,32 +837,32 @@ void Draw::drawCircumcentres(Dcel *dcel)
         if (!dcel->imaginaryFace(faceID))
         {
         	// Get points of the triangle.
-        	dcel->getFaceVertices( faceID, points);
+        	dcel->getFaceVertices(faceID, points);
 #ifdef DEBUG_DRAW_CIRCUMCENTRES
-			Logging::buildText( __FUNCTION__, __FILE__, "Drawing face ");
-			Logging::buildText( __FUNCTION__, __FILE__, faceID);
-			Logging::buildText( __FUNCTION__, __FILE__, " circumcentre whose points are ");
-			Logging::buildText( __FUNCTION__, __FILE__, points[0]);
-			Logging::buildText( __FUNCTION__, __FILE__, ",");
-			Logging::buildText( __FUNCTION__, __FILE__, points[1]);
-			Logging::buildText( __FUNCTION__, __FILE__, " and ");
-			Logging::buildText( __FUNCTION__, __FILE__, points[2]);
-			Logging::write( true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__, "Drawing face ");
+			Logging::buildText(__FUNCTION__, __FILE__, faceID);
+			Logging::buildText(__FUNCTION__, __FILE__, " circumcentre whose points are ");
+			Logging::buildText(__FUNCTION__, __FILE__, points[0]);
+			Logging::buildText(__FUNCTION__, __FILE__, ",");
+			Logging::buildText(__FUNCTION__, __FILE__, points[1]);
+			Logging::buildText(__FUNCTION__, __FILE__, " and ");
+			Logging::buildText(__FUNCTION__, __FILE__, points[2]);
+			Logging::write(true, Info);
 #endif
             // Build circle.
-        	circle = Circle(dcel->getRefPoint( points[0]-1),
-							dcel->getRefPoint( points[1]-1),
-							dcel->getRefPoint( points[2]-1));
+        	circle = Circle(dcel->getRefPoint(points[0]-1),
+							dcel->getRefPoint(points[1]-1),
+							dcel->getRefPoint(points[2]-1));
 
         	// Draw circle.
-        	this->draw( &circle, false);
+        	this->draw(&circle, false);
         }
 #ifdef DEBUG_DRAW_CIRCUMCENTRES
         else
         {
-			Logging::buildText( __FUNCTION__, __FILE__, "Skipping imaginary face ");
-			Logging::buildText( __FUNCTION__, __FILE__, faceID);
-			Logging::write( true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__, "Skipping imaginary face ");
+			Logging::buildText(__FUNCTION__, __FILE__, faceID);
+			Logging::write(true, Info);
         }
 #endif
 	}
@@ -886,8 +886,8 @@ void Draw::drawEdgesCircles(Dcel *dcel)
 	Point<TYPE> origin, dest;  	// Origin and destination points.
 	Point<TYPE> middle;	    	// Edge middle point.
 
-	this->setLineSize( 1.0);
-	this->setColor( BLUE);
+	this->setLineSize(1.0);
+	this->setColor(BLUE);
 
     // Loop all faces (but external).
 	nEdges = dcel->getNEdges();
@@ -907,11 +907,11 @@ void Draw::drawEdgesCircles(Dcel *dcel)
         	line.getMiddle(middle);
 
             // Create circle
-        	radius = origin.distance( middle);
-        	circle = Circle( &middle, radius);
+        	radius = origin.distance(middle);
+        	circle = Circle(&middle, radius);
 
             // Draw circle.
-        	this->draw( &circle, false);
+        	this->draw(&circle, false);
         }
 	}
 }
@@ -924,7 +924,7 @@ void Draw::drawEdgesCircles(Dcel *dcel)
 * GLOBAL:	NONE
 * Description: set current color
 ***************************************************************************/
-void Draw::setColor( enum ColorT color)
+void Draw::setColor(enum ColorT color)
 {
     // Check input color.
     switch(color)
@@ -932,43 +932,43 @@ void Draw::setColor( enum ColorT color)
         // Set red as current color.
         case RED:
         {
-            glColor3f( 1.0, 0.0, 0.0);
+            glColor3f(1.0, 0.0, 0.0);
             break;
         }
         // Set red as current color.
         case GREEN:
         {
-            glColor3f( 0.0, 1.0, 0.0);
+            glColor3f(0.0, 1.0, 0.0);
             break;
         }
         // Set red as current color.
         case BLUE:
         {
-            glColor3f( 0.0, 0.0, 1.0);
+            glColor3f(0.0, 0.0, 1.0);
             break;
         }
         // Set red as current color.
         case LIGHT_BLUE:
         {
-            glColor3f( 0.0, 1.0, 1.0);
+            glColor3f(0.0, 1.0, 1.0);
             break;
         }
         // Set yellow as current color.
         case YELLOW:
         {
-            glColor3f( 1.0, 1.0, 0.0);
+            glColor3f(1.0, 1.0, 0.0);
             break;
         }
         // Set red as current color.
         case WHITE:
         {
-            glColor3f( 1.0, 1.0, 1.0);
+            glColor3f(1.0, 1.0, 1.0);
             break;
         }
         // Set red as current color.
         default:
         {
-            glColor3f( 0.0, 0.0, 0.0);
+            glColor3f(0.0, 0.0, 0.0);
             break;
         }
     }
@@ -998,13 +998,13 @@ void Draw::setFont(void *newFont)
 * Description: 	writes the "string" text at position (x,y) using "font" and
 * 				r,g,b color.
 ***************************************************************************/
-void Draw::drawText( float x, float y, char *string)
+void Draw::drawText(float x, float y, char *string)
 {
 	int		i=0;		// Loop counter.
 	int		len=0;		// Array length.
 
 	// Set the position of the text in the window using the x and y coordinates
-	glRasterPos2f( x, y);
+	glRasterPos2f(x, y);
 
 	// Get the length of the string to display
 	len = (int) strlen(string);
@@ -1012,7 +1012,7 @@ void Draw::drawText( float x, float y, char *string)
 	//loop to display character by character
 	for (i=0; i<len; i++)
 	{
-		glutBitmapCharacter( font, string[i]);
+		glutBitmapCharacter(font, string[i]);
 	}
 }
 
@@ -1024,7 +1024,7 @@ void Draw::drawText( float x, float y, char *string)
 * RETURN:	NONE
 * Description: draw point identifiers.
 ***************************************************************************/
-void Draw::drawPointsInfo( Dcel *dcel)
+void Draw::drawPointsInfo(Dcel *dcel)
 {
 	int			i=0;		// Loop counter.
 	Point<TYPE>	*point;		// Current point.
@@ -1033,7 +1033,7 @@ void Draw::drawPointsInfo( Dcel *dcel)
 #ifdef DEBUG_DRAW_POINTS_INFO
 	Logging::buildText(__FUNCTION__, __FILE__, "# points to draw: ");
 	Logging::buildText(__FUNCTION__, __FILE__, dcel->getNEdges());
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
 
 	// Draw all points of the set.
@@ -1041,12 +1041,12 @@ void Draw::drawPointsInfo( Dcel *dcel)
 	{
 		// Get and draw i-point.
 		point = dcel->getRefPoint(i);
-		sprintf( text_Info, "%d", i+1);
-		this->drawText( point->getX(), point->getY(), text_Info);
+		sprintf(text_Info, "%d", i+1);
+		this->drawText(point->getX(), point->getY(), text_Info);
 #ifdef DEBUG_DRAW_POINTS_INFO
 		Logging::buildText(__FUNCTION__, __FILE__, "Drawing point ");
 		Logging::buildText(__FUNCTION__, __FILE__, point);
-		Logging::write( true, Info);
+		Logging::write(true, Info);
 #endif
 
 	}
@@ -1070,7 +1070,7 @@ void Draw::drawEdgesInfo(Dcel *dcel)
 #ifdef DEBUG_DRAW_FACES_INFO
 	Logging::buildText(__FUNCTION__, __FILE__, "# edges to draw: ");
 	Logging::buildText(__FUNCTION__, __FILE__, dcel->getNEdges());
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
 
 	// Loop all edges.
@@ -1083,18 +1083,18 @@ void Draw::drawEdgesInfo(Dcel *dcel)
 			if (!dcel->hasNegativeVertex(edgeIndex+1))
 			{
 				// Get edge extreme points.
-				dcel->getEdgePoints( edgeIndex, origin, dest);
+				dcel->getEdgePoints(edgeIndex, origin, dest);
 
 				// Compute middle point of edge.
-				Point<TYPE>::middlePoint( &origin, &dest, &middle);
+				Point<TYPE>::middlePoint(&origin, &dest, &middle);
 
 				// Print information.
-				sprintf( text_Info, "%d - %d", edgeIndex+1, dcel->getTwin(edgeIndex));
-				this->drawText( middle.getX(), middle.getY(), text_Info);
+				sprintf(text_Info, "%d - %d", edgeIndex+1, dcel->getTwin(edgeIndex));
+				this->drawText(middle.getX(), middle.getY(), text_Info);
 #ifdef DEBUG_DRAW_EDGES_INFO
 				Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
 				Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-				Logging::write( true, Info);
+				Logging::write(true, Info);
 #endif
 			}
 #ifdef DEBUG_DRAW_EDGES_INFO
@@ -1102,7 +1102,7 @@ void Draw::drawEdgesInfo(Dcel *dcel)
 			{
 				Logging::buildText(__FUNCTION__, __FILE__, "Negative vertex in edge ");
 				Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-				Logging::write( true, Info);
+				Logging::write(true, Info);
 			}
 #endif
         }
@@ -1111,7 +1111,7 @@ void Draw::drawEdgesInfo(Dcel *dcel)
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "Twin edge already drawn ");
 			Logging::buildText(__FUNCTION__, __FILE__, dcel->getTwin(edgeIndex));
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 		}
 #endif
 	}
@@ -1140,19 +1140,19 @@ void Draw::drawFacesInfo(Dcel *dcel)
 #ifdef DEBUG_DRAW_FACES_INFO
 	Logging::buildText(__FUNCTION__, __FILE__, "# faces to draw: ");
 	Logging::buildText(__FUNCTION__, __FILE__, dcel->getNFaces());
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
 
 	// Loop all faces (skip external face).
 	for (faceId=0; faceId<dcel->getNFaces() ;faceId++)
 	{
 		// If any vertex is imaginary then face is not drawn.
-		if (!dcel->imaginaryFace( faceId))
+		if (!dcel->imaginaryFace(faceId))
 		{
 #ifdef DEBUG_DRAW_FACES_INFO
-			Logging::buildText( __FUNCTION__, __FILE__,"Drawing face id ");
-			Logging::buildText( __FUNCTION__, __FILE__, faceId);
-			Logging::write( true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__,"Drawing face id ");
+			Logging::buildText(__FUNCTION__, __FILE__, faceId);
+			Logging::write(true, Info);
 #endif
 			// Get edge in current face.
 			firstEdgeIndex = dcel->getFaceEdge(faceId)-1;
@@ -1161,37 +1161,37 @@ void Draw::drawFacesInfo(Dcel *dcel)
 			do
 			{
 #ifdef DEBUG_DRAW_FACES_INFO
-				Logging::buildText( __FUNCTION__, __FILE__,"Adding point ");
-				Logging::buildText( __FUNCTION__, __FILE__, dcel->getOrigin(edgeIndex));
-				Logging::write( true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__,"Adding point ");
+				Logging::buildText(__FUNCTION__, __FILE__, dcel->getOrigin(edgeIndex));
+				Logging::write(true, Info);
 #endif
 				// Add origin point to polygon.
-				origin = *dcel->getRefPoint( dcel->getOrigin(edgeIndex)-1);
-				polygon.add( &origin);
+				origin = *dcel->getRefPoint(dcel->getOrigin(edgeIndex)-1);
+				polygon.add(&origin);
 
 				// Next edge in face.
 				edgeIndex = dcel->getNext(edgeIndex)-1;
 			} while(edgeIndex != firstEdgeIndex);
 
 #ifdef DEBUG_DRAW_FACES_INFO
-			Logging::buildText( __FUNCTION__, __FILE__,"Number of points in polygon is ");
-			Logging::buildText( __FUNCTION__, __FILE__, points.getNElements());
-			Logging::write( true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__,"Number of points in polygon is ");
+			Logging::buildText(__FUNCTION__, __FILE__, points.getNElements());
+			Logging::write(true, Info);
 #endif
 			// Compute face centroid.
-			polygon.centroid( center);
+			polygon.centroid(center);
 			polygon.reset();
 
 			// Print information.
-			sprintf( text_Info, "%d", faceId);
-			this->drawText( center.getX(), center.getY(), text_Info);
+			sprintf(text_Info, "%d", faceId);
+			this->drawText(center.getX(), center.getY(), text_Info);
 		}
 #ifdef DEBUG_DRAW_FACES_INFO
 		else
 		{
-			Logging::buildText( __FUNCTION__, __FILE__, "Face not drawn because of negative vertex. Face id ");
-			Logging::buildText( __FUNCTION__, __FILE__, faceId);
-			Logging::write( true, Info);
+			Logging::buildText(__FUNCTION__, __FILE__, "Face not drawn because of negative vertex. Face id ");
+			Logging::buildText(__FUNCTION__, __FILE__, faceId);
+			Logging::write(true, Info);
 		}
 #endif
 	}
@@ -1205,22 +1205,22 @@ void Draw::drawFacesInfo(Dcel *dcel)
 * GLOBAL:	NONE
 * Description: 	draw the DCEL data and all its information.
 ***************************************************************************/
-void Draw::drawInfo( Dcel *dcel)
+void Draw::drawInfo(Dcel *dcel)
 {
 	// Points information.
-	this->setColor( WHITE);
-	this->setFont( GLUT_BITMAP_HELVETICA_10);
-	this->drawPointsInfo( dcel);
+	this->setColor(WHITE);
+	this->setFont(GLUT_BITMAP_HELVETICA_10);
+	this->drawPointsInfo(dcel);
 
 	// Edges information.
-	this->setColor( LIGHT_BLUE);
-	this->setFont( GLUT_BITMAP_HELVETICA_12);
-	this->drawEdgesInfo( dcel);
+	this->setColor(LIGHT_BLUE);
+	this->setFont(GLUT_BITMAP_HELVETICA_12);
+	this->drawEdgesInfo(dcel);
 
 	// Faces information.
-	this->setColor( YELLOW);
-	this->setFont( GLUT_BITMAP_HELVETICA_18);
-	this->drawFacesInfo( dcel);
+	this->setColor(YELLOW);
+	this->setFont(GLUT_BITMAP_HELVETICA_18);
+	this->drawFacesInfo(dcel);
 }
 
 /***************************************************************************
@@ -1235,7 +1235,7 @@ void Draw::drawInfo( Dcel *dcel)
 * Description: 	draw the DCEL data, the segment between p1 and p2 and
 * 				highlights the faces between both points.
 ***************************************************************************/
-void Draw::drawPath( Dcel *dcel, Point<TYPE> *p1, Point<TYPE> *p2, Queue<int> &queue)
+void Draw::drawPath(Dcel *dcel, Point<TYPE> *p1, Point<TYPE> *p2, Queue<int> &queue)
 {
 	int		i=0;			// Counters.
 	int		nElements=0;	// # elements in queue.
@@ -1244,7 +1244,7 @@ void Draw::drawPath( Dcel *dcel, Point<TYPE> *p1, Point<TYPE> *p2, Queue<int> &q
 	// Draw line.
 	line = Line(*p1, *p2);
 	this->setColor(YELLOW);
-	this->draw( &line);
+	this->draw(&line);
 
 	// Draw input DCEL.
 	this->draw(dcel, INVALID);
@@ -1262,86 +1262,4 @@ void refresh(void)
 {
 	glutPostRedisplay();
 }
-
-
-/****************************************************************************************************************************************************/
-// PENDING ARE USED THESE FUNCTIONS????
-/***************************************************************************
-* Name: 	drawFindFace
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draw the set of points and its convex hull.
-***************************************************************************/
-/*
-void Draw::drawFindFace(Dcel *dcel, Point<float> point, int faceId)
-{
-	this->clear();
-
-	// Draw triangulation.
-	this->draw(this->process->getDcel());
-
-	// Draw two closest points.
-	this->setPointSize(5.0);
-	this->setColor(YELLOW);
-	this->draw(&point);
-	if (!dcel->imaginaryFace(faceId))
-	{
-		this->setPointSize(5.0);
-		this->setColor(GREEN);
-		this->draw( dcel->getRefFace(faceId), dcel);
-	}
-	this->flush();
-}
-*/
-
-
-/***************************************************************************
-* Name: 	draw
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: draw vertex point.
-***************************************************************************/
-/*
-void Draw::draw( Vertex *vertex)
-{
-	// Draw point.
-	draw( vertex->getRefPoint());
-}
-*/
-
-
-
-
-
-
-
-/***************************************************************************
-* Name: 		draw
-* IN:			polyline	polyline to draw
-* OUT:			NONE
-* RETURN:		NONE
-* GLOBAL:		NONE
-* Description: 	draws a polyline.
-***************************************************************************/
-/*
-void Draw::draw( Polyline *polyline)
-{
-	int	i=0;			// Loop counter.
-	Line *line;			// Current line.
-
-	// Loop all lines in polyline.
-	for (i=0; i<polyline->getLength() ;i++)
-	{
-		// Get line at i-th position.
-		line = polyline->at( i);
-
-		// Draw line.
-		draw( line);
-	}
-}
-*/
 
