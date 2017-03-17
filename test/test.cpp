@@ -173,6 +173,16 @@ TestType Test::getTypeTest(string testName)
 	{
 		type = TEST_DELAUNAY_COMPARE;
 	}
+	// Test convex hull.
+	else if (testName.compare(TEST_CONVEXHULL_NAME) == 0)
+	{
+		type = TEST_CONVEXHULL;
+	}
+	// Compare already built convex hull.
+	else if (testName.compare(TEST_CONVEXHULL_COMPARE_NAME) == 0)
+	{
+		type = TEST_CONVEXHULL_COMPARE;
+	}
 	// Test build Voronoi areas.
 	else if (testName.compare(TEST_VORONOI_NAME) == 0)
 	{

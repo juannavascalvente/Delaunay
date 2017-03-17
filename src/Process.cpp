@@ -220,6 +220,11 @@ bool Process::readData(int option)
 ***************************************************************************/
 void Process::resetData()
 {
+	// Check if Delaunay must be reset.
+	if (this->status.isDelaunayCreated())
+	{
+		this->delaunay.reset();
+	}
 	// Check if voronoi must be reset.
 	if (this->status.isVoronoiCreated())
 	{
@@ -790,6 +795,8 @@ void Process::execute(void)
 			if (this->buildConvexHull())
 			{
                 // Convex hull.
+				//Set<int> *convexHullEdges = this->delaunay.getConvexHullEdges();
+				//convexHullEdges->write("/home/juan/projects/delaunay/code/data/samples/test/input/convexHull/gold/convexHull1_4.txt");
 				this->drawer->drawFigures(CONVEXHULL_DRAW);
 			}
 			else

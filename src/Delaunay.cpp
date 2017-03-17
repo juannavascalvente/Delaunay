@@ -38,40 +38,6 @@
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-//Delaunay::Delaunay()
-//{
-//	try
-//	{
-//		this->algorithm= NONE;
-//		this->dcel = NULL;
-//		this->graph = NULL;
-//		this->graphAllocated = false;
-//		this->hull = new Polygon(DEFAUTL_CONVEXHULL_LEN);
-//		this->convexHullComputed = false;
-//	}
-//	catch (std::bad_alloc& ba)
-//	{
-//		std::cerr << "bad_alloc caught: " << ba.what() << endl;
-//	}
-//}
-//
-//Delaunay::Delaunay(Dcel *dcel)
-//{
-//	try
-//	{
-//		this->algorithm= NONE;
-//		this->dcel = dcel;
-//		this->graphAllocated = true;
-//		this->graph = new Graph(this->dcel->getNVertex()*10);
-//		this->hull = new Polygon(DEFAUTL_CONVEXHULL_LEN);
-//		this->convexHullComputed = false;
-//	}
-//	catch (std::bad_alloc& ba)
-//	{
-//		std::cerr << "bad_alloc caught: " << ba.what() << endl;
-//	}
-//}
-
 Delaunay::~Delaunay()
 {
 	this->dcel = NULL;
@@ -102,6 +68,8 @@ void Delaunay::reset()
 	this->algorithm = NONE;
 	this->setGraphAllocated(false);
 	this->setConvexHullComputed(false);
+	this->hull.reset();
+	this->hullEdges.reset();
 }
 
 /***************************************************************************

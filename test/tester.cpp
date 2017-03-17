@@ -7,6 +7,7 @@
 
 #include "Parameter.h"
 #include "tester.h"
+#include "testConvexHull.h"
 #include "testDcel.h"
 #include "testDelaunay.h"
 #include "testPath.h"
@@ -17,6 +18,8 @@
 #define OUT_FOLDER_SET					"./data/tests/log/setTest/"
 #define OUT_FOLDER_DELAUNAY				"./data/tests/log/delaunay/"
 #define OUT_FOLDER_DELAUNAY_COMP		"./data/tests/log/delaunayCompare/"
+#define OUT_FOLDER_CONVEXHULL			"./data/tests/log/convexHull/"
+#define OUT_FOLDER_CONVEXHULL_COMP		"./data/tests/log/convexHullCompare/"
 #define OUT_FOLDER_VORONOI				"./data/tests/log/voronoi/"
 #define OUT_FOLDER_VORONOI_COMP			"./data/tests/log/voronoiCompare/"
 #define OUT_FOLDER_DELAUNAY_PATH		"./data/tests/log/delaunayPath/"
@@ -122,13 +125,14 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DCEL" << endl;
 #endif
-			test = new TestDcel("testDcel.txt", OUT_FOLDER_DCEL, true);
+			test = new TestDcel("testDcel.txt", OUT_FOLDER_SET, true);
+
 			break;
 		}
 		case TEST_DELAUNAY:
 		{
 #ifdef DEBUG_TESTER_CREATEINSTANCE
-			cout << "Creating TEST_DELAUNAY" << endl;
+			cout << "Creating TEST_DELAUNAY_BUILD" << endl;
 #endif
 			test = new TestDelaunayBuild("testDelaunay.txt", OUT_FOLDER_DELAUNAY, true);
 			break;
@@ -136,9 +140,25 @@ Test* Tester::createTestInstance(TestType type)
 		case TEST_DELAUNAY_COMPARE:
 		{
 #ifdef DEBUG_TESTER_CREATEINSTANCE
-			cout << "Creating TEST_DELAUNAY" << endl;
+			cout << "Creating TEST_DELAUNAY_COMPARE" << endl;
 #endif
 			test = new TestDelaunayCompare("testDelaunayCompare.txt", OUT_FOLDER_DELAUNAY_COMP, true);
+			break;
+		}
+		case TEST_CONVEXHULL:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_CONVEX_HULL_BUILD" << endl;
+#endif
+			test = new TestConvexHullBuild("testConvexHull.txt", OUT_FOLDER_CONVEXHULL, true);
+			break;
+		}
+		case TEST_CONVEXHULL_COMPARE:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_CONVEX_HULL_COMPARE" << endl;
+#endif
+			test = new TestConvexHullCompare("testConvexHullCompare.txt", OUT_FOLDER_CONVEXHULL_COMP, true);
 			break;
 		}
 		case TEST_VORONOI_BUILD:
