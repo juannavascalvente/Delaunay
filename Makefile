@@ -7,7 +7,7 @@ LIBRARY=-lglut -lgomp -lGLU -lGL
 SRCEXT=cpp
 
 # Folders paths.
-INC_DIR=-I./test -I./include -I./performance -I./statistics
+INC_DIR=-I./test -I./include -I./statistics
 OBJ_DIR=./obj
 SRC_DIR=./src
 STAT_DIR=./statistics

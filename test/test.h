@@ -12,11 +12,15 @@
 #define	DEFAULT_OUTPUT_FOLDER			"."
 
 #include <string>
+#include <unistd.h>
 using namespace std;
 
+#include "Dcel.h"
+#include "Delaunay.h"
 #include "Logging.h"
 #include "Parameter.h"
 #include "Set.h"
+#include "Voronoi.h"
 
 /****************************************************************************
 // 							Data DEFITNION
@@ -107,9 +111,13 @@ public:
 	void run();
 	void finish();
 
+	// Common functions to execute tests.
+	bool buildVoronoi(Dcel& dcel, Voronoi &voronoi);
+
 	const string& getOutFolder() const {return outFolder;}
 	void setOutFolder(const string& outFolder) {this->outFolder = outFolder;}
 	const string& getTestName() const {return testName;}
 };
 
 #endif /* CODE_TEST_TEST_H_ */
+

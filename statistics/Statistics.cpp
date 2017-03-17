@@ -1,77 +1,53 @@
 /*
- * Statistics.cpp
+ * Performance.cpp
  *
  *  Created on: Nov 17, 2016
  *      Author: juan
  */
 #include "Statistics.h"
-
 #include <sys/time.h>
-
-// Internal static variables.
-Statistics *Statistics::instance=NULL;
 
 //------------------------------------------------------------------------
 // Public functions.
 //------------------------------------------------------------------------
-Statistics* Statistics::getInstance()
-{
-	if (!instance)
-	{
-		instance = new Statistics();
-	}
-
-	return(instance);
-}
-
-void Statistics::tic(void)
-{
-	this->begin = this->getTime();
-}
-
-void Statistics::toc(void)
-{
-	this->end = this->getTime();
-}
-
-void Statistics::diff(void)
+/*void Timer::diff(void)
 {
 	  // Perform the carry for the later subtraction by updating y.
-	  if (Statistics::begin.tv_usec < Statistics::end.tv_usec)
+	  if (Performance::begin.tv_usec < Performance::end.tv_usec)
 	  {
-		  int nsec = (Statistics::end.tv_usec - Statistics::begin.tv_usec) / 1000000 + 1;
-		  Statistics::end.tv_usec -= 1000000 * nsec;
-		  Statistics::end.tv_sec += nsec;
+		  int nsec = (Performance::end.tv_usec - Performance::begin.tv_usec) / 1000000 + 1;
+		  Performance::end.tv_usec -= 1000000 * nsec;
+		  Performance::end.tv_sec += nsec;
 	  }
-	  if (Statistics::begin.tv_usec - Statistics::end.tv_usec > 1000000)
+	  if (Performance::begin.tv_usec - Performance::end.tv_usec > 1000000)
 	  {
-		  int nsec = (Statistics::begin.tv_usec - Statistics::end.tv_usec) / 1000000;
-		  Statistics::end.tv_usec += 1000000 * nsec;
-		  Statistics::end.tv_sec -= nsec;
+		  int nsec = (Performance::begin.tv_usec - Performance::end.tv_usec) / 1000000;
+		  Performance::end.tv_usec += 1000000 * nsec;
+		  Performance::end.tv_sec -= nsec;
 	  }
 
 	  // Compute the time remaining to wait. tv_usec is certainly positive.
-	  Statistics::lapse.tv_sec = Statistics::begin.tv_sec - Statistics::end.tv_sec;
-	  Statistics::lapse.tv_usec = Statistics::begin.tv_usec - Statistics::end.tv_usec;
+	  Performance::lapse.tv_sec = Performance::begin.tv_sec - Performance::end.tv_sec;
+	  Performance::lapse.tv_usec = Performance::begin.tv_usec - Performance::end.tv_usec;
 }
-
-//------------------------------------------------------------------------
-// Private functions.
-//------------------------------------------------------------------------
-/***************************************************************************
-* Name: 	incremental
-* IN:		node		node whose area must be computed
-* OUT:		NONE
-* RETURN:	true		if triangulation built
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	computes the Delaunay triangulation using the incremental
-* 				algorithm.
-***************************************************************************/
-struct timeval Statistics::getTime()
+struct timeval Timer::getTime()
 {
     struct timeval time;
     gettimeofday(&time, 0);
 
     return(time);
+}
+*/
+/***************************************************************************
+* NAME: 	getInterval
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: computes the time lapse between tic and toc functions.
+***************************************************************************/
+void Timer::getInterval()
+{
+	this->diff = (this->end.tv_sec - this->begin.tv_sec) +
+				 (this->end.tv_nsec - this->begin.tv_nsec)/(double) BILLION;
 }

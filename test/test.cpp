@@ -387,3 +387,48 @@ void Test::finish()
 
 }
 
+/***************************************************************************
+* Name: 	buildVoronoi
+* IN:		dcel				dcel data that stores initial set of points
+* OUT:		voronoi				Voronoi data
+* RETURN:	true				if test executed successfully
+* 			false				i.o.c.
+* GLOBAL:	NONE
+* Description: 	builds a Voronoi diagram using the set of points of the dcel
+* 				as the set of points to build a Delaunay triangulation. If
+* 				the test fails then a file is created and the set of points
+* 				is dumped
+***************************************************************************/
+bool Test::buildVoronoi(Dcel& dcel, Voronoi &voronoi)
+{
+	bool built=true;
+	Delaunay delaunay;
+
+	// Build Delaunay triangulation.
+	delaunay.setDCEL(&dcel);
+	if (!delaunay.incremental())
+	{
+		cout << "Error building Delaunay triangulation" << endl;
+	}
+	else
+	{
+		if (voronoi.init(&dcel))
+		{
+			// Compute Voronoi diagram.
+			if (!voronoi.build())
+			{
+				cout << "Error building Voronoi" << endl;
+				built = false;
+			}
+		}
+		else
+		{
+			cout << "Error initializing Voronoi" << endl;
+			built = false;
+		}
+
+		sleep(1);
+	}
+
+	return(built);
+}

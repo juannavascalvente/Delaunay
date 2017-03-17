@@ -16,55 +16,6 @@
 //#define DEBUG_VORONOI_COMPARE_PREPARE
 //#define DEBUG_TEST_VORONOI_COMPARE
 
-bool buildVoronoi(int failedTestIndex, Dcel& dcel, Voronoi &voronoi);
-
-/***************************************************************************
-* Name: 	buildVoronoi
-* IN:		failedTestIndex		file index to create if test fails
-* 			dcel				dcel data that stores initial set of points
-* OUT:		voronoi				Voronoi data
-* RETURN:	true				if test executed successfully
-* 			false				i.o.c.
-* GLOBAL:	NONE
-* Description: 	builds a Voronoi diagram using the set of points of the dcel
-* 				as the set of points to build a Delaunay triangulation. If
-* 				the test fails then a file is created and the set of points
-* 				is dumped
-***************************************************************************/
-bool buildVoronoi(int failedTestIndex, Dcel& dcel, Voronoi &voronoi)
-{
-	bool built=true;
-	Delaunay delaunay;
-
-	// Build Delaunay triangulation.
-	delaunay.setDCEL(&dcel);
-	if (!delaunay.incremental())
-	{
-		cout << "Error building Delaunay triangulation" << endl;
-	}
-	else
-	{
-		if (voronoi.init(&dcel))
-		{
-			// Compute Voronoi diagram.
-			if (!voronoi.build())
-			{
-				cout << "Error building Voronoi" << endl;
-				built = false;
-			}
-		}
-		else
-		{
-			cout << "Error initializing Voronoi" << endl;
-			built = false;
-		}
-
-		sleep(1);
-	}
-
-	return(built);
-}
-
 /***************************************************************************
 * Name: 	main
 * IN:		NONE
@@ -131,7 +82,7 @@ void TestVoronoiBuild::main()
 				this->dump(fileName, dcel);
 
 				// Build Voronoi area.
-				if (buildVoronoi(failedTestIndex, dcel, voronoi))
+				if (this->buildVoronoi(dcel, voronoi))
 				{
 					remove(fileName.c_str());
 					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
@@ -265,7 +216,7 @@ void TestVoronoiCompare::main()
 				dcel.clean();
 
 				// Execute current test.
-				if (buildVoronoi(this->nTestFailed, dcel, voronoi))
+				if (this->buildVoronoi(dcel, voronoi))
 				{
 					if ((*voronoi.getRefDcel()) == voronoiDcel)
 					{
