@@ -125,7 +125,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DCEL" << endl;
 #endif
-			test = new TestDcel("testDcel.txt", OUT_FOLDER_SET, true);
+			test = new TestDcel("testDcel.txt", OUT_FOLDER_DCEL, true);
 
 			break;
 		}
