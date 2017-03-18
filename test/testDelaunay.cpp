@@ -30,7 +30,7 @@ void TestDelaunayBuild::main()
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
-	string		dcelFileName;		// DCEL file name.
+	string		dumpFileName;		// DCEL file name.
 
 #ifdef DEBUG_TEST_DELAUNAY_BUILD
 	// Print test parameters.
@@ -51,60 +51,32 @@ void TestDelaunayBuild::main()
 
 		for (testIndex=0; testIndex<this->nTests ;testIndex++)
 		{
-			// Execute current test.
-			delaunay.setDCEL(&dcel);
-			if (!dcel.generateRandom(currentNPoints))
+			// Build failed file name test data.
+			ostringstream convert;
+			convert << this->nTestFailed+1;
+			dumpFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
+
+			// Build incremental Delaunay triangulation.
+			if (this->buildRandomDelaunay(currentNPoints, dcel, delaunay))
 			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
-				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
-				Logging::write(true, Error);
+				Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Successful);
 			}
 			else
 			{
-#ifdef DEBUG_TEST_DELAUNAY_BUILD
-				Logging::buildText(__FUNCTION__, __FILE__, "Start building Delaunay incremental test ");
-				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
-				Logging::buildText(__FUNCTION__, __FILE__, "/");
-				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-				Logging::write(true, Info);
-				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
-				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
-				Logging::write(true, Info);
-#endif
-				// Write test data.
-				ostringstream convert;
-				convert << this->nTestFailed;
-				dcelFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
-				this->dump(dcelFileName, dcel);
-				if (delaunay.incremental())
-				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-					Logging::write(true, Successful);
-					remove(dcelFileName.c_str());
-				}
-				else
-				{
-					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay diagram in test ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-					Logging::write(true, Error);
-				}
-				sleep(1);
-
-				// Reset Delaunay data.
-				delaunay.reset();
-				this->testCounter++;
+				this->dump(dumpFileName, dcel);
 			}
 
-			// Update # points to generate.
-			currentNPoints = currentNPoints*this->deltaPoints;
+			// Reset Delaunay data.
+			delaunay.reset();
+			this->testCounter++;
 		}
+
+		// Update # points to generate.
+		currentNPoints = currentNPoints*this->deltaPoints;
 	}
 }
 

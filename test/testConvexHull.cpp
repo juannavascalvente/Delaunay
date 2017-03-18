@@ -31,7 +31,7 @@ void TestConvexHullBuild::main()
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;	// Current # points in DCEL.
-	string		dcelFileName;		// DCEL file name.
+	string 		dumpFileName;		// Input dcel file name.
 
 #ifdef DEBUG_TEST_CONEXHULL_BUILD
 	// Print test parameters.
@@ -49,70 +49,45 @@ void TestConvexHullBuild::main()
 		Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
 		Logging::write(true, Info);
 #endif
-
 		for (testIndex=0; testIndex<this->nTests ;testIndex++)
 		{
-			// Execute current test.
-			delaunay.setDCEL(&dcel);
-			if (!dcel.generateRandom(currentNPoints))
+			// Build failed file name test data.
+			ostringstream convert;
+			convert << this->nTestFailed+1;
+			dumpFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
+
+			// Build incremental Delaunay triangulation.
+			if (this->buildRandomDelaunay(currentNPoints, dcel, delaunay))
 			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in test ");
-				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-				Logging::write(true, Error);
-			}
-			else
-			{
-#ifdef DEBUG_TEST_CONEXHULL_BUILD
-				Logging::buildText(__FUNCTION__, __FILE__, "Start building Delaunay in test ");
-				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-				Logging::buildText(__FUNCTION__, __FILE__, "/");
-				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-				Logging::write(true, Info);
-				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
-				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
-				Logging::write(true, Info);
-#endif
-				// Write test data.
-				ostringstream convert;
-				convert << this->nTestFailed;
-				dcelFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
-				this->dump(dcelFileName, dcel);
-				if (delaunay.incremental())
+				if (delaunay.convexHull())
 				{
-					if (delaunay.convexHull())
-					{
-						Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-						Logging::buildText(__FUNCTION__, __FILE__, "/");
-						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-						Logging::write(true, Successful);
-						remove(dcelFileName.c_str());
-					}
-					else
-					{
-						this->nTestFailed++;
-						Logging::buildText(__FUNCTION__, __FILE__, "Error computing convex hull ");
-						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-						Logging::buildText(__FUNCTION__, __FILE__, "/");
-						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-						Logging::write(true, Error);
-					}
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+					Logging::write(true, Successful);
 				}
 				else
 				{
+					this->dump(dumpFileName, dcel);
 					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay in test ");
+					Logging::buildText(__FUNCTION__, __FILE__, "Error computing convex hull ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::buildText(__FUNCTION__, __FILE__, "/");
 					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 					Logging::write(true, Error);
 				}
+
+				// Wait 1 second so seed generation changes.
 				sleep(1);
 
 				// Reset Delaunay data.
 				delaunay.reset();
 				this->testCounter++;
+			}
+			else
+			{
+				this->dump(dumpFileName, dcel);
 			}
 
 			// Update # points to generate.

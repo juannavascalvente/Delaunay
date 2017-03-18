@@ -109,95 +109,59 @@ void TestPathDelaunay::main()
 
 		for (testIndex=0; testIndex<this->nTests ;testIndex++)
 		{
-			// Execute current test.
-			delaunay.setDCEL(&dcel);
-			if (!dcel.generateRandom(currentNPoints))
-			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
-				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
-				Logging::write(true, Error);
-			}
-			else
-			{
-#ifdef DEBUG_FIND_DELAUNAY_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Start Delaunay path test ");
-				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
-				Logging::buildText(__FUNCTION__, __FILE__, "/");
-				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-				Logging::write(true, Info);
-				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
-				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
-				Logging::write(true, Info);
-#endif
-				// Generate random points.
-				p1.random();
-				p2.random();
-				line = Line(p1, p2);
+			// Build failed file name test data.
+			ostringstream convert;
+			convert << this->nTestFailed+1;
+			pointsFileName = this->outFolder + "Points_" + convert.str() + ".txt";
+			dcelFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
 
-				// Write test data.
-				ostringstream convert;
-				convert << this->nTestFailed;
-				pointsFileName = this->outFolder + "Points_" + convert.str() + ".txt";
-				dcelFileName = this->outFolder + "DCEL_" + convert.str() + ".txt";
-				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
-				if (delaunay.incremental())
+			// Build incremental Delaunay triangulation.
+			if (this->buildRandomDelaunay(currentNPoints, dcel, delaunay))
+			{
+				// Compute triangles path between two points.
+				if (delaunay.findPath(line, faces))
 				{
+					// Print test results
 #ifdef DEBUG_FIND_DELAUNAY_PATH
-					Logging::buildText(__FUNCTION__, __FILE__, "Start find path");
+					Logging::buildText(__FUNCTION__, __FILE__, "Faces in the path:");
+					for (i=0; i<faces.getNElements() ;i++)
+					{
+						Logging::buildText(__FUNCTION__, __FILE__, " ");
+						Logging::buildText(__FUNCTION__, __FILE__, *faces.at(i));
+					}
 					Logging::write( true, Info);
 #endif
-					// Compute triangles path between two points.
-					if (delaunay.findPath(line, faces))
-					{
-						// Remove files because test did not fail.
-						remove(pointsFileName.c_str());
-						remove(dcelFileName.c_str());
-
-						// Print test results
-#ifdef DEBUG_FIND_DELAUNAY_PATH
-						Logging::buildText(__FUNCTION__, __FILE__, "Faces in the path:");
-						for (i=0; i<faces.getNElements() ;i++)
-						{
-							Logging::buildText(__FUNCTION__, __FILE__, " ");
-							Logging::buildText(__FUNCTION__, __FILE__, *faces.at(i));
-						}
-						Logging::write( true, Info);
-#endif
-						Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
-						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-						Logging::buildText(__FUNCTION__, __FILE__, "/");
-						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-						Logging::write( true, Successful);
-					}
-					else
-					{
-						this->nTestFailed++;
-						Logging::buildText(__FUNCTION__, __FILE__, \
-										"Line does not intersect set of points in test ");
-						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-						Logging::write( true, Error);
-					}
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+					Logging::write( true, Successful);
 				}
 				else
 				{
+					this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
 					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay in test ");
+					Logging::buildText(__FUNCTION__, __FILE__, \
+									"Line does not intersect set of points in test ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::write(true, Error);
+					Logging::write( true, Error);
 				}
-
-				// Reset Delaunay data.
-				sleep(1);
-				delaunay.reset();
 			}
+			else
+			{
+				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
+			}
+
+			// Wait 1 second so seed generation changes.
+			sleep(1);
+
+			// Reset Delaunay data.
+			delaunay.reset();
+			this->testCounter++;
 		}
 
 		// Update # points to generate.
 		currentNPoints = currentNPoints*this->deltaPoints;
-
-		// Update test counter.
-		this->testCounter++;
 	}
 }
 

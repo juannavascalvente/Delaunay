@@ -112,6 +112,7 @@ public:
 	void finish();
 
 	// Common functions to execute tests.
+	bool buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay);
 	bool buildVoronoi(Dcel& dcel, Voronoi &voronoi);
 
 	const string& getOutFolder() const {return outFolder;}
