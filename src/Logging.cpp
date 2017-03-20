@@ -78,11 +78,9 @@ void Logging::buildText(string text)
 ***************************************************************************/
 void Logging::buildTestHeader(int testId, int nTests, string testName)
 {
-	string ResultTestId;
 	ostringstream convertTestId;
 	convertTestId << testId;
 
-	string ResultnTests;
 	ostringstream convertnTests;
 	convertnTests << nTests;
 

@@ -145,6 +145,11 @@ void TestDelaunayCompare::main()
 	// Read all files.
 	for (i=0; i<this->filesList.getNElements() ;i++)
 	{
+		// Build file name where data is written if test fails.
+		ostringstream convert;
+		convert << this->nTestFailed;
+		outFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
+
 		// Open file.
 		dcelFileName = *this->filesList.at(i);
 		if (!originalDcel.read(dcelFileName, false))
@@ -152,62 +157,47 @@ void TestDelaunayCompare::main()
 			this->nTestFailed++;
 			Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
 			Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
+			Logging::buildText(__FUNCTION__, __FILE__, " in test ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+			Logging::buildText(__FUNCTION__, __FILE__, "/");
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 			Logging::write(true, Error);
 		}
-		else if (!dcel.readPoints(dcelFileName, false))
+		else if (this->readDelaunay(dcelFileName, dcel, delaunay))
 		{
-			this->nTestFailed++;
-			Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file: ");
-			Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
-			Logging::write(true, Error);
-		}
-		else
-		{
-			// Reset dcel to remove all data except point coordinates.
-			dcel.clean();
-
-			// Execute current test.
-			delaunay.setDCEL(&dcel);
-			if (!delaunay.incremental())
+			if (dcel == originalDcel)
 			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Failed test id: ");
-				Logging::buildText(__FUNCTION__, __FILE__, i+1);
-				Logging::write(true, Error);
+				Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Successful);
 			}
 			else
 			{
-				if (dcel == originalDcel)
-				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-					Logging::write(true, Successful);
-				}
-				else
-				{
-					this->nTestFailed++;
+				this->nTestFailed++;
 
-					// Write test data.
-					ostringstream convert;
-					convert << this->nTestFailed;
-					outFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
-					this->dump(outFileName, dcel);
+				// Write test data.
+				this->dump(outFileName, dcel);
 
-					// Print log error.
-					Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
-					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::write(true, Error);
-				}
+				// Print log error.
+				Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
 			}
-
-			// Reset Delaunay data.
-			this->testCounter++;
-			delaunay.reset();
-			originalDcel.reset();
-			dcel.reset();
 		}
+		else
+		{
+			this->dump(outFileName, dcel);
+		}
+
+		// Reset test data.
+		this->testCounter++;
+		delaunay.reset();
+		originalDcel.reset();
+		dcel.reset();
 	}
 }
 

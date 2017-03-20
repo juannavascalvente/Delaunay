@@ -112,12 +112,16 @@ public:
 	void finish();
 
 	// Common functions to execute tests.
+	bool readDelaunay(string filName, Dcel &dcel, Delaunay &delaunay);
 	bool buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay);
-	bool buildVoronoi(Dcel& dcel, Voronoi &voronoi);
+	bool readVoronoi(string filName, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi);
+	bool buildVoronoi(int nPoints, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi);
 
 	const string& getOutFolder() const {return outFolder;}
 	void setOutFolder(const string& outFolder) {this->outFolder = outFolder;}
 	const string& getTestName() const {return testName;}
+	int getTestFailed() const {return nTestFailed;}
+	int getTotalTests() const {return totalTests;}
 };
 
 #endif /* CODE_TEST_TEST_H_ */

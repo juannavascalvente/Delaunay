@@ -43,8 +43,7 @@ Delaunay::~Delaunay()
 	this->dcel = NULL;
 	if (this->graph != NULL)
 	{
-		//this->graph->~Graph();
-		// PENDING TO UNCOMMENT.
+		// Delete graph.
 		delete this->graph;
 	}
 	this->setGraphAllocated(false);

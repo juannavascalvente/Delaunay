@@ -35,6 +35,8 @@ void Tester::main()
 	int	 i=0;						// Loop counter.
 	Test *currentTest;				// Pointer to current test.
 	int	nTests=0;					// # tests to execute.
+	int	totalTests=0;
+	int	totalTestsFailed=0;
 
 	// Read tests.
 	if (this->readTests())
@@ -46,6 +48,28 @@ void Tester::main()
 			currentTest = *this->tests.at(i);
 			this->log.buildTestHeader((i+1), nTests, currentTest->getTestName());
 			currentTest->run();
+			totalTests = totalTests + currentTest->getTotalTests();
+			totalTestsFailed = totalTestsFailed + currentTest->getTestFailed();
+		}
+
+		ostringstream convertnTestsSuccess;
+		convertnTestsSuccess << totalTests - totalTestsFailed;
+		ostringstream convertnTests;
+		convertnTests << totalTests;
+
+		Logging::buildText("**********************************************\n");
+		Logging::buildText("Tets resume ");
+		Logging::buildText(convertnTestsSuccess.str());
+		Logging::buildText("/");
+		Logging::buildText(convertnTests.str());
+		Logging::buildText("\n**********************************************");
+		if (totalTestsFailed == 0)
+		{
+			Logging::write(true, Testing);
+		}
+		else
+		{
+			Logging::write(true, Error);
 		}
 
 		// Deallocate resources.

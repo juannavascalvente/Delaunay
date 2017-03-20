@@ -152,9 +152,6 @@ void TestPathDelaunay::main()
 				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
 			}
 
-			// Wait 1 second so seed generation changes.
-			sleep(1);
-
 			// Reset Delaunay data.
 			delaunay.reset();
 			this->testCounter++;
@@ -218,54 +215,32 @@ void TestPathDelaunayCompare::main()
 			Logging::buildText(__FUNCTION__, __FILE__, facesFileName);
 			Logging::write(true, Info);
 #endif
-			if (!dcel.readPoints(dcelFileName, false))
+			if (this->readDelaunay(dcelFileName, dcel, delaunay))
 			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
-				Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
-				Logging::write(true, Error);
-			}
-			else if (!originalPointsSet.read(pointsFileName))
-			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of points: ");
-				Logging::buildText(__FUNCTION__, __FILE__, pointsFileName);
-				Logging::write(true, Error);
-			}
-			else if (!originalFacesSet.read(facesFileName))
-			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of faces: ");
-				Logging::buildText(__FUNCTION__, __FILE__, facesFileName);
-				Logging::write(true, Error);
-			}
-			else
-			{
-#ifdef DEBUG_FIND_DELAUNAY_PATH_COMPARE
-				Logging::buildText(__FUNCTION__, __FILE__, "Start execution");
-				Logging::write(true, Info);
-#endif
-				// Reset dcel to remove all data except point coordinates.
-				dcel.clean();
-
-				// Execute current test.
-				delaunay.setDCEL(&dcel);
-				if (!delaunay.incremental())
+				if (!originalPointsSet.read(pointsFileName))
 				{
 					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Cannot create Delaunay. Test id: ");
-					Logging::buildText(__FUNCTION__, __FILE__, i+1);
+					Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of points: ");
+					Logging::buildText(__FUNCTION__, __FILE__, pointsFileName);
+					Logging::write(true, Error);
+				}
+				else if (!originalFacesSet.read(facesFileName))
+				{
+					this->nTestFailed++;
+					Logging::buildText(__FUNCTION__, __FILE__, "Error reading set of faces: ");
+					Logging::buildText(__FUNCTION__, __FILE__, facesFileName);
 					Logging::write(true, Error);
 				}
 				else
 				{
+	#ifdef DEBUG_FIND_DELAUNAY_PATH_COMPARE
+					Logging::buildText(__FUNCTION__, __FILE__, "Start Dleunay path execution");
+					Logging::write(true, Info);
+	#endif
 					p1 = *originalPointsSet.at(0);
 					p2 = *originalPointsSet.at(1);
 					line = Line(p1, p2);
-#ifdef DEBUG_FIND_DELAUNAY_PATH_COMPARE
-					Logging::buildText(__FUNCTION__, __FILE__, "Searching path");
-					Logging::write(true, Info);
-#endif
+
 					// Compute triangles path between two points.
 					testIndex++;
 					if (delaunay.findPath(line, facesSet))
@@ -392,7 +367,6 @@ void TestPathVoronoi::main()
 	double distance=0.0;		// Distance between points.
 	int	 initialFace=0;			// Initial face in the path.
 	int	 finalFace=0;			// Final face in the path.
-	Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
 	Set<int> extremeFaces(DEFAULT_QUEUE_SIZE);		// Set of faces.
 	Set<int> pathFaces;
 	string pointsFileName;			// Points file name.
@@ -408,36 +382,11 @@ void TestPathVoronoi::main()
 	currentNPoints = this->nPoints;
 	for (stepIndex=0; stepIndex<this->nSteps ;stepIndex++)
 	{
-#ifdef DEBUG_FIND_VORONOI_PATH
-		Logging::buildText(__FUNCTION__, __FILE__, "Executing step ");
-		Logging::buildText(__FUNCTION__, __FILE__, (stepIndex+1));
-		Logging::buildText(__FUNCTION__, __FILE__, "/");
-		Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
-		Logging::write(true, Info);
-#endif
 		for (testIndex=0; testIndex< this->nTests ;testIndex++)
 		{
-			// Execute current test.
-			delaunay.setDCEL(&dcel);
-			if (!dcel.generateRandom(currentNPoints))
+			// Build Voronoi area.
+			if (this->buildVoronoi(currentNPoints, dcel, delaunay, voronoi))
 			{
-				this->nTestFailed++;
-				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in iteration ");
-				Logging::buildText(__FUNCTION__, __FILE__, (testIndex+1));
-				Logging::write(true, Error);
-			}
-			else
-			{
-#ifdef DEBUG_FIND_VORONOI_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Start Voronoi path test ");
-				Logging::buildText(__FUNCTION__, __FILE__, testIndex+1);
-				Logging::buildText(__FUNCTION__, __FILE__, "/");
-				Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
-				Logging::write(true, Info);
-				Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
-				Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
-				Logging::write(true, Info);
-#endif
 				// Generate random points.
 				p1.random();
 				p2.random();
@@ -448,96 +397,77 @@ void TestPathVoronoi::main()
 				convert << this->nTestFailed;
 				pointsFileName = this->outFolder + "Points_" + convert.str() + ".txt";
 				dcelFileName = this->outFolder + "DCEL_" + convert.str() + ".txt";
-				this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
-
-				// Create Delaunay triangulation.
-				if (delaunay.incremental())
+#ifdef DEBUG_FIND_VORONOI_PATH
+				Logging::buildText(__FUNCTION__, __FILE__, "Locating initial faces");
+				Logging::write(true, Info);
+#endif
+				if (delaunay.findClosestPoint(p1, voronoi, closest, initialFace, distance) &&
+					delaunay.findClosestPoint(p2, voronoi, closest, finalFace, distance))
 				{
-					// Initialize Voronoi.
-					if (!voronoi.init(&dcel))
+					// Add faces to set.
+					extremeFaces.add(initialFace+1);
+					extremeFaces.add(finalFace+1);
+#ifdef DEBUG_FIND_VORONOI_PATH
+					Logging::buildText(__FUNCTION__, __FILE__, "Computing Voronoi path");
+					Logging::write(true, Info);
+#endif
+					// Compute triangles path between two points.
+					if (voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces))
 					{
-						this->nTestFailed++;
-						Logging::buildText(__FUNCTION__, __FILE__, "Error initializing Voronoi.");
-						Logging::write(true, Error);
-					}
-					// Build Voronoi.
-					else if (!voronoi.build())
-					{
-						this->nTestFailed++;
-						Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi.");
-						Logging::write(true, Error);
+						// Print test results
+#ifdef DEBUG_FIND_VORONOI_PATH
+						Logging::buildText(__FUNCTION__, __FILE__, "Faces in the path:");
+						for (i=0; i<pathFaces.getNElements() ;i++)
+						{
+							Logging::buildText(__FUNCTION__, __FILE__, " ");
+							Logging::buildText(__FUNCTION__, __FILE__, *pathFaces.at(i));
+						}
+						Logging::write( true, Info);
+#endif
+						Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
+						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+						Logging::buildText(__FUNCTION__, __FILE__, "/");
+						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+						Logging::write( true, Successful);
 					}
 					else
 					{
-#ifdef DEBUG_FIND_VORONOI_PATH
-						Logging::buildText(__FUNCTION__, __FILE__, "Locating initial faces");
-						Logging::write(true, Info);
-#endif
-						extremeFaces.reset();
-						if (delaunay.findClosestPoint(p1, voronoi, closest, initialFace, distance) &&
-							delaunay.findClosestPoint(p2, voronoi, closest, finalFace, distance))
-						{
-							// Add faces to set.
-							extremeFaces.add(initialFace+1);
-							extremeFaces.add(finalFace+1);
-#ifdef DEBUG_FIND_VORONOI_PATH
-							Logging::buildText(__FUNCTION__, __FILE__, "Computing Voronoi path");
-							Logging::write(true, Info);
-#endif
-							// Compute triangles path between two points.
-							pathFaces.reset();
-							if (voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces))
-							{
-								// Remove files because test did not fail.
-								remove(pointsFileName.c_str());
-								remove(dcelFileName.c_str());
-
-								// Print test results
-#ifdef DEBUG_FIND_VORONOI_PATH
-								Logging::buildText(__FUNCTION__, __FILE__, "Faces in the path:");
-								for (i=0; i<pathFaces.getNElements() ;i++)
-								{
-									Logging::buildText(__FUNCTION__, __FILE__, " ");
-									Logging::buildText(__FUNCTION__, __FILE__, *pathFaces.at(i));
-								}
-								Logging::write( true, Info);
-#endif
-								Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
-								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-								Logging::buildText(__FUNCTION__, __FILE__, "/");
-								Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-								Logging::write( true, Successful);
-							}
-							else
-							{
-								this->nTestFailed++;
-								Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in test ");
-								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-								Logging::write( true, Error);
-							}
-						}
-						else
-						{
-							this->nTestFailed++;
-							Logging::buildText(__FUNCTION__, __FILE__, "Error finding initial faces in Voronoi path in test ");
-							Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-							Logging::write( true, Error);
-						}
+						this->nTestFailed++;
+						Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in test ");
+						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+						Logging::buildText(__FUNCTION__, __FILE__, "/");
+						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+						Logging::write( true, Error);
+						this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
 					}
 				}
 				else
 				{
 					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi path in test ");
+					Logging::buildText(__FUNCTION__, __FILE__, "Error finding initial faces in Voronoi path in test ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::write(true, Error);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+					Logging::write( true, Error);
+					this->dump(pointsFileName, dcelFileName, p1, p2, dcel);
 				}
-
-				// Reset Delaunay data.
-				sleep(1);
-				delaunay.reset();
-				voronoi.reset();
 			}
+			else
+			{
+				this->nTestFailed++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error generating data set in test ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
+			}
+
+			// Reset Delaunay data.
+			dcel.reset();
+			delaunay.reset();
+			voronoi.reset();
+			pathFaces.reset();
+			extremeFaces.reset();
 		}
 
 		// Update # points to generate.
@@ -609,7 +539,8 @@ void TestPathVoronoiCompare::main()
 			Logging::buildText(__FUNCTION__, __FILE__, facesFileName);
 			Logging::write(true, Info);
 #endif
-			if (!dcel.readPoints(dcelFileName, false))
+			//if (!dcel.readPoints(dcelFileName, false))
+			if (!readVoronoi(dcelFileName, dcel, delaunay, voronoi))
 			{
 				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
@@ -636,85 +567,56 @@ void TestPathVoronoiCompare::main()
 				Logging::buildText(__FUNCTION__, __FILE__, "Start execution");
 				Logging::write(true, Info);
 #endif
-				// Reset dcel to remove all data except point coordinates.
-				dcel.clean();
-
-				// Execute current test.
-				delaunay.setDCEL(&dcel);
-				if (!delaunay.incremental())
-				{
-					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Cannot create Delaunay. Test id: ");
-					Logging::buildText(__FUNCTION__, __FILE__, i+1);
-					Logging::write(true, Error);
-				}
-				// Initialize Voronoi.
-				else if (!voronoi.init(&dcel))
-				{
-					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error initializing Voronoi.");
-					Logging::write(true, Error);
-				}
-				// Build Voronoi.
-				else if (!voronoi.build())
-				{
-					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi.");
-					Logging::write(true, Error);
-				}
-				else
-				{
-					// Get points from file.
-					p1 = *originalPointsSet.at(0);
-					p2 = *originalPointsSet.at(1);
-					line = Line(p1, p2);
+				// Get points from file.
+				p1 = *originalPointsSet.at(0);
+				p2 = *originalPointsSet.at(1);
+				line = Line(p1, p2);
 
 #ifdef DEBUG_FIND_VORONOI_PATH_COMPARE
-					Logging::buildText(__FUNCTION__, __FILE__, "Locating initial faces");
+				Logging::buildText(__FUNCTION__, __FILE__, "Locating initial faces");
+				Logging::write(true, Info);
+#endif
+				if (delaunay.findClosestPoint(p1, voronoi, closest, initialFace, distance) &&
+					delaunay.findClosestPoint(p2, voronoi, closest, finalFace, distance))
+				{
+					// Add faces to set.
+					facesSet.add(initialFace+1);
+					facesSet.add(finalFace+1);
+#ifdef DEBUG_FIND_VORONOI_PATH_COMPARE
+					Logging::buildText(__FUNCTION__, __FILE__, "Computing Voronoi path");
 					Logging::write(true, Info);
 #endif
-					if (delaunay.findClosestPoint(p1, voronoi, closest, initialFace, distance) &&
-						delaunay.findClosestPoint(p2, voronoi, closest, finalFace, distance))
+					// Compute triangles path between two points.
+					if (voronoi.getRefDcel()->findPath(facesSet, line, pathFaces))
 					{
-						// Add faces to set.
-						facesSet.add(initialFace+1);
-						facesSet.add(finalFace+1);
-#ifdef DEBUG_FIND_VORONOI_PATH_COMPARE
-						Logging::buildText(__FUNCTION__, __FILE__, "Computing Voronoi path");
-						Logging::write(true, Info);
-#endif
-						// Compute triangles path between two points.
-						if (voronoi.getRefDcel()->findPath(facesSet, line, pathFaces))
+						if (pathFaces == originalFacesSet)
 						{
-							if (pathFaces == originalFacesSet)
-							{
-								Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
-								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-								Logging::buildText(__FUNCTION__, __FILE__, "/");
-								Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-								Logging::write( true, Successful);
-							}
-							else
-							{
-								this->nTestFailed++;
-								Logging::buildText(__FUNCTION__, __FILE__, "Faces sets are not equal. Test id: ");
-								Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-								Logging::buildText(__FUNCTION__, __FILE__, "/");
-								Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-								Logging::write(true, Error);
-								originalFacesSet.print();
-								pathFaces.print();
-							}
+							Logging::buildText(__FUNCTION__, __FILE__, "Test OK Id: ");
+							Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+							Logging::buildText(__FUNCTION__, __FILE__, "/");
+							Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+							Logging::write( true, Successful);
 						}
 						else
 						{
 							this->nTestFailed++;
-							Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in test ");
+							Logging::buildText(__FUNCTION__, __FILE__, "Faces sets are not equal. Test id: ");
 							Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 							Logging::buildText(__FUNCTION__, __FILE__, "/");
 							Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-							Logging::write( true, Error);
+							Logging::write(true, Error);
+							originalFacesSet.print();
+							pathFaces.print();
 						}
+					}
+					else
+					{
+						this->nTestFailed++;
+						Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path in test ");
+						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+						Logging::buildText(__FUNCTION__, __FILE__, "/");
+						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+						Logging::write( true, Error);
 					}
 				}
 

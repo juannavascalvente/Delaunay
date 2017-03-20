@@ -48,7 +48,7 @@ Graph::Graph(int size)
 		// Allocate memory initializing data.
 		this->nodes = new Node[size];
 		this->face_Node_Assign = new int[size];
-		memset( this->face_Node_Assign, 0, sizeof(int)*size);
+		memset(this->face_Node_Assign, 0, sizeof(int)*size);
 
 		this->allocated = true;
 	}
@@ -57,7 +57,7 @@ Graph::Graph(int size)
 		this->allocated = false;
 		Logging::buildText(__FUNCTION__, __FILE__, "Error allocating memory. # nodes to allocate ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->size);
-		Logging::write( true, Error);
+		Logging::write(true, Error);
 	}
 	catch (exception &ex)
 	{
@@ -71,6 +71,7 @@ Graph::~Graph()
 	// Deallocate data.
 	if (this->allocated)
 	{
+		cout << "DEALLOCATED" << endl;
 		this->allocated = false;
 		delete[] this->nodes;
 		delete[] this->face_Node_Assign;
@@ -88,15 +89,15 @@ Graph::~Graph()
 * GLOBAL:	NONE
 * Description: 	inserts a node in the last position of the nodes array.
 ***************************************************************************/
-void Graph::insert( Node &node)
+void Graph::insert(Node &node)
 {
     // Check if array is full.
     if (this->isFull())
     {
-    	this->resize( INVALID, true);
+    	this->resize(INVALID, true);
 #ifdef DEBUG_INSERT_NODE
     	Logging::buildText(__FUNCTION__, __FILE__, "Graph is full -> resizing.");
-    	Logging::write( true, Info);
+    	Logging::write(true, Info);
 #endif
     }
 
@@ -108,7 +109,6 @@ void Graph::insert( Node &node)
     {
         this->face_Node_Assign[node.getFace()] = this->nElements;
     }
-
 #ifdef DEBUG_INSERT_NODE
 	Logging::buildText(__FUNCTION__, __FILE__, "Inserting new node at position ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->nElements);
@@ -118,9 +118,8 @@ void Graph::insert( Node &node)
 	Logging::buildText(__FUNCTION__, __FILE__, node.getFace());
 	Logging::buildText(__FUNCTION__, __FILE__, " assigned to node ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->nElements);
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
-
 	// Increase number of elements.
     this->nElements++;
 }
@@ -136,19 +135,18 @@ void Graph::insert( Node &node)
 * GLOBAL:	NONE
 * Description: 	updates the node information of node at position "index".
 ***************************************************************************/
-void Graph::update( int index, int nChildren, Node *node)
+void Graph::update(int index, int nChildren, Node *node)
 {
 	try
 	{
 		// Update values of node at position index.
 		this->nodes[index] = (*node);
-
 #ifdef DEBUG_UPDATE_NODE
-		Logging::buildText( __FUNCTION__, __FILE__, "Updating node ");
-		Logging::buildText( __FUNCTION__, __FILE__, index);
-		Logging::buildText( __FUNCTION__, __FILE__, ".");
-		Logging::buildText( __FUNCTION__, __FILE__, this->nodes[index].toStr());
-		Logging::write( true, Info);
+		Logging::buildText(__FUNCTION__, __FILE__, "Updating node ");
+		Logging::buildText(__FUNCTION__, __FILE__, index);
+		Logging::buildText(__FUNCTION__, __FILE__, ".");
+		Logging::buildText(__FUNCTION__, __FILE__, this->nodes[index].toStr());
+		Logging::write(true, Info);
 #endif
 	}
 	catch (exception &ex)
@@ -169,7 +167,7 @@ void Graph::update( int index, int nChildren, Node *node)
 * RETURN:	N/A
 * Description: 	returns the three vertex id of the "node_Index" node.
 ***************************************************************************/
-void Graph::getVertices( int node_Index, int &index1, int &index2, int &index3)
+void Graph::getVertices(int node_Index, int &index1, int &index2, int &index3)
 {
 	// Get point vertexes of node at node_Index position.
 	index1 = this->nodes[node_Index].getiPoint(0);
@@ -190,7 +188,7 @@ void Graph::getVertices( int node_Index, int &index1, int &index2, int &index3)
 * 				"copy" is true then data from previous graph is copied to
 * 				the new graph.
 ***************************************************************************/
-bool Graph::resize( int size, bool copy)
+bool Graph::resize(int size, bool copy)
 {
 	this->allocated = false;
 
@@ -205,7 +203,7 @@ bool Graph::resize( int size, bool copy)
 		{
 #ifdef DEBUG_GRAPH_RESIZE
 			Logging::buildText(__FUNCTION__, __FILE__, "Copying existing data");
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 #endif
 			tmpNodes = this->nodes;
 			tmpAssigned = this->face_Node_Assign;
@@ -233,30 +231,29 @@ bool Graph::resize( int size, bool copy)
 		}
 #ifdef DEBUG_GRAPH_RESIZE
 		Logging::buildText(__FUNCTION__, __FILE__, this->size);
-		Logging::write( true, Info);
+		Logging::write(true, Info);
 #endif
-
 		// PENDING What to do if size is negative?
 		// Check if new size is negative.
 		if (this->size < 0)
 		{
 			Logging::buildText(__FUNCTION__, __FILE__, "New graph size is negative: ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->size);
-			Logging::write( true, Error);
+			Logging::write(true, Error);
 		}
 		else
 		{
 			// Allocate new memory.
 			tmpNodes = new Node[this->size];
 			tmpAssigned = new int[this->size];
-			memset( tmpAssigned, 0, sizeof(int)*this->size);
+			memset(tmpAssigned, 0, sizeof(int)*this->size);
 
 			// copy current data.
 			if (copy)
 			{
 				// Copy current data.
-				memcpy( tmpNodes, this->nodes, this->nElements*sizeof(Node));
-				memcpy( tmpAssigned, this->face_Node_Assign, this->nElements*sizeof(int));
+				memcpy(tmpNodes, this->nodes, this->nElements*sizeof(Node));
+				memcpy(tmpAssigned, this->face_Node_Assign, this->nElements*sizeof(int));
 			}
 
 			// Deallocate data.
@@ -266,11 +263,10 @@ bool Graph::resize( int size, bool copy)
 			// Reference new data.
 			this->nodes = tmpNodes;
 			this->face_Node_Assign = tmpAssigned;
-
 #ifdef DEBUG_GRAPH_RESIZE
 			Logging::buildText(__FUNCTION__, __FILE__, "Resizing graph. New size is ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->size);
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 #endif
 			this->allocated = true;
 		}
@@ -279,12 +275,12 @@ bool Graph::resize( int size, bool copy)
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Error allocating memory. New # nodes is ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->size);
-		Logging::write( true, Error);
+		Logging::write(true, Error);
 	}
 	catch (exception &ex)
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Exception.");
-		Logging::write( true, Error);
+		Logging::write(true, Error);
 		std::cout << ex.what();
 	}
 
@@ -304,11 +300,11 @@ void Graph::reset()
 {
 	// Reset variables.
 	this->nElements = 0;
-	memset( this->nodes, 0, sizeof(Node)*this->size);
-	memset( this->face_Node_Assign, 0, sizeof(int)*this->size);
+	memset(this->nodes, 0, sizeof(Node)*this->size);
+	memset(this->face_Node_Assign, 0, sizeof(int)*this->size);
 #ifdef DEBUG_GRAPH_RESET
 	Logging::buildText(__FUNCTION__, __FILE__, "Reseting graph");
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
 }
 
@@ -333,7 +329,7 @@ void Graph::print(std::ostream& out)
     // Print graph nodes.
     for (i=0; i<this->getSize() ;i++)
     {
-    	this->nodes[i].print( out);
+    	this->nodes[i].print(out);
     }
 
 	// Print face-node relations.
@@ -361,13 +357,13 @@ bool Graph::read(string fileName)
 	Node	node;
 
 #ifdef DEBUG_GRAPH_READ
-	Logging::buildText( __FUNCTION__, __FILE__, "Opening file: ");
-	Logging::buildText( __FUNCTION__, __FILE__, fileName);
-	Logging::write( true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "Opening file: ");
+	Logging::buildText(__FUNCTION__, __FILE__, fileName);
+	Logging::write(true, Info);
 #endif
 
 	// Open file.
-	ifs.open( fileName.c_str(), ios::in);
+	ifs.open(fileName.c_str(), ios::in);
 
 	// Check file is opened.
 	if (ifs.is_open())
@@ -376,13 +372,13 @@ bool Graph::read(string fileName)
 		ifs >> size;
 
 		// Initialize graph.
-		this->resize( size, false);
+		this->resize(size, false);
 
 		// Nodes main loop.
 		for (i=0; i<this->getSize() ;i++)
 		{
-			node.read( ifs);
-			this->insert( node);
+			node.read(ifs);
+			this->insert(node);
 		}
 
 		// Read face-node relations.
@@ -397,7 +393,7 @@ bool Graph::read(string fileName)
 		// Close file.
 		ifs.close();
 #ifdef DEBUG_GRAPH_READ
-		this->print( std::cout);
+		this->print(std::cout);
 #endif
 	}
 	else
@@ -405,14 +401,14 @@ bool Graph::read(string fileName)
 #ifdef DEBUG_GRAPH_READ
 	Logging::buildText(__FUNCTION__, __FILE__, "Error opening input file ");
 	Logging::buildText(__FUNCTION__, __FILE__, fileName.c_str());
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
 		read = false;
 	}
 
 #ifdef DEBUG_GRAPH_READ
-	Logging::buildText( __FUNCTION__, __FILE__, "File read successfully.");
-	Logging::write( true, Info);
+	Logging::buildText(__FUNCTION__, __FILE__, "File read successfully.");
+	Logging::write(true, Info);
 #endif
 
 	return(read);
@@ -435,7 +431,7 @@ bool Graph::write(string fileName)
 	int	i=0;			// Loop counter.
 
 	// Open file.
-	ofs.open( fileName.c_str(), ios::out);
+	ofs.open(fileName.c_str(), ios::out);
 
 	// Check file is opened.
 	if (ofs.is_open())
@@ -446,7 +442,7 @@ bool Graph::write(string fileName)
 		// Nodes main loop.
 		for (i=0; i<this->getSize() ;i++)
 		{
-			this->nodes[i].write( ofs);
+			this->nodes[i].write(ofs);
 			ofs << endl;
 		}
 
@@ -464,7 +460,7 @@ bool Graph::write(string fileName)
 #ifdef DEBUG_GRAPH_WRITE
 	Logging::buildText(__FUNCTION__, __FILE__, "Error opening output file ");
 	Logging::buildText(__FUNCTION__, __FILE__, fileName.c_str());
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
 		success = false;
 	}

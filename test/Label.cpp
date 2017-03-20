@@ -107,6 +107,7 @@ LabelType Label::extractType(string &line)
 	regfree(&beginRegex);
 	regfree(&endRegex);
 	regfree(&dataRegex);
+	regfree(&comment);
 
 	return(type);
 }

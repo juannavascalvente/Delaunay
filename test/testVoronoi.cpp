@@ -29,9 +29,8 @@
 void TestVoronoiBuild::main()
 {
 	Dcel		dcel;				// Dcel data.
-	Delaunay	delaunay;			// Delaunay data.
+	Delaunay 	delaunay;			// Delaunay data.
 	Voronoi		voronoi;			// Voronoi data.
-	int			failedTestIndex=0;	// Index of last failed test.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
@@ -45,61 +44,43 @@ void TestVoronoiBuild::main()
 	currentNPoints = this->nPoints;
 	for (stepIndex=0; stepIndex<this->nSteps ;stepIndex++)
 	{
-#ifdef DEBUG_TEST_VORONOI_BUILD
-		Logging::buildText(__FUNCTION__, __FILE__, "Executing step ");
-		Logging::buildText(__FUNCTION__, __FILE__, (stepIndex+1));
-		Logging::buildText(__FUNCTION__, __FILE__, "/");
-		Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
-		Logging::write(true, Info);
-#endif
 		for (testIndex=0; testIndex< this->nTests ;testIndex++)
 		{
 #ifdef DEBUG_TEST_VORONOI_BUILD
 			Logging::buildText(__FUNCTION__, __FILE__," Start building voronoi diagram test ");
-			Logging::buildText(__FUNCTION__, __FILE__, testIndex + 1);
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 			Logging::buildText(__FUNCTION__, __FILE__, "/");
-			Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 			Logging::write(true, Info);
 			Logging::buildText(__FUNCTION__, __FILE__, "Current number of points ");
 			Logging::buildText(__FUNCTION__, __FILE__, currentNPoints);
 			Logging::write(true, Info);
 #endif
-			// Generate random set of points.
-			if (!dcel.generateRandom(currentNPoints))
+			// Write test data.
+			string 	fileName;
+			ostringstream convert;
+			convert << this->nTestFailed;
+			fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
+			this->dump(fileName, dcel);
+
+			// Build Voronoi area.
+			if (this->buildVoronoi(currentNPoints, dcel, delaunay, voronoi))
 			{
-				Logging::buildText(__FUNCTION__, __FILE__,
-						"Error generating data set in iteration ");
-				Logging::buildText(__FUNCTION__, __FILE__, (testIndex + 1));
-				Logging::write(true, Error);
+				remove(fileName.c_str());
+				Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Successful);
 			}
 			else
 			{
-				// Write test data.
-				string 	fileName;
-				ostringstream convert;
-				convert << failedTestIndex;
-				fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
-				this->dump(fileName, dcel);
-
-				// Build Voronoi area.
-				if (this->buildVoronoi(dcel, voronoi))
-				{
-					remove(fileName.c_str());
-					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-					Logging::write(true, Successful);
-				}
-				else
-				{
-					failedTestIndex++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi diagram in test ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-					Logging::buildText(__FUNCTION__, __FILE__, "/");
-					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-					Logging::write(true, Error);
-				}
+				this->nTestFailed++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi diagram in test ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
 			}
 
 			this->testCounter++;
@@ -107,19 +88,6 @@ void TestVoronoiBuild::main()
 
 		// Update # points to generate.
 		currentNPoints = currentNPoints*this->deltaPoints;
-	}
-
-	Logging::buildText(__FUNCTION__, __FILE__, "Tests executed successfully ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-failedTestIndex);
-	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-	if (failedTestIndex == 0)
-	{
-		Logging::write(true, Successful);
-	}
-	else
-	{
-		Logging::write(true, Error);
 	}
 }
 
@@ -172,7 +140,8 @@ void TestVoronoiCompare::main()
 	string 	dcelFileName;		// DCEL file name.
 	Dcel	voronoiDcel;		// Original dcel data.
 	Dcel	dcel;				// Dcel data.
-	Voronoi voronoi;
+	Delaunay delaunay;			// Delaunay data.
+	Voronoi voronoi;			// Voronoi data.
 
 	this->testCounter = 1;
 	this->totalTests = this->filesList.getNElements() / 2;
@@ -200,52 +169,34 @@ void TestVoronoiCompare::main()
 #endif
 			if (!voronoiDcel.read(voronoiFileName, false))
 			{
+				this->nTestFailed++;
 				Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
 				Logging::buildText(__FUNCTION__, __FILE__, voronoiFileName);
 				Logging::write(true, Error);
 			}
-			else if (!dcel.readPoints(dcelFileName, false))
+			else if (!readVoronoi(dcelFileName, dcel, delaunay, voronoi))
 			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file: ");
+				this->nTestFailed++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error reading Voronoi file: ");
 				Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
 				Logging::write(true, Error);
 			}
 			else
 			{
-				// Reset dcel to remove all data except point coordinates.
-				dcel.clean();
-
-				// Execute current test.
-				if (this->buildVoronoi(dcel, voronoi))
+				// Compare original and built Voronoi.
+				if ((*voronoi.getRefDcel()) == voronoiDcel)
 				{
-					if ((*voronoi.getRefDcel()) == voronoiDcel)
-					{
-						Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-						Logging::buildText(__FUNCTION__, __FILE__, "/");
-						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-						Logging::write(true, Successful);
-					}
-					else
-					{
-						this->nTestFailed++;
-						Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
-						Logging::buildText(__FUNCTION__, __FILE__, i+1);
-						Logging::write(true, Error);
-
-						// Write test data.
-						string 	fileName;
-						ostringstream convert;
-						convert << this->nTestFailed;
-						fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
-						cout << fileName << endl;
-						//this->dump(fileName, voronoi.getRefDcel());
-					}
+					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+					Logging::write(true, Successful);
 				}
 				else
 				{
 					this->nTestFailed++;
-					Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi");
+					Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
+					Logging::buildText(__FUNCTION__, __FILE__, i+1);
 					Logging::write(true, Error);
 
 					// Write test data.
@@ -253,7 +204,8 @@ void TestVoronoiCompare::main()
 					ostringstream convert;
 					convert << this->nTestFailed;
 					fileName = outFolder + "Voronoi_" + convert.str() + ".txt";
-					this->dump(fileName, dcel);
+					cout << fileName << endl;
+					this->dump(fileName, *voronoi.getRefDcel());
 				}
 
 				// Reset Delaunay data.

@@ -388,6 +388,55 @@ void Test::finish()
 }
 
 /***************************************************************************
+* Name: 	readDelaunay
+* IN:		fileName			file that stores the DCEL.
+* 			dcel				dcel data that stores initial set of points
+* OUT:		delaunay			output triangulation
+* RETURN:	true				if test executed successfully
+* 			false				i.o.c.
+* GLOBAL:	NONE
+* Description: 	builds a Delaunay triangulation reading the set of points
+* 				from input file and stores the triangulation in the
+* 				delaunay output parameter.
+***************************************************************************/
+bool Test::readDelaunay(string fileName, Dcel &dcel, Delaunay &delaunay)
+{
+	bool 		built=true;			// Return value.
+
+	// Read points from file.
+	if (!dcel.readPoints(fileName, false))
+	{
+		this->nTestFailed++;
+		Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file ");
+		Logging::buildText(__FUNCTION__, __FILE__, fileName);
+		Logging::buildText(__FUNCTION__, __FILE__, " in test ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+		Logging::buildText(__FUNCTION__, __FILE__, "/");
+		Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+		Logging::write(true, Error);
+	}
+	else
+	{
+		// Reset dcel to remove all data except point coordinates.
+		dcel.clean();
+
+		// Execute current test.
+		delaunay.setDCEL(&dcel);
+		if (!delaunay.incremental())
+		{
+			this->nTestFailed++;
+			Logging::buildText(__FUNCTION__, __FILE__, "Fail building triangulation from file  in test id: ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+			Logging::buildText(__FUNCTION__, __FILE__, "/");
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+			Logging::write(true, Error);
+		}
+	}
+
+	return(built);
+}
+
+/***************************************************************************
 * Name: 	buildRandomDelaunay
 * IN:		nPoints				# points in triangulation.
 * 			dcel				dcel data that stores initial set of points
@@ -431,12 +480,15 @@ bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 		}
 	}
 
+	sleep(1);
+
 	return(built);
 }
 
 /***************************************************************************
 * Name: 	buildVoronoi
-* IN:		dcel				dcel data that stores initial set of points
+* IN:		dcelFileName		file name of the file that stores the DCEL.
+* 			dcel				dcel data that stores initial set of points
 * OUT:		voronoi				Voronoi data
 * RETURN:	true				if test executed successfully
 * 			false				i.o.c.
@@ -446,35 +498,106 @@ bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 * 				the test fails then a file is created and the set of points
 * 				is dumped
 ***************************************************************************/
-bool Test::buildVoronoi(Dcel& dcel, Voronoi &voronoi)
+bool Test::readVoronoi(string dcelFileName, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi)
 {
-	bool built=true;
-	Delaunay delaunay;
+	bool built=true;		// Return value.
 
-	// Build Delaunay triangulation.
-	delaunay.setDCEL(&dcel);
-	if (!delaunay.incremental())
+	// Read DCEL file.
+	if (!this->readDelaunay(dcelFileName, dcel, delaunay))
 	{
-		cout << "Error building Delaunay triangulation" << endl;
+		built = false;
+		Logging::buildText(__FUNCTION__, __FILE__, "Error reading points file: ");
+		Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
+		Logging::buildText(__FUNCTION__, __FILE__, " in test ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+		Logging::buildText(__FUNCTION__, __FILE__, "/");
+		Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+		Logging::write(true, Error);
 	}
 	else
+	{
+		// Build Voronoi diagram.
+		if (voronoi.init(&dcel))
+		{
+			// Compute Voronoi diagram.
+			if (!voronoi.build())
+			{
+				built = false;
+				this->nTestFailed++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi in test ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
+				built = false;
+			}
+		}
+		else
+		{
+			built = false;
+			this->nTestFailed++;
+			Logging::buildText(__FUNCTION__, __FILE__, "Error init Voronoi in test ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+			Logging::buildText(__FUNCTION__, __FILE__, "/");
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+			Logging::write(true, Error);
+			built = false;
+		}
+	}
+
+	return(built);
+}
+
+/***************************************************************************
+* Name: 	buildVoronoi
+* IN:		nPoints				# points in the set.
+* 			dcel				dcel data that stores initial set of points
+* OUT:		voronoi				Voronoi data
+* RETURN:	true				if test executed successfully
+* 			false				i.o.c.
+* GLOBAL:	NONE
+* Description: 	builds a Voronoi diagram using the set of points of the dcel
+* 				as the set of points to build a Delaunay triangulation. If
+* 				the test fails then a file is created and the set of points
+* 				is dumped
+***************************************************************************/
+bool Test::buildVoronoi(int nPoints, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi)
+{
+	bool built=true;		// Return value.
+
+	// Build Delaunay.
+	if (this->buildRandomDelaunay(nPoints, dcel, delaunay))
 	{
 		if (voronoi.init(&dcel))
 		{
 			// Compute Voronoi diagram.
 			if (!voronoi.build())
 			{
-				cout << "Error building Voronoi" << endl;
+				built = false;
+				this->nTestFailed++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error building Voronoi in test ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
 				built = false;
 			}
 		}
 		else
 		{
-			cout << "Error initializing Voronoi" << endl;
+			built = false;
+			this->nTestFailed++;
+			Logging::buildText(__FUNCTION__, __FILE__, "Error init Voronoi in test ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+			Logging::buildText(__FUNCTION__, __FILE__, "/");
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+			Logging::write(true, Error);
 			built = false;
 		}
-
-		sleep(1);
+	}
+	else
+	{
+		built = false;
 	}
 
 	return(built);
