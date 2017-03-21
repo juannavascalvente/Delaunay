@@ -58,7 +58,7 @@ void Tester::main()
 		convertnTests << totalTests;
 
 		Logging::buildText("**********************************************\n");
-		Logging::buildText("Tets resume ");
+		Logging::buildText("Tests resume ");
 		Logging::buildText(convertnTestsSuccess.str());
 		Logging::buildText("/");
 		Logging::buildText(convertnTests.str());

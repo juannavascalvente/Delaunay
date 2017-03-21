@@ -66,6 +66,7 @@ void Delaunay::reset()
 	// Reset data flags.
 	this->algorithm = NONE;
 	this->setGraphAllocated(false);
+	delete this->graph;
 	this->setConvexHullComputed(false);
 	this->hull.reset();
 	this->hullEdges.reset();

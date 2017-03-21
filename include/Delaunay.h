@@ -69,6 +69,7 @@ public:
 							hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE) \
 
 	{
+		// PENDING REPLACE 10 BY DEFAULT LENGTH DEPENDING ON NPOINTS.
 		this->dcel = inDcel;
 		this->graph = new Graph(this->dcel->getNVertex()*10);
 	}
