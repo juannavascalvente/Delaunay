@@ -71,7 +71,6 @@ Graph::~Graph()
 	// Deallocate data.
 	if (this->allocated)
 	{
-		cout << "DEALLOCATED" << endl;
 		this->allocated = false;
 		delete[] this->nodes;
 		delete[] this->face_Node_Assign;
