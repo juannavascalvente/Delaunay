@@ -1,6 +1,6 @@
 # Set compiler and directives.
 CC=g++
-CFLAGS=
+CFLAGS=-Wall -O3 -fopenmp
 RM= rm -f
 EXEC=geometric
 LIBRARY=-lglut -lgomp -lGLU -lGL

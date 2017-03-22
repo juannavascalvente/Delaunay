@@ -133,7 +133,7 @@ bool Tester::readTests()
 
 Test* Tester::createTestInstance(TestType type)
 {
-	Test *test;			// Return value.
+	Test *test=NULL;			// Return value.
 	switch(type)
 	{
 		case TEST_SET:
