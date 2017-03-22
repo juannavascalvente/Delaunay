@@ -40,7 +40,7 @@ using namespace std;
 // Figures menu entries.
 #define FIGURES_MENU_TEXT				"Figures"
 #define FIGURES_CONVEX_TEXT				"Convex hull"
-#define FIGURES_CIRCUMCENTRES_TEXT		"Circumcentres"
+#define FIGURES_CIRCUMCENTRES_TEXT		"Circumcircles"
 #define FIGURES_EDGES_CRICLES_TEXT		"Edges circles"
 #define FIGURES_VORONOI_TEXT			"Voronoi"
 #define FIGURES_GABRIEL_TEXT			"Gabriel"
