@@ -682,7 +682,7 @@ void Process::execute(void)
 				this->status.isVoronoiCreated())
 			{
 				// Build Gabriel graph.
-				this->gabriel.init(this->delaunay.getDCEL(), &this->voronoi);
+				this->gabriel.init(this->delaunay.getRefDcel(), &this->voronoi);
 				error = !this->gabriel.build();
 				if (!error)
 				{

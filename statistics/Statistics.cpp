@@ -46,8 +46,127 @@ struct timeval Timer::getTime()
 * GLOBAL:	NONE
 * Description: computes the time lapse between tic and toc functions.
 ***************************************************************************/
-void Timer::getInterval()
+double Timer::getInterval()
 {
 	this->diff = (this->end.tv_sec - this->begin.tv_sec) +
 				 (this->end.tv_nsec - this->begin.tv_nsec)/(double) BILLION;
+	return(this->diff);
 }
+
+/***************************************************************************
+* NAME: 	writeResults
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	write two arrays: the number of points in test and the number
+* 				of edges of the convex hull per test.
+***************************************************************************/
+bool StatisticsConvexHullRegister::writeResults()
+{
+	bool written=false;		// Return value.
+	int	 i=0;				// Loop counter.
+	ConexHullStatisticsData *current=NULL;
+
+	// Check file is opened.
+	if (this->ofs.is_open())
+	{
+		if (this->data.getNElements() > 0)
+		{
+			// Write # points in test data.
+			current = *this->data.at(0);
+			this->ofs << "nPoints <- c(" << current->getPoints();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getPoints();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # edges in convex hull.
+			current = *this->data.at(0);
+			this->ofs << "nPoints <- c(" << current->getLength();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getLength();
+			}
+			this->ofs << ")" << endl;
+
+			// Write execution times.
+			current = *this->data.at(0);
+			this->ofs << "nPoints <- c(" << current->getExecTime();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				// Write # points in test data.
+				current = *this->data.at(i);
+				this->ofs << "," << current->getExecTime();
+			}
+			this->ofs << ")" << endl;
+
+			// Update return value.
+			written = true;
+		}
+		else
+		{
+			this->ofs << "No statistics computed." << endl;
+		}
+	}
+
+	return(written);
+}
+
+void StatisticsDelaunay::analyzeDelaunay(Delaunay &delaunay, int index)
+{
+	int		i=0;			// Loop counter.
+/*
+	// Get # points.
+	this->nPoints[index] = delaunay.getRefDcel()->getNVertex();
+
+	// Analyze edges.
+	for (i=0; i<delaunay.getRefDcel()->getNEdges() ;i++)
+	{
+		if (delaunay.getRefDcel()->hasNegativeVertex(i+1))
+		{
+			this->nEdges++;
+		}
+		else
+		{
+			this->nImaginaryEdges++;
+		}
+	}
+
+	// Divide by 2 because some edges are twin.
+	this->nEdges = this->nEdges / 2;
+	this->nImaginaryEdges = this->nImaginaryEdges / 2;
+
+	// Compute # edges the convex hull.
+	if (delaunay.convexHull())
+	{
+		this->nConvexhullEdges = delaunay.getConvexHullEdges()->getNElements();
+		this->nConvexhullEdges = this->nConvexhullEdges*2;
+	}
+	else
+	{
+		cout << "Error computing convex hull" << endl;
+	}
+
+	// Analyze faces.
+	for (i=0; i<delaunay.getRefDcel()->getNFaces() ;i++)
+	{
+		if (delaunay.getRefDcel()->imaginaryFace(i))
+		{
+			this->nFaces++;
+		}
+		else
+		{
+			this->nImaginaryFaces++;
+		}
+	}*/
+
+	// Analyze graph.
+	//this->analyzeGtaph(delaunay.getGraph());
+}
+
+
+

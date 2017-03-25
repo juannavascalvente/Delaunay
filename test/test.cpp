@@ -132,10 +132,14 @@ void Test::parseParameters(Set<Label> &labels)
 * GLOBAL:	NONE
 * Description: removes all files in output folder.
 ***************************************************************************/
-void Test::removeExistingFiles()
+int Test::removeExistingFiles()
 {
+	int ret=0;
+
 	string command = "exec rm -r " + this->outFolder + "*.txt";
-	system(command.c_str());
+	ret = system(command.c_str());
+
+	return(ret);
 }
 
 
@@ -480,6 +484,7 @@ bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 		}
 	}
 
+	// Wait 1 second so seed generation changes.
 	sleep(1);
 
 	return(built);

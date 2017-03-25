@@ -8,6 +8,7 @@
 #ifndef TEST_TESTEXECUTION_H_
 #define TEST_TESTEXECUTION_H_
 
+#include "Statistics.h"
 #include "test.h"
 
 /****************************************************************************
@@ -36,7 +37,7 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestExecution(string name, string fileName, string outFolder, bool print) : \
-						Test(name, fileName, outFolder, print),
+						Test(name, fileName, outFolder, print), \
 						nTests(0), nSteps(0), deltaPoints(0), nPoints(0) {};
 	~TestExecution() {};
 
@@ -53,6 +54,5 @@ public:
 	//------------------------------------------------------------------------
 	virtual void main() {};
 };
-
 
 #endif /* TEST_TESTEXECUTION_H_ */

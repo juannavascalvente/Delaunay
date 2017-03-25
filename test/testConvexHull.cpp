@@ -32,6 +32,7 @@ void TestConvexHullBuild::main()
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;	// Current # points in DCEL.
 	string 		dumpFileName;		// Input dcel file name.
+	StatisticsConvexHullRegister statReg("statisticsConvexHull.txt", "statConvexLog.txt");
 
 #ifdef DEBUG_TEST_CONEXHULL_BUILD
 	// Print test parameters.
@@ -51,6 +52,9 @@ void TestConvexHullBuild::main()
 #endif
 		for (testIndex=0; testIndex<this->nTests ;testIndex++)
 		{
+			ConexHullStatisticsData *statData = new ConexHullStatisticsData();
+			statData->setPoints(currentNPoints);
+
 			// Build failed file name test data.
 			ostringstream convert;
 			convert << this->nTestFailed+1;
@@ -59,13 +63,17 @@ void TestConvexHullBuild::main()
 			// Build incremental Delaunay triangulation.
 			if (this->buildRandomDelaunay(currentNPoints, dcel, delaunay))
 			{
+				statReg.tic();
 				if (delaunay.convexHull())
 				{
+					statReg.toc();
 					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::buildText(__FUNCTION__, __FILE__, "/");
 					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 					Logging::write(true, Successful);
+					statData->setLength(delaunay.getConvexHullEdges()->getNElements());
+					statData->setExecTime(statReg.getLapse());
 				}
 				else
 				{
@@ -78,9 +86,6 @@ void TestConvexHullBuild::main()
 					Logging::write(true, Error);
 				}
 
-				// Wait 1 second so seed generation changes.
-				sleep(1);
-
 				// Reset Delaunay data.
 				delaunay.reset();
 				this->testCounter++;
@@ -90,10 +95,16 @@ void TestConvexHullBuild::main()
 				this->dump(dumpFileName, dcel);
 			}
 
-			// Update # points to generate.
-			currentNPoints = currentNPoints*this->deltaPoints;
+			// Add statistics data.
+			statReg.add(statData);
 		}
+
+		// Update # points to generate.
+		currentNPoints = currentNPoints*this->deltaPoints;
 	}
+
+	// Write statistics data.
+	statReg.writeResults();
 }
 
 /***************************************************************************

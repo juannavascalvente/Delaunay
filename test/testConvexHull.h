@@ -21,8 +21,8 @@ public:
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	TestConvexHullBuild(string fileName, string outFolder, bool print) : \
-			TestExecution("Convex hull Build", fileName, outFolder, print) {};
-	~TestConvexHullBuild() {};
+			TestExecution("Convex hull Build", fileName, outFolder, print){};
+	~TestConvexHullBuild(){};
 
 	//------------------------------------------------------------------------
 	//  Public functions.

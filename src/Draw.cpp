@@ -223,7 +223,7 @@ void Draw::drawFigures(enum drawingT type, bool error)
 					for (i=0; i<this->facesSet->getNElements() ;i++)
 					{
 						faceId = *this->facesSet->at(i);
-						this->drawFace(faceId, this->delaunay->getDCEL());
+						this->drawFace(faceId, this->delaunay->getRefDcel());
 					}
 				}
 			}

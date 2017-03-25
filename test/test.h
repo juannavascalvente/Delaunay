@@ -75,7 +75,7 @@ class Test
 	//------------------------------------------------------------------------
 	bool getParameterIndex(Label &label, int &index);
 	void parseParameters(Set<Label> &labels);
-	void removeExistingFiles();
+	int  removeExistingFiles();
 	static TestType getTypeTest(string testName);
 protected:
 	//------------------------------------------------------------------------

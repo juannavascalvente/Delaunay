@@ -1001,8 +1001,8 @@ bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, do
 	for (pointIndex=0; pointIndex<nAnchors ;pointIndex++)
 	{
 		// Generate a random point.
-		id = rand() % this->getDCEL()->getNVertex();
-		currentPoint = *this->getDCEL()->getRefPoint(id);
+		id = rand() % this->getRefDcel()->getNVertex();
+		currentPoint = *this->getRefDcel()->getRefPoint(id);
 
 #ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
 		Logging::buildText(__FUNCTION__, __FILE__, "Checking distance form point id ");
@@ -1141,7 +1141,7 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 		if (computePath)
 		{
 			// Find path.
-			found = this->getDCEL()->findPath(extremeFaces, line, facesPath);
+			found = this->getRefDcel()->findPath(extremeFaces, line, facesPath);
 		}
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 		else

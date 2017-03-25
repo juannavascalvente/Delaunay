@@ -5,6 +5,9 @@
  *      Author: juan
  */
 
+#include "Delaunay.h"
+#include "Logging.h"
+
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -41,7 +44,7 @@ public:
 	//------------------------------------------------------------------------
 	inline void tic() {clock_gettime(CLOCK_REALTIME, &this->begin);};
 	inline void toc() {clock_gettime(CLOCK_REALTIME, &this->end);};
-	void getInterval();
+	double getInterval();
 	inline void average(int n) {this->avg = this->total / (double) n;};
 	inline void reset() {this->total = 0.0;};
 	inline void updateTotal() {this->total = this->total + this->diff;};
@@ -59,26 +62,31 @@ class StatisticsData
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
-	int nPoints;
+	int 	nPoints;
+	double  execTime;
 
 public:
-	//------------------------------------------------------------------------
-	// Constructor and destructor
-	//------------------------------------------------------------------------
-	StatisticsData() : nPoints(0) {}
-    ~StatisticsData() {}
+	StatisticsData() : nPoints(0), execTime(0.0) {};
+	virtual ~StatisticsData() {};
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
+	virtual bool writeResults() {return (true);}
+
+	//------------------------------------------------------------------------
+	// Get/Set functions.
+	//------------------------------------------------------------------------
+	double getExecTime() const {return execTime;}
 	int getPoints() const {return nPoints;}
+	void setExecTime(double execTime) {this->execTime = execTime;}
 	void setPoints(int points) {nPoints = points;}
 };
 
 /****************************************************************************
 //	 				StatisticsConexHull CLASS DEFITNION
 ****************************************************************************/
-class StatisticsConexHull : public StatisticsData
+class ConexHullStatisticsData : public StatisticsData
 {
 	//------------------------------------------------------------------------
 	//  Attributes
@@ -89,8 +97,8 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsConexHull() : StatisticsData(), length(0) {}
-    ~StatisticsConexHull() {}
+	ConexHullStatisticsData() : length(0) {};
+    ~ConexHullStatisticsData() {};
 
 	//------------------------------------------------------------------------
 	// Public functions.
@@ -100,14 +108,16 @@ public:
 };
 
 /****************************************************************************
-//	 						StatisticsTriangulation CLASS DEFITNION
+//	 			StatisticsTriangulation CLASS DEFITNION
 ****************************************************************************/
 class StatisticsTriangulation : public StatisticsData
 {
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
+protected:
 	int nEdges;
+	int	nConvexhullEdges;
 	int nFaces;
 	int	nFlips;
 
@@ -115,7 +125,7 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsTriangulation() : StatisticsData(), nEdges(0), nFaces(0), \
+	StatisticsTriangulation() : nEdges(0), nConvexhullEdges(0), nFaces(0), \
 								nFlips(0) {}
     ~StatisticsTriangulation() {}
 
@@ -131,7 +141,7 @@ public:
 };
 
 /****************************************************************************
-//	 						StatisticsDelaunay CLASS DEFITNION
+//	 				StatisticsDelaunay CLASS DEFITNION
 ****************************************************************************/
 class StatisticsDelaunay : public StatisticsTriangulation
 {
@@ -141,13 +151,17 @@ class StatisticsDelaunay : public StatisticsTriangulation
 	int nCollinear;
 	int n2children;
 	int	n3children;
+	int nImaginaryEdges;
+	int nImaginaryFaces;
+	int	nNodes;
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsDelaunay() : StatisticsTriangulation(), nCollinear(0), \
-							n2children(0), n3children(0)  {}
+	StatisticsDelaunay(string outFile) : nCollinear(0), n2children(0), 		\
+										 n3children(0), nImaginaryEdges(0), \
+										 nImaginaryFaces(0), nNodes(0) {}
     ~StatisticsDelaunay() {}
 
 	//------------------------------------------------------------------------
@@ -159,7 +173,77 @@ public:
 	void setN3childrenNodes(int n3children) {this->n3children = n3children;}
 	int getCollinear() const {return nCollinear;}
 	void setCollinear(int collinear) {nCollinear = collinear;}
+    void analyzeDelaunay(Delaunay &delaunay, int index);
+    void analyzeGtaph(Graph &graph, int index);
 };
 
+/****************************************************************************
+//	 				StatisticsRegister CLASS DEFITNION
+****************************************************************************/
+class StatisticsRegister
+{
+	//------------------------------------------------------------------------
+	//  Attributes
+	//------------------------------------------------------------------------
+protected:
+	//int			nTests;				// # statistics tests.
+	Timer		timer;				// Execution timer.
+	string  	fileName;			// Output statistics file.
+	ofstream 	ofs;				// Output stream.
+	Logging		log;				// Log file.
+
+public:
+	//------------------------------------------------------------------------
+	// Constructor and destructor
+	//------------------------------------------------------------------------
+	StatisticsRegister(string outFile, string logFile) : fileName(outFile), \
+														 log(logFile, true)
+	{
+		// Open file.
+		ofs.open(fileName.c_str(), ios::out);
+
+		// Check file is opened.
+		if (!ofs.is_open())
+		{
+			// Error opening points file.
+			log.buildText(__FILE__,__FUNCTION__,
+						"Error opening statistics file " + this->fileName);
+		}
+	};
+    virtual ~StatisticsRegister()
+    {
+    	// Check file is already opened.
+		if (ofs.is_open())
+		{
+			// Close file.
+			ofs.close();
+		}
+    };
+
+	//------------------------------------------------------------------------
+	// Get/Set functions.
+	//------------------------------------------------------------------------
+	//void setNTests(int nTests) {this->nTests = nTests;}
+	void tic() {this->timer.tic();};
+	void toc() {this->timer.toc();};
+	double getLapse() {return(this->timer.getInterval());};
+	virtual bool writeResults() {return(true);};
+};
+
+
+/****************************************************************************
+//	 				StatisticsConvexHullRegister CLASS DEFITNION
+****************************************************************************/
+class StatisticsConvexHullRegister : public StatisticsRegister
+{
+	Set<ConexHullStatisticsData *>	data;	// Test statistics array.
+public:
+	StatisticsConvexHullRegister(string outFile, string logFile) : \
+									StatisticsRegister(outFile, logFile) {};
+	~StatisticsConvexHullRegister(){};
+
+    void add(ConexHullStatisticsData *data) {this->data.add(data);};
+    bool writeResults();
+};
 
 #endif /* INCLUDE_STATISTICS_H_ */

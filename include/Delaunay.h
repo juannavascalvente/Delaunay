@@ -86,6 +86,7 @@ public:
 	inline bool isConvexHullComputed() {return(this->convexHullComputed);};
 	inline void setGraphAllocated(bool v) {this->graphAllocated = v;};
 	inline void setConvexHullComputed(bool v) {this->convexHullComputed = v;};
+	Graph* getGraph() {return graph;}
 
 	// Figures functions.
 	bool convexHull();
@@ -103,7 +104,7 @@ public:
 
 	// GET/SET functions.
 	inline void setDCEL(Dcel *dcel) {this->dcel = dcel;};
-	inline Dcel *getDCEL() {return(this->dcel); };
+	inline Dcel *getRefDcel() {return(this->dcel); };
 	inline void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
 	inline enum Algorithm getAlgorithm() {return(this->algorithm);};
 
