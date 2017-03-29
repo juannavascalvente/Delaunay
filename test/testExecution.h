@@ -11,6 +11,12 @@
 #include "Statistics.h"
 #include "test.h"
 
+// Default parameters in Delaunay Build test.
+#define DEFAULT_N_POINTS		3
+#define DEFAULT_DELTA_POINTS	2
+#define DEFAULT_N_STEPS			5
+#define DEFAULT_N_TESTS			5
+
 /****************************************************************************
 // 							TestExecution CLASS DEFITNION
 ****************************************************************************/
@@ -36,9 +42,11 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestExecution(string name, string fileName, string outFolder, bool print) : \
-						Test(name, fileName, outFolder, print), \
-						nTests(0), nSteps(0), deltaPoints(0), nPoints(0) {};
+	TestExecution(string name, string outFolder, bool print) : \
+						Test(name, outFolder, print), \
+						nTests(DEFAULT_N_TESTS), nSteps(DEFAULT_N_STEPS), \
+						deltaPoints(DEFAULT_DELTA_POINTS), \
+						nPoints(DEFAULT_N_POINTS) {};
 	~TestExecution() {};
 
 	//------------------------------------------------------------------------

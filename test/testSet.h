@@ -8,10 +8,19 @@
 #ifndef CODE_TEST_TESTSET_H_
 #define CODE_TEST_TESTSET_H_
 
+#define OUT_FOLDER_SET					"./data/tests/log/setTest/"
+#define DEFAULT_TEST_NAME				"Test Set"
+
 #include "test.h"
 
+/****************************************************************************
+// 						TestSet CLASS DEFITNION
+****************************************************************************/
 class TestSet : public Test
 {
+	//------------------------------------------------------------------------
+	//  Private functions.
+	//------------------------------------------------------------------------
 	void checkDefaultConstructor();
 	void checkCustomConstructor();
 	bool testEqualOpenMP();
@@ -22,10 +31,16 @@ class TestSet : public Test
 	bool parseParameters(Set<Label> &labels) {return(true);};
 	void write() {};
 	void print() {};
-
 public:
-	TestSet(string fileName, string outFolder, bool print) : \
-					Test("Test Set", fileName, outFolder, print) {};
+	//------------------------------------------------------------------------
+	// Constructor/Destructor.
+	//------------------------------------------------------------------------
+	TestSet(bool print) : Test(DEFAULT_TEST_NAME, OUT_FOLDER_SET, print) {};
+	TestSet(string outFolder,bool print) : Test("Test Set",outFolder,print){};
+
+	//------------------------------------------------------------------------
+	//  Public functions.
+	//------------------------------------------------------------------------
 	void main();
 };
 

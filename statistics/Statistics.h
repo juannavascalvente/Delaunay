@@ -186,18 +186,15 @@ class StatisticsRegister
 	//  Attributes
 	//------------------------------------------------------------------------
 protected:
-	//int			nTests;				// # statistics tests.
 	Timer		timer;				// Execution timer.
 	string  	fileName;			// Output statistics file.
 	ofstream 	ofs;				// Output stream.
-	Logging		log;				// Log file.
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsRegister(string outFile, string logFile) : fileName(outFile), \
-														 log(logFile, true)
+	StatisticsRegister(string outFile) : fileName(outFile) \
 	{
 		// Open file.
 		ofs.open(fileName.c_str(), ios::out);
@@ -206,8 +203,9 @@ public:
 		if (!ofs.is_open())
 		{
 			// Error opening points file.
-			log.buildText(__FILE__,__FUNCTION__,
+			Logging::buildText(__FILE__,__FUNCTION__,
 						"Error opening statistics file " + this->fileName);
+			Logging::write(true, Error);
 		}
 	};
     virtual ~StatisticsRegister()
@@ -223,13 +221,11 @@ public:
 	//------------------------------------------------------------------------
 	// Get/Set functions.
 	//------------------------------------------------------------------------
-	//void setNTests(int nTests) {this->nTests = nTests;}
-	void tic() {this->timer.tic();};
+    void tic() {this->timer.tic();};
 	void toc() {this->timer.toc();};
 	double getLapse() {return(this->timer.getInterval());};
 	virtual bool writeResults() {return(true);};
 };
-
 
 /****************************************************************************
 //	 				StatisticsConvexHullRegister CLASS DEFITNION
@@ -238,8 +234,8 @@ class StatisticsConvexHullRegister : public StatisticsRegister
 {
 	Set<ConexHullStatisticsData *>	data;	// Test statistics array.
 public:
-	StatisticsConvexHullRegister(string outFile, string logFile) : \
-									StatisticsRegister(outFile, logFile) {};
+	StatisticsConvexHullRegister(string outFile) : \
+									StatisticsRegister(outFile) {};
 	~StatisticsConvexHullRegister(){};
 
     void add(ConexHullStatisticsData *data) {this->data.add(data);};

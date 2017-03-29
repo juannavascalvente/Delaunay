@@ -14,22 +14,17 @@
 #include "testSet.h"
 #include "testVoronoi.h"
 
-#define OUT_FOLDER_DCEL					"./data/tests/log/dcelTest/"
-#define OUT_FOLDER_SET					"./data/tests/log/setTest/"
-#define OUT_FOLDER_DELAUNAY				"./data/tests/log/delaunay/"
-#define OUT_FOLDER_DELAUNAY_COMP		"./data/tests/log/delaunayCompare/"
-#define OUT_FOLDER_CONVEXHULL			"./data/tests/log/convexHull/"
-#define OUT_FOLDER_CONVEXHULL_COMP		"./data/tests/log/convexHullCompare/"
-#define OUT_FOLDER_VORONOI				"./data/tests/log/voronoi/"
-#define OUT_FOLDER_VORONOI_COMP			"./data/tests/log/voronoiCompare/"
-#define OUT_FOLDER_DELAUNAY_PATH		"./data/tests/log/delaunayPath/"
-#define OUT_FOLDER_DELAUNAY_PATH_COMP 	"./data/tests/log/delaunayPathCompare/"
-#define OUT_FOLDER_VORONOI_PATH			"./data/tests/log/voronoiPath/"
-#define OUT_FOLDER_VORONOI_PATH_COMP	"./data/tests/log/voronoiPathCompare/"
-
 //#define DEBUG_TESTER_READTESTS
 //#define DEBUG_TESTER_CREATEINSTANCE
 
+/***************************************************************************
+* Name: 	main
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	read all tests from file and executes them.
+***************************************************************************/
 void Tester::main()
 {
 	int	 i=0;						// Loop counter.
@@ -46,8 +41,14 @@ void Tester::main()
 		for(i=0; i<nTests ;i++)
 		{
 			currentTest = *this->tests.at(i);
+
+			// Print test header.
 			this->log.buildTestHeader((i+1), nTests, currentTest->getTestName());
+
+			// Execute test.
 			currentTest->run();
+
+			// Update # tests.
 			totalTests = totalTests + currentTest->getTotalTests();
 			totalTestsFailed = totalTestsFailed + currentTest->getTestFailed();
 		}
@@ -57,6 +58,7 @@ void Tester::main()
 		ostringstream convertnTests;
 		convertnTests << totalTests;
 
+		// Print tests execution resume.
 		Logging::buildText("**********************************************\n");
 		Logging::buildText("Tests resume ");
 		Logging::buildText(convertnTestsSuccess.str());
@@ -77,6 +79,14 @@ void Tester::main()
 	}
 }
 
+/***************************************************************************
+* Name: 	readTests
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	read all tests from file and creates tests instances.
+***************************************************************************/
 bool Tester::readTests()
 {
 	bool testsToExecute=false;	// Return value.
@@ -107,7 +117,10 @@ bool Tester::readTests()
 #ifdef DEBUG_TESTER_READTESTS
 				cout << "Initializing test id: " << (testId+1) << endl;
 #endif
+				// Create test instance.
 				test = this->createTestInstance(type);
+
+				// Create apply parameters values.
 				test->init(labels);
 				this->tests.add(test);
 				testsToExecute = true;
@@ -131,6 +144,14 @@ bool Tester::readTests()
 	return(testsToExecute);
 }
 
+/***************************************************************************
+* Name: 	createTestInstance
+* IN:		type			test type to create.
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	create a test depending on "type" value.
+***************************************************************************/
 Test* Tester::createTestInstance(TestType type)
 {
 	Test *test=NULL;			// Return value.
@@ -141,7 +162,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_SET" << endl;
 #endif
-			test = new TestSet("testSet.txt", OUT_FOLDER_SET, true);
+			test = new TestSet(true);
 			break;
 		}
 		case TEST_DCEL:
@@ -149,7 +170,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DCEL" << endl;
 #endif
-			test = new TestDcel("testDcel.txt", OUT_FOLDER_DCEL, true);
+			test = new TestDcel(true);
 
 			break;
 		}
@@ -158,7 +179,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DELAUNAY_BUILD" << endl;
 #endif
-			test = new TestDelaunayBuild("testDelaunay.txt", OUT_FOLDER_DELAUNAY, true);
+			test = new TestDelaunayBuild(true);
 			break;
 		}
 		case TEST_DELAUNAY_COMPARE:
@@ -166,7 +187,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_DELAUNAY_COMPARE" << endl;
 #endif
-			test = new TestDelaunayCompare("testDelaunayCompare.txt", OUT_FOLDER_DELAUNAY_COMP, true);
+			test = new TestDelaunayCompare(true);
 			break;
 		}
 		case TEST_CONVEXHULL:
@@ -174,7 +195,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_CONVEX_HULL_BUILD" << endl;
 #endif
-			test = new TestConvexHullBuild("testConvexHull.txt", OUT_FOLDER_CONVEXHULL, true);
+			test = new TestConvexHullBuild(true);
 			break;
 		}
 		case TEST_CONVEXHULL_COMPARE:
@@ -182,7 +203,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_CONVEX_HULL_COMPARE" << endl;
 #endif
-			test = new TestConvexHullCompare("testConvexHullCompare.txt", OUT_FOLDER_CONVEXHULL_COMP, true);
+			test = new TestConvexHullCompare(true);
 			break;
 		}
 		case TEST_VORONOI_BUILD:
@@ -190,7 +211,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_VORONOI_BUILD" << endl;
 #endif
-			test = new TestVoronoiBuild("testVoronoi.txt", OUT_FOLDER_VORONOI, true);
+			test = new TestVoronoiBuild(true);
 			break;
 		}
 		case TEST_VORONOI_COMPARE:
@@ -198,7 +219,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_VORONOI_COMPARE" << endl;
 #endif
-			test = new TestVoronoiCompare("testVoronoiCompare.txt", OUT_FOLDER_VORONOI_COMP, true);
+			test = new TestVoronoiCompare(true);
 			break;
 		}
 		case TEST_PATH_DELAUNAY:
@@ -206,7 +227,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_PATH_DELAUNAY" << endl;
 #endif
-			test = new TestPathDelaunay("testDelaunayPath.txt", OUT_FOLDER_DELAUNAY_PATH, true);
+			test = new TestPathDelaunay(true);
 			break;
 		}
 		case TEST_PATH_DELAUNAY_COMPARE:
@@ -214,7 +235,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_PATH_DELAUNAY_COMPARE" << endl;
 #endif
-			test = new TestPathDelaunayCompare("testVoronoiPath.txt", OUT_FOLDER_DELAUNAY_PATH_COMP, true);
+			test = new TestPathDelaunayCompare(true);
 			break;
 		}
 		case TEST_PATH_VORONOI:
@@ -222,7 +243,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_PATH_VORONOI" << endl;
 #endif
-			test = new TestPathVoronoi("testVoronoiPath.txt", OUT_FOLDER_VORONOI_PATH, true);
+			test = new TestPathVoronoi(true);
 			break;
 		}
 		case TEST_PATH_VORONOI_COMPARE:
@@ -230,7 +251,7 @@ Test* Tester::createTestInstance(TestType type)
 #ifdef DEBUG_TESTER_CREATEINSTANCE
 			cout << "Creating TEST_PATH_VORONOI" << endl;
 #endif
-			test = new TestPathVoronoiCompare("testVoronoiPathCompare.txt", OUT_FOLDER_VORONOI_PATH_COMP, true);
+			test = new TestPathVoronoiCompare(true);
 			break;
 		}
 		default:
@@ -242,6 +263,14 @@ Test* Tester::createTestInstance(TestType type)
 	return(test);
 }
 
+/***************************************************************************
+* Name: 	finish
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	deallocates tests.
+***************************************************************************/
 void Tester::finish()
 {
 	int i=0;			// Loop counter.

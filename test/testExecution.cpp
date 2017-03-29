@@ -17,6 +17,9 @@
 ***************************************************************************/
 void TestExecution::initParameters()
 {
+	// Add common test parameters.
+	Test::initParameters();
+
 	// Add # points parameter.
 	NumericValidator *nPointsDefinition = new NumericValidator(3, INT_MAX);
 	ParameterInt *nPointsParameter = new ParameterInt(TYPE_N_POINTS_LABEL, nPointsDefinition);
@@ -108,21 +111,20 @@ void TestExecution::applyParameter(Parameter *parameter, string value)
 void TestExecution::printParameters()
 {
 #ifdef DEBUG_TEST_EXECUTION
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of points ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->nPoints);
+	Logging::buildText("Number of points ");
+	Logging::buildText(this->nPoints);
 	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Delta points ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->deltaPoints);
+	Logging::buildText("Delta points ");
+	Logging::buildText(this->deltaPoints);
 	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of steps ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->nSteps);
+	Logging::buildText("Number of steps ");
+	Logging::buildText(this->nSteps);
 	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of test ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->nTests);
+	Logging::buildText("Number of test ");
+	Logging::buildText(this->nTests);
 	Logging::write(true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, "Output folder ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->outFolder);
-	Logging::write(true, Info);
+	Logging::buildText("Output folder ");
+	Logging::buildText(this->outFolder);
 	Logging::write(true, Info);
 #endif
 }

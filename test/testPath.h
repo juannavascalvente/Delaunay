@@ -8,6 +8,18 @@
 #ifndef TEST_TESTPATH_H_
 #define TEST_TESTPATH_H_
 
+#define OUT_FOLDER_DELAUNAY_PATH					"./data/tests/log/delaunayPath/"
+#define DEFAULT_TEST_DELAUNAY_PATH_NAME			 	"Test Delaunay Path"
+
+#define OUT_FOLDER_DELAUNAY_PATH_COMP 				"./data/tests/log/delaunayPathCompare/"
+#define DEFAULT_TEST_DELAUNAY_PATH_COMP_NAME		"Test Delaunay Path Compare"
+
+#define OUT_FOLDER_VORONOI_PATH						"./data/tests/log/voronoiPath/"
+#define DEFAULT_TEST_VORONOI_PATH_NAME			 	"Test Voronoi Path"
+
+#define OUT_FOLDER_VORONOI_PATH_COMP				"./data/tests/log/voronoiPathCompare/"
+#define DEFAULT_TEST_VORONOI_PATH_COMP_NAME			"Test Voronoi Path Compare"
+
 #include "Dcel.h"
 #include "Delaunay.h"
 #include "Point.h"
@@ -23,8 +35,11 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestPathDelaunay(string fileName, string outFolder, bool print) : \
-			TestExecution("Path Delaunay", fileName, outFolder, print) {};
+	TestPathDelaunay(bool print) : \
+					TestExecution(DEFAULT_TEST_DELAUNAY_PATH_NAME, \
+					OUT_FOLDER_DELAUNAY_PATH, print) {};
+	TestPathDelaunay(string outFolder, bool print) : \
+			TestExecution(DEFAULT_TEST_DELAUNAY_PATH_NAME, outFolder, print) {};
 	~TestPathDelaunay() {};
 
 	//------------------------------------------------------------------------
@@ -44,8 +59,11 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestPathDelaunayCompare(string fileName, string outFolder, bool print) : \
-		TestCompare("Path Delaunay Compare", fileName, outFolder, print) {};
+	TestPathDelaunayCompare(bool print) : \
+		TestCompare(DEFAULT_TEST_DELAUNAY_PATH_COMP_NAME, \
+				OUT_FOLDER_DELAUNAY_PATH_COMP, print) {};
+	TestPathDelaunayCompare(string outFolder, bool print) : \
+		TestCompare(DEFAULT_TEST_DELAUNAY_PATH_COMP_NAME, outFolder, print) {};
 	~TestPathDelaunayCompare() {};
 
 	//------------------------------------------------------------------------
@@ -63,8 +81,10 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestPathVoronoi(string fileName, string outFolder, bool print) : \
-			TestExecution("Path Voronoi", fileName, outFolder, print) {};
+	TestPathVoronoi(bool print) : TestExecution(DEFAULT_TEST_VORONOI_PATH_NAME, \
+											OUT_FOLDER_VORONOI_PATH, print) {};
+	TestPathVoronoi(string outFolder, bool print) : \
+			TestExecution(DEFAULT_TEST_VORONOI_PATH_NAME, outFolder, print) {};
 	~TestPathVoronoi() {};
 
 	//------------------------------------------------------------------------
@@ -84,8 +104,11 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestPathVoronoiCompare(string fileName, string outFolder, bool print) : \
-			TestCompare("Path Voronoi Compare", fileName, outFolder, print) {};
+	TestPathVoronoiCompare(bool print) : \
+			TestCompare(DEFAULT_TEST_VORONOI_PATH_COMP_NAME, \
+					OUT_FOLDER_VORONOI_PATH_COMP, print) {};
+	TestPathVoronoiCompare(string outFolder, bool print) : \
+			TestCompare(DEFAULT_TEST_VORONOI_PATH_COMP_NAME, outFolder, print) {};
 	~TestPathVoronoiCompare() {};
 
 	//------------------------------------------------------------------------

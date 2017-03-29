@@ -38,8 +38,8 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestCompare(string name, string logFile, string outFolder, bool print) :
-					Test(name, logFile, outFolder, print), \
+	TestCompare(string name, string outFolder, bool print) :
+					Test(name, outFolder, print), \
 					filesNamesFile(DEFAULT_FILE_LIST_COMPARE), \
 					filesList(DEFAULT_N_FILES_COMPARE) {};
 	~TestCompare() {};

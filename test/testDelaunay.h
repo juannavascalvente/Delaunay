@@ -7,11 +7,11 @@
 #ifndef TEST_TESTDELAUNAY_H_
 #define TEST_TESTDELAUNAY_H_
 
-// Default parameters in Delaunay Build test.
-#define DEFAULT_N_POINTS		3
-#define DEFAULT_DELTA_POINTS	2
-#define DEFAULT_N_STEPS			5
-#define DEFAULT_N_TESTS			5
+#define OUT_FOLDER_DELAUNAY					 "./data/tests/log/delaunay/"
+#define DEFAULT_TEST_DELAUNAY_NAME			 "Test Delaunay Build"
+
+#define OUT_FOLDER_DELAUNAY_COMP			 "./data/tests/log/delaunayCompare/"
+#define DEFAULT_TEST_DELAUNAY_NAME_COMP		 "Test Delaunay Compare"
 
 // Default parameters in Delaunay Compare test.
 #define DEFAULT_N_FILES			20
@@ -31,8 +31,10 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestDelaunayBuild(string fileName, string outFolder, bool print) : \
-			TestExecution("Delaunay Build", fileName, outFolder, print) {};
+	TestDelaunayBuild(bool print) : \
+			TestExecution(DEFAULT_TEST_DELAUNAY_NAME, OUT_FOLDER_DELAUNAY, print) {};
+	TestDelaunayBuild(string outFolder, bool print) : \
+			TestExecution(DEFAULT_TEST_DELAUNAY_NAME, outFolder, print) {};
 	~TestDelaunayBuild() {};
 
 	//------------------------------------------------------------------------
@@ -51,8 +53,10 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestDelaunayCompare(string fileName, string outFolder, bool print) : \
-		TestCompare("Delaunay Compare", fileName, outFolder, print) {};
+	TestDelaunayCompare(bool print) : \
+		TestCompare(DEFAULT_TEST_DELAUNAY_NAME_COMP, OUT_FOLDER_DELAUNAY_COMP, print) {};
+	TestDelaunayCompare(string outFolder, bool print) : \
+		TestCompare(DEFAULT_TEST_DELAUNAY_NAME_COMP, outFolder, print) {};
 	~TestDelaunayCompare() {};
 
 	//------------------------------------------------------------------------

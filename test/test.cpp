@@ -5,8 +5,10 @@
  *      Author: juan
  */
 #include "test.h"
+#include "Validator.h"
 #include <stdlib.h>
 
+//#define DEBUG_TEST_INIT
 //#define DEBUG_TEST_READ
 //#define DEBUG_TEST_GET_PARAM_INDEX
 //#define DEBUG_TEST_PARSE_PARAMETERS
@@ -16,6 +18,14 @@ enum READ_TEST_PROCESS	{READ_HEADER_STATUS,
 						 READ_PARAMETER_STATUS,
 						 UNKOWN_STATUS};
 
+/***************************************************************************
+* Name: 	destructor
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: deallocates parameters.
+***************************************************************************/
 Test::~Test()
 {
 	int i=0;			// Loop counter.
@@ -30,6 +40,15 @@ Test::~Test()
 	}
 }
 
+/***************************************************************************
+* Name: 	getParameterIndex
+* IN:		label			label that contains the parameter name to search
+* OUT:		index			index of the parameter in the list
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	gets the "index" of the input parameter from the lists of
+* 				test parameters.
+***************************************************************************/
 bool Test::getParameterIndex(Label &label, int &index)
 {
 	bool found=false;				// Return value.
@@ -72,6 +91,15 @@ bool Test::getParameterIndex(Label &label, int &index)
 	return (found);
 }
 
+/***************************************************************************
+* Name: 	parseParameters
+* IN:		labels			set of parameters to be updated.
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	updates the current test parameters with the values of the
+* 				input "labels".
+***************************************************************************/
 void Test::parseParameters(Set<Label> &labels)
 {
 	int	i=0;			// Loop counter.
@@ -136,12 +164,11 @@ int Test::removeExistingFiles()
 {
 	int ret=0;
 
-	string command = "exec rm -r " + this->outFolder + "*.txt";
+	string command = "exec rm -r " + this->outFolder + "*.*";
 	ret = system(command.c_str());
 
 	return(ret);
 }
-
 
 /***************************************************************************
 * Name: 	getTypeTest
@@ -225,6 +252,40 @@ TestType Test::getTypeTest(string testName)
 	return(type);
 }
 
+/***************************************************************************
+* Name: 	read
+* IN:		ifs			input file stream
+* OUT:		labels		set of valid labels read from file
+* 			testType	type of test to be executed.
+* RETURN:	true		if test prepared
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	reads from the "ifs" stream the set of labels set between
+* 				two "<TEST>" labels and stores them in the "labels" set. Also
+* 				returns in the "testType" parameter the type of the test
+* 				read.
+***************************************************************************/
+void Test::initParameters()
+{
+	// Add output folder name parameter.
+	FileValidator *outFolderValidator = new FileValidator();
+	ParameterFile *outFolderParameter = new ParameterFile(OUT_FOLDER_LABEL, outFolderValidator);
+	this->parameters.add(outFolderParameter);
+};
+
+/***************************************************************************
+* Name: 	read
+* IN:		ifs			input file stream
+* OUT:		labels		set of valid labels read from file
+* 			testType	type of test to be executed.
+* RETURN:	true		if test prepared
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	reads fromthe "ifs" stream the set of labels set between
+* 				two "<TEST>" labelsand stores them in the "labels" set. Also
+* 				returns in the "testType" parameter the type of the test
+* 				read.
+***************************************************************************/
 bool Test::read(ifstream &ifs, Set<Label> &labels, TestType &testType)
 {
 	bool 	eof=false;				// End of file flag.
@@ -352,30 +413,67 @@ bool Test::read(ifstream &ifs, Set<Label> &labels, TestType &testType)
 	return(eof);
 }
 
+/***************************************************************************
+* Name: 	write
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	logs test results in the log file and writes any statistics
+* 				data if set in the test.
+***************************************************************************/
 void Test::init(Set<Label> &labels)
 {
+	string statFile;
+
+	// Creates the parameters set.
 	this->initParameters();
+
+	// Reads parameters and apply values.
 	this->parseParameters(labels);
+
+	// Remove any existing output data.
 	this->removeExistingFiles();
 }
 
+/***************************************************************************
+* Name: 	run
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	executes any previous computations required by the tests,
+* 				executes the tests and writes output results.
+***************************************************************************/
 void Test::run()
 {
+	// Execute any test initialization.
 	this->prepare();
+
+	// Execute tests.
 	this->main();
+
+	// Write any output data.
 	this->write();
 }
 
+/***************************************************************************
+* Name: 	write
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	logs test results in the log file and writes any statistics
+* 				data if set in the test.
+***************************************************************************/
 void Test::write()
 {
-	Logging::buildText(__FUNCTION__, __FILE__, \
-			"----------------------------------------------\n");
-	Logging::buildText(__FUNCTION__, __FILE__, "Test summary\n");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests-this->nTestFailed);
-	Logging::buildText(__FUNCTION__, __FILE__, "/");
-	Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-	Logging::buildText(__FUNCTION__, __FILE__,  \
-			"\n----------------------------------------------");
+	Logging::buildText("----------------------------------------------\n");
+	Logging::buildText("Test summary\n");
+	Logging::buildText(this->totalTests-this->nTestFailed);
+	Logging::buildText("/");
+	Logging::buildText(this->totalTests);
+	Logging::buildText("\n----------------------------------------------");
 	if (this->nTestFailed == 0)
 	{
 		Logging::write(true, Successful);
@@ -384,11 +482,6 @@ void Test::write()
 	{
 		Logging::write(true, Error);
 	}
-}
-
-void Test::finish()
-{
-
 }
 
 /***************************************************************************

@@ -11,6 +11,7 @@
 #define DEFAULT_N_TESTS_TO_EXEC		20
 #define DEFAULT_N_LABELS			20
 #define DEFAULT_TEST_FILE_NAME		"test.txt"
+#define DEFAULT_LOG_FILE_NAME		"logTest.txt"
 
 #include "Set.h"
 #include "Logging.h"
@@ -45,7 +46,7 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	Tester() : fileName(DEFAULT_TEST_FILE_NAME), log("logTest.txt", true) {};
+	Tester() : fileName(DEFAULT_TEST_FILE_NAME), log(DEFAULT_LOG_FILE_NAME, true) {};
 	Tester(string fName, string logFile, bool forcePrintData) : \
 			fileName(fName), tests(DEFAULT_N_TESTS_TO_EXEC),
 			labels(DEFAULT_N_LABELS), log(logFile, forcePrintData) {};
@@ -56,6 +57,5 @@ public:
 	//------------------------------------------------------------------------
 	void main();
 };
-
 
 #endif /* CODE_TEST_TESTER_H_ */

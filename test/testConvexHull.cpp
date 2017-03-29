@@ -32,7 +32,7 @@ void TestConvexHullBuild::main()
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;	// Current # points in DCEL.
 	string 		dumpFileName;		// Input dcel file name.
-	StatisticsConvexHullRegister statReg("statisticsConvexHull.txt", "statConvexLog.txt");
+	StatisticsConvexHullRegister statReg(this->statFileName);
 
 #ifdef DEBUG_TEST_CONEXHULL_BUILD
 	// Print test parameters.

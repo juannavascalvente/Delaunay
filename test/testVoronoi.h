@@ -8,12 +8,17 @@
 #ifndef TEST_TESTVORONOI_H_
 #define TEST_TESTVORONOI_H_
 
+#define OUT_FOLDER_VORONOI					 "./data/tests/log/voronoi/"
+#define DEFAULT_TEST_VORONOI_NAME			 "Test Voronoi Build"
+
+#define OUT_FOLDER_VORONOI_COMP				 "./data/tests/log/voronoiCompare/"
+#define DEFAULT_TEST_VORONOI_NAME_COMP		 "Test Voronoi Compare"
+
 // Default parameters in Voronoi Build test.
 #define VORONOI_DEFAULT_N_POINTS		3
 #define VORONOI_DEFAULT_DELTA_POINTS	2
 #define VORONOI_DEFAULT_N_STEPS			5
 #define VORONOI_DEFAULT_N_TESTS			5
-#define DEF_VORONOI_OUT_FOLDER	"/home/juan/projects/delaunay/code/data/samples/test/output/voronoi/build/"
 
 // Default parameters in Voronoi Compare test.
 #define DEFAULT_N_FILES			20
@@ -32,8 +37,10 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestVoronoiBuild(string fileName, string outFolder, bool print) : \
-			TestExecution("Voronoi Build", fileName, outFolder, print) {};
+	TestVoronoiBuild(bool print) : \
+			TestExecution(DEFAULT_TEST_VORONOI_NAME, OUT_FOLDER_VORONOI, print) {};
+	TestVoronoiBuild(string outFolder, bool print) : \
+			TestExecution(DEFAULT_TEST_VORONOI_NAME, outFolder, print) {};
 	~TestVoronoiBuild() {};
 
 	//------------------------------------------------------------------------
@@ -52,8 +59,10 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	TestVoronoiCompare(string fileName, string outFolder, bool print) : \
-		TestCompare("Voronoi Compare", fileName, outFolder, print) {};
+	TestVoronoiCompare(bool print) : \
+		TestCompare(DEFAULT_TEST_VORONOI_NAME_COMP, OUT_FOLDER_VORONOI_COMP, print) {};
+	TestVoronoiCompare(string outFolder, bool print) : \
+		TestCompare(DEFAULT_TEST_VORONOI_NAME_COMP, outFolder, print) {};
 	~TestVoronoiCompare() {};
 
 	//------------------------------------------------------------------------

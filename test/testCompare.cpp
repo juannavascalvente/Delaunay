@@ -22,6 +22,9 @@
 ***************************************************************************/
 void TestCompare::initParameters()
 {
+	// Add common test parameters.
+	Test::initParameters();
+
 	// Add files list parameter.
 	FileValidator *filesValidator = new FileValidator();
 	ParameterFile *fileParameter = new ParameterFile(TEST_FILE_LABEL, filesValidator);

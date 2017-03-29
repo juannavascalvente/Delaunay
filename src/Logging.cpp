@@ -31,6 +31,7 @@ Logging::Logging(const string fileName, bool force)
 	concat = false;
 	ofs = new ofstream;
 	opened = true;
+	// PENDING THROW EXCEPTION IF NOT OPEN.
 	ofs->open(fileName.c_str(), std::ofstream::out);
 	function = "";
 	file = "";
@@ -64,6 +65,35 @@ Logging::~Logging()
 void Logging::buildText(string text)
 {
 	message = message + text;
+}
+
+/***************************************************************************
+* Name: write
+* IN:		function		function that writes the log
+* 			text			message to be logged
+* 			value			integer to be logged
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: starts infinite loop.
+***************************************************************************/
+void Logging::buildText(int value)
+{
+	string Result;
+	ostringstream convert;
+	convert << value;
+
+	// Check if text must be concatenated.
+	if (concat)
+	{
+		message = message + convert.str();
+	}
+	else
+	{
+		// Copy function and text to be printed.
+		message = convert.str();
+		concat = true;
+	}
 }
 
 /***************************************************************************
@@ -305,7 +335,14 @@ void Logging::write(bool print, enum MessageCategory category)
 	if (opened)
 	{
 		// Write log text.
-		(*ofs) << file << "\t\tFunction " << function << "():\t\t" << message << std::endl;
+		if ((category != Testing) && (category != Successful))
+		{
+			(*ofs) << file << "\t\tFunction " << function << "():\t\t" << message << std::endl;
+		}
+		else
+		{
+			(*ofs) << message << std::endl;
+		}
 
 		// Check message category.
 		switch (category)

@@ -49,7 +49,8 @@ public:
 	static void write(bool print, enum MessageCategory category);
 
 	static void buildText(string text);
-	static void buildTestHeader(int testId, int nTests, string testName);
+	static void buildText(int value);
+	void buildTestHeader(int testId, int nTests, string testName);
 };
 
 #endif /* INCLUDE_LOGGING_H_ */

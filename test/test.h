@@ -10,6 +10,8 @@
 
 #define DEFAULT_TEST_N_PARAMETERS		20
 #define	DEFAULT_OUTPUT_FOLDER			"."
+#define	DEFAULT_LOG_FILENAME			"log.txt"
+#define	DEFAULT_STAT_FILENAME			"statistics.txt"
 
 #include <string>
 #include <unistd.h>
@@ -20,6 +22,7 @@ using namespace std;
 #include "Logging.h"
 #include "Parameter.h"
 #include "Set.h"
+#include "Statistics.h"
 #include "Voronoi.h"
 
 /****************************************************************************
@@ -62,7 +65,6 @@ class Test
 	//------------------------------------------------------------------------
 	// Private virtual functions.
 	//------------------------------------------------------------------------
-	virtual void initParameters(){cout << "DEFAULT INIT PARAMETERS" << endl;};
 	virtual void applyParameter(Parameter *parameter, string value) \
 										{cout << "DEFAULT APPLY" << endl;};
 	virtual void printParameters() {cout << "DEFAULT PRINT" << endl;};
@@ -81,26 +83,35 @@ protected:
 	//------------------------------------------------------------------------
 	// Attributes.
 	//------------------------------------------------------------------------
-	Logging logFile;			// Test log file.
-	Set<Parameter*> parameters;	// Test parameters.
-	string outFolder;			// Test output folder.
-	string testName;			// Test name.
-	int	totalTests;				// Total # of tests.
-	int	testCounter;			// Current test.
-	int	nTestFailed;			// # tests failed.
+	string testName;				// Test name.
+	string outFolder;				// Test output folder.
+	string logFileName;				// Log output file name.
+	string statFileName;			// Statistics output file name.
+	int	totalTests;					// Total # of tests.
+	int	testCounter;				// Current test.
+	int	nTestFailed;				// # tests failed.
+	Set<Parameter*> parameters;		// Test parameters.
+	bool print;						// Print log data.
+	StatisticsRegister *stat;		// Pointer to statistics data.
+
+	virtual void initParameters();
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Test() : logFile("logTest.txt", false),
-			 parameters(DEFAULT_TEST_N_PARAMETERS), \
-			 outFolder(DEFAULT_OUTPUT_FOLDER), \
-			 testName(""), totalTests(0), testCounter(0), nTestFailed(0) {};
-	Test(string name, const string file, string folder, bool print=false):\
-			logFile(file, print), parameters(DEFAULT_TEST_N_PARAMETERS), \
-			outFolder(folder), testName(name), totalTests(0), \
-			testCounter(0), nTestFailed(0){};
+	Test() : testName(""), outFolder(DEFAULT_OUTPUT_FOLDER), \
+			 logFileName(DEFAULT_LOG_FILENAME), \
+			 statFileName(DEFAULT_STAT_FILENAME), totalTests(0), \
+			 testCounter(0), nTestFailed(0), \
+			 parameters(DEFAULT_TEST_N_PARAMETERS), print(true), \
+			 stat(NULL) {};
+	Test(string name, string folder, bool print) : testName(name), \
+			outFolder(folder), logFileName(DEFAULT_LOG_FILENAME), \
+			statFileName(DEFAULT_STAT_FILENAME), totalTests(0), \
+			testCounter(0), nTestFailed(0), \
+			parameters(DEFAULT_TEST_N_PARAMETERS), print(print), \
+			stat(NULL) {};
 	virtual ~Test();
 
 	//------------------------------------------------------------------------
@@ -109,7 +120,7 @@ public:
 	static bool read(ifstream &ifs, Set<Label> &labels, TestType &testType);
 	void init(Set<Label> &labels);
 	void run();
-	void finish();
+	void finish() {};
 
 	// Common functions to execute tests.
 	bool readDelaunay(string filName, Dcel &dcel, Delaunay &delaunay);

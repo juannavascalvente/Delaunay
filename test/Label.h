@@ -23,6 +23,7 @@ using namespace std;
 #define TYPE_DELTA_STEP_LABEL	"DELTA_STEP"
 #define TYPE_N_STEPS_LABEL		"N_STEPS"
 #define TEST_FILE_LABEL			"FILE"
+#define OUT_FOLDER_LABEL		"OUTPUT_FOLDER"
 
 enum LabelType {UNKNOWN_LABEL,
 				BEGIN_LABEL,
