@@ -120,7 +120,7 @@ public:
 	static bool read(ifstream &ifs, Set<Label> &labels, TestType &testType);
 	void init(Set<Label> &labels);
 	void run();
-	void finish() {};
+	void finish(){};
 
 	// Common functions to execute tests.
 	bool readDelaunay(string filName, Dcel &dcel, Delaunay &delaunay);

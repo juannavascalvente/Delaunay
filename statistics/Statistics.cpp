@@ -85,7 +85,7 @@ bool StatisticsConvexHullRegister::writeResults()
 
 			// Write # edges in convex hull.
 			current = *this->data.at(0);
-			this->ofs << "nPoints <- c(" << current->getLength();
+			this->ofs << "nEdges <- c(" << current->getLength();
 			for (i=1; i<this->data.getNElements() ;i++)
 			{
 				current = *this->data.at(i);
@@ -95,7 +95,7 @@ bool StatisticsConvexHullRegister::writeResults()
 
 			// Write execution times.
 			current = *this->data.at(0);
-			this->ofs << "nPoints <- c(" << current->getExecTime();
+			this->ofs << "times <- c(" << current->getExecTime();
 			for (i=1; i<this->data.getNElements() ;i++)
 			{
 				// Write # points in test data.
@@ -116,24 +116,177 @@ bool StatisticsConvexHullRegister::writeResults()
 	return(written);
 }
 
-void StatisticsDelaunay::analyzeDelaunay(Delaunay &delaunay, int index)
+/***************************************************************************
+* NAME: 	deallocate
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	delete statistics data vector elements.
+***************************************************************************/
+void StatisticsConvexHullRegister::deallocate()
+{
+	int	 i=0;				// Loop counter.
+
+	// Delete statistics registers.
+	for (i=0; i<this->data.getNElements() ;i++)
+	{
+		delete *this->data.at(i);
+	}
+}
+
+/***************************************************************************
+* NAME: 	writeResults
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	write two arrays: the number of points in test and the number
+* 				of edges of the convex hull per test.
+***************************************************************************/
+bool StatisticsDelaunayRegister::writeResults()
+{
+	bool written=false;		// Return value.
+	int	 i=0;				// Loop counter.
+	StatisticsDelaunayData *current=NULL;
+
+	// Check file is opened.
+	if (this->ofs.is_open())
+	{
+		if (this->data.getNElements() > 0)
+		{
+			// Write # points in test data.
+			current = *this->data.at(0);
+			this->ofs << "nPoints <- c(" << current->getPoints();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getPoints();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # edges in test data.
+			current = *this->data.at(0);
+			this->ofs << "nEdges <- c(" << current->getEdges();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getEdges();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # imaginary edges in test data.
+			current = *this->data.at(0);
+			this->ofs << "nImaginaryEdges <- c(" << current->getImaginaryEdges();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getImaginaryEdges();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # convex hull edges in test data.
+			current = *this->data.at(0);
+			this->ofs << "nConvexHullEdges <- c(" << current->getConvexhullEdges();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getConvexhullEdges();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # faces in test data.
+			current = *this->data.at(0);
+			this->ofs << "nFaces <- c(" << current->getFaces();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getFaces();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # imaginary faces in test data.
+			current = *this->data.at(0);
+			this->ofs << "nImaginaryFaces <- c(" << current->getImaginaryFaces();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getImaginaryFaces();
+			}
+			this->ofs << ")" << endl;
+
+			// Write execution times.
+			current = *this->data.at(0);
+			this->ofs << "times <- c(" << current->getExecTime();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				// Write # points in test data.
+				current = *this->data.at(i);
+				this->ofs << "," << current->getExecTime();
+			}
+			this->ofs << ")" << endl;
+
+			// Update return value.
+			written = true;
+		}
+		else
+		{
+			this->ofs << "No statistics computed." << endl;
+		}
+	}
+
+	return(written);
+}
+
+/***************************************************************************
+* NAME: 	deallocate
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	delete statistics data vector elements.
+***************************************************************************/
+void StatisticsDelaunayRegister::deallocate()
+{
+	int	 i=0;				// Loop counter.
+
+	// Delete statistics registers.
+	for (i=0; i<this->data.getNElements() ;i++)
+	{
+		delete *this->data.at(i);
+	}
+}
+
+/***************************************************************************
+* NAME: 	analyzeDelaunay
+* IN:		delaunay		delaunay data
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	analyzes a DCEL built using the incremental Delaunay
+* 				algorithm.
+***************************************************************************/
+void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 {
 	int		i=0;			// Loop counter.
-/*
+
 	// Get # points.
-	this->nPoints[index] = delaunay.getRefDcel()->getNVertex();
+	this->setPoints(delaunay.getRefDcel()->getNVertex());
 
 	// Analyze edges.
 	for (i=0; i<delaunay.getRefDcel()->getNEdges() ;i++)
 	{
 		if (delaunay.getRefDcel()->hasNegativeVertex(i+1))
 		{
-			this->nEdges++;
+			cout << "IMAGINARY ";
+			this->nImaginaryEdges++;
 		}
 		else
 		{
-			this->nImaginaryEdges++;
+			cout << "REAL ";
+			this->nEdges++;
 		}
+		delaunay.getRefDcel()->getRefEdge(i)->print(std::cout);
 	}
 
 	// Divide by 2 because some edges are twin.
@@ -144,7 +297,6 @@ void StatisticsDelaunay::analyzeDelaunay(Delaunay &delaunay, int index)
 	if (delaunay.convexHull())
 	{
 		this->nConvexhullEdges = delaunay.getConvexHullEdges()->getNElements();
-		this->nConvexhullEdges = this->nConvexhullEdges*2;
 	}
 	else
 	{
@@ -156,13 +308,13 @@ void StatisticsDelaunay::analyzeDelaunay(Delaunay &delaunay, int index)
 	{
 		if (delaunay.getRefDcel()->imaginaryFace(i))
 		{
-			this->nFaces++;
+			this->nImaginaryFaces++;
 		}
 		else
 		{
-			this->nImaginaryFaces++;
+			this->nFaces++;
 		}
-	}*/
+	}
 
 	// Analyze graph.
 	//this->analyzeGtaph(delaunay.getGraph());

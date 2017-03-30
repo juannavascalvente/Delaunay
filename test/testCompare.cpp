@@ -69,6 +69,10 @@ void TestCompare::applyParameter(Parameter *parameter, string value)
 		// Copy file name list.
 		this->setFileNamesFile(value);
 	}
+	else if (parameterName == OUT_FOLDER_LABEL)
+	{
+		this->setOutFolder(value);
+	}
 	else
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Unknown label parameter:");

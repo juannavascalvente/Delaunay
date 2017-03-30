@@ -65,6 +65,7 @@ Logging::~Logging()
 void Logging::buildText(string text)
 {
 	message = message + text;
+	concat = true;
 }
 
 /***************************************************************************

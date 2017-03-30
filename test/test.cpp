@@ -38,6 +38,8 @@ Test::~Test()
 		param->deleteValidator();
 		delete param;
 	}
+
+	delete this->stat;
 }
 
 /***************************************************************************
@@ -424,13 +426,14 @@ bool Test::read(ifstream &ifs, Set<Label> &labels, TestType &testType)
 ***************************************************************************/
 void Test::init(Set<Label> &labels)
 {
-	string statFile;
-
 	// Creates the parameters set.
 	this->initParameters();
 
 	// Reads parameters and apply values.
 	this->parseParameters(labels);
+
+	// Set output statistics file name.
+	this->statFileName = this->outFolder + this->statFileName;
 
 	// Remove any existing output data.
 	this->removeExistingFiles();
@@ -469,11 +472,10 @@ void Test::run()
 void Test::write()
 {
 	Logging::buildText("----------------------------------------------\n");
-	Logging::buildText("Test summary\n");
+	Logging::buildText("Test success:\t\t\t\t");
 	Logging::buildText(this->totalTests-this->nTestFailed);
 	Logging::buildText("/");
 	Logging::buildText(this->totalTests);
-	Logging::buildText("\n----------------------------------------------");
 	if (this->nTestFailed == 0)
 	{
 		Logging::write(true, Successful);
@@ -481,6 +483,12 @@ void Test::write()
 	else
 	{
 		Logging::write(true, Error);
+	}
+
+	// Check if file statistics must be written.
+	if (this->stat != NULL)
+	{
+		this->stat->writeResults();
 	}
 }
 
@@ -565,8 +573,10 @@ bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 	else
 	{
 		// Create incremental Delaunay algorithm.
+		this->stat->tic();
 		if (!delaunay.incremental())
 		{
+			this->stat->toc();
 			built = false;
 			this->nTestFailed++;
 			Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay in test ");

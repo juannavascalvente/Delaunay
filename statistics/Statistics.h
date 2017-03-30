@@ -17,6 +17,8 @@ using namespace std;
 #ifndef INCLUDE_STATISTICS_H_
 #define INCLUDE_STATISTICS_H_
 
+#define DEFAULT_N_STATISTICS			100
+
 #define MILLION	1000000
 #define BILLION 1000000000L;
 
@@ -110,7 +112,7 @@ public:
 /****************************************************************************
 //	 			StatisticsTriangulation CLASS DEFITNION
 ****************************************************************************/
-class StatisticsTriangulation : public StatisticsData
+class StatisticsTriangulationData : public StatisticsData
 {
 	//------------------------------------------------------------------------
 	//  Attributes
@@ -125,9 +127,9 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsTriangulation() : nEdges(0), nConvexhullEdges(0), nFaces(0), \
+	StatisticsTriangulationData() : nEdges(0), nConvexhullEdges(0), nFaces(0), \
 								nFlips(0) {}
-    ~StatisticsTriangulation() {}
+    virtual ~StatisticsTriangulationData() {}
 
 	//------------------------------------------------------------------------
 	// Public functions.
@@ -138,12 +140,13 @@ public:
 	void setFaces(int faces) {nFaces = faces;}
 	int getFlips() const {return nFlips;}
 	void setFlips(int flips) {nFlips = flips;}
+	int getConvexhullEdges() const {return nConvexhullEdges;}
 };
 
 /****************************************************************************
 //	 				StatisticsDelaunay CLASS DEFITNION
 ****************************************************************************/
-class StatisticsDelaunay : public StatisticsTriangulation
+class StatisticsDelaunayData : public StatisticsTriangulationData
 {
 	//------------------------------------------------------------------------
 	//  Attributes
@@ -159,22 +162,24 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsDelaunay(string outFile) : nCollinear(0), n2children(0), 		\
-										 n3children(0), nImaginaryEdges(0), \
-										 nImaginaryFaces(0), nNodes(0) {}
-    ~StatisticsDelaunay() {}
+	StatisticsDelaunayData() : nCollinear(0), n2children(0), n3children(0), \
+						   nImaginaryEdges(0), nImaginaryFaces(0), nNodes(0){}
+    ~StatisticsDelaunayData() {}
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
-	int getN2childrenNodes() const {return n2children;}
+    void analyzeDelaunay(Delaunay &delaunay);
+    void analyzeGraph(Graph &graph);
+
+    int getN2childrenNodes() const {return n2children;}
 	void setN2childrenNodes(int n2children) {this->n2children = n2children;}
 	int getN3childrenNodes() const {return n3children;}
 	void setN3childrenNodes(int n3children) {this->n3children = n3children;}
 	int getCollinear() const {return nCollinear;}
 	void setCollinear(int collinear) {nCollinear = collinear;}
-    void analyzeDelaunay(Delaunay &delaunay, int index);
-    void analyzeGtaph(Graph &graph, int index);
+	int getImaginaryEdges() const {return nImaginaryEdges;}
+	int getImaginaryFaces() const {return nImaginaryFaces;}
 };
 
 /****************************************************************************
@@ -225,6 +230,7 @@ public:
 	void toc() {this->timer.toc();};
 	double getLapse() {return(this->timer.getInterval());};
 	virtual bool writeResults() {return(true);};
+	virtual void deallocate() { cout << "PARENT " << endl;};
 };
 
 /****************************************************************************
@@ -235,11 +241,30 @@ class StatisticsConvexHullRegister : public StatisticsRegister
 	Set<ConexHullStatisticsData *>	data;	// Test statistics array.
 public:
 	StatisticsConvexHullRegister(string outFile) : \
-									StatisticsRegister(outFile) {};
-	~StatisticsConvexHullRegister(){};
+									StatisticsRegister(outFile),
+									data(DEFAULT_N_STATISTICS) {};
+	~StatisticsConvexHullRegister(){this->deallocate();};
 
     void add(ConexHullStatisticsData *data) {this->data.add(data);};
     bool writeResults();
+    void deallocate();
+};
+
+/****************************************************************************
+//	 				StatisticsDelaunayRegister CLASS DEFITNION
+****************************************************************************/
+class StatisticsDelaunayRegister : public StatisticsRegister
+{
+	Set<StatisticsDelaunayData *>	data;	// Test statistics array.
+public:
+	StatisticsDelaunayRegister(string outFile) : \
+									StatisticsRegister(outFile),
+									data(DEFAULT_N_STATISTICS) {};
+	~StatisticsDelaunayRegister(){this->deallocate();};
+
+    void add(StatisticsDelaunayData *data) {this->data.add(data);};
+    bool writeResults();
+    void deallocate();
 };
 
 #endif /* INCLUDE_STATISTICS_H_ */

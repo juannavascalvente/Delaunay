@@ -8,6 +8,7 @@
 #include "Delaunay.h"
 #include "generic.h"
 #include "Label.h"
+#include "Statistics.h"
 #include <unistd.h>
 
 //#define DEBUG_TEST_DELAUNAY_BUILD
@@ -31,6 +32,8 @@ void TestDelaunayBuild::main()
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
 	string		dumpFileName;		// DCEL file name.
+	StatisticsDelaunayRegister *statReg = new StatisticsDelaunayRegister(this->statFileName);
+	this->stat = statReg;
 
 #ifdef DEBUG_TEST_DELAUNAY_BUILD
 	// Print test parameters.
@@ -51,6 +54,9 @@ void TestDelaunayBuild::main()
 
 		for (testIndex=0; testIndex<this->nTests ;testIndex++)
 		{
+			StatisticsDelaunayData *statData = new StatisticsDelaunayData();
+			statData->setPoints(currentNPoints);
+
 			// Build failed file name test data.
 			ostringstream convert;
 			convert << this->nTestFailed+1;
@@ -59,6 +65,7 @@ void TestDelaunayBuild::main()
 			// Build incremental Delaunay triangulation.
 			if (this->buildRandomDelaunay(currentNPoints, dcel, delaunay))
 			{
+				statData->setExecTime(this->stat->getLapse());
 				Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
 				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 				Logging::buildText(__FUNCTION__, __FILE__, "/");
@@ -73,6 +80,10 @@ void TestDelaunayBuild::main()
 			// Reset Delaunay data.
 			delaunay.reset();
 			this->testCounter++;
+
+			// Add statistics data.
+			statReg->add(statData);
+			statData->analyzeDelaunay(delaunay);
 		}
 
 		// Update # points to generate.

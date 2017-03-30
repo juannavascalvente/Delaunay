@@ -32,7 +32,8 @@ void TestConvexHullBuild::main()
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;	// Current # points in DCEL.
 	string 		dumpFileName;		// Input dcel file name.
-	StatisticsConvexHullRegister statReg(this->statFileName);
+	StatisticsConvexHullRegister *statReg = new StatisticsConvexHullRegister(this->statFileName);
+	this->stat = statReg;
 
 #ifdef DEBUG_TEST_CONEXHULL_BUILD
 	// Print test parameters.
@@ -63,17 +64,17 @@ void TestConvexHullBuild::main()
 			// Build incremental Delaunay triangulation.
 			if (this->buildRandomDelaunay(currentNPoints, dcel, delaunay))
 			{
-				statReg.tic();
+				this->stat->tic();
 				if (delaunay.convexHull())
 				{
-					statReg.toc();
+					this->stat->toc();
 					Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 					Logging::buildText(__FUNCTION__, __FILE__, "/");
 					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 					Logging::write(true, Successful);
 					statData->setLength(delaunay.getConvexHullEdges()->getNElements());
-					statData->setExecTime(statReg.getLapse());
+					statData->setExecTime(this->stat->getLapse());
 				}
 				else
 				{
@@ -96,15 +97,12 @@ void TestConvexHullBuild::main()
 			}
 
 			// Add statistics data.
-			statReg.add(statData);
+			statReg->add(statData);
 		}
 
 		// Update # points to generate.
 		currentNPoints = currentNPoints*this->deltaPoints;
 	}
-
-	// Write statistics data.
-	statReg.writeResults();
 }
 
 /***************************************************************************

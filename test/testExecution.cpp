@@ -92,6 +92,10 @@ void TestExecution::applyParameter(Parameter *parameter, string value)
 
 		this->setSteps(convertedValue);
 	}
+	else if (parameterName == OUT_FOLDER_LABEL)
+	{
+		this->setOutFolder(value);
+	}
 	else
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Unknown label parameter: ");
