@@ -278,15 +278,15 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 	{
 		if (delaunay.getRefDcel()->hasNegativeVertex(i+1))
 		{
-			cout << "IMAGINARY ";
+			//cout << "IMAGINARY ";
 			this->nImaginaryEdges++;
 		}
 		else
 		{
-			cout << "REAL ";
+			//cout << "REAL ";
 			this->nEdges++;
 		}
-		delaunay.getRefDcel()->getRefEdge(i)->print(std::cout);
+		//delaunay.getRefDcel()->getRefEdge(i)->print(std::cout);
 	}
 
 	// Divide by 2 because some edges are twin.

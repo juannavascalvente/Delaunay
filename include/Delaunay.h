@@ -48,8 +48,8 @@ class Delaunay
 	void 	checkEdge(int edge_ID);
 	void 	flipEdges(int edge_ID);
 	bool 	insertPoint(int index);
-	bool 	locateNode(Point<TYPE> &point, int &nodeIndex);
-	bool 	isInteriorToNode(Point<TYPE> &point, int nodeIndex);
+	bool 	locateNode(const Point<TYPE> &point, int &nodeIndex);
+	bool 	isInteriorToNode(const Point<TYPE> &point, int nodeIndex);
 	bool 	isStrictlyInteriorToNode(Point<TYPE> &point, int nodeIndex);
 	void 	splitNode(int pointIndex, int nodeIndex, int nTriangles);
 	double	signedArea(Node *node);
@@ -95,7 +95,7 @@ public:
 	inline Set<int>* getConvexHullEdges() {return(&this->hullEdges);};
 	bool findTwoClosest(int &first, int &second);
 	bool findFace(Point<TYPE> &point, int &faceId);
-	bool findClosestPoint(Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
+	bool findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
 															int	&poinIndex,
 															double &dist);
 	bool findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q,

@@ -86,10 +86,11 @@ class Point
 
 	// Location interface.
 	bool has_Extreme_Coordinates(void);
-	enum Turn_T	check_Turn(Point<A_Type> &p, Point<A_Type> &q);
+	enum Turn_T	check_Turn(const Point<A_Type> &p, const Point<A_Type> &q);
 	static bool lowerY(Point<TYPE> *p, Point<TYPE> *q);
-	static bool lexicographicHigher(Point<TYPE> *p, Point<TYPE> *q);
-	static bool higher_Point(Point<TYPE> *p1, Point<TYPE> *p2, bool (*f)(Point<TYPE> *, Point<TYPE> *));
+	static bool lexicographicHigher(const Point<TYPE> *p, const Point<TYPE> *q);
+	static bool higher_Point(const Point<TYPE> *p1, const Point<TYPE> *p2, \
+						bool (*f)(const Point<TYPE> *, const Point<TYPE> *));
 	static bool inCircle(Point<TYPE> *p1, Point<TYPE> *p2, Point<TYPE> *q1, Point<TYPE> *q2);
 	static void middlePoint(Point<TYPE> *p, Point<TYPE> *q, Point<TYPE> *middle);
 
@@ -182,7 +183,7 @@ template <class A_Type> bool Point<A_Type>::has_Extreme_Coordinates(void)
  * Complexity:	O(1)
 *****************************************************************************/
 // PENDING CHANGE PARAMETERS TO BE reference.
-template <class A_Type> enum Turn_T Point<A_Type>::check_Turn(Point<A_Type> &p, Point<A_Type> &q)
+template <class A_Type> enum Turn_T Point<A_Type>::check_Turn(const Point<A_Type> &p, const Point<A_Type> &q)
 {
 	double          area=0.0;       // Signed area.
 	enum Turn_T     turn;           // Return value.
@@ -378,7 +379,7 @@ template <class A_Type> bool Point<A_Type>::lowerY(Point<TYPE> *p, Point<TYPE> *
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> bool Point<A_Type>::lexicographicHigher(Point<TYPE> *p, Point<TYPE> *q)
+template <class A_Type> bool Point<A_Type>::lexicographicHigher(const Point<TYPE> *p, const Point<TYPE> *q)
 {
     bool higher=false;       // Return value.
 
@@ -408,8 +409,9 @@ template <class A_Type> bool Point<A_Type>::lexicographicHigher(Point<TYPE> *p, 
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> bool Point<A_Type>::higher_Point(Point<TYPE> *p1,
-					Point<TYPE> *p2, bool (*f)(Point<TYPE> *, Point<TYPE> *))
+template <class A_Type> bool Point<A_Type>::higher_Point(const Point<TYPE> *p1, \
+									const Point<TYPE> *p2, \
+									bool (*f)(const Point<TYPE> *, const Point<TYPE> *))
 {
     return((*f)(p1, p2));
 }

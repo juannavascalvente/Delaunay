@@ -573,10 +573,16 @@ bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 	else
 	{
 		// Create incremental Delaunay algorithm.
-		this->stat->tic();
+		if (this->stat != NULL)
+		{
+			this->stat->tic();
+		}
 		if (!delaunay.incremental())
 		{
-			this->stat->toc();
+			if (this->stat != NULL)
+			{
+				this->stat->toc();
+			}
 			built = false;
 			this->nTestFailed++;
 			Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay in test ");

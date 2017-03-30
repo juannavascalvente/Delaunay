@@ -838,7 +838,7 @@ bool Delaunay::findTwoClosest(int &first, int &second)
 * Description: 	finds the closest point q to input point p. To do so it first
 * 				locates the face that surrounds p and then
 ***************************************************************************/
-bool Delaunay::findClosestPoint(Point<TYPE> &p, Voronoi &voronoi,
+bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 															Point<TYPE> &q,
 															int	&pointIndex,
 															double &dist)
@@ -971,7 +971,7 @@ bool Delaunay::findClosestPoint(Point<TYPE> &p, Voronoi &voronoi,
 		{
 			// Update output data.
 			q = *this->dcel->getRefPoint(pointIndex);
-			dist = p.distance(q);
+			dist = q.distance(p);
 		}
 	}
 
@@ -1482,7 +1482,7 @@ bool Delaunay::insertPoint(int index)
 * Description: 	Locates the node where the point whose index is the first
 * 				input parameter is located.
 ***************************************************************************/
-bool Delaunay::locateNode(Point<TYPE> &point, int &nodeIndex)
+bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
 {
 	bool	locatedNode=false;	// Return value.
 	int     i=0;                // Loop counter.
@@ -1572,7 +1572,7 @@ bool Delaunay::locateNode(Point<TYPE> &point, int &nodeIndex)
 * 				conditions checks that there is no RIGHT turn between the
 * 				input point and the points of every edge of the triangle.
 ***************************************************************************/
-bool Delaunay::isInteriorToNode(Point<TYPE> &point, int nodeIndex)
+bool Delaunay::isInteriorToNode(const Point<TYPE> &point, int nodeIndex)
 {
 	bool	isInterior=false;		// Return value.
 	int		id1=0, id2=0, id3=0;	// IDs of vertex points.

@@ -157,8 +157,8 @@ public:
 	bool generateClusters(int nPoints, int nClusters, TYPE radius);
 	void sort();
 	int  getIndexLowest(bool (*f)(Point<TYPE> *, Point<TYPE> *));
-	int  getIndexHighest(bool (*f)(Point<TYPE> *, Point<TYPE> *));
-	enum Turn_T returnTurn(Point<TYPE> *p, int sourcePoint, int destPoint);
+	int  getIndexHighest(bool (*f)(const Point<TYPE> *, const Point<TYPE> *));
+	enum Turn_T returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoint);
 	double 		signedArea(int id1, int id2, int id3);
 
 	// Figures? PENDING. Move to another module?

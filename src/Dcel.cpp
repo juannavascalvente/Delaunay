@@ -1470,7 +1470,7 @@ int Dcel::getIndexLowest(bool (*f)(Point<TYPE> *, Point<TYPE> *))
 * Description: 	searches highest point in the DCEL vertex set and places
 * 				it in the first position of the array.
 ***************************************************************************/
-int Dcel::getIndexHighest(bool (*f)(Point<TYPE> *, Point<TYPE> *))
+int Dcel::getIndexHighest(bool (*f)(const Point<TYPE> *, const Point<TYPE> *))
 {
     int     i=0;                // Loop counter.
     int     index=0;    // Index of highest point.
@@ -1509,7 +1509,7 @@ int Dcel::getIndexHighest(bool (*f)(Point<TYPE> *, Point<TYPE> *))
 * Description: 	searches highest point in the DCEL vertex set and places
 * 				it in the first position of the array.
 ***************************************************************************/
-enum Turn_T Dcel::returnTurn(Point<TYPE> *p, int sourcePoint, int destPoint)
+enum Turn_T Dcel::returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoint)
 {
     enum Turn_T turn=LEFT_TURN;         // Return value.
 
