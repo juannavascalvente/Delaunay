@@ -88,6 +88,10 @@ bool Delaunay::incremental()
 	int  	pointIndex=0;	// Points loop counter.
 	int	 	nPoints=0;		// Loop upper bound.
 	int  	highestPointIndex=0;	// Index of the highest point.
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+	this->nFlips = 0;
+	this->nCollinear = 0;
+#endif
 
 	// Set type of algorithm.
 	this->setAlgorithm(INCREMENTAL);
@@ -104,13 +108,6 @@ bool Delaunay::incremental()
 		// If no graph allocated then create a new graph.
 		if (this->initializeGraph())
 		{
-#ifdef DELAUNAY_STATISTICS
-			// Initialize graph statistics (first 2 points are located in first triangle).
-			delaunay_Stat.trianglesFound[0] = 2;
-			delaunay_Stat.trianglesFound[1] = 0;
-			delaunay_Stat.trianglesFound[2] = 0;
-			delaunay_Stat.nFlipped = 0;
-#endif
 			// Set highest point at first position of the DCEL vertex array.
 			highestPointIndex = this->dcel->getIndexHighest(&Point<TYPE>::lexicographicHigher);
 			this->dcel->swapVertex(0, highestPointIndex);
@@ -155,7 +152,7 @@ bool Delaunay::incremental()
 				Logging::write(true, Info);
 #endif
 				// Insert new point into triangle where it is located.
-				inserted = this->insertPoint(pointIndex);
+				inserted = this->addPointToDelaunay(pointIndex);
 				built = inserted;
 				pointIndex++;
 			}
@@ -290,9 +287,8 @@ void Delaunay::checkEdge(int edge_ID)
 	// Check if edges must be flipped.
 	if (flipEdges)
 	{
-#ifdef DELAUNAY_STATISTICS
-		// Update triangle where point is located.
-		delaunay_Stat.nFlipped++;
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+		this->nFlips++;
 #endif
 #ifdef DEBUG_CHECK_EDGES
 		Logging::buildText(__FUNCTION__, __FILE__, "Edge: ");
@@ -1414,7 +1410,7 @@ bool Delaunay::initializeGraph()
 }
 
 /***************************************************************************
-* Name: 	insertPoint
+* Name: 	addPointToDelaunay
 * IN:		index		index of the point to locate.
 * OUT:		NONE
 * RETURN:	true		if point inserted.
@@ -1423,7 +1419,7 @@ bool Delaunay::initializeGraph()
 * Description: 	Locates the node where the point whose index is the input
 * 				parameter and inserts the point in the triangulation.
 ***************************************************************************/
-bool Delaunay::insertPoint(int index)
+bool Delaunay::addPointToDelaunay(int index)
 {
 	bool	inserted=false;		// Return value.
 	int		nodeIndex=0;		// Current node index.
@@ -1811,6 +1807,10 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
     }
     else
     {
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+		this->nCollinear++;
+		cout << "COLLINEAR TOTAL: " << this->nCollinear << endl;
+#endif
         // Get edge identifier where new point is collinear.
     	collinear_Edge_ID = this->dcel->getCollinear(pointIndex, ptrFace->getEdge());
 

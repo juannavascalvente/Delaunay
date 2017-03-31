@@ -256,6 +256,7 @@ bool StatisticsDelaunayRegister::writeResults()
 			this->ofs << ")" << endl;
 
 			// Write # collinear points in test data.
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
 			current = *this->data.at(0);
 			this->ofs << "nCollinearPoints <- c(" << current->getCollinear();
 			for (i=1; i<this->data.getNElements() ;i++)
@@ -264,7 +265,7 @@ bool StatisticsDelaunayRegister::writeResults()
 				this->ofs << "," << current->getCollinear();
 			}
 			this->ofs << ")" << endl;
-
+#endif
 			// Write # leaves in graph.
 			current = *this->data.at(0);
 			this->ofs << "nLeaves <- c(" << current->getLeaves();
@@ -378,8 +379,9 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 	}
 
 	// Get # collinear points found in algorithm execution.
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	this->nCollinear = delaunay.getCollinear();
-
+#endif
 	// Analyze graph.
 	this->analyzeGraph(*delaunay.getGraph());
 }

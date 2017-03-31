@@ -600,10 +600,6 @@ bool Triangulation::delaunay()
 				// Check if remaining point from adjacent face is in circle.
 				if (circle.inCircle( this->dcel->getRefPoint( this->dcel->getOrigin( twin->getPrevious()-1)-1)))
 				{
-#ifdef DELAUNAY_STATISTICS
-					delaunay_Stat.nFlipped++;
-#endif
-
 #ifdef DEBUG_TRIANGULATION_DELAUNAY
 					Logging::buildText(__FUNCTION__, __FILE__, "Edge ");
 					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
