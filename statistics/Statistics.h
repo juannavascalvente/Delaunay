@@ -122,13 +122,14 @@ protected:
 	int	nConvexhullEdges;
 	int nFaces;
 	int	nFlips;
+	int nCollinear;
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
 	StatisticsTriangulationData() : nEdges(0), nConvexhullEdges(0), nFaces(0), \
-								nFlips(0) {}
+								nFlips(0), nCollinear(0) {}
     virtual ~StatisticsTriangulationData() {}
 
 	//------------------------------------------------------------------------
@@ -141,6 +142,7 @@ public:
 	int getFlips() const {return nFlips;}
 	void setFlips(int flips) {nFlips = flips;}
 	int getConvexhullEdges() const {return nConvexhullEdges;}
+	int getCollinear() const {return nCollinear;}
 };
 
 /****************************************************************************
@@ -151,7 +153,7 @@ class StatisticsDelaunayData : public StatisticsTriangulationData
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
-	int nCollinear;
+	int	nLeaves;
 	int n2children;
 	int	n3children;
 	int nImaginaryEdges;
@@ -162,7 +164,7 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsDelaunayData() : nCollinear(0), n2children(0), n3children(0), \
+	StatisticsDelaunayData() : nLeaves(0), n2children(0), n3children(0), \
 						   nImaginaryEdges(0), nImaginaryFaces(0), nNodes(0){}
     ~StatisticsDelaunayData() {}
 
@@ -173,13 +175,11 @@ public:
     void analyzeGraph(Graph &graph);
 
     int getN2childrenNodes() const {return n2children;}
-	void setN2childrenNodes(int n2children) {this->n2children = n2children;}
 	int getN3childrenNodes() const {return n3children;}
-	void setN3childrenNodes(int n3children) {this->n3children = n3children;}
-	int getCollinear() const {return nCollinear;}
-	void setCollinear(int collinear) {nCollinear = collinear;}
 	int getImaginaryEdges() const {return nImaginaryEdges;}
 	int getImaginaryFaces() const {return nImaginaryFaces;}
+	int getNodes() const {return nNodes;}
+	int getLeaves() const {return nLeaves;}
 };
 
 /****************************************************************************

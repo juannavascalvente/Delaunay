@@ -40,22 +40,25 @@ class Delaunay
 
 	// Type of algorithm executed to compute the Delaunay algorithm.
 	enum Algorithm algorithm;
-
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+	int nFlips;
+	int nCollinear;
+#endif
 	//------------------------------------------------------------------------
 	// Private functions.
 	//------------------------------------------------------------------------
-	bool 	initializeGraph();
-	void 	checkEdge(int edge_ID);
-	void 	flipEdges(int edge_ID);
-	bool 	insertPoint(int index);
-	bool 	locateNode(const Point<TYPE> &point, int &nodeIndex);
-	bool 	isInteriorToNode(const Point<TYPE> &point, int nodeIndex);
-	bool 	isStrictlyInteriorToNode(Point<TYPE> &point, int nodeIndex);
-	void 	splitNode(int pointIndex, int nodeIndex, int nTriangles);
-	double	signedArea(Node *node);
+	bool initializeGraph();
+	void checkEdge(int edge_ID);
+	void flipEdges(int edge_ID);
+	bool addPointToDelaunay(int index);
+	bool locateNode(const Point<TYPE> &point, int &nodeIndex);
+	bool isInteriorToNode(const Point<TYPE> &point, int nodeIndex);
+	bool isStrictlyInteriorToNode(Point<TYPE> &point, int nodeIndex);
+	void splitNode(int pointIndex, int nodeIndex, int nTriangles);
+	double signedArea(Node *node);
 
-	void 	getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace);
-	void 	getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
+	void getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace);
+	void getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
 
 public:
 	//------------------------------------------------------------------------
@@ -65,8 +68,8 @@ public:
 					convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), \
 					hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
 	Delaunay(Dcel *inDcel) : graphAllocated(true), convexHullComputed(false), \
-							hull(DEFAUTL_CONVEXHULL_LEN), \
-							hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE) \
+						hull(DEFAUTL_CONVEXHULL_LEN), \
+						hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE) \
 
 	{
 		// PENDING REPLACE 10 BY DEFAULT LENGTH DEPENDING ON NPOINTS.
@@ -113,6 +116,10 @@ public:
 	void print(Node *node);
 	bool read(string fileName, string graphFileName);
 	bool write(string fileName, string graphFileName);
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+	int getCollinear() const {return nCollinear;}
+	int getFlips() const {return nFlips;}
+#endif
 };
 
 #endif /* INCLUDE_DELAUNAY_H_ */

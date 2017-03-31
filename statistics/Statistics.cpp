@@ -215,6 +215,67 @@ bool StatisticsDelaunayRegister::writeResults()
 			}
 			this->ofs << ")" << endl;
 
+			// Write # nodes in test data.
+			current = *this->data.at(0);
+			this->ofs << "nNodes <- c(" << current->getNodes();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getNodes();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # nodes with 3 children in test data.
+			current = *this->data.at(0);
+			this->ofs << "n3childrenNodes <- c(" << current->getN3childrenNodes();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getN3childrenNodes();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # nodes with 2 children in test data.
+			current = *this->data.at(0);
+			this->ofs << "n2childrenNodes <- c(" << current->getN2childrenNodes();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getN2childrenNodes();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # flipped edges in test data.
+			current = *this->data.at(0);
+			this->ofs << "nFlipped <- c(" << current->getFlips();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getFlips();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # collinear points in test data.
+			current = *this->data.at(0);
+			this->ofs << "nCollinearPoints <- c(" << current->getCollinear();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getCollinear();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # leaves in graph.
+			current = *this->data.at(0);
+			this->ofs << "nLeaves <- c(" << current->getLeaves();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				// Write # points in test data.
+				current = *this->data.at(i);
+				this->ofs << "," << current->getLeaves();
+			}
+			this->ofs << ")" << endl;
+
 			// Write execution times.
 			current = *this->data.at(0);
 			this->ofs << "times <- c(" << current->getExecTime();
@@ -316,9 +377,48 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 		}
 	}
 
+	// Get # collinear points found in algorithm execution.
+	this->nCollinear = delaunay.getCollinear();
+
 	// Analyze graph.
-	//this->analyzeGtaph(delaunay.getGraph());
+	this->analyzeGraph(*delaunay.getGraph());
 }
 
+/***************************************************************************
+* NAME: 	analyzeGraph
+* IN:		graph		graph data
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	analyzes a graph built using the incremental Delaunay
+* 				algorithm.
+***************************************************************************/
+void StatisticsDelaunayData::analyzeGraph(Graph &graph)
+{
+	int i=0;		// Loop counter.
 
+	// Get # nodes.
+	this->nNodes = graph.getNElements();
+
+	// Check all nodes.
+	for (i=0; i<graph.getNElements() ;i++)
+	{
+		// Check # children in current node.
+		if (graph.getNChildren(i) == 3)
+		{
+			this->n3children++;
+		}
+		else if (graph.getNChildren(i) == 2)
+		{
+			this->n2children++;
+		}
+		else
+		{
+			this->nLeaves++;
+		}
+	}
+
+	// Compute # flipped edges.
+	this->setFlips(this->n2children / 2);
+}
 

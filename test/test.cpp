@@ -579,10 +579,6 @@ bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 		}
 		if (!delaunay.incremental())
 		{
-			if (this->stat != NULL)
-			{
-				this->stat->toc();
-			}
 			built = false;
 			this->nTestFailed++;
 			Logging::buildText(__FUNCTION__, __FILE__, "Error building Delaunay in test ");
@@ -590,6 +586,10 @@ bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 			Logging::buildText(__FUNCTION__, __FILE__, "/");
 			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 			Logging::write(true, Error);
+		}
+		if (this->stat != NULL)
+		{
+			this->stat->toc();
 		}
 	}
 
