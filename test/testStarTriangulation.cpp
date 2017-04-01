@@ -4,8 +4,10 @@
  *  Created on: Apr 1, 2017
  *      Author: juan
  */
-
 #include "testStarTriangulation.h"
+
+#define DEBUG_TEST_STAR_BUILD
+#define DEBUG_TEST_STAR_COMPARE
 
 /***************************************************************************
 * Name: 	main
@@ -30,7 +32,7 @@ void TestStarTriangulationBuild::main()
 				this->nSteps, this->nTests);
 	this->stat = statReg;
 
-#ifdef DEBUG_TEST_DELAUNAY_BUILD
+#ifdef DEBUG_TEST_STAR_BUILD
 	// Print test parameters.
 	this->printParameters();
 #endif
@@ -39,7 +41,7 @@ void TestStarTriangulationBuild::main()
 	currentNPoints = this->nPoints;
 	for (stepIndex=0; stepIndex<this->nSteps ;stepIndex++)
 	{
-#ifdef DEBUG_TEST_DELAUNAY_BUILD
+#ifdef DEBUG_TEST_STAR_BUILD
 		Logging::buildText(__FUNCTION__, __FILE__, "Executing step ");
 		Logging::buildText(__FUNCTION__, __FILE__, (stepIndex+1));
 		Logging::buildText(__FUNCTION__, __FILE__, "/");
@@ -82,10 +84,6 @@ void TestStarTriangulationBuild::main()
 			statData->analyzeTriangulation(triangulation);
 			statReg->add(statData);
 
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-			memcpy(statData->getNodesChecked(), delaunay.getNodesChecked(), sizeof(int)*currentNPoints);
-			delaunay.freeStatistics();
-#endif
 			// Reset Delaunay data.
 			triangulation.reset();
 			this->testCounter++;
@@ -142,18 +140,17 @@ void TestStarTriangulationBuild::dump(string dcelFileName, Dcel &dcel)
 ***************************************************************************/
 void TestStarTriangulationCompare::main()
 {
-	/*
 	int 	 i=0;				// Loop counter.
 	string 	 dcelFileName;		// DCEL file name.
 	string 	 outFileName;		// Output file name.
 	Dcel	 originalDcel;		// Original dcel data.
 	Dcel	 dcel;				// Dcel data.
-	Delaunay delaunay;			// Delaunay data.
+	Triangulation triangulation;
 
 	this->testCounter = 1;
 	this->totalTests = filesList.getNElements();
 
-#ifdef DEBUG_DELAUNAY_COMPARE_PREPARE
+#ifdef DEBUG_TEST_STAR_COMPARE
 	// Print test parameters.
 	this->printParameters();
 	Logging::buildText(__FUNCTION__, __FILE__, "Number of files to compare: ");
@@ -181,43 +178,80 @@ void TestStarTriangulationCompare::main()
 			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 			Logging::write(true, Error);
 		}
-		else if (this->readDelaunay(dcelFileName, dcel, delaunay))
+		else if (!dcel.readPoints(dcelFileName, false))
 		{
-			if (dcel == originalDcel)
+			this->nTestFailed++;
+			Logging::buildText(__FUNCTION__, __FILE__, "Error reading point from file: ");
+			Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
+			Logging::buildText(__FUNCTION__, __FILE__, " in test ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+			Logging::buildText(__FUNCTION__, __FILE__, "/");
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+			Logging::write(true, Error);
+		}
+		else
+		{
+			// Reset dcel to remove all data except point coordinates.
+			dcel.clean();
+
+			// Create star triangulation.
+			if (triangulation.build(&dcel))
 			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
-				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
-				Logging::buildText(__FUNCTION__, __FILE__, "/");
-				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
-				Logging::write(true, Successful);
+				// Create Delaunay from star triangulation.
+				if (!triangulation.delaunay())
+				{
+					this->dump(outFileName, dcel);
+					this->nTestFailed++;
+					Logging::buildText(__FUNCTION__, __FILE__, "Error building delaunay from star in test ");
+					Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+					Logging::buildText(__FUNCTION__, __FILE__, "/");
+					Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+					Logging::write(true, Error);
+				}
+				else
+				{
+					if (dcel == originalDcel)
+					{
+						Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+						Logging::buildText(__FUNCTION__, __FILE__, "/");
+						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+						Logging::write(true, Successful);
+					}
+					else
+					{
+						this->nTestFailed++;
+
+						// Write test data.
+						this->dump(outFileName, dcel);
+
+						// Print log error.
+						Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
+						Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+						Logging::buildText(__FUNCTION__, __FILE__, "/");
+						Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+						Logging::write(true, Error);
+					}
+				}
 			}
 			else
 			{
-				this->nTestFailed++;
-
-				// Write test data.
 				this->dump(outFileName, dcel);
-
-				// Print log error.
-				Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
+				this->nTestFailed++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error building star in test ");
 				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
 				Logging::buildText(__FUNCTION__, __FILE__, "/");
 				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 				Logging::write(true, Error);
 			}
 		}
-		else
-		{
-			this->dump(outFileName, dcel);
-		}
 
 		// Reset test data.
 		this->testCounter++;
-		delaunay.reset();
+		triangulation.reset();
 		originalDcel.reset();
 		dcel.reset();
 	}
-	*/
 }
 
 /***************************************************************************
