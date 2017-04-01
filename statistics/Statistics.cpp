@@ -146,9 +146,13 @@ void StatisticsConvexHullRegister::deallocate()
 ***************************************************************************/
 bool StatisticsDelaunayRegister::writeResults()
 {
-	bool written=false;		// Return value.
-	int	 i=0;				// Loop counter.
-	StatisticsDelaunayData *current=NULL;
+	bool written=false;						// Return value.
+	int	 i=0;								// Loop counter.
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+	int	 j=0;								// Loop counter.
+	int	 *intVector=NULL;					// Pointer to integers vector.
+#endif
+	StatisticsDelaunayData *current=NULL;	// Pointer to test statistics.
 
 	// Check file is opened.
 	if (this->ofs.is_open())
@@ -177,7 +181,7 @@ bool StatisticsDelaunayRegister::writeResults()
 
 			// Write # imaginary edges in test data.
 			current = *this->data.at(0);
-			this->ofs << "nImaginaryEdges <- c(" << current->getImaginaryEdges();
+			this->ofs << "nImagEdges <- c(" << current->getImaginaryEdges();
 			for (i=1; i<this->data.getNElements() ;i++)
 			{
 				current = *this->data.at(i);
@@ -187,7 +191,7 @@ bool StatisticsDelaunayRegister::writeResults()
 
 			// Write # convex hull edges in test data.
 			current = *this->data.at(0);
-			this->ofs << "nConvexHullEdges <- c(" << current->getConvexhullEdges();
+			this->ofs << "nConvexEdges <- c(" << current->getConvexhullEdges();
 			for (i=1; i<this->data.getNElements() ;i++)
 			{
 				current = *this->data.at(i);
@@ -207,7 +211,7 @@ bool StatisticsDelaunayRegister::writeResults()
 
 			// Write # imaginary faces in test data.
 			current = *this->data.at(0);
-			this->ofs << "nImaginaryFaces <- c(" << current->getImaginaryFaces();
+			this->ofs << "nImagFaces <- c(" << current->getImaginaryFaces();
 			for (i=1; i<this->data.getNElements() ;i++)
 			{
 				current = *this->data.at(i);
@@ -255,8 +259,8 @@ bool StatisticsDelaunayRegister::writeResults()
 			}
 			this->ofs << ")" << endl;
 
-			// Write # collinear points in test data.
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
+			// Write # collinear points in test data.
 			current = *this->data.at(0);
 			this->ofs << "nCollinearPoints <- c(" << current->getCollinear();
 			for (i=1; i<this->data.getNElements() ;i++)
@@ -265,6 +269,19 @@ bool StatisticsDelaunayRegister::writeResults()
 				this->ofs << "," << current->getCollinear();
 			}
 			this->ofs << ")" << endl;
+
+			// Write # nodes checked for each point insertion.
+			for (i=0; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "nInsertions" << (i+1) << " <- c(1";
+				intVector = current->getNodesChecked();
+				for (j=1; j<current->getPoints() ;j++)
+				{
+					this->ofs << "," << intVector[j];
+				}
+				this->ofs << ")" << endl;
+			}
 #endif
 			// Write # leaves in graph.
 			current = *this->data.at(0);

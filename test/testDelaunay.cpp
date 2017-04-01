@@ -32,7 +32,9 @@ void TestDelaunayBuild::main()
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
 	string		dumpFileName;		// DCEL file name.
-	StatisticsDelaunayRegister *statReg = new StatisticsDelaunayRegister(this->statFileName);
+	StatisticsDelaunayRegister *statReg =  							 		\
+						new StatisticsDelaunayRegister(this->statFileName,  \
+						this->nSteps, this->nTests);
 	this->stat = statReg;
 
 #ifdef DEBUG_TEST_DELAUNAY_BUILD
@@ -56,6 +58,7 @@ void TestDelaunayBuild::main()
 		{
 			StatisticsDelaunayData *statData = new StatisticsDelaunayData();
 			statData->setPoints(currentNPoints);
+			statData->setNodesChecked(new int[currentNPoints]);
 
 			// Build failed file name test data.
 			ostringstream convert;
@@ -77,13 +80,17 @@ void TestDelaunayBuild::main()
 				this->dump(dumpFileName, dcel);
 			}
 
+			// Add statistics data.
+			statData->analyzeDelaunay(delaunay);
+			statReg->add(statData);
+
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+			memcpy(statData->getNodesChecked(), delaunay.getNodesChecked(), sizeof(int)*currentNPoints);
+			delaunay.freeStatistics();
+#endif
 			// Reset Delaunay data.
 			delaunay.reset();
 			this->testCounter++;
-
-			// Add statistics data.
-			statReg->add(statData);
-			statData->analyzeDelaunay(delaunay);
 		}
 
 		// Update # points to generate.

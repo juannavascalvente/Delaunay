@@ -54,6 +54,21 @@ Delaunay::~Delaunay()
 // Public functions.
 //------------------------------------------------------------------------
 /***************************************************************************
+* Name: 	freeStatistics
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description:	delete resources allocated during statistics recording.
+***************************************************************************/
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+void Delaunay::freeStatistics()
+{
+	delete[] this->nNodesChecked;
+}
+#endif
+
+/***************************************************************************
 * Name: 	reset
 * IN:		NONE
 * OUT:		NONE
@@ -91,6 +106,8 @@ bool Delaunay::incremental()
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	this->nFlips = 0;
 	this->nCollinear = 0;
+	this->nNodesChecked = new int[this->dcel->getNVertex()];
+	this->nNodesChecked[0] = 1;
 #endif
 
 	// Set type of algorithm.
@@ -1424,6 +1441,10 @@ bool Delaunay::addPointToDelaunay(int index)
 	bool	inserted=false;		// Return value.
 	int		nodeIndex=0;		// Current node index.
 	Point<TYPE> *point=NULL;   	// Pointer to points in DCEL.
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+	this->nNodesCheckedIndex = index;
+	this->nNodesChecked[nNodesCheckedIndex] = 1;
+#endif
 
 	// Get new point to insert.
 	point = this->dcel->getRefPoint(index);
@@ -1495,6 +1516,9 @@ bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
 	nodeIndex = 0;
     while ((!this->graph->isLeaf(nodeIndex)) && (!error))
     {
+#ifdef INCREMENTAL_DELAUNAY_STATISTICS
+    	this->nNodesChecked[this->nNodesCheckedIndex]++;
+#endif
        	// PENDING REMOVE ASSIGNED FACE WHEN NODE IS INTERIOR.
         // Search triangle in children nodes.
         i = 0;
@@ -1809,7 +1833,6 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
     {
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 		this->nCollinear++;
-		cout << "COLLINEAR TOTAL: " << this->nCollinear << endl;
 #endif
         // Get edge identifier where new point is collinear.
     	collinear_Edge_ID = this->dcel->getCollinear(pointIndex, ptrFace->getEdge());

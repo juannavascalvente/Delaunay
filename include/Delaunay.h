@@ -43,6 +43,8 @@ class Delaunay
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int nFlips;
 	int nCollinear;
+	int *nNodesChecked;
+	int nNodesCheckedIndex;
 #endif
 	//------------------------------------------------------------------------
 	// Private functions.
@@ -119,6 +121,8 @@ public:
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}
 	int getFlips() const {return nFlips;}
+	void freeStatistics();
+	int* getNodesChecked() const {return nNodesChecked;}
 #endif
 };
 

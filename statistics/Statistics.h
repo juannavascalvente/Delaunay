@@ -150,6 +150,7 @@ public:
 ****************************************************************************/
 class StatisticsDelaunayData : public StatisticsTriangulationData
 {
+protected:
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
@@ -159,14 +160,16 @@ class StatisticsDelaunayData : public StatisticsTriangulationData
 	int nImaginaryEdges;
 	int nImaginaryFaces;
 	int	nNodes;
+	int	*nNodesChecked;
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
 	StatisticsDelaunayData() : nLeaves(0), n2children(0), n3children(0), \
-						   nImaginaryEdges(0), nImaginaryFaces(0), nNodes(0){}
-    ~StatisticsDelaunayData() {}
+						   nImaginaryEdges(0), nImaginaryFaces(0), nNodes(0),
+						   nNodesChecked(NULL) {}
+    ~StatisticsDelaunayData() {delete[] nNodesChecked;}
 
 	//------------------------------------------------------------------------
 	// Public functions.
@@ -174,12 +177,17 @@ public:
     void analyzeDelaunay(Delaunay &delaunay);
     void analyzeGraph(Graph &graph);
 
+	//------------------------------------------------------------------------
+	// Get/Set functions.
+	//------------------------------------------------------------------------
     int getN2childrenNodes() const {return n2children;}
 	int getN3childrenNodes() const {return n3children;}
 	int getImaginaryEdges() const {return nImaginaryEdges;}
 	int getImaginaryFaces() const {return nImaginaryFaces;}
 	int getNodes() const {return nNodes;}
 	int getLeaves() const {return nLeaves;}
+	int* getNodesChecked() const {return nNodesChecked;}
+	void setNodesChecked(int* nodesChecked) {nNodesChecked = nodesChecked;}
 };
 
 /****************************************************************************
@@ -194,12 +202,15 @@ protected:
 	Timer		timer;				// Execution timer.
 	string  	fileName;			// Output statistics file.
 	ofstream 	ofs;				// Output stream.
+	int			nSteps;				// # steps in execution.
+	int			nTestsStep;		// # executions per step.
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor and destructor
 	//------------------------------------------------------------------------
-	StatisticsRegister(string outFile) : fileName(outFile) \
+	StatisticsRegister(string outFile, int nSteps, int nTestsPerStep) :		\
+							fileName(outFile), nSteps(0), nTestsStep(0)  	\
 	{
 		// Open file.
 		ofs.open(fileName.c_str(), ios::out);
@@ -234,15 +245,15 @@ public:
 };
 
 /****************************************************************************
-//	 				StatisticsConvexHullRegister CLASS DEFITNION
+//	 			StatisticsConvexHullRegister CLASS DEFITNION
 ****************************************************************************/
 class StatisticsConvexHullRegister : public StatisticsRegister
 {
 	Set<ConexHullStatisticsData *>	data;	// Test statistics array.
 public:
-	StatisticsConvexHullRegister(string outFile) : \
-									StatisticsRegister(outFile),
-									data(DEFAULT_N_STATISTICS) {};
+	StatisticsConvexHullRegister(string outFile, int nSteps, int nTestsStep):\
+							StatisticsRegister(outFile, nSteps, nTestsStep), \
+							data(DEFAULT_N_STATISTICS) {};
 	~StatisticsConvexHullRegister(){this->deallocate();};
 
     void add(ConexHullStatisticsData *data) {this->data.add(data);};
@@ -251,15 +262,15 @@ public:
 };
 
 /****************************************************************************
-//	 				StatisticsDelaunayRegister CLASS DEFITNION
+//	 			StatisticsDelaunayRegister CLASS DEFITNION
 ****************************************************************************/
 class StatisticsDelaunayRegister : public StatisticsRegister
 {
 	Set<StatisticsDelaunayData *>	data;	// Test statistics array.
 public:
-	StatisticsDelaunayRegister(string outFile) : \
-									StatisticsRegister(outFile),
-									data(DEFAULT_N_STATISTICS) {};
+	StatisticsDelaunayRegister(string outFile, int nSteps, int nTestsStep): \
+							StatisticsRegister(outFile, nSteps, nTestsStep),\
+							data(DEFAULT_N_STATISTICS) {};
 	~StatisticsDelaunayRegister(){this->deallocate();};
 
     void add(StatisticsDelaunayData *data) {this->data.add(data);};
