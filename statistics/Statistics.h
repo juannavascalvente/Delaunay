@@ -262,6 +262,23 @@ public:
 };
 
 /****************************************************************************
+//	 			StatisticsStarTriangulationRegister CLASS DEFITNION
+****************************************************************************/
+class StatisticsStarTriangulationRegister : public StatisticsRegister
+{
+	Set<StatisticsTriangulationData *>	data;	// Test statistics array.
+public:
+	StatisticsStarTriangulationRegister(string outFile, int nSteps, int nTestsStep): \
+							StatisticsRegister(outFile, nSteps, nTestsStep),\
+							data(DEFAULT_N_STATISTICS) {};
+	~StatisticsStarTriangulationRegister(){this->deallocate();};
+
+    void add(StatisticsTriangulationData *data) {this->data.add(data);};
+    bool writeResults();
+    void deallocate();
+};
+
+/****************************************************************************
 //	 			StatisticsDelaunayRegister CLASS DEFITNION
 ****************************************************************************/
 class StatisticsDelaunayRegister : public StatisticsRegister

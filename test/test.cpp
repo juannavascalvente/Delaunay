@@ -542,6 +542,63 @@ bool Test::readDelaunay(string fileName, Dcel &dcel, Delaunay &delaunay)
 }
 
 /***************************************************************************
+* Name: 	buildRandomStarTriangulation
+* IN:		nPoints				# points in triangulation.
+* 			dcel				dcel data that stores initial set of points
+* OUT:		triang				output triangulation
+* RETURN:	true				if test executed successfully
+* 			false				i.o.c.
+* GLOBAL:	NONE
+* Description: 	builds a star triangulation creating a random set of
+* 				points. If the test fails then a file is created and the
+* 				set of points is dumped.
+***************************************************************************/
+bool Test::buildRandomStarTriangulation(int nPoints, Dcel &dcel, Triangulation &triang)
+{
+	bool 		built=true;			// Return value.
+
+	// Execute current test.
+	triang.setDCEL(&dcel);
+	if (!dcel.generateRandom(nPoints))
+	{
+		built = false;
+		this->nTestFailed++;
+		Logging::buildText(__FUNCTION__, __FILE__, "Error generating point in test ");
+		Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+		Logging::buildText(__FUNCTION__, __FILE__, "/");
+		Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+		Logging::write(true, Error);
+	}
+	else
+	{
+		// Create incremental Delaunay algorithm.
+		if (this->stat != NULL)
+		{
+			this->stat->tic();
+		}
+		if (!triang.build())
+		{
+			built = false;
+			this->nTestFailed++;
+			Logging::buildText(__FUNCTION__, __FILE__, "Error building star in test ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+			Logging::buildText(__FUNCTION__, __FILE__, "/");
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+			Logging::write(true, Error);
+		}
+		if (this->stat != NULL)
+		{
+			this->stat->toc();
+		}
+	}
+
+	// Wait 1 second so seed generation changes.
+	sleep(1);
+
+	return(built);
+}
+
+/***************************************************************************
 * Name: 	buildRandomDelaunay
 * IN:		nPoints				# points in triangulation.
 * 			dcel				dcel data that stores initial set of points
@@ -549,10 +606,9 @@ bool Test::readDelaunay(string fileName, Dcel &dcel, Delaunay &delaunay)
 * RETURN:	true				if test executed successfully
 * 			false				i.o.c.
 * GLOBAL:	NONE
-* Description: 	builds a Voronoi diagram using the set of points of the dcel
-* 				as the set of points to build a Delaunay triangulation. If
-* 				the test fails then a file is created and the set of points
-* 				is dumped
+* Description: 	builds a Delaunay triangulation creating a random set of
+* 				points. If the test fails then a file is created and the
+* 				set of points is dumped.
 ***************************************************************************/
 bool Test::buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay)
 {

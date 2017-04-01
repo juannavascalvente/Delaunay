@@ -124,6 +124,7 @@ public:
 
 	// Common functions to execute tests.
 	bool readDelaunay(string filName, Dcel &dcel, Delaunay &delaunay);
+	bool buildRandomStarTriangulation(int nPoints, Dcel &dcel, Triangulation &triang);
 	bool buildRandomDelaunay(int nPoints, Dcel &dcel, Delaunay &delaunay);
 	bool readVoronoi(string filName, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi);
 	bool buildVoronoi(int nPoints, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi);

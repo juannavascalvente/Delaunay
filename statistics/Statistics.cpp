@@ -144,6 +144,41 @@ void StatisticsConvexHullRegister::deallocate()
 * Description: 	write two arrays: the number of points in test and the number
 * 				of edges of the convex hull per test.
 ***************************************************************************/
+bool StatisticsStarTriangulationRegister::writeResults()
+{
+	bool written=false;						// Return value.
+
+	return(written);
+}
+
+/***************************************************************************
+* NAME: 	deallocate
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	delete statistics data vector elements.
+***************************************************************************/
+void StatisticsStarTriangulationRegister::deallocate()
+{
+	int	 i=0;				// Loop counter.
+
+	// Delete statistics registers.
+	for (i=0; i<this->data.getNElements() ;i++)
+	{
+		delete *this->data.at(i);
+	}
+}
+
+/***************************************************************************
+* NAME: 	writeResults
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	write two arrays: the number of points in test and the number
+* 				of edges of the convex hull per test.
+***************************************************************************/
 bool StatisticsDelaunayRegister::writeResults()
 {
 	bool written=false;						// Return value.
@@ -365,7 +400,6 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 			//cout << "REAL ";
 			this->nEdges++;
 		}
-		//delaunay.getRefDcel()->getRefEdge(i)->print(std::cout);
 	}
 
 	// Divide by 2 because some edges are twin.
