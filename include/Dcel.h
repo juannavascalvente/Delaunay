@@ -103,9 +103,9 @@ public:
 	void getEdgeVertices(int edgeID, int &index1, int &index2) const;
 	int	 getCollinear(int pointIndex, int edgeID);
 
-	//---------------------------------------------------------------------------
+	//------------------------------------------------------------------------
 	// Get/set functions.
-	//---------------------------------------------------------------------------
+	//------------------------------------------------------------------------
 	inline Point<TYPE> *getRefPoint(int index) const {return(this->vertex[index].getRefPoint());};
 	inline Edge *getRefEdge(int index) {return(&this->edges[index]);};
 	inline Face *getRefFace(int index) {return(&this->faces[index]);};

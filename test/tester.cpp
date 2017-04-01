@@ -12,6 +12,7 @@
 #include "testDelaunay.h"
 #include "testPath.h"
 #include "testSet.h"
+#include "testStarTriangulation.h"
 #include "testVoronoi.h"
 
 //#define DEBUG_TESTER_READTESTS
@@ -172,6 +173,22 @@ Test* Tester::createTestInstance(TestType type)
 #endif
 			test = new TestDcel(true);
 
+			break;
+		}
+		case TEST_STAR:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_STAR" << endl;
+#endif
+			test = new TestStarTriangulationBuild(true);
+			break;
+		}
+		case TEST_STAR_COMPARE:
+		{
+#ifdef DEBUG_TESTER_CREATEINSTANCE
+			cout << "Creating TEST_STAR_COMPARE" << endl;
+#endif
+			test = new TestStarTriangulationCompare(true);
 			break;
 		}
 		case TEST_DELAUNAY:

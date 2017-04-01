@@ -7,6 +7,7 @@
 
 #include "Delaunay.h"
 #include "Logging.h"
+#include "Triangulation.h"
 
 #include <iostream>
 #include <fstream>
@@ -134,6 +135,11 @@ public:
 
 	//------------------------------------------------------------------------
 	// Public functions.
+	//------------------------------------------------------------------------
+    void analyzeTriangulation(Triangulation	&triangulation);
+
+	//------------------------------------------------------------------------
+	// Get/Set functions.
 	//------------------------------------------------------------------------
 	int getEdges() const {return nEdges;}
 	void setEdges(int edges) {nEdges = edges;}

@@ -11,9 +11,6 @@
 #include "defines.h"
 #include "Logging.h"
 #include "Triangulation.h"
-#ifdef STATISCTICS
-#include <Statistics.h>
-#endif
 
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_TRIANGULATION_DEBUG
@@ -76,7 +73,7 @@ bool Triangulation::convexHull()
 	try
 	{
 		// Get outer face.
-		face = this->dcel->getRefFace( 0);
+		face = this->dcel->getRefFace(0);
 
 		// Get index of first edge.
 		index = face->getEdge() - 1;
@@ -87,18 +84,18 @@ bool Triangulation::convexHull()
 		while (!this->convexHullComputed)
 		{
 			// Get edge info.
-			currentEdge = this->dcel->getRefEdge( index);
+			currentEdge = this->dcel->getRefEdge(index);
 
 			// Get origin of current edge.
-			point = this->dcel->getRefPoint( currentEdge->getOrigin()-1);
+			point = this->dcel->getRefPoint(currentEdge->getOrigin()-1);
 #ifdef DEBUG_TRIANGULATION_CONVEX_HULL
 			Logging::buildText(__FUNCTION__, __FILE__, "Point to add to convex hull: ");
 			Logging::buildText(__FUNCTION__, __FILE__, currentEdge->getOrigin());
-			Logging::write( true);
+			Logging::write(true);
 #endif
 
 			// Insert next point.
-			this->hull->add( point);
+			this->hull->add(point);
 
 			// Get next edge.
 			index = currentEdge->getNext()-1;
@@ -107,7 +104,7 @@ bool Triangulation::convexHull()
 				this->convexHullComputed = true;
 #ifdef DEBUG_TRIANGULATION_CONVEX_HULL
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull computed.");
-				Logging::write( true);
+				Logging::write(true);
 #endif
 			}
 		}
@@ -130,7 +127,7 @@ bool Triangulation::convexHull()
 * GLOBAL:	NONE
 * Description: 	Finds the two closest point in the DCEL.
 ***************************************************************************/
-bool Triangulation::findTwoClosest( int &first, int &second)
+bool Triangulation::findTwoClosest(int &first, int &second)
 {
 	bool found=false;				// Return value.
 	int	 i=0, j=0;					// Loop counters.
@@ -143,27 +140,27 @@ bool Triangulation::findTwoClosest( int &first, int &second)
 	for (i=0; i<this->dcel->getNVertex(); i++)
 	{
 		// Get origin point.
-		origin = this->dcel->getRefPoint( i);
+		origin = this->dcel->getRefPoint(i);
 
 		// Compute distance to remaining points.
 		for (j=(i+1); j<this->dcel->getNVertex(); j++)
 		{
 			// Get destination point.
-			dest = this->dcel->getRefPoint( j);
+			dest = this->dcel->getRefPoint(j);
 #ifdef DEBUG_TRIANGULATION_FINDTWOCLOSEST
 			Logging::buildText(__FUNCTION__, __FILE__, "Computing distance between ");
 			Logging::buildText(__FUNCTION__, __FILE__, i);
 			Logging::buildText(__FUNCTION__, __FILE__, " and ");
 			Logging::buildText(__FUNCTION__, __FILE__, j);
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 #endif
 
 			// Compute distance.
-			distance = origin->distance( *dest);
+			distance = origin->distance(*dest);
 #ifdef DEBUG_TRIANGULATION_FINDTWOCLOSEST
 			Logging::buildText(__FUNCTION__, __FILE__, "New distance is ");
 			Logging::buildText(__FUNCTION__, __FILE__, distance);
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 #endif
 
 			// Compare to current.
@@ -172,7 +169,7 @@ bool Triangulation::findTwoClosest( int &first, int &second)
 #ifdef DEBUG_TRIANGULATION_FINDTWOCLOSEST
 				Logging::buildText(__FUNCTION__, __FILE__, "New distance is lower than ");
 				Logging::buildText(__FUNCTION__, __FILE__, lowestDistance);
-				Logging::write( true, Info);
+				Logging::write(true, Info);
 #endif
 				// Update lowest distance and output indexes.
 				lowestDistance = distance;
@@ -188,13 +185,13 @@ bool Triangulation::findTwoClosest( int &first, int &second)
 	Logging::buildText(__FUNCTION__, __FILE__, first);
 	Logging::buildText(__FUNCTION__, __FILE__, " and ");
 	Logging::buildText(__FUNCTION__, __FILE__, second);
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 #endif
 
 	return(found);
 }
 
-bool Triangulation::findFace( Point<TYPE> &point, int &faceId)
+bool Triangulation::findFace(Point<TYPE> &point, int &faceId)
 {
 	bool 	found=false;		// Return value.
 
@@ -215,7 +212,7 @@ bool Triangulation::findFace( Point<TYPE> &point, int &faceId)
 * 				the distance between both points. To find the closest point
 * 				it compares the input point to all existing points.
 ***************************************************************************/
-bool Triangulation::findClosestPoint( Point<TYPE> &p, Point<TYPE> &q, double &distance)
+bool Triangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 {
 	bool found=false;				// Return value.
 	int	pointIndex=0;				// Loop counter.
@@ -246,6 +243,22 @@ bool Triangulation::findClosestPoint( Point<TYPE> &p, Point<TYPE> &q, double &di
 }
 
 /***************************************************************************
+* Name: 	reset
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	resets triangulation data.
+***************************************************************************/
+void Triangulation::reset()
+{
+	// Reset data.
+	this->dcel = NULL;
+	this->hull->reset();
+	this->convexHullComputed = false;
+}
+
+/***************************************************************************
 * Name: 	build
 * IN:		NONE
 * OUT:		NONE
@@ -254,44 +267,41 @@ bool Triangulation::findClosestPoint( Point<TYPE> &p, Point<TYPE> &q, double &di
 * GLOBAL:	NONE
 * Description: 	computes the star triangulation of the DCEL set of points.
 ***************************************************************************/
-// PENDING REMOVE COMMENTED CODE.
-bool Triangulation::build()
+bool Triangulation::build(Dcel *dcel)
 {
 	bool	built=true;					// Return value.
 	int		i=0;						// Loop counter.
 	int		len=0;						// Loop length.
-
 	struct ConvexPoint	convexPoint;	// Point to insert in convex hull.
 	struct ConvexPoint	convexEdge;		// Point to insert in convex hull.
 	struct ConvexPoint	peakEdge;		// Last edge in convex hull.
 	int	   convex_Peak[2];				// Last two points in convex hull.
-
 	int		edgeId=0, faceId=0;			// Edge and face Id counters.
 	int		savedEdge=0;
 	int		nextConvexEdge=0;			// Next edge to add to convex hull.
-
 	int		originVertex1=0, originVertex2=0;
 	int		originVertexIndex1=0, originVertexIndex2=0;
-
 	int		lowestPointIndex=0;			// Index of the lowest point.
-
 	bool	finished=false;				// Loop control flag.
+#ifdef STATISTICS_STAR_TRIANGULATION
+	this->nCollinear = 0;
+#endif
 
 	// Check if DCEL data is referenced.
-	if (this->dcel == NULL)
+	if (dcel == NULL)
 	{
 		built = false;
 		Logging::buildText(__FUNCTION__, __FILE__, "DCEL not referenced");
-		Logging::write( true, Error);
+		Logging::write(true, Error);
 	}
 	else
 	{
 		// Allocate stack.
 		Stack<ConvexPoint> stack = Stack<ConvexPoint>(DEFAUTL_CONVEXHULL_LEN);
 
-		// Reset convex hull computed flag.
-		this->convexHullComputed = false;
-		this->hull->reset();
+		// Reset convex hull computed flag and set dcel.
+		this->reset();
+		this->dcel = dcel;
 
 		// Set lowest Y coordinates point first.
 		lowestPointIndex = this->dcel->getIndexLowest(&Point<TYPE>::lowerY);
@@ -301,40 +311,40 @@ bool Triangulation::build()
 		this->dcel->sort();
 #ifdef DEBUG_TRIANGULATION_DEBUG
 		Logging::buildText(__FUNCTION__, __FILE__, "DCEL set sorted.");
-		Logging::write( true, Info);
+		Logging::write(true, Info);
 #endif
 		// Insert invalid face. Updated when convex hull added.
-		this->dcel->addFace( -1);
+		this->dcel->addFace(-1);
 
 		// First vertex belongs to convex hull.
 		convexPoint.vertexIndex = 0;
 		convexPoint.edgeID = 1;
-		stack.push( convexPoint);
+		stack.push(convexPoint);
 
 		// Insert first edge.
-		this->dcel->updateVertex( 1, 0);
-		this->dcel->addEdge( 1, -1, 3, 2, 1);
+		this->dcel->updateVertex(1, 0);
+		this->dcel->addEdge(1, -1, 3, 2, 1);
 
 		// Second vertex belongs to convex hull.
 		convexPoint.vertexIndex = 1;
 		convexPoint.edgeID = 2;
-		stack.push( convexPoint);
+		stack.push(convexPoint);
 
 		// Insert second edge.
-		this->dcel->updateVertex( 2, 1);
-		this->dcel->addEdge( 2, -1, 1, 3, 1);
+		this->dcel->updateVertex(2, 1);
+		this->dcel->addEdge(2, -1, 1, 3, 1);
 
 		// Third element is inserted in convex hull at starting.
 		convexPoint.vertexIndex = 2;
 		convexPoint.edgeID = 3;
-		stack.push( convexPoint);
+		stack.push(convexPoint);
 
 		// Insert third edge.
-		this->dcel->updateVertex( 3, 2);
-		this->dcel->addEdge( 3, -1, 2, 1, 1);
+		this->dcel->updateVertex(3, 2);
+		this->dcel->addEdge(3, -1, 2, 1, 1);
 
 		// Insert first face.
-		this->dcel->addFace( 1);
+		this->dcel->addFace(1);
 
 		// Initialize variables before loop.
 		faceId = 2;
@@ -345,10 +355,10 @@ bool Triangulation::build()
 		{
 #ifdef DEBUG_TRIANGULATION_DEBUG
 			Logging::buildText(__FUNCTION__, __FILE__, "-----------------------------------------------------");
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 			Logging::buildText(__FUNCTION__, __FILE__, "Inserting point index ");
 			Logging::buildText(__FUNCTION__, __FILE__, i);
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 #endif
 			// Initialize indexes and values.
 			originVertexIndex1 = 0;
@@ -365,31 +375,31 @@ bool Triangulation::build()
 				// Get last two vertex from convex hull.
 				convexEdge = stack.peak();
 				convex_Peak[0] = convexEdge.vertexIndex;
-				convexEdge = stack.elementAt( 2);
+				convexEdge = stack.elementAt(2);
 				convex_Peak[1] = convexEdge.vertexIndex;
 #ifdef DEBUG_TRIANGULATION_DEBUG
 				Logging::buildText(__FUNCTION__, __FILE__, "Points recovered from convex hull are ");
 				Logging::buildText(__FUNCTION__, __FILE__, convex_Peak[0]);
 				Logging::buildText(__FUNCTION__, __FILE__, " and ");
 				Logging::buildText(__FUNCTION__, __FILE__, convex_Peak[1]);
-				Logging::write( true, Info);
+				Logging::write(true, Info);
 #endif
 
 				// Insert new edge and update its twin.
-				this->dcel->updateVertex( edgeId, originVertexIndex1);
-				this->dcel->setTwin( peakEdge.edgeID-1, edgeId);
-				this->dcel->addEdge( originVertex1, peakEdge.edgeID, edgeId+2, edgeId+1, faceId);
+				this->dcel->updateVertex(edgeId, originVertexIndex1);
+				this->dcel->setTwin(peakEdge.edgeID-1, edgeId);
+				this->dcel->addEdge(originVertex1, peakEdge.edgeID, edgeId+2, edgeId+1, faceId);
 
 				// Insert new edge.
-				this->dcel->updateVertex( edgeId+1, originVertexIndex2);
-				this->dcel->addEdge( originVertex2, INVALID, edgeId, edgeId+2, faceId);
+				this->dcel->updateVertex(edgeId+1, originVertexIndex2);
+				this->dcel->addEdge(originVertex2, INVALID, edgeId, edgeId+2, faceId);
 
 				// Insert new edge.
-				this->dcel->updateVertex( edgeId+2, i);
-				this->dcel->addEdge( i+1, savedEdge, edgeId+1, edgeId, faceId);
+				this->dcel->updateVertex(edgeId+2, i);
+				this->dcel->addEdge(i+1, savedEdge, edgeId+1, edgeId, faceId);
 				if (savedEdge != -1)
 				{
-					this->dcel->setTwin( savedEdge-1, edgeId+2);
+					this->dcel->setTwin(savedEdge-1, edgeId+2);
 				}
 				savedEdge = edgeId+1;
 #ifdef DEBUG_TRIANGULATION_DEBUG
@@ -399,61 +409,67 @@ bool Triangulation::build()
 				Logging::buildText(__FUNCTION__, __FILE__, convex_Peak[0]);
 				Logging::buildText(__FUNCTION__, __FILE__, " and ");
 				Logging::buildText(__FUNCTION__, __FILE__, i);
-				Logging::write( true, Info);
+				Logging::write(true, Info);
 
-				if (Debug::outOfBouds( convex_Peak[1], 0, this->dcel->getNVertex()))
+				if (Debug::outOfBouds(convex_Peak[1], 0, this->dcel->getNVertex()))
 				{
 					Logging::buildText(__FUNCTION__, __FILE__, "Index " );
 					Logging::buildText(__FUNCTION__, __FILE__, convex_Peak[1]);
 					Logging::buildText(__FUNCTION__, __FILE__, "out of bounds ");
 					Logging::buildRange(__FUNCTION__, __FILE__, 0, this->dcel->getNVertex());
-					Logging::write( true, Error);
+					Logging::write(true, Error);
 				}
-				else if (Debug::outOfBouds( convex_Peak[0], 0, this->dcel->getNVertex()))
+				else if (Debug::outOfBouds(convex_Peak[0], 0, this->dcel->getNVertex()))
 				{
 					Logging::buildText(__FUNCTION__, __FILE__, "Index " );
 					Logging::buildText(__FUNCTION__, __FILE__, convex_Peak[0]);
 					Logging::buildText(__FUNCTION__, __FILE__, "out of bounds ");
 					Logging::buildRange(__FUNCTION__, __FILE__, 0, this->dcel->getNVertex());
-					Logging::write( true, Error);
+					Logging::write(true, Error);
 				}
-				else if (Debug::outOfBouds( i, 0, this->dcel->getNVertex()))
+				else if (Debug::outOfBouds(i, 0, this->dcel->getNVertex()))
 				{
 					Logging::buildText(__FUNCTION__, __FILE__, "Index " );
 					Logging::buildText(__FUNCTION__, __FILE__, i);
 					Logging::buildText(__FUNCTION__, __FILE__, "out of bounds ");
 					Logging::buildRange(__FUNCTION__, __FILE__, 0, this->dcel->getNVertex());
-					Logging::write( true, Error);
+					Logging::write(true, Error);
 				}
 #endif
 				// Check type of turn with new point.
-				if ((this->dcel->getRefPoint(convex_Peak[1])->check_Turn( *this->dcel->getRefPoint( convex_Peak[0]), *this->dcel->getRefPoint(i)) == LEFT_TURN) ||
-					(this->dcel->getRefPoint(convex_Peak[1])->check_Turn( *this->dcel->getRefPoint( convex_Peak[0]), *this->dcel->getRefPoint(i)) == COLLINEAR))
+				if ((this->dcel->getRefPoint(convex_Peak[1])->check_Turn(*this->dcel->getRefPoint(convex_Peak[0]), *this->dcel->getRefPoint(i)) == LEFT_TURN) ||
+					(this->dcel->getRefPoint(convex_Peak[1])->check_Turn(*this->dcel->getRefPoint(convex_Peak[0]), *this->dcel->getRefPoint(i)) == COLLINEAR))
 				{
+#ifdef STATISTICS_STAR_TRIANGULATION
+					if ((this->dcel->getRefPoint(convex_Peak[1])->check_Turn(*this->dcel->getRefPoint(convex_Peak[0]), *this->dcel->getRefPoint(i)) == COLLINEAR))
+					{
+						this->nCollinear++;
+					}
+#endif
 					// Update peak of convex hull.
 					peakEdge = stack.peak();
 					peakEdge.edgeID = edgeId+1;
-					stack.updatePeak( peakEdge);
+					stack.updatePeak(peakEdge);
 #ifdef DEBUG_TRIANGULATION_DEBUG
 					Logging::buildText(__FUNCTION__, __FILE__, "Inserted point ");
 					Logging::buildText(__FUNCTION__, __FILE__, i);
 					Logging::buildText(__FUNCTION__, __FILE__, " belongs to convex hull.");
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 					Logging::buildText(__FUNCTION__, __FILE__, "Updating peak with edge ");
 					Logging::buildText(__FUNCTION__, __FILE__, edgeId+1);
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 #endif
 					// Add edge to convex hull.
 					convexEdge.vertexIndex = i;
 					convexEdge.edgeID = nextConvexEdge;
-					stack.push( convexEdge);
+					stack.push(convexEdge);
 					finished = true;
 #ifdef DEBUG_TRIANGULATION_DEBUG
 					Logging::buildText(__FUNCTION__, __FILE__, "Push point ");
 					Logging::buildText(__FUNCTION__, __FILE__, convexEdge.vertexIndex);
 					Logging::buildText(__FUNCTION__, __FILE__, " and edge ");
 					Logging::buildText(__FUNCTION__, __FILE__, convexEdge.edgeID);
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 #endif
 				}
 				else
@@ -466,7 +482,7 @@ bool Triangulation::build()
 					// Pop convex hull.
 #ifdef DEBUG_TRIANGULATION_DEBUG
 					Logging::buildText(__FUNCTION__, __FILE__, "Right TURN. Pop element from stack.");
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 #endif
 					stack.pop();
 					peakEdge = stack.peak();
@@ -475,7 +491,7 @@ bool Triangulation::build()
 				}
 
 				// Insert face.
-				this->dcel->addFace( edgeId);
+				this->dcel->addFace(edgeId);
 
 				// Update counters.
 				faceId++;
@@ -484,15 +500,15 @@ bool Triangulation::build()
 		}
 
 		// Save index of first edge from convex hull.
-		convexEdge = stack.peak( );
+		convexEdge = stack.peak();
 		savedEdge = convexEdge.edgeID;
 
-		stack.pop( );
+		stack.pop();
 		peakEdge = stack.peak();
 
 		// Insert first edge from convex hull.
-		this->dcel->setTwin( peakEdge.edgeID - 1, edgeId);
-		this->dcel->addEdge( convexEdge.vertexIndex+1, peakEdge.edgeID,
+		this->dcel->setTwin(peakEdge.edgeID - 1, edgeId);
+		this->dcel->addEdge(convexEdge.vertexIndex+1, peakEdge.edgeID,
 				edgeId + stack.getLength(),
 				edgeId + 1,
 				0);
@@ -504,24 +520,24 @@ bool Triangulation::build()
 		len = stack.getLength()-1;
 		for (i=0; i<len ;i++)
 		{
-			convexEdge = stack.peak( );
-			stack.pop( );
-			peakEdge = stack.peak( );
+			convexEdge = stack.peak();
+			stack.pop();
+			peakEdge = stack.peak();
 
 			// Insert new edge from convex hull.
-			this->dcel->setTwin( peakEdge.edgeID - 1, edgeId);
-			this->dcel->addEdge( convexEdge.vertexIndex+1, peakEdge.edgeID, edgeId-1, edgeId+1, 0);
+			this->dcel->setTwin(peakEdge.edgeID - 1, edgeId);
+			this->dcel->addEdge(convexEdge.vertexIndex+1, peakEdge.edgeID, edgeId-1, edgeId+1, 0);
 
 			// Next edge.
 			edgeId++;
 		}
 
 		// Insert first edge from convex hull.
-		this->dcel->setTwin( savedEdge - 1, edgeId);
-		this->dcel->addEdge( 1, savedEdge, edgeId-1, edgeId-len-1, 0);
+		this->dcel->setTwin(savedEdge - 1, edgeId);
+		this->dcel->addEdge(1, savedEdge, edgeId-1, edgeId-len-1, 0);
 
 		// Update convex hull face departing edge.
-		this->dcel->updateFace( edgeId, 0);
+		this->dcel->updateFace(edgeId, 0);
 	}
 
 	return(built);
@@ -546,17 +562,20 @@ bool Triangulation::delaunay()
 	Edge	*edge;				// Pointer to current edge.
 	Edge	*twin;				// Pointer to twin edge of current edge.
 	Circle	circle;
+#ifdef STATISTICS_STAR_TRIANGULATION
+	this->nFlips = 0;
+#endif
 
 	// Initialize variables.
 	edgeIndex=0;									// First edge index.
 	this->nPending = this->dcel->getNEdges();		// # edges to check.
 	this->edgeChecked = new bool[this->nPending];	// Already checked edges array.
-	memset( this->edgeChecked, false, sizeof(bool)*this->nPending);
+	memset(this->edgeChecked, false, sizeof(bool)*this->nPending);
 
 #ifdef DEBUG_TRIANGULATION_DELAUNAY
 	Logging::buildText(__FUNCTION__, __FILE__, "Convert to Delaunay triangulation. # edges to check ");
 	Logging::buildText(__FUNCTION__, __FILE__, this->nPending);
-	Logging::write( true, Info);
+	Logging::write(true, Info);
 	this->dcel->print(std::cout);
 #endif
 
@@ -569,7 +588,7 @@ bool Triangulation::delaunay()
 #ifdef DEBUG_TRIANGULATION_DELAUNAY
 			Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
 			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 #endif
 			// Get edge information.
 			edge = this->dcel->getRefEdge(edgeIndex);
@@ -579,68 +598,71 @@ bool Triangulation::delaunay()
 			{
 				// Create face circle.
 				circle = Circle(this->dcel->getRefPoint(edge->getOrigin()-1),
-								this->dcel->getRefPoint(this->dcel->getOrigin( edge->getNext()-1)-1),
-								this->dcel->getRefPoint(this->dcel->getOrigin( edge->getPrevious()-1)-1));
+								this->dcel->getRefPoint(this->dcel->getOrigin(edge->getNext()-1)-1),
+								this->dcel->getRefPoint(this->dcel->getOrigin(edge->getPrevious()-1)-1));
 
 				// Get twin edge.
-				twin = this->dcel->getRefEdge( this->dcel->getTwin(edgeIndex)-1);
+				twin = this->dcel->getRefEdge(this->dcel->getTwin(edgeIndex)-1);
 #ifdef DEBUG_TRIANGULATION_DELAUNAY
 				Logging::buildText(__FUNCTION__, __FILE__, "Creating circle with points ");
 				Logging::buildText(__FUNCTION__, __FILE__, edge->getOrigin());
 				Logging::buildText(__FUNCTION__, __FILE__, ",");
-				Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getOrigin( edge->getNext()-1));
+				Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getOrigin(edge->getNext()-1));
 				Logging::buildText(__FUNCTION__, __FILE__, " and ");
-				Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getOrigin( edge->getPrevious()-1));
-				Logging::write( true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getOrigin(edge->getPrevious()-1));
+				Logging::write(true, Info);
 				Logging::buildText(__FUNCTION__, __FILE__, "Point to check ");
-				Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getOrigin( twin->getPrevious()-1));
-				Logging::write( true, Info);
+				Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getOrigin(twin->getPrevious()-1));
+				Logging::write(true, Info);
 #endif
 
 				// Check if remaining point from adjacent face is in circle.
-				if (circle.inCircle( this->dcel->getRefPoint( this->dcel->getOrigin( twin->getPrevious()-1)-1)))
+				if (circle.inCircle(this->dcel->getRefPoint(this->dcel->getOrigin(twin->getPrevious()-1)-1)))
 				{
+#ifdef STATISTICS_STAR_TRIANGULATION
+					this->nFlips++;
+#endif
 #ifdef DEBUG_TRIANGULATION_DELAUNAY
 					Logging::buildText(__FUNCTION__, __FILE__, "Edge ");
 					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
 					Logging::buildText(__FUNCTION__, __FILE__, " and its twin must be flipped.");
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 					Logging::buildText(__FUNCTION__, __FILE__, edge->toStr());
 					Logging::buildText(__FUNCTION__, __FILE__, twin->toStr());
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 #endif
 					// Update vertex.
-					this->dcel->updateVertex( twin->getNext(), edge->getOrigin()-1);
-					this->dcel->updateVertex( edge->getNext(), twin->getOrigin()-1);
+					this->dcel->updateVertex(twin->getNext(), edge->getOrigin()-1);
+					this->dcel->updateVertex(edge->getNext(), twin->getOrigin()-1);
 
 					// Update origin of current and twin edges.
-					originPoint = this->dcel->getOrigin( edge->getPrevious()-1);
-					this->dcel->setOrigin( twin->getTwin()-1, this->dcel->getOrigin( twin->getPrevious()-1));
-					this->dcel->setOrigin( edge->getTwin()-1, originPoint);
+					originPoint = this->dcel->getOrigin(edge->getPrevious()-1);
+					this->dcel->setOrigin(twin->getTwin()-1, this->dcel->getOrigin(twin->getPrevious()-1));
+					this->dcel->setOrigin(edge->getTwin()-1, originPoint);
 
 					// Update next edges.
-					this->dcel->setNext( edge->getNext()-1, edge->getTwin());
-					this->dcel->setNext( twin->getNext()-1, twin->getTwin());
-					this->dcel->setNext( edge->getPrevious()-1, twin->getNext());
-					this->dcel->setNext( twin->getPrevious()-1, edge->getNext());
-					this->dcel->setNext( twin->getTwin()-1, this->dcel->getPrevious(twin->getTwin()-1));
-					this->dcel->setNext( edge->getTwin()-1, this->dcel->getPrevious(edge->getTwin()-1));
+					this->dcel->setNext(edge->getNext()-1, edge->getTwin());
+					this->dcel->setNext(twin->getNext()-1, twin->getTwin());
+					this->dcel->setNext(edge->getPrevious()-1, twin->getNext());
+					this->dcel->setNext(twin->getPrevious()-1, edge->getNext());
+					this->dcel->setNext(twin->getTwin()-1, this->dcel->getPrevious(twin->getTwin()-1));
+					this->dcel->setNext(edge->getTwin()-1, this->dcel->getPrevious(edge->getTwin()-1));
 
 					// Update previous edges.
-					this->dcel->setPrevious( twin->getTwin()-1, this->dcel->getNext( edge->getNext()-1));
-					this->dcel->setPrevious( edge->getTwin()-1, this->dcel->getNext( twin->getNext()-1));
-					this->dcel->setPrevious( edge->getNext()-1, this->dcel->getNext( edge->getPrevious()-1));
-					this->dcel->setPrevious( twin->getNext()-1, this->dcel->getNext( twin->getPrevious()-1));
-					this->dcel->setPrevious( edge->getPrevious()-1, this->dcel->getNext( twin->getTwin()-1));
-					this->dcel->setPrevious( twin->getPrevious()-1, this->dcel->getNext( edge->getTwin()-1));
+					this->dcel->setPrevious(twin->getTwin()-1, this->dcel->getNext(edge->getNext()-1));
+					this->dcel->setPrevious(edge->getTwin()-1, this->dcel->getNext(twin->getNext()-1));
+					this->dcel->setPrevious(edge->getNext()-1, this->dcel->getNext(edge->getPrevious()-1));
+					this->dcel->setPrevious(twin->getNext()-1, this->dcel->getNext(twin->getPrevious()-1));
+					this->dcel->setPrevious(edge->getPrevious()-1, this->dcel->getNext(twin->getTwin()-1));
+					this->dcel->setPrevious(twin->getPrevious()-1, this->dcel->getNext(edge->getTwin()-1));
 
 					// Update faces in edges.
-					this->dcel->setFace( edge->getPrevious()-1, edge->getFace());
-					this->dcel->setFace( twin->getPrevious()-1, twin->getFace());
+					this->dcel->setFace(edge->getPrevious()-1, edge->getFace());
+					this->dcel->setFace(twin->getPrevious()-1, twin->getFace());
 
 					// Update faces.
-					this->dcel->updateFace( twin->getTwin(), edge->getFace());
-					this->dcel->updateFace( edge->getTwin(), twin->getFace());
+					this->dcel->updateFace(twin->getTwin(), edge->getFace());
+					this->dcel->updateFace(edge->getTwin(), twin->getFace());
 
 					// Update pending edges.
 					this->edgeChecked[edgeIndex] = true;
@@ -654,22 +676,22 @@ bool Triangulation::delaunay()
 					}
 
 					// Update pending edges.
-					this->setNotChecked( edge->getPrevious()-1);
-					this->setNotChecked( edge->getNext()-1);
-					this->setNotChecked( twin->getPrevious()-1);
-					this->setNotChecked( twin->getNext()-1);
+					this->setNotChecked(edge->getPrevious()-1);
+					this->setNotChecked(edge->getNext()-1);
+					this->setNotChecked(twin->getPrevious()-1);
+					this->setNotChecked(twin->getNext()-1);
 #ifdef DEBUG_TRIANGULATION_DELAUNAY
 					Logging::buildText(__FUNCTION__, __FILE__, "Edge ");
 					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
 					Logging::buildText(__FUNCTION__, __FILE__, " flipped. Pending edges: ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->nPending);
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 
 					Logging::buildText(__FUNCTION__, __FILE__, "New faces are ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getRefFace( edge->getFace())->toStr());
+					Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getRefFace(edge->getFace())->toStr());
 					Logging::buildText(__FUNCTION__, __FILE__, " and ");
-					Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getRefFace( twin->getFace())->toStr());
-					Logging::write( true, Info);
+					Logging::buildText(__FUNCTION__, __FILE__, this->dcel->getRefFace(twin->getFace())->toStr());
+					Logging::write(true, Info);
 #endif
 				}
 				// Edge OK -> Not to be flipped.
@@ -682,7 +704,7 @@ bool Triangulation::delaunay()
 					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
 					Logging::buildText(__FUNCTION__, __FILE__, " is OK. Pending edges: ");
 					Logging::buildText(__FUNCTION__, __FILE__, this->nPending);
-					Logging::write( true, Info);
+					Logging::write(true, Info);
 #endif
 				}
 			}
@@ -698,7 +720,7 @@ bool Triangulation::delaunay()
 				Logging::buildText(__FUNCTION__, __FILE__, edge->getTwin());
 				Logging::buildText(__FUNCTION__, __FILE__, " is in external face. Pending edges: ");
 				Logging::buildText(__FUNCTION__, __FILE__, this->nPending);
-				Logging::write( true, Info);
+				Logging::write(true, Info);
 #endif
 			}
 		}
@@ -708,7 +730,7 @@ bool Triangulation::delaunay()
 			Logging::buildText(__FUNCTION__, __FILE__, "Edge ");
 			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
 			Logging::buildText(__FUNCTION__, __FILE__, " already checked.");
-			Logging::write( true, Info);
+			Logging::write(true, Info);
 		}
 #endif
 		// Next edge.
@@ -733,7 +755,7 @@ bool Triangulation::delaunay()
 * 				this->edgeChecked
 * Description: 	updates the "index" edge as pending to be checked.
 ***************************************************************************/
-bool Triangulation::setNotChecked( int index)
+bool Triangulation::setNotChecked(int index)
 {
 	bool updated=false;		// Return value.
 
@@ -741,7 +763,7 @@ bool Triangulation::setNotChecked( int index)
 	if (index < this->dcel->getNEdges())
 	{
 		// If edge or its twin is in external face then do not update.
-		if (!this->dcel->isExternalEdge( index))
+		if (!this->dcel->isExternalEdge(index))
 		{
 			// If edge already checked then switch state to check it again.
 			if (this->edgeChecked[index])
@@ -756,8 +778,8 @@ bool Triangulation::setNotChecked( int index)
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Index out of bounds when trying to update checked edge ");
 		Logging::buildText(__FUNCTION__, __FILE__, index+1);
-		Logging::buildRange( __FUNCTION__, __FILE__, 0, this->dcel->getNEdges());
-		Logging::write( true, Error);
+		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->dcel->getNEdges());
+		Logging::write(true, Error);
 		updated = false;
 	}
 

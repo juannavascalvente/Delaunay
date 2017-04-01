@@ -255,8 +255,7 @@ bool Process::buildTriangulation(int option)
 		// Check if star triangulation already computed.
 		if (!this->status.isTriangulationCreated())
 		{
-			this->triangulation.setDCEL(&this->dcel);
-			built = this->triangulation.build();
+			built = this->triangulation.build(&this->dcel);
 			if (built)
 			{
 				status.set(false, true, true, false, false, false);

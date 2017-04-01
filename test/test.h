@@ -23,6 +23,7 @@ using namespace std;
 #include "Parameter.h"
 #include "Set.h"
 #include "Statistics.h"
+#include "Triangulation.h"
 #include "Voronoi.h"
 
 /****************************************************************************
@@ -32,6 +33,8 @@ using namespace std;
 enum TestType { UNKNOWN_TEST,
 				TEST_SET,
 				TEST_DCEL,
+				TEST_STAR,
+				TEST_STAR_COMPARE,
 				TEST_DELAUNAY,
 				TEST_DELAUNAY_COMPARE,
 				TEST_CONVEXHULL,
@@ -48,6 +51,8 @@ enum TestType { UNKNOWN_TEST,
 #define TEST_DCEL_NAME						"TEST_DCEL"
 #define TEST_CONVEXHULL_NAME				"TEST_CONVEXHULL"
 #define TEST_CONVEXHULL_COMPARE_NAME		"TEST_CONVEXHULL_COMPARE"
+#define TEST_STAR_NAME						"TEST_STAR"
+#define TEST_STAR_COMPARE_NAME				"TEST_STAR_COMPARE"
 #define TEST_DELAUNAY_NAME					"TEST_DELAUNAY"
 #define TEST_DELAUNAY_COMPARE_NAME			"TEST_DELAUNAY_COMPARE"
 #define TEST_VORONOI_NAME					"TEST_VORONOI"
@@ -94,6 +99,9 @@ protected:
 	bool print;						// Print log data.
 	StatisticsRegister *stat;		// Pointer to statistics data.
 
+	//------------------------------------------------------------------------
+	// Protected functions.
+	//------------------------------------------------------------------------
 	virtual void initParameters();
 
 public:
@@ -129,6 +137,9 @@ public:
 	bool readVoronoi(string filName, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi);
 	bool buildVoronoi(int nPoints, Dcel& dcel, Delaunay &delaunay, Voronoi &voronoi);
 
+	//------------------------------------------------------------------------
+	// Get/Set functions.
+	//------------------------------------------------------------------------
 	const string& getOutFolder() const {return outFolder;}
 	void setOutFolder(const string& outFolder) {this->outFolder = outFolder;}
 	const string& getTestName() const {return testName;}

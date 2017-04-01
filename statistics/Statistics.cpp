@@ -147,6 +147,77 @@ void StatisticsConvexHullRegister::deallocate()
 bool StatisticsStarTriangulationRegister::writeResults()
 {
 	bool written=false;						// Return value.
+	int	 i=0;								// Loop counter.
+	StatisticsTriangulationData *current=NULL;	// Pointer to test statistics.
+
+	// Check file is opened.
+	if (this->ofs.is_open())
+	{
+		if (this->data.getNElements() > 0)
+		{
+			// Write # points in test data.
+			current = *this->data.at(0);
+			this->ofs << "nPoints <- c(" << current->getPoints();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getPoints();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # edges in test data.
+			current = *this->data.at(0);
+			this->ofs << "nEdges <- c(" << current->getEdges();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getEdges();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # faces in test data.
+			current = *this->data.at(0);
+			this->ofs << "nFaces <- c(" << current->getFaces();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getFaces();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # convex hull edges in test data.
+			current = *this->data.at(0);
+			this->ofs << "nConvexEdges <- c(" << current->getConvexhullEdges();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getConvexhullEdges();
+			}
+			this->ofs << ")" << endl;
+
+#ifdef STATISTICS_STAR_TRIANGULATION
+			// Write # flipped edges in test data.
+			current = *this->data.at(0);
+			this->ofs << "nFlipped <- c(" << current->getFlips();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getFlips();
+			}
+			this->ofs << ")" << endl;
+
+			// Write # collinear points in test data.
+			current = *this->data.at(0);
+			this->ofs << "nCollinearPoints <- c(" << current->getCollinear();
+			for (i=1; i<this->data.getNElements() ;i++)
+			{
+				current = *this->data.at(i);
+				this->ofs << "," << current->getCollinear();
+			}
+			this->ofs << ")" << endl;
+#endif
+		}
+	}
 
 	return(written);
 }
@@ -168,6 +239,36 @@ void StatisticsStarTriangulationRegister::deallocate()
 	{
 		delete *this->data.at(i);
 	}
+}
+
+/***************************************************************************
+* NAME: 	analyzeTriangulation
+* IN:		triangulation		triangulation data
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	analyzes a DCEL built using the star triangulation
+* 				algorithm.
+***************************************************************************/
+void StatisticsTriangulationData::analyzeTriangulation(Triangulation &triangulation)
+{
+	// Get # points, edges and faces.
+	this->setPoints(triangulation.getDcel()->getNVertex());
+	this->setEdges(triangulation.getDcel()->getNEdges());
+	this->setFaces(triangulation.getDcel()->getNFaces());
+
+	// Compute # edges the convex hull.
+	if (!triangulation.isConvexHullComputed())
+	{
+		triangulation.convexHull();
+	}
+	this->nConvexhullEdges = triangulation.getConvexHull()->getNElements();
+
+#ifdef STATISTICS_STAR_TRIANGULATION
+	// Get # collinear points and flipped edges.
+	this->nFlips = triangulation.getFlips();
+	this->nCollinear = triangulation.getCollinear();
+#endif
 }
 
 /***************************************************************************

@@ -196,6 +196,16 @@ TestType Test::getTypeTest(string testName)
 	{
 		type = TEST_DCEL;
 	}
+	// Test star triangulation.
+	else if (testName.compare(TEST_STAR_NAME) == 0)
+	{
+		type = TEST_STAR;
+	}
+	// Compare already built star triangulation.
+	else if (testName.compare(TEST_STAR_COMPARE_NAME) == 0)
+	{
+		type = TEST_STAR_COMPARE;
+	}
 	// Test Delaunay triangulation.
 	else if (testName.compare(TEST_DELAUNAY_NAME) == 0)
 	{
@@ -558,7 +568,6 @@ bool Test::buildRandomStarTriangulation(int nPoints, Dcel &dcel, Triangulation &
 	bool 		built=true;			// Return value.
 
 	// Execute current test.
-	triang.setDCEL(&dcel);
 	if (!dcel.generateRandom(nPoints))
 	{
 		built = false;
@@ -571,12 +580,26 @@ bool Test::buildRandomStarTriangulation(int nPoints, Dcel &dcel, Triangulation &
 	}
 	else
 	{
-		// Create incremental Delaunay algorithm.
 		if (this->stat != NULL)
 		{
 			this->stat->tic();
 		}
-		if (!triang.build())
+		// Create star triangulation.
+		if (triang.build(&dcel))
+		{
+			// Create Delaunay from star triangulation.
+			if (!triang.delaunay())
+			{
+				built = false;
+				this->nTestFailed++;
+				Logging::buildText(__FUNCTION__, __FILE__, "Error building delaunay from star in test ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
+			}
+		}
+		else
 		{
 			built = false;
 			this->nTestFailed++;
@@ -586,6 +609,7 @@ bool Test::buildRandomStarTriangulation(int nPoints, Dcel &dcel, Triangulation &
 			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
 			Logging::write(true, Error);
 		}
+
 		if (this->stat != NULL)
 		{
 			this->stat->toc();

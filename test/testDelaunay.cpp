@@ -78,6 +78,12 @@ void TestDelaunayBuild::main()
 			else
 			{
 				this->dump(dumpFileName, dcel);
+				Logging::buildText(__FUNCTION__, __FILE__, "Test FALIED ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
+				this->nTestFailed++;
 			}
 
 			// Add statistics data.

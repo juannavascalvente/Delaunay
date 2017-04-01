@@ -20,7 +20,7 @@
 void TestStarTriangulationBuild::main()
 {
 	Dcel		dcel;				// Dcel data.
-	Triangulation	triangulation	// Triangulation data.
+	Triangulation	triangulation;	// Triangulation data.
 	int			testIndex=0;		// Current test index.
 	int			stepIndex=0;		// Current step index.
 	int			currentNPoints=0;
@@ -70,10 +70,16 @@ void TestStarTriangulationBuild::main()
 			else
 			{
 				this->dump(dumpFileName, dcel);
+				Logging::buildText(__FUNCTION__, __FILE__, "Test FALIED ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
+				this->nTestFailed++;
 			}
 
 			// Add statistics data.
-			//statData->analyzeDelaunay(delaunay);
+			statData->analyzeTriangulation(triangulation);
 			statReg->add(statData);
 
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
@@ -81,7 +87,7 @@ void TestStarTriangulationBuild::main()
 			delaunay.freeStatistics();
 #endif
 			// Reset Delaunay data.
-			delaunay.reset();
+			triangulation.reset();
 			this->testCounter++;
 		}
 
@@ -112,6 +118,129 @@ void TestStarTriangulationBuild::dump(string dcelFileName, Dcel &dcel)
 	{
 		// Write DCEL data.
 		if (!dcel.writePoints(dcelFileName, dcel.getNVertex()))
+		{
+			cout << "Cannot open file " << dcelFileName << " to write dcel data" << endl;
+		}
+	}
+	// Error opening points file.
+	else
+	{
+		cout << "Cannot open file " << dcelFileName << " to write points" << endl;
+	}
+}
+
+
+/***************************************************************************
+* Name: 	main
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	true			if test prepared
+* 			false			i.o.c.
+* GLOBAL:	NONE
+* Description: 	compares the Delaunay read from input files with the Delaunay
+* 				computed using the points in the input files
+***************************************************************************/
+void TestStarTriangulationCompare::main()
+{
+	/*
+	int 	 i=0;				// Loop counter.
+	string 	 dcelFileName;		// DCEL file name.
+	string 	 outFileName;		// Output file name.
+	Dcel	 originalDcel;		// Original dcel data.
+	Dcel	 dcel;				// Dcel data.
+	Delaunay delaunay;			// Delaunay data.
+
+	this->testCounter = 1;
+	this->totalTests = filesList.getNElements();
+
+#ifdef DEBUG_DELAUNAY_COMPARE_PREPARE
+	// Print test parameters.
+	this->printParameters();
+	Logging::buildText(__FUNCTION__, __FILE__, "Number of files to compare: ");
+	Logging::buildText(__FUNCTION__, __FILE__, this->filesList.getNElements());
+	Logging::write(true, Info);
+#endif
+	// Read all files.
+	for (i=0; i<this->filesList.getNElements() ;i++)
+	{
+		// Build file name where data is written if test fails.
+		ostringstream convert;
+		convert << this->nTestFailed;
+		outFileName = this->outFolder + "Delaunay_" + convert.str() + ".txt";
+
+		// Open file.
+		dcelFileName = *this->filesList.at(i);
+		if (!originalDcel.read(dcelFileName, false))
+		{
+			this->nTestFailed++;
+			Logging::buildText(__FUNCTION__, __FILE__, "Error reading original file: ");
+			Logging::buildText(__FUNCTION__, __FILE__, dcelFileName);
+			Logging::buildText(__FUNCTION__, __FILE__, " in test ");
+			Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+			Logging::buildText(__FUNCTION__, __FILE__, "/");
+			Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+			Logging::write(true, Error);
+		}
+		else if (this->readDelaunay(dcelFileName, dcel, delaunay))
+		{
+			if (dcel == originalDcel)
+			{
+				Logging::buildText(__FUNCTION__, __FILE__, "Test OK ");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Successful);
+			}
+			else
+			{
+				this->nTestFailed++;
+
+				// Write test data.
+				this->dump(outFileName, dcel);
+
+				// Print log error.
+				Logging::buildText(__FUNCTION__, __FILE__, "Test failed when comparing dcel. Test id:");
+				Logging::buildText(__FUNCTION__, __FILE__, this->testCounter);
+				Logging::buildText(__FUNCTION__, __FILE__, "/");
+				Logging::buildText(__FUNCTION__, __FILE__, this->totalTests);
+				Logging::write(true, Error);
+			}
+		}
+		else
+		{
+			this->dump(outFileName, dcel);
+		}
+
+		// Reset test data.
+		this->testCounter++;
+		delaunay.reset();
+		originalDcel.reset();
+		dcel.reset();
+	}
+	*/
+}
+
+/***************************************************************************
+* Name: 	dump
+* IN:		dcelFileName	dcelFilefile where dcel points are written
+* 			dcel			dcel data to write
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: 	Writes to output files the data required to reproduce the fail
+***************************************************************************/
+void TestStarTriangulationCompare::dump(string dcelFileName, Dcel &dcel)
+{
+	ofstream ofs;			// Output file.
+
+	// Open file.
+	ofs.open(dcelFileName.c_str(), ios::out);
+
+	// Check file is opened.
+	if (ofs.is_open())
+	{
+		// Write DCEL data.
+		if (!dcel.write(dcelFileName, false))
 		{
 			cout << "Cannot open file " << dcelFileName << " to write dcel data" << endl;
 		}
