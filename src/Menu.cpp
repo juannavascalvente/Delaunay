@@ -23,8 +23,8 @@ using namespace std;
 #define	READ_MENU_TEXT					"Read"
 #define	INPUTSET_READ_FLAT_TEXT			"Flat file"
 #define	INPUTSET_READ_DCEL_POINTS_TEXT 	"Points DCEL file"
-#define	INPUTSET_READ_DCEL_TEXT			"DCEL file"
-#define	INPUTSET_READ_DELAUNAY_TEXT		"Delaunay files"
+#define	INPUTSET_READ_TRIANG_TEXT		"Triangulation file"
+#define	INPUTSET_READ_INCREMENTAL_TEXT	"Incremental files"
 #define	INPUTSET_READ_VORONOI_TEXT		"Voronoi file"
 #define INPUTSET_READ_GABRIEL_TEXT		"Gabriel file"
 #define	INPUTSET_SHAKE_DCEL_TEXT		"Shake points"
@@ -146,8 +146,8 @@ void Menu::updateMenu()
 		this->subMenuGenerate = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FLAT_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, READ_POINTS_DCEL_FILE);
-		glutAddMenuEntry(INPUTSET_READ_DCEL_TEXT, READ_DCEL);
-		glutAddMenuEntry(INPUTSET_READ_DELAUNAY_TEXT, READ_DELAUNAY);
+		glutAddMenuEntry(INPUTSET_READ_TRIANG_TEXT, READ_DCEL);
+		glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, READ_DELAUNAY);
 		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, READ_VORONOI);
 		glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, READ_GABRIEL);
 
@@ -179,8 +179,8 @@ void Menu::updateMenu()
 		this->subMenuGenerate = glutCreateMenu(menu_level_1);
 		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, READ_POINTS_FLAT_FILE);
 		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, READ_POINTS_DCEL_FILE);
-		glutAddMenuEntry(INPUTSET_READ_DCEL_TEXT, READ_DCEL);
-		glutAddMenuEntry(INPUTSET_READ_DELAUNAY_TEXT, READ_DELAUNAY);
+		glutAddMenuEntry(INPUTSET_READ_TRIANG_TEXT, READ_DCEL);
+		glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, READ_DELAUNAY);
 		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, READ_VORONOI);
 		glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, READ_GABRIEL);
 

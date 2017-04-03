@@ -175,7 +175,7 @@ bool Process::readData(int option)
 			// PENDING CHECK IF A DCEL IS CONSISTENT?
 			success = this->dcel.read(this->config->getInDCELFilename(), false);
 			this->delaunay.setDCEL(&this->dcel);
-			this->status.set(false, true, true, true, false, false);
+			this->status.set(false, true, true, false, false, false);
 			break;
 		}
 		// Read Delaunay incremental algorithm files.
@@ -193,8 +193,9 @@ bool Process::readData(int option)
 		case READ_VORONOI:
 		{
 			// PENDING: What to allow in menu if only voronoi is read.
-			success = this->voronoi.read(this->config->getInVoronoiFilename());
-			this->status.set(false, true, !success, !success, true, false);
+			//success = this->voronoi.read(this->config->getInVoronoiFilename());
+			//this->status.set(false, true, !success, !success, true, false);
+			cout << "NOT IMPLEMENTED YES" << endl;
 			break;
 		}
 		// Read Gabriel file.
