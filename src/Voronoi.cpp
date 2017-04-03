@@ -189,7 +189,7 @@ bool Voronoi::getCentre(int areaId, Point<TYPE> &centre)
 * Description: 	computes the Voronoi diagram associated to the current
 * 				triangulation stored in the "triangulation" attribute.
 ***************************************************************************/
-bool Voronoi::build()
+bool Voronoi::build(bool isIncremental)
 {
 	bool built=true;		// Return value.
 	int	 pointIndex=0;		// Loop counter.
@@ -204,7 +204,7 @@ bool Voronoi::build()
 		Logging::write(true, Info);
 #endif
 		// Compute Voronoi circumcentres for every non-imaginary face.
-		this->computeCircumcentres();
+		this->computeCircumcentres(isIncremental);
 
 		// Compute Voronoi area for every point in Delaunay triangulation.
 		for (pointIndex=0; pointIndex<this->triangulation->getNVertex() ;pointIndex++)
@@ -388,7 +388,7 @@ bool Voronoi::write(string fileName)
 * Description: 	comptues the voronoi centre of every face of the "dcel"
 * 				triangulation and updates the "voronoi" vertex array.
 ***************************************************************************/
-void Voronoi::computeCircumcentres()
+void Voronoi::computeCircumcentres(bool isIncremental)
 {
 	int			faceId=0;			// Current face id.
 	int			adjacentFaceId=0;	// Adjacent face id.
@@ -457,70 +457,73 @@ void Voronoi::computeCircumcentres()
 	Logging::write(true, Info);
 #endif
 
-	// Build imaginary faces circumcentres.
-	for (faceId=1; faceId<=lastIamginaryFace ;faceId++)
+	if (isIncremental)
 	{
-		// Skip face bottom most face because it has no adjacent real faces.
-		if (!this->isBottomMostFace(faceId))
+		// Build imaginary faces circumcentres.
+		for (faceId=1; faceId<=lastIamginaryFace ;faceId++)
 		{
-			// Parse only imaginary Delaunay faces.
-			if (this->triangulation->imaginaryFace(faceId))
+			// Skip face bottom most face because it has no adjacent real faces.
+			if (!this->isBottomMostFace(faceId))
 			{
-#ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
-				Logging::buildText(__FUNCTION__, __FILE__, "Face ");
-				Logging::buildText(__FUNCTION__, __FILE__, faceId);
-				Logging::buildText(__FUNCTION__, __FILE__, " is imaginary.");
-				Logging::write(true, Info);
-#endif
-				// Get edge in current Delaunay face.
-				edgeIndex = this->triangulation->getFaceEdge(faceId)-1;
-
-				realFaceFound = false;
-				while (!realFaceFound)
+				// Parse only imaginary Delaunay faces.
+				if (this->triangulation->imaginaryFace(faceId))
 				{
-					// Check if twin edge belongs to real Delaunay face.
-					twinEdgeIndex = this->triangulation->getTwin(edgeIndex)-1;
-					adjacentFaceId = this->triangulation->getFace(twinEdgeIndex);
-					if (!this->triangulation->imaginaryFace(adjacentFaceId))
+#ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
+					Logging::buildText(__FUNCTION__, __FILE__, "Face ");
+					Logging::buildText(__FUNCTION__, __FILE__, faceId);
+					Logging::buildText(__FUNCTION__, __FILE__, " is imaginary.");
+					Logging::write(true, Info);
+#endif
+					// Get edge in current Delaunay face.
+					edgeIndex = this->triangulation->getFaceEdge(faceId)-1;
+
+					realFaceFound = false;
+					while (!realFaceFound)
 					{
-						// Adjacent face found.
-						realFaceFound = true;
+						// Check if twin edge belongs to real Delaunay face.
+						twinEdgeIndex = this->triangulation->getTwin(edgeIndex)-1;
+						adjacentFaceId = this->triangulation->getFace(twinEdgeIndex);
+						if (!this->triangulation->imaginaryFace(adjacentFaceId))
+						{
+							// Adjacent face found.
+							realFaceFound = true;
+						}
+						else
+						{
+							// Check next edge in current Delaunay face.
+							edgeIndex = this->triangulation->getNext(edgeIndex)-1;
+						}
 					}
-					else
-					{
-						// Check next edge in current Delaunay face.
-						edgeIndex = this->triangulation->getNext(edgeIndex)-1;
-					}
+
+					// Get centre of adjacent Voronoi face.
+					centre = this->voronoi.getRefPoint(adjacentFaceId-1);
+
+					// Compute centre of external Delaunay face.
+					externalCentre = this->computeExtremeVoronoi(edgeIndex, *centre);
+
+					// Update Voronoi point coordinates.
+					this->voronoi.updateVertex(&externalCentre, faceId-1);
 				}
-
-				// Get centre of adjacent Voronoi face.
-				centre = this->voronoi.getRefPoint(adjacentFaceId-1);
-
-				// Compute centre of external Delaunay face.
-				externalCentre = this->computeExtremeVoronoi(edgeIndex, *centre);
-
-				// Update Voronoi point coordinates.
-				this->voronoi.updateVertex(&externalCentre, faceId-1);
+#ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
+				else
+				{
+					Logging::buildText(__FUNCTION__, __FILE__, "Face ");
+					Logging::buildText(__FUNCTION__, __FILE__, faceId);
+					Logging::buildText(__FUNCTION__, __FILE__, " is real and skipped.");
+					Logging::write(true, Info);
+				}
+#endif
 			}
 #ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
 			else
 			{
 				Logging::buildText(__FUNCTION__, __FILE__, "Face ");
 				Logging::buildText(__FUNCTION__, __FILE__, faceId);
-				Logging::buildText(__FUNCTION__, __FILE__, " is real and skipped.");
+				Logging::buildText(__FUNCTION__, __FILE__, " is bottom most face and skipped.");
 				Logging::write(true, Info);
 			}
 #endif
 		}
-#ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
-		else
-		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Face ");
-			Logging::buildText(__FUNCTION__, __FILE__, faceId);
-			Logging::buildText(__FUNCTION__, __FILE__, " is bottom most face and skipped.");
-			Logging::write(true, Info);
-		}
-#endif
 	}
 
 #ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
