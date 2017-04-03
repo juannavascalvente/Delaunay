@@ -181,11 +181,11 @@ bool Voronoi::getCentre(int areaId, Point<TYPE> &centre)
 
 /***************************************************************************
 * Name: 	build
-* IN:		NONE
+* IN:		isIncremental	is incremental Delaunay flag.
 * OUT:		NONE
-* RETURN:	true 		if Voronoi diagram built.
-* 			false		otherwise.
-* GLOBAL:	this->voronoi		update with Voronoi edges and faces.
+* RETURN:	true 			if Voronoi diagram built.
+* 			false			otherwise.
+* GLOBAL:	this->voronoi	update with Voronoi edges and faces.
 * Description: 	computes the Voronoi diagram associated to the current
 * 				triangulation stored in the "triangulation" attribute.
 ***************************************************************************/
