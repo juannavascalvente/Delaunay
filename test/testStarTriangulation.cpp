@@ -6,8 +6,8 @@
  */
 #include "testStarTriangulation.h"
 
-#define DEBUG_TEST_STAR_BUILD
-#define DEBUG_TEST_STAR_COMPARE
+//#define DEBUG_TEST_STAR_BUILD
+//#define DEBUG_TEST_STAR_COMPARE
 
 /***************************************************************************
 * Name: 	main

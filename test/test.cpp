@@ -714,7 +714,7 @@ bool Test::readVoronoi(string dcelFileName, Dcel& dcel, Delaunay &delaunay, Voro
 		if (voronoi.init(&dcel))
 		{
 			// Compute Voronoi diagram.
-			if (!voronoi.build())
+			if (!voronoi.build(false))
 			{
 				built = false;
 				this->nTestFailed++;
@@ -765,7 +765,7 @@ bool Test::buildVoronoi(int nPoints, Dcel& dcel, Delaunay &delaunay, Voronoi &vo
 		if (voronoi.init(&dcel))
 		{
 			// Compute Voronoi diagram.
-			if (!voronoi.build())
+			if (!voronoi.build(true))
 			{
 				built = false;
 				this->nTestFailed++;

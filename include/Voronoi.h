@@ -28,7 +28,7 @@ class Voronoi
 	//  Private functions.
 	//------------------------------------------------------------------------
 	inline void setValid(bool valid) { this->valid = valid; };
-	void computeCircumcentres();
+	void computeCircumcentres(bool isIncremental);
 	void buildArea(int pointIndex);
 	Point<TYPE> computeExtremeVoronoi(int edgeIndex, Point<TYPE> &centre);
 	bool edgeExists(Edge &edge);
@@ -58,7 +58,7 @@ public:
 	bool 		 getCentre(int areaId, Point<TYPE> &centre);
 
 	// Figures functions.
-	bool 	build();
+	bool 	build(bool isIncremental);
 	bool	findArea(Point<TYPE> &p);
 	bool 	findPath(Line &line, Set<int> &faces);
 	bool 	isInnerToArea(const Point<TYPE> &p, int areaId);

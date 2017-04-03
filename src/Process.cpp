@@ -653,7 +653,7 @@ void Process::execute(void)
 				if (!error)
 				{
 					// Compute Voronoi diagram.
-					error = !this->voronoi.build();
+					error = !this->voronoi.build(true);
 				}
 
 				// Check error and update status.
