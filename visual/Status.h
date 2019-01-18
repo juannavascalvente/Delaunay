@@ -5,8 +5,8 @@
  *      Author: juan
  */
 
-#ifndef INCLUDE_STATUS_H_
-#define INCLUDE_STATUS_H_
+#ifndef VISUAL_STATUS_H_
+#define VISUAL_STATUS_H_
 
 /****************************************************************************
 // 						STATUS CLASS DEFITNION
@@ -54,4 +54,4 @@ public:
 	inline void setGabrielCreated(bool value) { this->hasGabriel = value;};
 };
 
-#endif /* INCLUDE_STATUS_H_ */
+#endif /* VISUAL_STATUS_H_ */

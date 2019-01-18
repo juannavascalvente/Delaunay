@@ -5,7 +5,8 @@
  *      Author: jnavas
  */
 
-#include "Draw.h"
+#include "../visual/Draw.h"
+
 #include "Queue.h"
 #include "Triangle.h"
 #include <string.h>

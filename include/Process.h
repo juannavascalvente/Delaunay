@@ -8,15 +8,15 @@
 #ifndef PROCESS_H_
 #define PROCESS_H_
 
+#include "../visual/Draw.h"
+#include "../visual/Menu.h"
+#include "../visual/Status.h"
 #include "Config.h"
 #include "Dcel.h"
 #include "Delaunay.h"
-#include "Draw.h"
 #include "Gabriel.h"
 #include "Logging.h"
-#include "Menu.h"
 #include "Queue.h"
-#include "Status.h"
 #include "Triangulation.h"
 #include "Voronoi.h"
 
