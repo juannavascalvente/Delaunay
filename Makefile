@@ -25,7 +25,7 @@ OBJS=$(patsubst %.cpp,$(OBJ_DIR)/%.o,$(subst ./test/, ,$(FILES)))
 .PHONY: directories
 dir_guard=@mkdir -p $(@D)
 
-$(EXEC): $(OBJS)
+all: $(OBJS)
 	$(dir_guard)
 	$(CC) $(INC_DIR) $(CFLAGS) $(OBJS) -o $(EXEC) $(LIBRARY)
 
