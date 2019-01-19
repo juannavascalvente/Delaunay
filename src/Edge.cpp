@@ -11,17 +11,23 @@
 #include <sstream>
 using namespace std;
 
+/****************************************************************************
+//	 						DEFINES SECTION
+****************************************************************************/
+#define INVALID_EDGE		(-1)
+#define INVALID_ORIGIN		(-1)
+
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
 Edge::Edge()
 {
 	// Set input values.
-	this->origin = INVALID;
-	this->twin = INVALID;
-	this->previous = INVALID;
-	this->next = INVALID;
-	this->face = INVALID;
+	this->origin = INVALID_ORIGIN;
+	this->twin = INVALID_EDGE;
+	this->previous = INVALID_EDGE;
+	this->next = INVALID_EDGE;
+	this->face = INVALID_EDGE;
 }
 
 Edge::Edge(int origin, int twin, int prev, int next, int face)
@@ -66,16 +72,36 @@ void Edge::set(int origin, int twin, int previous, int next, int face)
 * OUT:		NONE
 * RETURN:	NONE
 * GLOBAL:	NONE
-* Description: reset fields to INVALID
+* Description: reset fields to INVALID_EDGE
 ***************************************************************************/
 void Edge::reset()
 {
 	// Reset object values.
-	this->origin = INVALID;
-	this->twin = INVALID;
-	this->previous = INVALID;
-	this->next = INVALID;
-	this->face = INVALID;
+	this->origin = INVALID_ORIGIN;
+	this->twin = INVALID_EDGE;
+	this->previous = INVALID_EDGE;
+	this->next = INVALID_EDGE;
+	this->face = INVALID_EDGE;
+}
+
+
+/***************************************************************************
+* Name: 	isInvalid
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	true		if vertex has all fields invalid
+* 			false		i.o.c
+* GLOBAL:	NONE
+* Description: 	Checks if the edge has origin point index or any edge as
+* 				INVALID.
+***************************************************************************/
+bool Edge::isInvalid(void)
+{
+	return ((this->origin == INVALID_ORIGIN) ||
+			(this->twin == INVALID_EDGE) ||
+			(this->previous == INVALID_EDGE) ||
+			(this->next == INVALID_EDGE) ||
+			(this->face == INVALID_EDGE));
 }
 
 
