@@ -10,6 +10,7 @@
 #include "defines.h"
 #include "Process.h"
 #include "Statistics.h"
+#include "Tester.h"
 
 #include <string.h>
 #include <iostream>
@@ -117,6 +118,9 @@ void printUsage(int type, char *exec)
 int executeTests(int argc, char** argv)
 {
 	int 	ret=SUCCESS;			// Return value.
+
+	Tester tester;
+	ret = tester.Execute(argc, argv);
 
 	return ret;
 }
