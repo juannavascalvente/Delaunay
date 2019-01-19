@@ -14,6 +14,12 @@ using namespace std;
 #include "defines.h"
 #include "Point.h"
 
+
+/****************************************************************************
+//	 						DEFINES SECTION
+****************************************************************************/
+#define INVALID_INDEX		(-1)
+
 /****************************************************************************
 //	 						VERTEX CLASS DEFITNION
 ****************************************************************************/
@@ -30,7 +36,7 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	Vertex(){this->originEdge = INVALID; this->point = Point<TYPE>(0.0, 0.0);};
+	Vertex(){this->originEdge = INVALID_INDEX; this->point = Point<TYPE>(0.0, 0.0);};
 	Vertex(int originEdge, Point<TYPE> p) {this->originEdge = originEdge; this->point = p;};
 
 	//------------------------------------------------------------------------
@@ -73,6 +79,7 @@ public:
 		return(out);
 	};
 	bool  operator==(const Vertex &v) const;
+	bool  operator!=(const Vertex &v) const;
 };
 
 #endif /* VERTEX_H_ */

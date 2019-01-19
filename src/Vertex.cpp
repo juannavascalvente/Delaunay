@@ -24,7 +24,7 @@ void Vertex::random()
 	this->point.random();
 
 	// Set edge as invalid.
-	this->originEdge = INVALID;
+	this->originEdge = INVALID_INDEX;
 }
 
 
@@ -56,7 +56,7 @@ int	Vertex::read(ifstream ifs)
 	this->point.read(ifs);
 
 	// Set edge as invalid.
-	this->originEdge = INVALID;
+	this->originEdge = INVALID_INDEX;
 
 	return(ret);
 }
@@ -106,16 +106,28 @@ void Vertex::printPoint(std::ostream& out) const
 
 /***************************************************************************
 * Name: 	==
-* IN:		v			vertex to compare to
+* IN:		v			vertex to compare with
 * OUT:		NONE
 * RETURN:	true 		if both vertex are equal
 * 			false		i.o.c.
 * GLOBAL:	NONE
-* Description: 	checks ifboth vertex are equals.
+* Description: 	checks if both vertex are equals.
 ***************************************************************************/
 bool Vertex::operator==(const Vertex &v) const
 {
 	return ((this->originEdge == v.originEdge) && (this->point == v.point));
 }
 
-
+/***************************************************************************
+* Name: 	!=
+* IN:		v			vertex to compare with
+* OUT:		NONE
+* RETURN:	true 		if both vertex are not equal
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: 	checks if both vertex are not equal.
+***************************************************************************/
+bool Vertex::operator!=(const Vertex &v) const
+{
+	return ((this->originEdge != v.originEdge) || (this->point != v.point));
+}
