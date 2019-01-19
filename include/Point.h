@@ -50,7 +50,7 @@ class Point
 	//***********************************************************
 	// MEMBERS
 	//***********************************************************
-	public:
+public:
 
 	//***********************************************************
 	// Constructor/Destructor.
@@ -96,6 +96,7 @@ class Point
 
 	void random();
 	void shake();
+	inline void shift(TYPE deltaX, TYPE deltaY) {this->x += deltaX; this->y += deltaY;};
 
 	// I/O interface
 	void print(std::ostream& out) const;
@@ -110,12 +111,10 @@ class Point
 	inline Point& 	operator*(const TYPE value) {this->x *= value; this->y *= value; return(*this);}
 	inline Point& 	operator/(const TYPE value) {this->x /= value; this->y /= value; return(*this);}
 	inline bool 	operator==(const Point& q) const {return ((this->x == q.x) && (this->y == q.y));}
-	inline bool 	operator!=(const Point& q) {return ((this->x != q.x) || (this->y != q.y));}
+	inline bool 	operator!=(const Point& q) const {return ((this->x != q.x) || (this->y != q.y));}
 	inline Point& 	operator=(const Point& other ) {this->x = other.x; this->y = other.y; return(*this);}
 	friend istream &operator>>(istream &in, Point &p) {in >> p.x; in >> p.y; return(in);};
 	friend ostream &operator<<(ostream &out, Point &p) {out << p.x; out << " "; out << p.y; return(out);};
-
-	inline void shift(TYPE deltaX, TYPE deltaY) {this->x += deltaX; this->y += deltaY;};
 };
 
 /*****************************************************************************
