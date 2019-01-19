@@ -25,18 +25,17 @@ public:
 	/*------------------------------------------------------------------------
 	  Constructor/Destructor.
 	------------------------------------------------------------------------*/
-	Face();
-	Face(int edge, bool imaginary);
+	Face(void);
 	Face(int edge);
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
-	bool hasNegativeVertex();
+	bool isInvalid(void);
 
 	// Get / Set.
 	inline void setEdge(int value) { this->edge = value; };
-	inline int 	getEdge() { return(this->edge); };
+	inline int 	getEdge(void) { return(this->edge); };
 
 	// Operators.
 	Face& operator=(Face other)
@@ -49,10 +48,11 @@ public:
 	friend ostream &operator<<(ostream &out, Face &face)
 				{ out << face.edge; return(out);};
 	inline bool operator==(const Face &other) const {return(this->edge == other.edge);};
+	inline bool operator!=(const Face &other) const {return(this->edge != other.edge);};
 
 	// I/O functions.
 	void 	print(std::ostream& out) const;
-	string 	toStr();
+	string 	toStr(void);
 };
 
 #endif /* INCLUDE_FACE_H_ */

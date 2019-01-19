@@ -11,22 +11,21 @@
 #include <sstream>
 using namespace std;
 
+/****************************************************************************
+//	 						DEFINES SECTION
+****************************************************************************/
+#define INVALID_FACE		(-1)
+
+
 /*------------------------------------------------------------------------
   Constructor/Destructor.
 ------------------------------------------------------------------------*/
 Face::Face()
 {
 	// Update object attributes.
-	this->edge = INVALID;
-	//this->imaginaryFace = false;
+	this->edge = INVALID_FACE;
 }
 
-//Face::Face(int edge, bool imaginary)
-//{
-//	// Update object attributes.
-//	this->edge = edge;
-//	this->imaginaryFace = imaginaryFace;
-//}
 
 Face::Face(int edge)
 {
@@ -38,23 +37,19 @@ Face::Face(int edge)
 //------------------------------------------------------------------------
 // Public functions.
 //------------------------------------------------------------------------
-///***************************************************************************
-//* Name: set
-//* IN:		edge			edge value
-//* 			imaginaryFace	flag to indicate if face is imaginary
-//* OUT:		NONE
-//* RETURN:	NONE
-//* GLOBAL:	NONE
-//* Description: updates face fields
-//***************************************************************************/
-//void Face::set(int edge, bool imaginaryFace)
-//{
-//	// Update object attributes.
-//	this->edge = edge;
-//	this->imaginaryFace = imaginaryFace;
-//}
-
-
+/***************************************************************************
+* Name: 	isInvalid
+* IN:		NONE
+* OUT:		NONE
+* RETURN:	true		if edge is invalid
+* 			false		i.o.c.
+* GLOBAL:	NONE
+* Description: checks if face has an invalid edge
+***************************************************************************/
+bool Face::isInvalid(void)
+{
+	return (this->edge == INVALID_FACE);
+}
 
 /***************************************************************************
 * Name: 	print
