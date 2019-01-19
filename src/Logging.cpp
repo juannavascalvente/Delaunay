@@ -331,7 +331,6 @@ void Logging::write(bool print, enum MessageCategory category)
 	std::string blue = "\x1b[34m";
 	std::string reset = "\x1B[0m";
 
-
 	// Check log file is already open.
 	if (opened)
 	{
@@ -382,13 +381,17 @@ void Logging::write(bool print, enum MessageCategory category)
 				break;
 			}
 		}
-
-		// Empty texts.
-		concat = false;
-		message = "";
-		function = "";
-		file = "";
 	}
+	else
+	{
+		std::cout << file << "\t\tFunction " << function << "():\t\t" << message << std::endl;
+	}
+
+	// Empty texts.
+	concat = false;
+	message = "";
+	function = "";
+	file = "";
 }
 
 
