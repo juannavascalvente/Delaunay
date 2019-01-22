@@ -26,8 +26,8 @@ using namespace std;
 #define 	COLLINEAR_THRESHOLD		0.0
 
 // Window size
-#define MAX_X_COORD				10000
-#define MAX_Y_COORD				10000
+#define MAX_X_COORD				10000.0
+#define MAX_Y_COORD				10000.0
 
 //****************************************************************************
 // 							Data types definition

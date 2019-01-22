@@ -37,10 +37,6 @@
 #define     P_MINUS_1           -1
 #define     P_MINUS_2           -2
 
-// Window size
-#define MAX_X_COORD				10000
-#define MAX_Y_COORD				10000
-
 // File name max length.
 #ifndef FILENAME_MAX
 #define FILENAME_MAX			200
