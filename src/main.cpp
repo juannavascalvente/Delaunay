@@ -8,12 +8,13 @@
 #include <time.h>
 
 #include "defines.h"
-#include "Process.h"
 #include "Statistics.h"
 #include "Tester.h"
 
 #include <string.h>
 #include <iostream>
+
+#include "../visual/Process.h"
 using namespace std;
 
 #define STATISTICS_EXECUTION	"-stat"
