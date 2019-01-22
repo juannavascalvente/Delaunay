@@ -5,10 +5,9 @@
  *      Author: jnavas
  */
 
-#include <GL/glut.h>
-
 #include "Process.h"
-#include "Triangle.h"
+
+#include <GL/glut.h>
 
 //#define DEBUG_PROCESS_FIND_CLOSESTPOINT
 //#define DEBUG_PROCESS_FIND_PATH

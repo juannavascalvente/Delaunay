@@ -8,7 +8,6 @@
 #include "Dcel.h"
 #include "Logging.h"
 #include <string.h>
-#include "Triangle.h"
 
 #include <iostream>
 #include <fstream>
