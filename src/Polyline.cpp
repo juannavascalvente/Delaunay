@@ -63,12 +63,16 @@ double Polyline::length()
 	int	i=0;				// Loop counter.
 	double perimeter=0.0;	// Return value.
 	Line *line;				// Current line.
+	Point<TYPE> origin;
+	Point<TYPE> destination;
 
 	// Computes distance between every pair of points.
 	for (i=0; i<(this->set.getNElements()-1) ;i++)
 	{
 		line = this->set.at( i);
-		perimeter += line->getOriginRef()->distance( *line->getDestRef());
+		origin = line->getOrigin();
+		destination = line->getDest();
+		perimeter += origin.distance( destination);
 	}
 
 	return(perimeter);
