@@ -17,22 +17,32 @@
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-Circle::Circle( )
+Circle::Circle(void)
 {
 	// Initialize fields.
 	this->centre.setOrigin();
 	this->radius = 0.0;
 }
 
-Circle::Circle( Point<TYPE> *centre, TYPE radius)
+Circle::Circle(Point<TYPE> *centre, TYPE radius)
 {
 	// Initialize fields.
 	this->centre = (*centre);
 	this->radius = radius;
+
+	// Set points in circle.
+	this->p.setX(this->centre.getX());
+	this->p.setY(this->centre.getY() - radius);
+
+	this->q.setX(this->centre.getX() + radius);
+	this->q.setY(this->centre.getY());
+
+	this->r.setX(this->centre.getX());
+	this->r.setY(this->centre.getY() + radius);
 }
 
 
-Circle::Circle( Point<TYPE> *p,	Point<TYPE> *q, Point<TYPE> *r)
+Circle::Circle(Point<TYPE> *p,	Point<TYPE> *q, Point<TYPE> *r)
 {
 	// Initialize fields.
 	this->p = *p;
@@ -64,7 +74,7 @@ Circle::Circle( Point<TYPE> *p,	Point<TYPE> *q, Point<TYPE> *r)
 * Description: 	Checks if the input point "s" is in inside the circle formed
 * 				by points p-q-r.
 ***************************************************************************/
-bool Circle::inCircle( Point<TYPE> *s)
+bool Circle::inCircle(Point<TYPE> *s)
 {
 #ifdef DEBUG_CIRCLE_INCIRCLE
 	Logging::buildText(__FUNCTION__, __FILE__, "Circle points are: ");
@@ -74,11 +84,11 @@ bool Circle::inCircle( Point<TYPE> *s)
 	Logging::write( true, Info);
 	Logging::buildText(__FUNCTION__, __FILE__, this->r.toStr());
 	Logging::write( true, Info);
-	Logging::buildText(__FUNCTION__, __FILE__, ". Point to check is: ");
+	Logging::buildText(__FUNCTION__, __FILE__, "Point to check is: ");
 	Logging::buildText(__FUNCTION__, __FILE__, s->toStr());
 	Logging::write( true, Info);
 #endif
-	bool	inCircle=false;
+	bool	isInCircle=false;
 	double 	value=0.0;		// Determinant value.
 	double 	temp[9];		// Intermediate values.
 
@@ -108,10 +118,10 @@ bool Circle::inCircle( Point<TYPE> *s)
 	// If positive then point "s" belongs to p-q-r circumference.
 	if (value > 0.0)
 	{
-		inCircle = true;
+		isInCircle = true;
 	}
 
-	return(inCircle);
+	return(isInCircle);
 }
 
 /***************************************************************************
@@ -125,7 +135,7 @@ bool Circle::inCircle( Point<TYPE> *s)
 * 				three points of the triangle and updates the "centre"
 * 				attribute.
 ***************************************************************************/
-void Circle::computeCentre()
+void Circle::computeCentre(void)
 {
 	TYPE 	x1=0.0, y1=0.0;
 	TYPE  	x2=0.0, y2=0.0;

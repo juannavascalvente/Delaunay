@@ -16,7 +16,7 @@ using namespace std;
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-Node::Node()
+Node::Node(void)
 {
 	// Initialize fields.
 	this->nChildren = 0;
@@ -29,7 +29,7 @@ Node::Node()
 	this->face = INVALID;
 }
 
-Node::Node( int p1, int p2, int p3, int face)
+Node::Node(int p1, int p2, int p3, int face)
 {
 	// Initialize fields.
 	this->nChildren = 0;
@@ -147,7 +147,7 @@ void Node::write(std::ostream& out)
 * GLOBAL:	NONE
 * Description: 	concat the node information as a string
 ***************************************************************************/
-string Node::toStr()
+string Node::toStr(void)
 {
 	ostringstream oss;
 	string text;
@@ -167,7 +167,7 @@ string Node::toStr()
 * GLOBAL:	NONE
 * Description: 	copy input node to "this"
 ***************************************************************************/
-Node& Node::operator=( const Node& other)
+Node& Node::operator=(const Node& other)
 {
 	// Copy all fields.
 	this->nChildren = other.nChildren;

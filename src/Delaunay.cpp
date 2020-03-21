@@ -9,7 +9,6 @@
 #include "Logging.h"
 #include "Point.h"
 #include "Queue.h"
-#include "Triangle.h"
 #include "Voronoi.h"
 #include <float.h>
 

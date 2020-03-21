@@ -6,6 +6,7 @@
  */
 
 #include "Line.h"
+#include "Logging.h"
 #include <float.h>
 #include <limits.h>
 
@@ -17,15 +18,18 @@
 /*****************************************************************************
 * 							LINE class implementation
 *****************************************************************************/
-Line::Line()
+Line::Line(void) : m(0.0), n(0.0), enSlopeType(ZERO_SLOPE)
 {
 	// Initialize origin and destination points to (0,0).
 	this->origin.setOrigin();
 	this->destination.setOrigin();
-	this->m = 0.0;
-	this->n = 0.0;
 }
 
+Line::Line(Point<TYPE> p, Point<TYPE> q) : origin(p), destination(q), m(0.0),
+		n(0.0), enSlopeType(REAL_SLOPE)
+{
+	this->setSlopeAndN();
+}
 
 //--------------------------------------------------------------------------
 // Public functions.
@@ -40,6 +44,7 @@ PRE:            N/A
 POST:           *********************************************************
 COMPLEXITY:     O(1)
 *****************************************************************************/
+// TODO - Issue #35
 bool Line::intersect(Line other)
 {
     bool doIntersect=false;
@@ -98,6 +103,7 @@ bool Line::intersect(Line other)
  * 	POST:           *********************************************************
  * 	COMPLEXITY:     O(1)
 *****************************************************************************/
+// TODO - Issue #35
 void Line::getIntersection(Line other, Point<TYPE> &intersection)
 {
 	// Compute intersection.
@@ -150,9 +156,20 @@ void Line::getMiddle(Point<TYPE> &middle)
  * 	POST:
  * 	COMPLEXITY:     O(1)
 *****************************************************************************/
+
+//FROM_0_TO_45,
+//				  FROM_45_TO_90,
+//				  FROM_90_TO_135,
+//                  FROM_135_TO_180,
+//                  FROM_180_TO_225,
+//				  FROM_225_TO_270,
+//				  FROM_270_TO_315,
+//                  FROM_315_TO_360
+
+//MAX_X_COORD				10000.0
+//#define MAX_Y_COORD
 void Line::extendToBoundary(Point<TYPE> &extreme)
 {
-	int			error;		// Error during intermediate computations.
     Direction_E direction; 	// Line direction.
 
     // Compute line m and n.
@@ -163,69 +180,93 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 	Logging::buildText(__FUNCTION__, __FILE__, &this->destination);
 	Logging::write(true, Info);
 #endif
-	error = this->getSlopeAndN();
-    if (error == SUCCESS)
-    {
-		// Compute direction of p-q line.
-		direction = this->getDirection();
+	// Check type of slope.
+	switch(this->getSlopeType())
+	{
+		case REAL_SLOPE:
+		{
+			// Compute direction of p-q line.
+			direction = this->getDirection();
 
-		// Line towards positive x coordinates values.
-		if ((direction == FROM_0_TO_90) || (direction == FROM_270_TO_360))
-		{
-			extreme.setX(INT_MAX);
-
-			// Set y value y=mx + n
-			extreme.setY(this->getSlope()*extreme.getX() + this->getN());
+			// Line towards positive x coordinates values.
+			switch (direction)
+			{
+				// Max Y coordinate and compute X.
+				case FROM_45_TO_90:
+				case FROM_90_TO_135:
+				{
+//					cout << " FROM_45_TO_90 FROM_90_TO_135 " << endl;
+					extreme.setY(MAX_Y_COORD);
+					extreme.setX((extreme.getY() - this->getN()) / this->getSlope());
+					break;
+				}
+				// Min X coordinate and compute Y.
+				case FROM_135_TO_180:
+				case FROM_180_TO_225:
+				{
+//					cout << " FROM_135_TO_180 FROM_180_TO_225 " << endl;
+					extreme.setX(-MAX_X_COORD);
+					extreme.setY((this->getSlope()*extreme.getX()) + this->getN());
+					break;
+				}
+				// Min Y coordinate and compute X.
+				case FROM_225_TO_270:
+				case FROM_270_TO_315:
+				{
+//					cout << " FROM_225_TO_270 FROM_270_TO_315 " << endl;
+					extreme.setY(-MAX_Y_COORD);
+					extreme.setX((extreme.getY() - this->getN()) / this->getSlope());
+					break;
+				}
+				// FROM_0_TO_45
+				// FROM_315_TO_360
+				// Max X coordinate and compute Y.
+				default:
+				{
+//					cout << " FROM_0_TO_45 FROM_315_TO_360 " << endl;
+					extreme.setX(MAX_X_COORD);
+					extreme.setY((this->getSlope()*extreme.getX()) + this->getN());
+					break;
+				}
+			}
+//			printf("%lf %lf\n", extreme.getX(), extreme.getY());
+			break;
 		}
-		// Line towards negative x coordinates values.
-		else if ((direction == FROM_90_TO_180) || (direction == FROM_180_TO_270))
-		{
-			extreme.setX(INT_MIN);
-
-			// Set y value y=mx + n
-			extreme.setY(this->getSlope()*extreme.getX() + this->getN());
-		}
-		// Line is parallel to X coordinates axis towards right.
-		else if (direction == HORIZONTAL_0)
-		{
-			extreme.setX(INT_MAX);
-			extreme.setY(this->origin.getY());
-		}
-		// Line is parallel to X coordinates axis towards left.
-		else if (direction == HORIZONTAL_180)
-		{
-			extreme.setX(INT_MIN);
-			extreme.setY(this->origin.getY());
-		}
-		// Line is parallel to Y coordinates axis upwards.
-		else if (direction == VERTICAL_90)
+		// Set current x and maximum y-coordinate value.
+		case INFINITE_POS_SLOPE:
 		{
 			extreme.setX(this->origin.getX());
-			extreme.setY(INT_MAX);
-		}
-		// Line is parallel to Y coordinates axis downwards.
-		else
-		{
-			extreme.setX(this->origin.getX());
-			extreme.setY(INT_MIN);
-		}
-    }
-    else
-    {
-    	// PENDING: What to do if there is an error?
-    	// Set common value.
-		extreme.setX(this->origin.getX());
-
-    	// Check error value.
-    	if (error == -1)
-    	{
-			extreme.setY(-MAX_Y_COORD);
-    	}
-    	else
-    	{
 			extreme.setY(MAX_Y_COORD);
-    	}
-    }
+			break;
+		}
+		// Set current x and minimum y-coordinate value.
+		case INFINITE_NEG_SLOPE:
+		{
+			extreme.setX(this->origin.getX());
+			extreme.setY(-MAX_Y_COORD);
+			break;
+		}
+		// ZERO_SLOPE
+		default:
+		{
+			// Compute direction of p-q line.
+			direction = this->getDirection();
+
+			// Line is parallel to X coordinates axis towards right.
+			if (direction == HORIZONTAL_0)
+			{
+				extreme.setX(MAX_X_COORD);
+				extreme.setY(this->origin.getY());
+			}
+			// Line is parallel to X coordinates axis towards left.
+			else
+			{
+				extreme.setX(-MAX_X_COORD);
+				extreme.setY(this->origin.getY());
+			}
+			break;
+		}
+	}
 #ifdef DEBUG_EXTEND_SEGMENT
 	Logging::buildText(__FUNCTION__, __FILE__, "Extreme point is ");
 	Logging::buildText(__FUNCTION__, __FILE__, &extreme);
@@ -250,6 +291,50 @@ enum Turn_T	Line::checkTurn(Point<TYPE> *p)
 	return(this->origin.check_Turn(this->destination, *p));
 }
 
+
+/*****************************************************************************
+ * 	FUNCTION:      	setOrigin
+ * 	DESCRIPTION:   	updates origin point and updates line slope and n value.
+ * 	INPUT:         	p			new origin point
+ * 	OUTPUT:        	NONE
+ * 	IN/OUTPUT:		NONE
+ * 	RETURN:			NONE
+ * 	PRE:            N/A
+ * 	POST:           origin point is p and slope and n are recomputed.
+ * 	COMPLEXITY:     O(1)
+*****************************************************************************/
+void Line::setOrigin(Point<TYPE> *p)
+{
+	// Update destination point.
+	this->origin = *p;
+
+	// Update slope and N.
+	this->setSlopeAndN();
+}
+
+
+/*****************************************************************************
+ * 	FUNCTION:      	setOrigin
+ * 	DESCRIPTION:   	updates destination point and updates line slope and n
+ * 					value.
+ * 	INPUT:         	p			new destination point
+ * 	OUTPUT:        	NONE
+ * 	IN/OUTPUT:		NONE
+ * 	RETURN:			NONE
+ * 	PRE:            N/A
+ * 	POST:           destination point is p and slope and n are recomputed.
+ * 	COMPLEXITY:     O(1)
+*****************************************************************************/
+void Line::setDestination(Point<TYPE> *p)
+{
+	// Update destination point.
+	this->destination = *p;
+
+	// Update slope and N.
+	this->setSlopeAndN();
+}
+
+
 /***************************************************************************
 * Name: 		print
 * IN:			out			output stream
@@ -262,13 +347,39 @@ void Line::print(std::ostream& out)
 {
 	this->origin.print(out);
 	this->destination.print(out);
+	out << "Slope: " << this->m << " N: " << this->n << endl;
+	out << "Slope type: ";
+	switch (this->enSlopeType)
+	{
+		case INFINITE_POS_SLOPE:
+		{
+			out << " INFINITE_POS_SLOPE" << endl;
+			break;
+		}
+		case INFINITE_NEG_SLOPE:
+		{
+			out << " INFINITE_NEG_SLOPE" << endl;
+			break;
+		}
+		case ZERO_SLOPE:
+		{
+			out << " ZERO_SLOPE" << endl;
+			break;
+		}
+		default:
+		{
+			out << " REAL_SLOPE" << endl;
+			break;
+		}
+	}
 }
+
 
 //--------------------------------------------------------------------------
 // Private functions.
 //--------------------------------------------------------------------------
 /*****************************************************************************
- * 	FUNCTION:      	getSlopeAndN
+ * 	FUNCTION:      	setSlopeAndN
  * 	DESCRIPTION:   	compute m and n values in y=mx + n.
  * 	INPUT:         	NONE
  * 	OUTPUT:			NONE
@@ -278,39 +389,38 @@ void Line::print(std::ostream& out)
  * 					n = n value in y=mx + n
  * 	COMPLEXITY:     O(1)
 *****************************************************************************/
-int Line::getSlopeAndN()
+void Line::setSlopeAndN(void)
 {
-	int error=SUCCESS;	// Return value.
-	TYPE divisor;
+	TYPE fpDeltaX = (this->destination.getX() - this->origin.getX());
+	TYPE fpDeltaY = (this->destination.getY() - this->origin.getY());
 
-	// Avoid division by 0.
-	divisor = this->destination.getX() - this->origin.getX();
-	if (divisor != 0)
+	// Check if slope is zero.
+	if (0 == fpDeltaY)
 	{
-		// Compute slope.
-		this->setSlope((this->destination.getY() - this->origin.getY()) / divisor);
-
-		// Compute n.
-		this->setN(this->origin.getY() - (this->getSlope()*this->origin.getX()));
+		this->setSlopeType(ZERO_SLOPE);
 	}
-	else
+	else if (0 == fpDeltaX)
 	{
-		if (this->destination.getY() < this->origin.getY())
+		if (fpDeltaY > 0)
 		{
-			this->setSlope(-FLT_MAX);
-			error = -1;
+			this->setSlopeType(INFINITE_POS_SLOPE);
 		}
 		else
 		{
-			this->setSlope(-FLT_MAX);
-			error = -2;
+			this->setSlopeType(INFINITE_NEG_SLOPE);
 		}
-#ifdef DEBUG_COMPUTE_SLOPE_N
-			printf("Slope is +/- infinite and set to %f\n", this->getSlope());
-#endif
 	}
+	else
+	{
+		this->setSlopeType(REAL_SLOPE);
 
-	return(error);
+		// Compute slope (m) in y=m*x + n
+		this->setSlope(fpDeltaY / fpDeltaX);
+
+		// Compute (n) in y=m*x + n
+		this->setN(this->destination.getY() - this->getSlope()*this->destination.getX());
+
+	}
 }
 
 /*****************************************************************************
@@ -324,7 +434,7 @@ int Line::getSlopeAndN()
  * 	POST:			PENDING
  * 	COMPLEXITY:     O(1)
 *****************************************************************************/
-Direction_E Line::getDirection()
+Direction_E Line::getDirection(void)
 {
 	Direction_E direction;		// Return value.
 
@@ -339,88 +449,107 @@ Direction_E Line::getDirection()
 #endif
 
     // Only first or third quadrant.
-	if (this->getSlope() > 0)
+	if (this->getSlopeType() != REAL_SLOPE)
+	{
+		if (INFINITE_POS_SLOPE == this->getSlopeType())
+		{
+			direction = HORIZONTAL_180;
+		}
+		else if (INFINITE_NEG_SLOPE == this->getSlopeType())
+		{
+			direction = VERTICAL_270;
+		}
+		else if (this->origin.getX() < this->destination.getX())
+		{
+			direction = HORIZONTAL_0;
+		}
+		else
+		{
+			direction = HORIZONTAL_180;
+		}
+	}
+	else if (this->getSlope() > 0.0)
     {
         // First quadrant.
 		if (this->origin.getY() < this->destination.getY())
         {
+			if (this->getSlope() > 1.0)
+			{
 #ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " between [0,90].");
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_45_TO_90.");
 #endif
-            direction = FROM_0_TO_90;
+				direction = FROM_45_TO_90;
+			}
+			else
+			{
+#ifdef LINE_GET_DIRECTION
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_0_TO_45.");
+#endif
+				direction = FROM_0_TO_45;
+			}
         }
         // Third quadrant.
         else
         {
+			if (this->getSlope() > 1.0)
+			{
 #ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " between [180,270].");
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_180_TO_225.");
 #endif
-            direction = FROM_180_TO_270;
+				direction = FROM_180_TO_225;
+			}
+			else
+			{
+#ifdef LINE_GET_DIRECTION
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_135_TO_180.");
+#endif
+				direction = FROM_135_TO_180;
+			}
         }
     }
-    // Second or fourth quadrant.
-    else if (this->getSlope() < 0)
-    {
-        // First quadrant.
-    	if (this->origin.getY() > this->destination.getY())
-        {
-#ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " between [270,360].");
-#endif
-            direction = FROM_270_TO_360;
-        }
-        // Third quadrant.
-        else
-        {
-#ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " between [90,180].");
-#endif
-            direction = FROM_90_TO_180;
-        }
-    }
-    // Slope is zero -> line parallel to X axis.
-    else if (this->getSlope() == 0)
-    {
-        // Parallel to X axis to the right.
-    	if (this->origin.getX() < this->destination.getX())
-        {
-#ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " horizontal 0.");
-#endif
-            direction = HORIZONTAL_0;
-        }
-        // Parallel to X axis to the left.
-        else
-        {
-#ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " horizontal 180.");
-#endif
-            direction = HORIZONTAL_180;
-        }
-    }
-    // Slope is infinite -> line parallel to Y axis.
+    // (this->getSlope() < 0.0) -> Second or fourth quadrant
     else
     {
-        // Parallel to Y axis upwards.
-    	if (this->origin.getY() < this->destination.getY())
+        // Fourth quadrant.
+    	if (this->origin.getY() > this->destination.getY())
         {
+			if (this->getSlope() < (-1.0))
+			{
 #ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " vertical 90.");
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_270_TO_315.");
 #endif
-            direction = VERTICAL_90;
+				direction = FROM_270_TO_315;
+			}
+			else
+			{
+#ifdef LINE_GET_DIRECTION
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_315_TO_360.");
+#endif
+				direction = FROM_315_TO_360;
+			}
         }
-        // Parallel to Y axis downwards.
+        // Second quadrant.
         else
         {
+        	if (this->getSlope() < (-1.0))
+			{
 #ifdef LINE_GET_DIRECTION
-			Logging::buildText(__FUNCTION__, __FILE__, " vertical 270.");
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_135_TO_180.");
 #endif
-            direction = VERTICAL_270;
+				direction = FROM_135_TO_180;
+			}
+			else
+			{
+#ifdef LINE_GET_DIRECTION
+				Logging::buildText(__FUNCTION__, __FILE__, " FROM_90_TO_135.");
+#endif
+				direction = FROM_90_TO_135;
+			}
         }
     }
+
 #ifdef LINE_GET_DIRECTION
 	Logging::write(true, Info);
 #endif
 	return(direction);
 }
-

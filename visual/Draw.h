@@ -18,10 +18,10 @@
 #include "Polygon.h"
 #include "Point.h"
 #include "Polyline.h"
-#include "Status.h"
 #include "Triangulation.h"
 
 #include <GL/glut.h>
+#include "../visual/Status.h"
 
 typedef Point<TYPE> PointT;
 

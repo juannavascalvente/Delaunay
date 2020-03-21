@@ -3,7 +3,7 @@ CC=g++
 CFLAGS=-Wall -O3 -fopenmp
 RM= rm -f
 EXEC=geometric
-LIBRARY=-lglut -lgomp -lGLU -lGL
+LIBRARY=-lglut -lgomp -lGLU -lGL -lgtest
 SRCEXT=cpp
 
 # Folders paths.
@@ -12,6 +12,7 @@ OBJ_DIR=./obj
 SRC_DIR=./src
 STAT_DIR=./statistics
 TEST_DIR=./test
+VISUAL_DIR=./visual
 PERF_DIR=./performance
 SRC:= $(shell find . -name '*.$(SRCEXT)')
 
@@ -19,14 +20,14 @@ SRC:= $(shell find . -name '*.$(SRCEXT)')
 MKDIR_P = mkdir obj
 
 # Files list.
-FILES=$(subst ./test/, ,$(subst ./src/, ,$(subst ./performance/, ,$(subst ./statistics/, ,$(SRC)))))
+FILES=$(subst ./visual/, ,$(subst ./test/, ,$(subst ./src/, ,$(subst ./performance/, ,$(subst ./statistics/, ,$(SRC))))))
 OBJS=$(patsubst %.cpp,$(OBJ_DIR)/%.o,$(subst ./test/, ,$(FILES)))
 
 .PHONY: directories
 dir_guard=@mkdir -p $(@D)
 
-$(EXEC): $(OBJS)
-	$(dir_guard)
+all: $(OBJS)
+	$(dir_guard)http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=3274405
 	$(CC) $(INC_DIR) $(CFLAGS) $(OBJS) -o $(EXEC) $(LIBRARY)
 
 $(OBJ_DIR)/%.o: $(STAT_DIR)/%.cpp
@@ -34,6 +35,10 @@ $(OBJ_DIR)/%.o: $(STAT_DIR)/%.cpp
 	$(CC) $(INC_DIR) -c $< $(CFLAGS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(dir_guard)
+	$(CC) $(INC_DIR) -c $< $(CFLAGS) -o $@
+	
+$(OBJ_DIR)/%.o: $(VISUAL_DIR)/%.cpp
 	$(dir_guard)
 	$(CC) $(INC_DIR) -c $< $(CFLAGS) -o $@
 

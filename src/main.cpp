@@ -8,12 +8,13 @@
 #include <time.h>
 
 #include "defines.h"
-#include "Process.h"
 #include "Statistics.h"
-#include "tester.h"
+#include "Tester.h"
 
 #include <string.h>
 #include <iostream>
+
+#include "../visual/Process.h"
 using namespace std;
 
 #define STATISTICS_EXECUTION	"-stat"
@@ -118,21 +119,9 @@ void printUsage(int type, char *exec)
 int executeTests(int argc, char** argv)
 {
 	int 	ret=SUCCESS;			// Return value.
-	Tester 	*tester;				// Test object.
 
-	if (argc == 4)
-	{
-		tester = new Tester(argv[2], argv[3], true);
-		tester->main();
-		delete tester;
-	}
-	// Test execution does not take any parameter.
-	else
-	{
-		std::cerr << "Wrong number of arguments " << argc << std::endl;
-		printUsage(TEST, argv[0]);
-		ret = FAILURE;
-	}
+	Tester tester;
+	ret = tester.Execute(argc, argv);
 
 	return ret;
 }

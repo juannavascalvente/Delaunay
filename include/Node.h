@@ -38,32 +38,32 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Node();
-	Node( int p1, int p2, int p3, int face);
+	Node(void);
+	Node(int p1, int p2, int p3, int face);
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
 	// GET/SET functions.
-	inline int getNChildren() { return(this->nChildren); };
+	inline int getNChildren(void) { return(this->nChildren); };
 	inline int getiChild(int index) { return(this->children[index]); };
 	inline int getiPoint(int index) { return(this->points[index]); };
-	inline int getFace() { return(this->face); };
-	inline void setChildren( int id1, int id2) { this->children[0] = id1;
+	inline int getFace(void) { return(this->face); };
+	inline void setChildren(int id1, int id2) { this->children[0] = id1;
 												 this->children[1] = id2;
 												 this->nChildren = 2; };
-	inline void setChildren( int id1, int id2, int id3) { this->children[0] = id1;
+	inline void setChildren(int id1, int id2, int id3) { this->children[0] = id1;
 														  this->children[1] = id2;
 														  this->children[2] = id3;
 														  this->nChildren = 3; };
-	inline bool isLeaf() { return(getNChildren() == ZERO); };
-	inline bool splitted() { return(getNChildren() == TWO); };
+	inline bool isLeaf(void) { return(getNChildren() == ZERO); };
+	inline bool splitted(void) { return(getNChildren() == TWO); };
 
 	// I/O functions.
 	void print(std::ostream& out);
 	void read(std::istream& in);
 	void write(std::ostream& out);
-	string toStr();
+	string toStr(void);
 
 	// Overload operators.
 	Node& operator=( const Node& other );
