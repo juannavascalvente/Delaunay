@@ -11,7 +11,7 @@
 #include "Queue.h"
 #include "Voronoi.h"
 #include <float.h>
-#include <DcelReader.h>
+#include "DcelReader.h"
 #include "DcelWriter.h"
 
 #ifdef DEBUG_GEOMETRICAL

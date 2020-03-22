@@ -8,9 +8,9 @@
 #ifndef PROCESS_H_
 #define PROCESS_H_
 
-#include "../visual/Draw.h"
-#include "../visual/Menu.h"
-#include "../visual/Status.h"
+#include "Draw.h"
+#include "Menu.h"
+#include "Status.h"
 #include "Config.h"
 #include "Dcel.h"
 #include "Delaunay.h"

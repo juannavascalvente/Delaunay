@@ -34,6 +34,7 @@ endif (BUILD_DEBUG)
 ################################################ Source code ##########################################################
 file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include
+        ${BUILD_PATH}/include/Dcel
         ${BUILD_PATH}/statistics
         ${BUILD_PATH}/test
         ${BUILD_PATH}/visual
@@ -41,6 +42,7 @@ file(GLOB DELAUNAY_HEADER_FILES
 
 file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/src/*.cpp
+        ${BUILD_PATH}/src/Dcel/*.cpp
         ${BUILD_PATH}/statistics/*.cpp
         ${BUILD_PATH}/test/*.cpp
         ${BUILD_PATH}/visual/*.cpp

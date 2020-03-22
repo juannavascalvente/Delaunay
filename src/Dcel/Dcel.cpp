@@ -5,7 +5,7 @@
  *      Author: jnavas
  */
 
-#include "Dcel.h"
+#include "Dcel/Dcel.h"
 #include "Logging.h"
 #include <string.h>
 
