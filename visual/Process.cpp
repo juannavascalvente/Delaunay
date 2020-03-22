@@ -5,10 +5,19 @@
  *      Author: jnavas
  */
 
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Process.h"
+#include "DcelReader.h"
+#include "DcelWriter.h"
 
 #include <GL/glut.h>
 
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
 //#define DEBUG_PROCESS_FIND_CLOSESTPOINT
 //#define DEBUG_PROCESS_FIND_PATH
 
@@ -158,12 +167,12 @@ bool Process::readData(int option)
 			// Read points from flat file.
 			if(option == READ_POINTS_FLAT_FILE)
 			{
-				success = this->dcel.readPoints(this->config->getInFlatFilename(), true);
+				success = DcelReader::readPoints(this->config->getInFlatFilename(), true, this->dcel);
 			}
 			// Read points from DCEL file.
 			else
 			{
-				success = this->dcel.readPoints(this->config->getInDCELFilename(), false);
+				success = DcelReader::readPoints(this->config->getInDCELFilename(), false, this->dcel);
 			}
 			this->status.set(false, success, false, false, false, false);
 			break;
@@ -172,7 +181,7 @@ bool Process::readData(int option)
 		case READ_DCEL:
 		{
 			// PENDING CHECK IF A DCEL IS CONSISTENT?
-			success = this->dcel.read(this->config->getInDCELFilename(), false);
+			success = DcelReader::read(this->config->getInDCELFilename(), false, this->dcel);
 			this->delaunay.setDCEL(&this->dcel);
 			this->status.set(false, true, true, false, false, false);
 			break;
@@ -938,13 +947,13 @@ void Process::execute(void)
 		// Write points to a flat file.
 		case WRITE_POINTS:
 		{
-			this->dcel.writePoints(this->config->getOutFlatFilename(), INVALID);
+			DcelWriter::writePoints(this->config->getOutFlatFilename(), INVALID, this->dcel);
 			break;
 		}
 		// Write points to a DCEL file.
 		case WRITE_DCEL:
 		{
-			this->dcel.write(this->config->getOutDCELFilename(), false);
+			DcelWriter::write(this->config->getOutDCELFilename(), false, this->dcel);
 			break;
 		}
 		// Write DCEL and graph files.

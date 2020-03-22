@@ -8,21 +8,26 @@
 #ifndef DCEL_H_
 #define DCEL_H_
 
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Edge.h"
 #include "Face.h"
 #include "Line.h"
 #include "Set.h"
 #include "Vertex.h"
 
-//------------------------------------------------------------------------
-// PUBLIC defines
-//------------------------------------------------------------------------
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
 #define     NO_UPDATE           	-1
 #define 	EXTERNAL_FACE       	0
 
-/****************************************************************************
-// 								DCEL CLASS DEFITNION
-****************************************************************************/
+
+/***********************************************************************************************************************
+* Class definition
+***********************************************************************************************************************/
 class Dcel
 {
 	//------------------------------------------------------------------------
@@ -63,14 +68,8 @@ class Dcel
 	void drawEdgesInfo();
 	void drawFacesInfo();
 
-	bool read(string fileName);
-	bool readBinary(string fileName);
-	bool readDcelPoints(string fileName);
-	bool readFlatPoints(string fileName);
-	bool readVertexSet(ifstream &ifs);
-
-	bool write(string fileName) const;
-	bool writeBinary(string fileName)  const;
+    friend class DcelReader;
+    friend class DcelWriter;
 public:
 	/*------------------------------------------------------------------------
 	  Constructor/Destructor.
@@ -113,8 +112,12 @@ public:
 	inline int getNEdges() const{return(this->nEdges);};
 	inline int getNFaces()  const{return(this->nFaces);};
 	inline int getSizeVertex() const{return(this->sizeVertex);};
+
 	inline int getSizeEdges() const {return(this->sizeEdges);};
+    inline void setSizeEdges(int size) { this->sizeEdges = size; };
+
 	inline int getSizeFaces() const {return(this->sizeFaces);};
+    inline void setSizeFaces(int size) { this->sizeFaces = size; };
 
 	// Access to POINTS fields.
 	inline int getPointEdge(int pointIndex) {return(this->vertex[pointIndex].getOrigin());};
@@ -164,13 +167,6 @@ public:
 	// Figures? PENDING. Move to another module?
 	bool 	getEdgeInserection(Line &line, int face, int &edgeId);
 	bool 	findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces);
-
-	// I/O functions.
-	bool 	read(string fileName, bool isBinary);
-	bool 	readPoints(string fileName, bool fromFlatFile);
-	bool 	write(string fileName, bool isBinary) const;
-	bool 	writePoints(string fileName, int nPoints) const;
-	void 	print(std::ostream& out) const;
 
 	bool operator==(const Dcel& other) const;
 #ifdef TESTING
