@@ -45,13 +45,13 @@ class Process
 	/*------------------------------------------------------------------------
 	  Private functions.
 	------------------------------------------------------------------------*/
-	void execute(void);
+	void execute();
 	static void executeWrapper();
 	bool readData(int option);
 	void resetData();
 	bool buildTriangulation(int option);
 	bool buildConvexHull();
-	bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
+	static bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
 	bool findTwoClosest( int &index1, int &index2);
 	bool findFace( Point<TYPE> &point, int &faceId);
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
@@ -80,7 +80,7 @@ public:
 	inline Gabriel* getGabriel() {return(&this->gabriel); };
 
 	// Main functions.
-	void start(void);
+    static void start();
 	static void setInstance(Process *process);
 };
 
