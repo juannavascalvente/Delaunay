@@ -5,12 +5,21 @@
  *      Author: jnavas
  */
 
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Logging.h"
 #include "Circle.h"
 #include "Voronoi.h"
+#include "DcelWriter.h"
 
 #include <string.h>
+#include <DcelReader.h>
 
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_VORONOI_INIT
 //#define DEBUG_VORONOI_EDGEEXISTS
@@ -331,7 +340,7 @@ void Voronoi::print(std::ostream& out)
 {
 	if (this->valid)
 	{
-		this->voronoi.print(out);
+		DcelWriter::print(out, this->voronoi);
 	}
 }
 
@@ -347,7 +356,7 @@ void Voronoi::print(std::ostream& out)
 bool Voronoi::read(string fileName)
 {
 	// Read voronoi DCEL file.
-	this->valid = this->voronoi.read(fileName, false);
+	this->valid = DcelReader::read(fileName, false, this->voronoi);
 
 	return(this->valid);
 }
@@ -369,7 +378,7 @@ bool Voronoi::write(string fileName)
 	write = this->valid;
 	if (this->valid)
 	{
-		write = this->voronoi.write(fileName, false);
+		write = DcelWriter::write(fileName, false, this->voronoi);
 	}
 
 	return(write);

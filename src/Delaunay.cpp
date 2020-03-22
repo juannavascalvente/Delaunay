@@ -11,6 +11,8 @@
 #include "Queue.h"
 #include "Voronoi.h"
 #include <float.h>
+#include <DcelReader.h>
+#include "DcelWriter.h"
 
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_DELAUNAY
@@ -595,7 +597,7 @@ void Delaunay::print()
 	// Print DCEL and graph data.
 	if (this->dcel != NULL)
 	{
-		this->dcel->print(std::cout);
+		DcelWriter::print(std::cout, *this->dcel);
 
 		// If graph allocated print graph data.
 		if (this->isGraphAllocated())
@@ -667,7 +669,7 @@ bool Delaunay::read(string fileName, string graphFileName)
 	bool	read=true;		// Return value.
 
 	// Read DCEL data.
-	read = this->dcel->read(fileName, false);
+	read = DcelReader::read(fileName, false, *this->dcel);
 	if (read)
 	{
 		// Initialize graph.
@@ -700,7 +702,7 @@ bool Delaunay::write(string fileName, string graphFileName)
 	bool	success=true;		// Return value.
 
 	// Write DCEL data.
-	success = this->dcel->write(fileName, false);
+	success = DcelWriter::write(fileName, false, *this->dcel);
 	if (success)
 	{
 		// Write graph data if graph exists.

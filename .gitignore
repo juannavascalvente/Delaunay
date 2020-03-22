@@ -1,4 +1,4 @@
-# Project settings.
+# Project settings
 .cproject
 .project
 
@@ -8,6 +8,10 @@ cmake-build*/
 .settings/
 Debug/
 obj/
+tmp/
 
-# Executables.
+# Log
+log.txt
+
+# Executables
 geometric
