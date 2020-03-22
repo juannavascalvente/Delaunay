@@ -2,7 +2,6 @@
 * Includes
 ***********************************************************************************************************************/
 #include <iostream>
-#include <fstream>
 #include <gtest/gtest.h>
 
 #include "Dcel.h"

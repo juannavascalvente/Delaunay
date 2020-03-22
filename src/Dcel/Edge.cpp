@@ -5,7 +5,7 @@
  *      Author: jnavas
  */
 
-#include "Edge.h"
+#include "Dcel/Edge.h"
 #include "defines.h"
 
 #include <sstream>

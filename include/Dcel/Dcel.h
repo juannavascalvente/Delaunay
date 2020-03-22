@@ -21,8 +21,8 @@
 /***********************************************************************************************************************
 * Defines
 ***********************************************************************************************************************/
-#define     NO_UPDATE           	-1
-#define 	EXTERNAL_FACE       	0
+#define     NO_UPDATE           	(-1)
+#define 	EXTERNAL_FACE       	(0)
 
 
 /***********************************************************************************************************************
@@ -60,7 +60,6 @@ class Dcel
 	//------------------------------------------------------------------------
 	//  Private functions.
 	//------------------------------------------------------------------------
-	void clutter();
 	void quicksort(Vertex *origin, Vertex *list, int first, int last);
 	int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
 
@@ -70,19 +69,20 @@ class Dcel
 
     friend class DcelReader;
     friend class DcelWriter;
+
 public:
 	/*------------------------------------------------------------------------
 	  Constructor/Destructor.
 	------------------------------------------------------------------------*/
 	Dcel();
-	Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
+	explicit Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
 	~Dcel();
 
 	/*------------------------------------------------------------------------
 	  Public functions.
 	------------------------------------------------------------------------*/
 	// Add / Delete functions.
-	void addVertex(const Point<TYPE> *p, const int edge);
+	void addVertex(const Point<TYPE> *p, int edge);
 	void addVertex(const Vertex *vertex);
 	void updateVertex(int edge_ID, int index);
 	void updateVertex(Point<TYPE> *p, int index);
@@ -93,7 +93,7 @@ public:
 	void updateEdge(int origin, int twin, int previous, int next, int face, int index);
 
 	void addFace(const Face *face);
-	void addFace(const int face);
+	void addFace(int face);
 	void updateFace(int edge_ID, int index);
 
 	// Check functions.
@@ -156,8 +156,6 @@ public:
 	bool isValid();
 
 	// PENDING. Move to set? point?
-	bool generateRandom(int nPoints);
-	bool generateClusters(int nPoints, int nClusters, TYPE radius);
 	void sort();
 	int  getIndexLowest(bool (*f)(Point<TYPE> *, Point<TYPE> *));
 	int  getIndexHighest(bool (*f)(const Point<TYPE> *, const Point<TYPE> *));
@@ -169,9 +167,6 @@ public:
 	bool 	findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces);
 
 	bool operator==(const Dcel& other) const;
-#ifdef TESTING
-	int		test(int nPoints);
-#endif
 };
 
 #endif /* DCEL_H_ */

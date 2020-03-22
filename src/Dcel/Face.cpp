@@ -6,7 +6,7 @@
  */
 
 #include "defines.h"
-#include "Face.h"
+#include "Dcel/Face.h"
 
 #include <sstream>
 using namespace std;

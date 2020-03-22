@@ -11,6 +11,7 @@
 #include "Process.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
+#include "DcelGenerator.h"
 
 #include <GL/glut.h>
 
@@ -21,7 +22,7 @@
 //#define DEBUG_PROCESS_FIND_CLOSESTPOINT
 //#define DEBUG_PROCESS_FIND_PATH
 
-Process *Process::instance = 0;
+Process *Process::instance = nullptr;
 
 typedef Point<TYPE> PointT;
 
@@ -87,7 +88,7 @@ Process::~Process()
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Process::start(void)
+void Process::start()
 {
 	// GLUT main function.
 	glutMainLoop();
@@ -148,15 +149,14 @@ bool Process::readData(int option)
 		// Generate random set.
 		case RANDOMLY:
 		{
-			success = this->dcel.generateRandom(this->config->getNPoints());
+		    success = DcelGenerator::generateRandom(this->config->getNPoints(), this->dcel);
 			this->status.set(false, success, false, false, false, false);
 			break;
 		}
 		// Generate clusters set.
 		case CLUSTER:
 		{
-			success = this->dcel.generateClusters(this->config->getNPoints(),
-					this->config->getNClusters(), this->config->getRadius());
+            success = DcelGenerator::generateClusters(this->config->getNPoints(), this->config->getNClusters(), this->config->getRadius(), this->dcel);
 			this->status.set(false, success, false, false, false, false);
 			break;
 		}
@@ -312,7 +312,7 @@ bool Process::buildTriangulation(int option)
 ***************************************************************************/
 bool Process::buildConvexHull()
 {
-	bool built=true;		// Return value.
+	bool built;		// Return value.
 
 	// Computing convex hull.
 	if (this->status.isDelaunayCreated())
@@ -406,7 +406,7 @@ bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, Set<int
 ***************************************************************************/
 bool Process::findTwoClosest(int &index1, int &index2)
 {
-	bool found=true;		// Return value.
+	bool found;		// Return value.
 
 	// Check if Delaunay triangulation computed.
 	// PENDING ALSO EXECUTES THIS IF THE DELAUNAY WAS BUILD FROM STAR? IF
@@ -438,7 +438,7 @@ bool Process::findTwoClosest(int &index1, int &index2)
 ***************************************************************************/
 bool Process::findFace(Point<TYPE> &point, int &faceId)
 {
-	bool found=true;		// Return value.
+	bool found;		// Return value.
 
 	// Check if Delaunay triangulation computed.
 	// PENDING ALSO EXECUTES THIS IF THE DELAUNAY WAS BUILD FROM STAR? IF
@@ -470,8 +470,8 @@ bool Process::findFace(Point<TYPE> &point, int &faceId)
 ***************************************************************************/
 bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 {
-	bool found=true;		// Return value.
-	int	pointIndex=0;		// Index of the closest point.
+	bool found;		    // Return value.
+	int	pointIndex=0;	// Index of the closest point.
 
 	// Check if Delaunay triangulation computed.
 	if (this->status.isDelaunayCreated())
@@ -520,7 +520,7 @@ void Process::getPointToLocate(Point<TYPE> &point)
 		config->getScreenCoordinates(minX, minY, maxX, maxY);
 
 		// Generate seed.
-		srand(time(NULL));
+		srand(time(nullptr));
 
 		// Create a random point.
 		point.setX(rand() % (int) maxX);
@@ -553,7 +553,7 @@ void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
 		config->getScreenCoordinates(minX, minY, maxX, maxY);
 
 		// Generate seed.
-		srand(time(NULL));
+		srand(time(nullptr));
 
 		// Create a random points.
 		p1.setX(rand() % (int) maxX);
@@ -572,7 +572,7 @@ void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
 * Description: 	main loop that processes events from menu and executes the
 * 				selected option and updates menu and internal status.
 ***************************************************************************/
-void Process::execute(void)
+void Process::execute()
 {
 	static bool firstTime=true;
 	int		option=0;			// Option to be executed.

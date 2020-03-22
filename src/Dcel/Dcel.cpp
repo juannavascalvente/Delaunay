@@ -7,11 +7,10 @@
 
 #include "Dcel.h"
 #include "Logging.h"
-#include <string.h>
 
+#include <cstring>
 #include <iostream>
-#include <fstream>
-#include <sstream>
+
 using namespace std;
 
 #define HEADERS 10
@@ -64,13 +63,13 @@ Dcel::Dcel()
 	this->incremental = false;
 	this->nVertex = 0;
 	this->sizeVertex = 0;
-	this->vertex = NULL;
+	this->vertex = nullptr;
 	this->nEdges = 0;
 	this->sizeEdges = 0;
-	this->edges = NULL;
+	this->edges = nullptr;
 	this->nFaces = 0;
 	this->sizeFaces = 0;
-	this->faces = NULL;
+	this->faces = nullptr;
 	this->minX = 0.0;
 	this->minY = 0.0;
 	this->maxX = 0.0;
@@ -153,18 +152,9 @@ Dcel::~Dcel()
 	this->sizeFaces = 0;
 
 	// Deallocate data.
-	if (this->vertex != NULL)
-	{
-		delete[] this->vertex;
-	}
-	if (this->edges != NULL)
-	{
-		delete[] this->edges;
-	}
-	if (this->faces != NULL)
-	{
-		delete[] this->faces;
-	}
+    delete[] this->vertex;
+	delete[] this->edges;
+	delete[] this->faces;
 }
 
 //------------------------------------------------------------------------
@@ -424,8 +414,8 @@ void Dcel::clean()
 	{
 		this->vertex[i].setOrigin(INVALID);
 	}
-	memset(this->edges, 0, sizeof(Vertex)*this->sizeVertex);
-	memset(this->faces, 0, sizeof(Face)*this->sizeFaces);
+	memset((void *) this->edges, 0, sizeof(Vertex)*this->sizeVertex);
+	memset((void *) this->faces, 0, sizeof(Face)*this->sizeFaces);
 
 	// Reset edges and faces number of elements.
 	this->nEdges = 0;
@@ -523,9 +513,9 @@ void Dcel::resize(int size, bool copy)
 				if (copy)
 				{
 					// Copy current data.
-					memcpy(tmpPoints, this->vertex, this->nVertex*sizeof(Vertex));
-					memcpy(tmpEdges, this->edges, this->nEdges*sizeof(Edge));
-					memcpy(tmpFaces, this->faces, this->nFaces*sizeof(Face));
+					memcpy((void *) tmpPoints, (void *) this->vertex, this->nVertex*sizeof(Vertex));
+					memcpy((void *) tmpEdges, (void *) this->edges, this->nEdges*sizeof(Edge));
+					memcpy((void *) tmpFaces, (void *) this->faces, this->nFaces*sizeof(Face));
 				}
 
 				// Deallocate data.
@@ -595,13 +585,13 @@ void Dcel::invalidate()
 	this->incremental = false;
 	this->nVertex = INVALID;
 	this->sizeVertex = INVALID;
-	this->vertex = NULL;
+	this->vertex = nullptr;
 	this->nEdges = INVALID;
 	this->sizeEdges = INVALID;
-	this->edges = NULL;
+	this->edges = nullptr;
 	this->nFaces = INVALID;
 	this->sizeFaces = INVALID;
-	this->faces = NULL;
+	this->faces = nullptr;
 }
 
 /***************************************************************************
@@ -1218,209 +1208,6 @@ void Dcel::shake()
 
 
 /***************************************************************************
-* Name: 	generateRandom
-* IN:		nPoints			# points in the new set.
-* OUT:		NONE
-* RETURN:	true			if genarated.
-* 			false 			otherwise
-* GLOBAL:	NONE
-* Description: 	resizes the DCEL, empties the faces and edges array and
-* 				creates a random set of points.
-***************************************************************************/
-bool Dcel::generateRandom(int nPoints)
-{
-	bool	generated=true;	// Return value.
-	int		i=0;			// Loop counter.
-	Point<TYPE> p;			// Temporary point.
-
-	// Check # points to generate is positive.
-	if (nPoints > 0)
-	{
-#ifdef DEBUG_GENERATE_RANDOM_DCEL
-		Logging::buildText(__FUNCTION__, __FILE__, "# points is to generate is ");
-		Logging::buildText(__FUNCTION__, __FILE__, nPoints);
-		Logging::write( true, Info);
-#endif
-		// Resize DCEL if new number of points is higher.
-		if (nPoints > this->sizeVertex)
-		{
-#ifdef DEBUG_GENERATE_RANDOM_DCEL
-			Logging::buildText(__FUNCTION__, __FILE__, "Resizing set of points.");
-			Logging::write( true, Info);
-#endif
-			this->resize(nPoints, false);
-		}
-		// Otherwise just reset the # of elements.
-		else
-		{
-#ifdef DEBUG_GENERATE_RANDOM_DCEL
-			Logging::buildText(__FUNCTION__, __FILE__, "Reseting set of points.");
-			Logging::write( true, Info);
-#endif
-			this->reset();
-		}
-
-		// Create seed.
-		srand48((int) time(NULL));
-
-		// Generate new set of points.
-		for (i=0; i<nPoints ;i++)
-		{
-			// Generate random points.
-			p.random();
-			this->addVertex(&p, INVALID);
-		}
-#ifdef DEBUG_GENERATE_RANDOM_DCEL
-		Logging::buildText(__FUNCTION__, __FILE__, "# points generated.");
-		Logging::buildText(__FUNCTION__, __FILE__, this->getNVertex());
-		Logging::write( true, Info);
-#endif
-	}
-	else
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Number of points to generate must be positive and is ");
-		Logging::buildText(__FUNCTION__, __FILE__, nPoints);
-		Logging::write(true, Error);
-		generated = false;
-	}
-
-	return(generated);
-}
-
-
-/***************************************************************************
-* Name: 	generateClusters
-* IN:		nPoints			# points in the new set.
-* 			nClusters		# clusters to generate
-* 			radius			# radius of the clusters.
-* OUT:		NONE
-* RETURN:	true 			if generated.
-* 			false			i.o.c.
-* GLOBAL:	NONE
-* Description: 	creates a new set of points with "nClusters" clusters where
-* 				the points of every cluster are not further than "radius"
-* 				distance to a given initial point of the cluster.
-***************************************************************************/
-bool Dcel::generateClusters(int nPoints, int nClusters, TYPE radius)
-{
-	bool		generated=true;			// Return value.
-	int			i=0, j=0;				// Loop counters.
-	int			nElementsCluster=0;		// # points per cluster.
-	Point<TYPE> p, q;					// Temporary points.
-	int 		move=0;					// Direction flag.
-
-#ifdef DEBUG_GENERATE_CLUSTER
-	Logging::buildText(__FUNCTION__, __FILE__, "Generating ");
-	Logging::buildText(__FUNCTION__, __FILE__, nPoints);
-	Logging::buildText(__FUNCTION__, __FILE__, " points in ");
-	Logging::buildText(__FUNCTION__, __FILE__, nClusters);
-	Logging::buildText(__FUNCTION__, __FILE__, " clusters with radius ");
-	Logging::buildText(__FUNCTION__, __FILE__, radius);
-	Logging::write(true, Info);
-#endif
-
-	// Resize DCEL
-	resize(nPoints, false);
-
-	// Create seed.
-	srand48((int) time(NULL));
-
-	// Get # elements per cluster.
-	nElementsCluster = nPoints / nClusters;
-
-	// Generate clusters centers.
-	for (i=0; i<nClusters ;i++)
-	{
-		// Generate new point.
-		p.random();
-
-        // Insert new point.
-		addVertex(&p, INVALID);
-
-#ifdef DEBUG_GENERATE_CLUSTER
-    	Logging::buildText(__FUNCTION__, __FILE__, "Generating cluster ");
-    	Logging::buildText(__FUNCTION__, __FILE__, i+1);
-    	Logging::buildText(__FUNCTION__, __FILE__, " whose seed is ");
-    	Logging::buildText(__FUNCTION__, __FILE__, p.toStr());
-    	Logging::write(true, Info);
-#endif
-
-        // Add points center in current seed.
-        for (j=0; j<nElementsCluster-1 ;j++)
-        {
-        	q = p;
-
-        	// Move point in random direction.
-        	move = rand() % 4;
-        	if (move == 0)
-        	{
-        		q.shift((-drand48())*radius, (-drand48())*radius);
-        	}
-        	else if (move == 1)
-        	{
-        		q.shift((-drand48())*radius, drand48()*radius);
-        	}
-        	else if (move == 2)
-        	{
-        		q.shift(drand48()*radius, (-drand48())*radius);
-        	}
-        	else
-        	{
-        		q.shift(drand48()*radius, drand48()*radius);
-        	}
-
-            // Insert new point.
-    		addVertex(&q, INVALID);
-#ifdef DEBUG_GENERATE_CLUSTER
-        	Logging::buildText(__FUNCTION__, __FILE__, "Generating point ");
-        	Logging::buildText(__FUNCTION__, __FILE__, j+1);
-        	Logging::buildText(__FUNCTION__, __FILE__, " ");
-        	Logging::buildText(__FUNCTION__, __FILE__, p.toStr());
-        	Logging::write(true, Info);
-#endif
-        }
-
-        // Check if it is last cluster.
-        if (i == (nClusters-1))
-        {
-        	// Add elements randomly until nPoints reached.
-        	for (i=this->nVertex; i<nPoints ;i++)
-        	{
-            	q = p;
-
-            	// Move point in random direction.
-            	move = rand() % 4;
-            	if (move == 0)
-            	{
-            		q.shift((-drand48())*radius, (-drand48())*radius);
-            	}
-            	else if (move == 1)
-            	{
-            		q.shift((-drand48())*radius, drand48()*radius);
-            	}
-            	else if (move == 2)
-            	{
-            		q.shift(drand48()*radius, (-drand48())*radius);
-            	}
-            	else
-            	{
-            		q.shift(drand48()*radius, drand48()*radius);
-            	}
-
-                // Insert new point.
-        		addVertex(&q, INVALID);
-        	}
-        }
-	}
-
-	// Clutter set of points.
-	clutter();
-
-	// PENDING return value never false???
-	return(generated);
-}
-
-/***************************************************************************
 * Name: 	sort
 * IN:		NONE
 * OUT:		NONE
@@ -1514,7 +1301,7 @@ int Dcel::getIndexHighest(bool (*f)(const Point<TYPE> *, const Point<TYPE> *))
 ***************************************************************************/
 enum Turn_T Dcel::returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoint)
 {
-    enum Turn_T turn=LEFT_TURN;         // Return value.
+    enum Turn_T turn;         // Return value.
 
     // Normal source point.
     if (sourcePoint > 0)
@@ -1529,16 +1316,16 @@ enum Turn_T Dcel::returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoin
         // Destination point is P-2.
         else if (destPoint == P_MINUS_2)
         {
-        	if (sourcePoint == 1)
+            if (sourcePoint == 1)
         	{
         		turn = LEFT_TURN;
         	}
             // Check if point is over line from source_Index point to P-2.
-        	else if (Point<TYPE>::higher_Point(p, this->vertex[sourcePoint-1].getRefPoint(), &Point<TYPE>::lexicographicHigher))
+            else if (Point<TYPE>::higher_Point(p, this->vertex[sourcePoint-1].getRefPoint(), &Point<TYPE>::lexicographicHigher))
             {
                 turn = RIGHT_TURN;
             }
-			else
+            else
 			{
 				turn = LEFT_TURN;
 			}
@@ -1551,7 +1338,7 @@ enum Turn_T Dcel::returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoin
             {
 				turn = LEFT_TURN;
             }
-			else
+            else
 			{
 				turn = RIGHT_TURN;
 			}
@@ -1562,16 +1349,16 @@ enum Turn_T Dcel::returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoin
         // Source point is P-1 and destination cannot be p-2.
         if (sourcePoint == P_MINUS_1)
         {
-        	if (destPoint == 1)
+            if (destPoint == 1)
         	{
         		turn = LEFT_TURN;
         	}
             // Check if point is over line from P-1 point to dest_Index point.
-        	else if (Point<TYPE>::higher_Point(p, this->vertex[destPoint-1].getRefPoint(), &Point<TYPE>::lexicographicHigher))
+            else if (Point<TYPE>::higher_Point(p, this->vertex[destPoint-1].getRefPoint(), &Point<TYPE>::lexicographicHigher))
             {
 				turn = RIGHT_TURN;
             }
-			else
+            else
 			{
 				turn = LEFT_TURN;
 			}
@@ -1591,7 +1378,7 @@ enum Turn_T Dcel::returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoin
 					turn = RIGHT_TURN;
 				}
             }
-			else
+            else
 			{
 				// Points can only do a left turn.
 				turn = LEFT_TURN;
@@ -1647,17 +1434,17 @@ double Dcel::signedArea(int id1, int id2, int id3)
 	Point<TYPE> *p1, *p2, *p3;		// Temporary points
 
 	// Get references to points.
-	if ((id1 < 0) || (id1 < 0) || (id1 < 0))
+	if ((id1 < 0) || (id2 < 0) || (id3 < 0))
 	{
-		p1 = this->getRefPoint(id1);
-		p2 = this->getRefPoint(id1);
-		p3 = this->getRefPoint(id1);
-		area = p1->signedArea(*p2, *p3);
+        area = 0.0;
 	}
 	else
 	{
-		area = 0.0;
-	}
+        p1 = this->getRefPoint(id1);
+        p2 = this->getRefPoint(id1);
+        p3 = this->getRefPoint(id1);
+        area = p1->signedArea(*p2, *p3);
+    }
 
 	return(area);
 }
@@ -1821,13 +1608,11 @@ bool Dcel::findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces)
 			}
 			else
 			{
-#ifdef DEBUG_DELAUNAY_FIND_PATH
 				found = false;
 				Logging::buildText(__FUNCTION__, __FILE__, "Current face ");
 				Logging::buildText(__FUNCTION__, __FILE__, firstFace);
 				Logging::buildText(__FUNCTION__, __FILE__, " does not intersect line.");
 				Logging::write(true, Info);
-#endif
 			}
 		} while ((firstFace != lastFace) && found);
 	}
@@ -1862,8 +1647,8 @@ bool Dcel::findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces)
 ***************************************************************************/
 bool Dcel::operator==(const Dcel& other) const
 {
-	int i=0;			// Loop counter
-	bool equal=true;	// Return value.
+	int i=0;		// Loop counter
+	bool equal;	    // Return value.
 
 	// Compare # vertex, edges and faces.
 	equal = (this->nVertex == other.nVertex) &&
@@ -1959,35 +1744,6 @@ bool Dcel::operator==(const Dcel& other) const
 /***********************************************************************************************************************
 * Private methods definitions
 ***********************************************************************************************************************/
-/***************************************************************************
-* Name: 	clutter
-* IN:		N/A
-* OUT:		N/A
-* IN/OUT:	N/A
-* RETURN:	N/A
-* Description: clutters the set of point of the DCEL.
-***************************************************************************/
-void Dcel::clutter()
-{
-	int	i=0;					// Loop counter.
-	int	index1=0, index2=0;		// Array indexes.
-
-	// Set seed.
-	srand(time(NULL));
-
-	// Loop set of points.
-	for (i=0; i<this->nVertex ;i++)
-	{
-		// Generate random indexes to swap.
-		index1 = rand() %  this->nVertex;
-		index2 = rand() %  this->nVertex;
-
-		// Swap elements.
-		swapVertex(index1, index2);
-	}
-}
-
-
 /***************************************************************************
 * Name: 	quicksort
 * IN:		N/A
