@@ -12,6 +12,7 @@
 #include "DcelReader.h"
 #include "DcelWriter.h"
 #include "DcelGenerator.h"
+#include "DelaunayIO.h"
 
 #include <GL/glut.h>
 
@@ -191,8 +192,8 @@ bool Process::readData(int option)
 		{
 			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
 			this->delaunay.setDCEL(&this->dcel);
-			success = this->delaunay.read(this->config->getInDCELFilename(),
-											this->config->getInGraphFilename());
+			success = DelaunayIO::read(this->config->getInDCELFilename(),
+                                       this->config->getInGraphFilename(), this->delaunay);
 			this->status.set(false, success, success, success, false, false);
 			this->delaunay.setAlgorithm(INCREMENTAL);
 			break;
@@ -959,7 +960,7 @@ void Process::execute()
 		// Write DCEL and graph files.
 		case WRITE_DELAUNAY:
 		{
-			this->delaunay.write(this->config->getOutDCELFilename(), this->config->getOutGraphFilename());
+            DelaunayIO::write(this->config->getOutDCELFilename(), this->config->getOutGraphFilename(), this->delaunay);
 			break;
 		}
 		// Write voronoi DCEL file.

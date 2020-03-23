@@ -62,6 +62,7 @@ class Delaunay
 	void getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace);
 	void getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
 
+	friend class DelaunayIO;
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
@@ -113,11 +114,6 @@ public:
 	inline void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
 	inline enum Algorithm getAlgorithm() {return(this->algorithm);};
 
-	// I/O functions.
-	void print();
-	void print(Node *node);
-	bool read(string fileName, string graphFileName);
-	bool write(string fileName, string graphFileName);
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}
 	int getFlips() const {return nFlips;}
