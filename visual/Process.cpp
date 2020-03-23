@@ -13,6 +13,7 @@
 #include "DcelWriter.h"
 #include "DcelGenerator.h"
 #include "DelaunayIO.h"
+#include "GabrielIO.h"
 #include "VoronoiIO.h"
 
 #include <GL/glut.h>
@@ -212,7 +213,7 @@ bool Process::readData(int option)
 		default:
 		{
 			// PENDING: What to allow in menu if only voronoi is read.
-			success = this->gabriel.readBinary(this->config->getOutGabrielFilename());
+			success = GabrielIO::readBinary(this->config->getOutGabrielFilename(), this->gabriel);
 			this->status.setGabrielCreated(true);
 			break;
 		}
@@ -973,7 +974,7 @@ void Process::execute()
 		// Write Gabriel graph data.
 		case WRITE_GABRIEL:
 		{
-			this->gabriel.writeBinary(this->config->getOutGabrielFilename());
+			GabrielIO::writeBinary(this->config->getOutGabrielFilename(), this->gabriel);
 			break;
 		}
 		// Clear data.

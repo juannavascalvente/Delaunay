@@ -34,6 +34,7 @@ class Gabriel
 	void validateEdges( int edgeIndex);
 	bool resize( int size, bool copy);
 
+	friend class GabrielIO;
 public:
 
 	//------------------------------------------------------------------------
@@ -51,21 +52,14 @@ public:
 	inline bool isSet( int index) { return(this->validEdge[index]); };
 	inline void set( int index) { this->validEdge[index] = true; };
 	inline void unset( int index) { this->validEdge[index] = false; };
-	inline bool at( int index) { return(this->validEdge[index]); };
+	inline bool at( int index) const { return(this->validEdge[index]); };
 
 	// Get/Set functions.
 	inline bool isValid() {return(this->valid); };
-	inline int  getSize() {return(this->size); };
+	inline int  getSize() const {return(this->size); };
 	inline Dcel *getDcel() {return(this->dcel); };
 
 	bool build();
-
-	// I/O functions.
-	void print(std::ostream& out);
-	bool read(string fileName);
-	bool write(string fileName);
-	bool readBinary(string fileName);
-	bool writeBinary(string fileName);
 };
 
 #endif /* INCLUDE_GABRIEL_H_ */

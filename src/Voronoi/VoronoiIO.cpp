@@ -10,14 +10,9 @@
 #include "VoronoiIO.h"
 
 
-/***************************************************************************
-* Name: 	print
-* IN:		out			output stream.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	print voronoi data.
-***************************************************************************/
+/***********************************************************************************************************************
+* Public methods definitions
+***********************************************************************************************************************/
 void VoronoiIO::print(const Voronoi &voronoi, std::ostream &out)
 {
     if (voronoi.valid)
@@ -26,15 +21,7 @@ void VoronoiIO::print(const Voronoi &voronoi, std::ostream &out)
     }
 }
 
-/***************************************************************************
-* Name: 	read
-* IN:		fileName		file name to read data from.
-* OUT:		NONE
-* RETURN:	false			if error writing data.
-* 			true			i.o.c.
-* GLOBAL:	NONE
-* Description: 	read the voronoi data from "fileName" file.
-***************************************************************************/
+
 bool VoronoiIO::read(const string &strFileName, Voronoi &voronoi)
 {
     // Read voronoi DCEL file.
@@ -43,15 +30,7 @@ bool VoronoiIO::read(const string &strFileName, Voronoi &voronoi)
     return(voronoi.valid);
 }
 
-/***************************************************************************
-* Name: 	write
-* IN:		fileName		file name to write data to.
-* OUT:		NONE
-* RETURN:	false			if error writing data.
-* 			true			i.o.c.
-* GLOBAL:	NONE
-* Description: 	writes the voronoi data to "fileName" file.
-***************************************************************************/
+
 bool VoronoiIO::write(const string &strFileName, const Voronoi &voronoi)
 {
     bool write;		// Return value.
