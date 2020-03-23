@@ -33,15 +33,16 @@ class Voronoi
 	Point<TYPE> computeExtremeVoronoi(int edgeIndex, Point<TYPE> &centre);
 	bool edgeExists(Edge &edge);
 	bool isBottomMostFace(int faceId);
-	void setBorderPoints(int minX, int minY, int maxX, int maxY, Line *borders);
+	static void setBorderPoints(int minX, int minY, int maxX, int maxY, Line *borders);
 
+	friend class VoronoiIO;
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
 	// PENDING IMPLICIT CONSTRUCTORS.
 	Voronoi();
-	Voronoi(Dcel *dcel);
+	explicit Voronoi(Dcel *dcel);
 	~Voronoi();
 
 	//------------------------------------------------------------------------
@@ -63,11 +64,6 @@ public:
 	bool 	findPath(Line &line, Set<int> &faces);
 	bool 	isInnerToArea(const Point<TYPE> &p, int areaId);
 	void 	correctBorderPoints(int minX, int minY, int maxX, int maxY);
-
-	// I/O functions.
-	void 	print(std::ostream& out);
-	bool 	read(string fileName);
-	bool 	write(string fileName);
 };
 
 #endif /* INCLUDE_VORONOI_H_ */
