@@ -13,6 +13,7 @@
 #include "DcelWriter.h"
 #include "DcelGenerator.h"
 #include "DelaunayIO.h"
+#include "VoronoiIO.h"
 
 #include <GL/glut.h>
 
@@ -204,7 +205,7 @@ bool Process::readData(int option)
 			// PENDING: What to allow in menu if only voronoi is read.
 			//success = this->voronoi.read(this->config->getInVoronoiFilename());
 			//this->status.set(false, true, !success, !success, true, false);
-			cout << "NOT IMPLEMENTED YES" << endl;
+			cout << "NOT IMPLEMENTED YET" << endl;
 			break;
 		}
 		// Read Gabriel file.
@@ -966,7 +967,7 @@ void Process::execute()
 		// Write voronoi DCEL file.
 		case WRITE_VORONOI:
 		{
-			this->voronoi.write(this->config->getOutVoronoiFilename());
+			VoronoiIO::write(this->config->getOutVoronoiFilename(), this->voronoi);
 			break;
 		}
 		// Write Gabriel graph data.

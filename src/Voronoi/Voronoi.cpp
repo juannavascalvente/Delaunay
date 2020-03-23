@@ -10,11 +10,9 @@
 ***********************************************************************************************************************/
 #include "Logging.h"
 #include "Circle.h"
-#include "Voronoi.h"
+#include "Voronoi/Voronoi.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
-
-#include <string.h>
 
 
 /***********************************************************************************************************************
@@ -41,7 +39,7 @@
 Voronoi::Voronoi()
 {
 	// Initialize attributes.
-	this->triangulation = NULL;
+	this->triangulation = nullptr;
 	this->valid = false;
 }
 
@@ -52,7 +50,7 @@ Voronoi::Voronoi(Dcel *triangulation)
 	this->triangulation = triangulation;
 
 	// Allocate voronoi data.
-	if (this->triangulation != NULL)
+	if (this->triangulation != nullptr)
 	{
 		// Allocate data.
 		this->voronoi.resize(this->triangulation->getNFaces(), false);
@@ -65,7 +63,7 @@ Voronoi::Voronoi(Dcel *triangulation)
 Voronoi::~Voronoi()
 {
 	// Reset attributes and deallocate memory.
-	this->triangulation = NULL;
+	this->triangulation = nullptr;
 	this->valid = false;
 }
 
@@ -88,7 +86,7 @@ bool Voronoi::init(Dcel *dcel)
 	bool	initialized=true;			// Return value.
 
 	// Ckeck input parameter.
-	if (dcel != NULL)
+	if (dcel != nullptr)
 	{
 #ifdef DEBUG_VORONOI_INIT
 		Logging::buildText(__FUNCTION__, __FILE__, "Input triangulation data.\n\t# Points ");
@@ -328,62 +326,6 @@ bool Voronoi::isInnerToArea(const Point<TYPE> &p, int areaId)
 	return(inner);
 }
 
-/***************************************************************************
-* Name: 	print
-* IN:		out			output stream.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	print voronoi data.
-***************************************************************************/
-void Voronoi::print(std::ostream& out)
-{
-	if (this->valid)
-	{
-		DcelWriter::print(out, this->voronoi);
-	}
-}
-
-/***************************************************************************
-* Name: 	read
-* IN:		fileName		file name to read data from.
-* OUT:		NONE
-* RETURN:	false			if error writing data.
-* 			true			i.o.c.
-* GLOBAL:	NONE
-* Description: 	read the voronoi data from "fileName" file.
-***************************************************************************/
-bool Voronoi::read(string fileName)
-{
-	// Read voronoi DCEL file.
-	this->valid = DcelReader::read(fileName, false, this->voronoi);
-
-	return(this->valid);
-}
-
-/***************************************************************************
-* Name: 	write
-* IN:		fileName		file name to write data to.
-* OUT:		NONE
-* RETURN:	false			if error writing data.
-* 			true			i.o.c.
-* GLOBAL:	NONE
-* Description: 	writes the voronoi data to "fileName" file.
-***************************************************************************/
-bool Voronoi::write(string fileName)
-{
-	bool write=true;		// Return value.
-
-	// Write data to file.
-	write = this->valid;
-	if (this->valid)
-	{
-		write = DcelWriter::write(fileName, false, this->voronoi);
-	}
-
-	return(write);
-}
-
 
 //------------------------------------------------------------------------
 //  Private functions.
@@ -405,10 +347,10 @@ void Voronoi::computeCircumcentres(bool isIncremental)
 	int			lastIamginaryFace=0;// Last imaginary face id.
 	int			edgeIndex=0;		// Edge index.
 	int			twinEdgeIndex=0;	// Twin edge index.
-	bool		realFaceFound=false;// Adjacent face is real.
+	bool		realFaceFound;		// Adjacent face is real.
 	Circle		circle;				// Circle to compute cicurmcentre.
 	Point<TYPE>	p, q, r;			// Vertices points.
-	Point<TYPE>	*centre;				// Vertices points.
+	Point<TYPE>	*centre;			// Vertices points.
 	Point<TYPE>	externalCentre;		// Circuemcentre in external face.
 	Point<TYPE>	invalidPoint;		// Point to use in imaginary faces.
 
@@ -447,7 +389,7 @@ void Voronoi::computeCircumcentres(bool isIncremental)
 #endif
         }
 		// Add invalid point for imaginary face.
-        else
+		else
         {
 #ifdef DEBUG_VORONOI_COMPUTE_CIRCUMCENTRES
         	Logging::buildText(__FUNCTION__, __FILE__, "Imaginary face: ");
@@ -555,7 +497,7 @@ void Voronoi::computeCircumcentres(bool isIncremental)
 ***************************************************************************/
 void Voronoi::buildArea(int pointIndex)
 {
-	bool 			finished=false;		// Loop control flag.
+	bool 			finished;			// Loop control flag.
 
 	int voronoiOriginId=0, voronoiDestId=0;	// Edge origin and destination points id.
 
@@ -976,7 +918,7 @@ void Voronoi::correctBorderPoints(int minX, int minY, int maxX, int maxY)
 	Point<TYPE> origin, dest;	// Edge extreme points.
 	Point<TYPE> intersection;	// Point intersection.
 	int		i=0;				// Loop counter.
-	bool	found=false;		// Loop control flag.
+	bool	found;				// Loop control flag.
 	int		pointIndex=0;		// Point index.
 	Line	borders[4];			// Border lines.
 
@@ -1023,8 +965,8 @@ void Voronoi::correctBorderPoints(int minX, int minY, int maxX, int maxY)
 					found = true;
 
 					// Check if origin out of bounds.
-					if ((origin.getX() < minX) || (origin.getX() > maxX) ||
-						(origin.getY() < minY) || (origin.getY() > maxY))
+					if ((origin.getX() < (float) minX) || (origin.getX() > (float) maxX) ||
+						(origin.getY() < (float) minY) || (origin.getY() > (float) maxY))
 					{
 #ifdef DEBUG_VORONOI_CORRECTBORDER
 						Logging::buildText(__FUNCTION__, __FILE__, "Correcting origin point ");
