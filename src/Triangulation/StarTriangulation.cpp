@@ -1,5 +1,5 @@
 /*
- * Triangulation.cpp
+ * StarTriangulation.cpp
  *
  *  Created on: Jul 22, 2016
  *      Author: jnavas
@@ -10,7 +10,7 @@
 #include "Circle.h"
 #include "defines.h"
 #include "Logging.h"
-#include "Triangulation.h"
+#include "StarTriangulation.h"
 
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_TRIANGULATION_DEBUG
@@ -22,7 +22,7 @@
 /*------------------------------------------------------------------------
   Constructor/Destructor.
 ------------------------------------------------------------------------*/
-Triangulation::Triangulation()
+StarTriangulation::StarTriangulation()
 {
 	// Initialize fields.
 	this->dcel = NULL;
@@ -33,7 +33,7 @@ Triangulation::Triangulation()
 }
 
 
-Triangulation::~Triangulation()
+StarTriangulation::~StarTriangulation()
 {
 	// Dereference fields.
 	this->dcel = NULL;
@@ -58,7 +58,7 @@ Triangulation::~Triangulation()
 * GLOBAL:	the convex hull is stored in the "convexHull" attribute.
 * Description: 	computes the convex hull of the DCEL set of points.
 ***************************************************************************/
-bool Triangulation::convexHull()
+bool StarTriangulation::convexHull()
 {
 	int	 	index=0;			// Array index.
 	int	 	first_Index=0;		// Index of first edge.
@@ -127,7 +127,7 @@ bool Triangulation::convexHull()
 * GLOBAL:	NONE
 * Description: 	Finds the two closest point in the DCEL.
 ***************************************************************************/
-bool Triangulation::findTwoClosest(int &first, int &second)
+bool StarTriangulation::findTwoClosest(int &first, int &second)
 {
 	bool found=false;				// Return value.
 	int	 i=0, j=0;					// Loop counters.
@@ -191,7 +191,7 @@ bool Triangulation::findTwoClosest(int &first, int &second)
 	return(found);
 }
 
-bool Triangulation::findFace(Point<TYPE> &point, int &faceId)
+bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
 {
 	bool 	found=false;		// Return value.
 
@@ -212,7 +212,7 @@ bool Triangulation::findFace(Point<TYPE> &point, int &faceId)
 * 				the distance between both points. To find the closest point
 * 				it compares the input point to all existing points.
 ***************************************************************************/
-bool Triangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &distance)
+bool StarTriangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 {
 	bool found=false;				// Return value.
 	int	pointIndex=0;				// Loop counter.
@@ -250,7 +250,7 @@ bool Triangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &dis
 * GLOBAL:	NONE
 * Description: 	resets triangulation data.
 ***************************************************************************/
-void Triangulation::reset()
+void StarTriangulation::reset()
 {
 	// Reset data.
 	this->dcel = NULL;
@@ -267,7 +267,7 @@ void Triangulation::reset()
 * GLOBAL:	NONE
 * Description: 	computes the star triangulation of the DCEL set of points.
 ***************************************************************************/
-bool Triangulation::build(Dcel *dcel)
+bool StarTriangulation::build(Dcel *dcel)
 {
 	bool	built=true;					// Return value.
 	int		i=0;						// Loop counter.
@@ -553,7 +553,7 @@ bool Triangulation::build(Dcel *dcel)
 * Description: 	transforms the star triangulation into a Delaunay
 * 				triangulation.
 ***************************************************************************/
-bool Triangulation::delaunay()
+bool StarTriangulation::delaunay()
 {
 	// PENDING TO CHECK ERROR WHILE BUILDING DELAUNAY.
 	bool	built=true;			// Return value.
@@ -755,7 +755,7 @@ bool Triangulation::delaunay()
 * 				this->edgeChecked
 * Description: 	updates the "index" edge as pending to be checked.
 ***************************************************************************/
-bool Triangulation::setNotChecked(int index)
+bool StarTriangulation::setNotChecked(int index)
 {
 	bool updated=false;		// Return value.
 

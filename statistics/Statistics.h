@@ -7,7 +7,7 @@
 
 #include "Delaunay.h"
 #include "Logging.h"
-#include "Triangulation.h"
+#include "StarTriangulation.h"
 
 #include <iostream>
 #include <fstream>
@@ -136,7 +136,7 @@ public:
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
-    void analyzeTriangulation(Triangulation	&triangulation);
+    void analyzeTriangulation(StarTriangulation	&triangulation);
 
 	//------------------------------------------------------------------------
 	// Get/Set functions.

@@ -17,7 +17,7 @@
 #include "Gabriel.h"
 #include "Logging.h"
 #include "Queue.h"
-#include "Triangulation.h"
+#include "StarTriangulation.h"
 #include "Voronoi.h"
 
 
@@ -36,7 +36,7 @@ class Process
 
 	Dcel			dcel;			// Dcel data.
 	Delaunay		delaunay;		// Delaunay data.
-	Triangulation	triangulation;	// Star triangulation data.
+	StarTriangulation	triangulation;	// Star triangulation data.
 	Voronoi			voronoi;		// Voronoi diagram data.
 	Gabriel			gabriel;		// Gabriel graph data.
 
@@ -75,7 +75,7 @@ public:
 	inline Status* getStatus() {return(&this->status); };
 	inline Dcel* getDcel() {return(&this->dcel); };
 	inline Delaunay* getDelaunay() {return(&this->delaunay); };
-	inline Triangulation* getTriangulation() {return(&this->triangulation); };
+	inline StarTriangulation* getTriangulation() {return(&this->triangulation); };
 	inline Voronoi* getVoronoi() {return(&this->voronoi); };
 	inline Gabriel* getGabriel() {return(&this->gabriel); };
 

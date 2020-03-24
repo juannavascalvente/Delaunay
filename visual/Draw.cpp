@@ -36,7 +36,7 @@ void 		  *font;
 Draw 		  *Draw::instance=NULL; // Drawer instance.
 Dcel		  *Draw::dcel;			// Dcel data.
 Delaunay	  *Draw::delaunay;		// Delaunay data.
-Triangulation *Draw::triangulation;	// Star triangulation data.
+StarTriangulation *Draw::triangulation;	// Star triangulation data.
 Voronoi		  *Draw::voronoi;		// Voronoi diagram data.
 Gabriel		  *Draw::gabriel;		// Gabriel graph data.
 Status 		  *Draw::status;		// Current process status.
@@ -50,11 +50,11 @@ void refresh(void);
 // Constructor/Destructor
 //------------------------------------------------------------------------
 Draw* Draw::getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelaunay,
-		 	 	 	 	 	 	 	 	 	 	 Triangulation *inTriangulation,
-												 Voronoi *inVoronoi,
-												 Gabriel *inGabriel,
-												 Status *inStatus,
-												 Config *inConfig)
+                        StarTriangulation *inTriangulation,
+                        Voronoi *inVoronoi,
+                        Gabriel *inGabriel,
+                        Status *inStatus,
+                        Config *inConfig)
 {
 	int minX, minY, maxX, maxY;		// Window dimension.
 

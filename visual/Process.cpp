@@ -70,7 +70,7 @@ Process::~Process()
 
 	if (this->status.isTriangulationCreated())
 	{
-		this->triangulation.~Triangulation();
+		this->triangulation.~StarTriangulation();
 	}
 
 	if (this->status.isVoronoiCreated())
@@ -734,7 +734,7 @@ void Process::execute()
 				{
 					// PENDING https://github.com/juannavascalvente/Delaunay/issues/10
 					Logging::buildText(__FUNCTION__, __FILE__,
-							"Triangulation path not implemented in normal triangulation");
+							"StarTriangulation path not implemented in normal triangulation");
 					Logging::write(true, Error);
 				}
 
