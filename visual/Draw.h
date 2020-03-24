@@ -133,14 +133,9 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	static Draw* getInstance(int argc, char **argv,
-                             Dcel *dcel,
-                             Delaunay *delaunay,
-                             StarTriangulation *triangulation,
-                             Voronoi *voronoi,
-                             Gabriel *gabriel,
-                             Status *status,
-                             Config *config);
+	static Draw *
+    getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelaunay, StarTriangulation *inTriangulation,
+                Voronoi *inVoronoi, Gabriel *inGabriel, Status *inStatus);
 	Draw() : windowID(0), pointsSet(NULL), facesSet(NULL) {} ;
 	~Draw() {};
 

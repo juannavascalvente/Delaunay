@@ -19,73 +19,80 @@ class Config
 	//------------------------------------------------------------------------
 	// Attributes
 	//------------------------------------------------------------------------
-	int		nPoints;			// # points in set.
-	string	configFileName;		// Configuration file name.
+    static int		nPoints;			// # points in set.
+    static string	strConfigFileName;  // Configuration file name.
 
-	string	inFlatFileName;		// Flat output points file name.
-	string	outFlatFileName;	// DCEL input data file name.
+    static string	inFlatFileName;		// Flat output points file name.
+    static string	outFlatFileName;	// DCEL input data file name.
 
-	string	inDcelFileName;		// DCEL input data file name.
-	string	outDcelFileName;	// DCEL output data file name.
+    static string	inDcelFileName;		// DCEL input data file name.
+    static string	outDcelFileName;	// DCEL output data file name.
 
-	string	inGraphFileName;	// Graph input data file name.
-	string	outGraphFileName;	// Graph output data file name.
+    static string	inGraphFileName;	// Graph input data file name.
+    static string	outGraphFileName;	// Graph output data file name.
 
-	string	inVoronoiFileName;	// Voronoi input data file name.
-	string	outVoronoiFileName;	// Voronoi output data file name.
+//    static string	inVoronoiFileName;	// Voronoi input data file name.
+    static string	outVoronoiFileName;	// Voronoi output data file name.
 
-	string	inGabrielFileName;	// Gabriel input data file name.
-	string	outGabrielFileName;	// Gabriel output data file name.
+//    static string	inGabrielFileName;	// Gabriel input data file name.
+    static string	outGabrielFileName;	// Gabriel output data file name.
 
-	Point<TYPE>	closestPoint;
-	TYPE		minLengthEdge;
+    static Point<TYPE>	closestPoint;
+    static TYPE		    minLengthEdge;
 
-	Point<TYPE>	originPoint;		// Line origin point.
-	Point<TYPE>	destinationPoint;	// Line destination point.
+    static Point<TYPE>	originPoint;		// Line origin point.
+    static Point<TYPE>	destinationPoint;	// Line destination point.
 
-	int		nClusters;		// # clusters in set when generating cluster set.
-	int 	clusterRadius;	// Cluster radius.
+    static int		nClusters;		    // # clusters in set when generating cluster set.
+    static int 	    clusterRadius;	    // Cluster radius.
 
-	int		nAnchors;		// # anchors to locate point.
+    static int		nAnchors;		    // # anchors to locate point.
 
-	bool	initialized;
-	int		minX;				// Min value in x-coordinates.
-	int		maxX;				// Max value in x-coordinates.
-	int		minY;				// Min value in y-coordinates.
-	int		maxY;				// Max value in y-coordinates.
+    static int		iMinX;				// Min value in x-coordinates.
+    static int		iMaxX;				// Max value in x-coordinates.
+    static int		iMinY;				// Min value in y-coordinates.
+    static int		iMaxY;				// Max value in y-coordinates.
+
+    static void setDefaultConfig();
 
 public:
-	//------------------------------------------------------------------------
-	// Constructor/Destructor
-	//------------------------------------------------------------------------
-	Config(string fileName);
+    /***************************************************************************
+    * Name: 	readConfig
+    * IN:		NONE
+    * OUT:		NONE
+    * IN/OUT:	NONE
+    * GLOBAL:	"Config" object updated.
+    * RETURN:	true if file exists and parameters are ok. false i.o.c.
+    * Description: 	reads the configuration file parameters and updates "Config"
+    * 				object. If file does not exists then set default values.
+    * 				If a wrong file is found then it is skipped and current
+    * 				field value is kept.
+    ***************************************************************************/
+    static bool readConfig(const string &strFileName="");
 
-	//------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
-	void setDefaultConfig(void);
-	int  readConfig();
+	/*******************************************************************************************************************
+	 *  GET functions.
+	 ******************************************************************************************************************/
+	static void getScreenCoordinates( int &minX, int &minY, int &maxX, int &maxY);
 
-	// GET functions.
-	void getScreenCoordinates( int &minX, int &minY, int &maxX, int &maxY);
-	inline Point<TYPE> getClosestPoint() { return(this->closestPoint); };
-	inline int getNPoints() { return(this->nPoints); };
-	inline int getNClusters( ) { return(this->nClusters); };
-	inline int getNAnchors() { return(this->nAnchors); };
-	inline int getRadius() { return(this->clusterRadius); };
-	inline string getInFlatFilename() { return(this->inFlatFileName); };
-	inline string getInDCELFilename() { return(this->inDcelFileName); };
-	inline string getInGraphFilename() { return(this->inGraphFileName); };
-	inline string getInVoronoiFilename() { return(this->inVoronoiFileName); };
-	inline string getInGabrielFilename() { return(this->inGabrielFileName); };
-	inline string getOutFlatFilename() { return(this->outFlatFileName); };
-	inline string getOutDCELFilename() { return(this->outDcelFileName); };
-	inline string getOutGraphFilename() { return(this->outGraphFileName); };
-	inline string getOutVoronoiFilename() { return(this->outVoronoiFileName); };
-	inline string getOutGabrielFilename() { return(this->outGabrielFileName); };
-	inline TYPE getMinLengthEdge() {return (this->minLengthEdge);}
-	Point<TYPE> getDestinationPoint() const {return this->destinationPoint;}
-	Point<TYPE> getOriginPoint() const {return this->originPoint;}
+	static inline Point<TYPE> getClosestPoint() { return(Config::closestPoint); };
+    static inline int getNPoints()  { return(Config::nPoints); };
+    static inline int getNClusters(){ return(Config::nClusters); };
+	static inline int getNAnchors() { return(Config::nAnchors); };
+	static inline int getRadius()   { return(Config::clusterRadius); };
+	static inline string getInFlatFilename()    { return(Config::inFlatFileName); };
+	static inline string getInDCELFilename()    { return(Config::inDcelFileName); };
+	static inline string getInGraphFilename()   { return(Config::inGraphFileName); };
+//	static inline string getInVoronoiFilename() { return(Config::inVoronoiFileName); };
+//	static inline string getInGabrielFilename() { return(Config::inGabrielFileName); };
+	static inline string getOutFlatFilename()   { return(Config::outFlatFileName); };
+	static inline string getOutDCELFilename()   { return(Config::outDcelFileName); };
+	static inline string getOutGraphFilename()  { return(Config::outGraphFileName); };
+	static inline string getOutVoronoiFilename() { return(Config::outVoronoiFileName); };
+	static inline string getOutGabrielFilename() { return(Config::outGabrielFileName); };
+	static inline TYPE getMinLengthEdge()    { return (Config::minLengthEdge);}
+    static Point<TYPE> getDestinationPoint() { return Config::destinationPoint;}
+    static Point<TYPE> getOriginPoint()      { return Config::originPoint;}
 };
 
 #endif /* CONFIG_H_ */

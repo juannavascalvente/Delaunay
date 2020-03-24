@@ -29,7 +29,6 @@ class Process
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
-	Config 			*config;		// Configuration file.
 	Menu 			m;				// Menu object.
 	Status 			status;			// Current status.
 	Draw			*drawer;		// Pointer to drawer instance.
@@ -55,7 +54,7 @@ class Process
 	bool findTwoClosest( int &index1, int &index2);
 	bool findFace( Point<TYPE> &point, int &faceId);
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
-	void getPointToLocate(Point<TYPE> &point);
+	static void getPointToLocate(Point<TYPE> &point);
 	void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
 
 protected:

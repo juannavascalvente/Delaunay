@@ -19,15 +19,9 @@
 #include <GL/glut.h>
 
 
-/***********************************************************************************************************************
-* Defines
-***********************************************************************************************************************/
-//#define DEBUG_PROCESS_FIND_CLOSESTPOINT
-//#define DEBUG_PROCESS_FIND_PATH
-
 Process *Process::instance = nullptr;
-
 typedef Point<TYPE> PointT;
+
 
 //------------------------------------------------------------------------
 // Constructors / Destructor.
@@ -38,19 +32,18 @@ Process::Process(int argc, char **argv, bool printData)
 
 	// Initialize configuration.
 	fileName = argv[2];
-	this->config = new Config(fileName);
+	Config::readConfig(fileName);
 
 	// Check flag to print data to screen.
 	this->log = new Logging("log.txt", printData);
 
 	// Initialize drawer and menu.
 	this->drawer = this->drawer->getInstance(argc, argv, &this->dcel,
-												&this->delaunay,
-												&this->triangulation,
-												&this->voronoi,
-												&this->gabriel,
-												&this->status,
-												this->config);
+                                             &this->delaunay,
+                                             &this->triangulation,
+                                             &this->voronoi,
+                                             &this->gabriel,
+                                             &this->status);
 	this->m = Menu(&this->status);
 
 	// Function to execute by GLUT.
@@ -60,7 +53,6 @@ Process::Process(int argc, char **argv, bool printData)
 Process::~Process()
 {
 	// Deallocate draw.
-	delete this->config;
 	delete this->log;
 	// PENDING Really necessary to call destructors.
 	if (this->status.isDelaunayCreated())
@@ -152,14 +144,14 @@ bool Process::readData(int option)
 		// Generate random set.
 		case RANDOMLY:
 		{
-		    success = DcelGenerator::generateRandom(this->config->getNPoints(), this->dcel);
+		    success = DcelGenerator::generateRandom(Config::getNPoints(), this->dcel);
 			this->status.set(false, success, false, false, false, false);
 			break;
 		}
 		// Generate clusters set.
 		case CLUSTER:
 		{
-            success = DcelGenerator::generateClusters(this->config->getNPoints(), this->config->getNClusters(), this->config->getRadius(), this->dcel);
+            success = DcelGenerator::generateClusters(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), this->dcel);
 			this->status.set(false, success, false, false, false, false);
 			break;
 		}
@@ -170,12 +162,12 @@ bool Process::readData(int option)
 			// Read points from flat file.
 			if(option == READ_POINTS_FLAT_FILE)
 			{
-				success = DcelReader::readPoints(this->config->getInFlatFilename(), true, this->dcel);
+				success = DcelReader::readPoints(Config::getInFlatFilename(), true, this->dcel);
 			}
 			// Read points from DCEL file.
 			else
 			{
-				success = DcelReader::readPoints(this->config->getInDCELFilename(), false, this->dcel);
+				success = DcelReader::readPoints(Config::getInDCELFilename(), false, this->dcel);
 			}
 			this->status.set(false, success, false, false, false, false);
 			break;
@@ -184,7 +176,7 @@ bool Process::readData(int option)
 		case READ_DCEL:
 		{
 			// PENDING CHECK IF A DCEL IS CONSISTENT?
-			success = DcelReader::read(this->config->getInDCELFilename(), false, this->dcel);
+			success = DcelReader::read(Config::getInDCELFilename(), false, this->dcel);
 			this->delaunay.setDCEL(&this->dcel);
 			this->status.set(false, true, true, false, false, false);
 			break;
@@ -194,8 +186,8 @@ bool Process::readData(int option)
 		{
 			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
 			this->delaunay.setDCEL(&this->dcel);
-			success = DelaunayIO::read(this->config->getInDCELFilename(),
-                                       this->config->getInGraphFilename(), this->delaunay);
+			success = DelaunayIO::read(Config::getInDCELFilename(),
+                                       Config::getInGraphFilename(), this->delaunay);
 			this->status.set(false, success, success, success, false, false);
 			this->delaunay.setAlgorithm(INCREMENTAL);
 			break;
@@ -204,7 +196,7 @@ bool Process::readData(int option)
 		case READ_VORONOI:
 		{
 			// PENDING: What to allow in menu if only voronoi is read.
-			//success = this->voronoi.read(this->config->getInVoronoiFilename());
+			//success = this->voronoi.read(Config::getInVoronoiFilename());
 			//this->status.set(false, true, !success, !success, true, false);
 			cout << "NOT IMPLEMENTED YET" << endl;
 			break;
@@ -213,7 +205,7 @@ bool Process::readData(int option)
 		default:
 		{
 			// PENDING: What to allow in menu if only voronoi is read.
-			success = GabrielIO::readBinary(this->config->getOutGabrielFilename(), this->gabriel);
+			success = GabrielIO::readBinary(Config::getOutGabrielFilename(), this->gabriel);
 			this->status.setGabrielCreated(true);
 			break;
 		}
@@ -487,7 +479,7 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 		else
 		{
 			printf("PENDING TO IMPLEMENT.\n");
-			found = this->delaunay.findClosestPoint(p, this->config->getNAnchors(), q, distance);
+			found = this->delaunay.findClosestPoint(p, Config::getNAnchors(), q, distance);
 		}
 	}
 	else
@@ -514,13 +506,13 @@ void Process::getPointToLocate(Point<TYPE> &point)
 	int minX, minY, maxX, maxY;
 
 	// Get point from configuration.
-	point = config->getClosestPoint();
+	point = Config::getClosestPoint();
 
 	// Check if input point parameter provided by user.
 	if (point.getX() == INVALID)
 	{
 		// Get min and max coordiantes.
-		config->getScreenCoordinates(minX, minY, maxX, maxY);
+		Config::getScreenCoordinates(minX, minY, maxX, maxY);
 
 		// Generate seed.
 		srand(time(nullptr));
@@ -546,14 +538,14 @@ void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
 	int minX, minY, maxX, maxY;
 
 	// Get point from configuration.
-	p1 = config->getOriginPoint();
-	p2 = config->getDestinationPoint();
+	p1 = Config::getOriginPoint();
+	p2 = Config::getDestinationPoint();
 
 	// Check if input point parameter provided by user.
 	if ((p1.getX() == INVALID) || (p2.getX() == INVALID))
 	{
 		// Get min and max coordiantes.
-		config->getScreenCoordinates(minX, minY, maxX, maxY);
+		Config::getScreenCoordinates(minX, minY, maxX, maxY);
 
 		// Generate seed.
 		srand(time(nullptr));
@@ -593,7 +585,7 @@ void Process::execute()
 		case PARAMETERS:
 		{
 			// Read configuration file.
-			this->config->readConfig();
+            Config::readConfig();
 			break;
 		}
 		// New set of points (generated or read).
@@ -672,7 +664,7 @@ void Process::execute()
 				if (!error)
 				{
 					//int minX, minY, maxX, maxY;
-					//this->config->getScreenCoordinates(minX, minY, maxX, maxY);
+					//Config::getScreenCoordinates(minX, minY, maxX, maxY);
 					//this->voronoi.correctBorderPoints(minX, minY, maxX, maxY);
 
 					// Draw Voronoi graph and the triangulation.
@@ -950,31 +942,31 @@ void Process::execute()
 		// Write points to a flat file.
 		case WRITE_POINTS:
 		{
-			DcelWriter::writePoints(this->config->getOutFlatFilename(), INVALID, this->dcel);
+			DcelWriter::writePoints(Config::getOutFlatFilename(), INVALID, this->dcel);
 			break;
 		}
 		// Write points to a DCEL file.
 		case WRITE_DCEL:
 		{
-			DcelWriter::write(this->config->getOutDCELFilename(), false, this->dcel);
+			DcelWriter::write(Config::getOutDCELFilename(), false, this->dcel);
 			break;
 		}
 		// Write DCEL and graph files.
 		case WRITE_DELAUNAY:
 		{
-            DelaunayIO::write(this->config->getOutDCELFilename(), this->config->getOutGraphFilename(), this->delaunay);
+            DelaunayIO::write(Config::getOutDCELFilename(), Config::getOutGraphFilename(), this->delaunay);
 			break;
 		}
 		// Write voronoi DCEL file.
 		case WRITE_VORONOI:
 		{
-			VoronoiIO::write(this->config->getOutVoronoiFilename(), this->voronoi);
+			VoronoiIO::write(Config::getOutVoronoiFilename(), this->voronoi);
 			break;
 		}
 		// Write Gabriel graph data.
 		case WRITE_GABRIEL:
 		{
-			GabrielIO::writeBinary(this->config->getOutGabrielFilename(), this->gabriel);
+			GabrielIO::writeBinary(Config::getOutGabrielFilename(), this->gabriel);
 			break;
 		}
 		// Clear data.
