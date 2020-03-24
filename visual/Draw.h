@@ -80,7 +80,6 @@ class Draw
 	static Voronoi		 *voronoi;		// Voronoi diagram data.
 	static Gabriel		 *gabriel;		// Gabriel graph data.
 	static Status 		 *status;		// Current process status.
-	static Config 		 *config;		// Configuration file.
 
 	//------------------------------------------------------------------------
 	// Private functions.
