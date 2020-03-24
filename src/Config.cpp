@@ -5,35 +5,27 @@
  *      Author: juan
  */
 
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Config.h"
-#include <errno.h>
-#include <float.h>
+#include <cfloat>
 #include "generic.h"
 #include "Logging.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include <iostream>
 #include <string>
-#include <fstream>
-#include <sstream>
+
 using namespace std;
 
-#ifdef DEBUG_GEOMETRICAL
-//#define DEBUG_PARSE_ZOOM
-//#define DEBUG_READ_CONFIG
-#endif
 
-/**************************************************************************
+/***********************************************************************************************************************
 * Defines section
-**************************************************************************/
+***********************************************************************************************************************/
 #define	DEFAULT_N_POINTS				10
 #define	DEFAULT_INPUT_FLAT_FILENAME		"inFlat.txt"
 #define	DEFAULT_INPUT_DCEL_FILENAME		"inDCEL.txt"
 #define	DEFAULT_INPUT_GRAPH_FILENAME	"inGraph.txt"
-#define DEFAULT_INPUT_VORONOI_FILENAME	"inVoronoi.txt"
-#define DEFAULT_INPUT_GABRIEL_FILENAME	"inGabriel.txt"
+//#define DEFAULT_INPUT_VORONOI_FILENAME	"inVoronoi.txt"
+//#define DEFAULT_INPUT_GABRIEL_FILENAME	"inGabriel.txt"
 #define	DEFAULT_OUTPUT_FLAT_FILENAME	"outFlat.txt"
 #define	DEFAULT_OUTPUT_DCEL_FILENAME	"outDCEL.txt"
 #define	DEFAULT_OUTPUT_GRAPH_FILENAME	"outGraph.txt"
@@ -52,8 +44,8 @@ using namespace std;
 #define INPUT_FLAT_FILE_PARAM		"INPUT_FLAT_FILE"
 #define INPUT_DCEL_FILE_PARAM		"INPUT_DCEL_FILE"
 #define INPUT_GRAPH_FILE_PARAM		"INPUT_GRAPH_FILE"
-#define INPUT_VORONOI_FILE_PARAM	"INPUT_VORONOI_FILE"
-#define INPUT_GABRIEL_FILE_PARAM	"INPUT_GABRIEL_FILE"
+//#define INPUT_VORONOI_FILE_PARAM	"INPUT_VORONOI_FILE"
+//#define INPUT_GABRIEL_FILE_PARAM	"INPUT_GABRIEL_FILE"
 #define OUTPUT_FLAT_FILE_PARAM		"OUTPUT_FLAT_FILE"
 #define OUTPUT_DCEL_FILE_PARAM		"OUTPUT_DCEL_FILE"
 #define OUTPUT_GRAPH_FILE_PARAM		"OUTPUT_GRAPH_FILE"
@@ -66,90 +58,43 @@ using namespace std;
 #define MIN_LENGTH_EDGE_PARAM		"MIN_LENGTH_EDGE"
 #define ZOOM_PARAM					"ZOOM"
 #define CLUSTER_SET_PARAM			"CLUSTER_SET"
-#define MAX_LINE_LENGTH				200
-
-/***************************************************************************
-* Private functions headers.
-***************************************************************************/
-int	parse_Int(char *strValue, int *value);
-int	parse_TYPE(char *strValue, TYPE *value);
-int	parse_Two_Int(char *value, int *value1, int *value2);
-int	parse_Point(char *value, Point<TYPE> *p);
-int parse_Zoom(char *value, int *min_X, int *max_X, int *min_Y, int *max_Y);
-
-Config::Config(string fileName)
-{
-	// Set default parameters.
-	this->initialized = true;
-	this->nPoints = DEFAULT_N_POINTS;
-	this->configFileName = fileName;
-	this->inFlatFileName = DEFAULT_INPUT_FLAT_FILENAME;
-	this->inDcelFileName = DEFAULT_INPUT_DCEL_FILENAME;
-	this->inGraphFileName = DEFAULT_INPUT_GRAPH_FILENAME;
-	this->inVoronoiFileName = DEFAULT_INPUT_VORONOI_FILENAME;
-	this->inGabrielFileName = DEFAULT_INPUT_GABRIEL_FILENAME;
-	this->outFlatFileName = DEFAULT_OUTPUT_FLAT_FILENAME;
-	this->outDcelFileName = DEFAULT_OUTPUT_DCEL_FILENAME;
-	this->outGraphFileName = DEFAULT_OUTPUT_GRAPH_FILENAME;
-	this->outVoronoiFileName = DEFAULT_OUTPUT_VORONOI_FILENAME;
-	this->outGabrielFileName = DEFAULT_OUTPUT_GABRIEL_FILENAME;
-	this->closestPoint = Point<TYPE>(INVALID, INVALID);
-	this->originPoint = Point<TYPE>(INVALID, INVALID);
-	this->destinationPoint = Point<TYPE>(INVALID, INVALID);
-	this->nAnchors = INVALID;
-	this->minLengthEdge = FLT_MAX;
-
-	// Initialize window dimensions.
-	this->minX = DEFAULT_MIN_X;
-	this->maxX = DEFAULT_MAX_X;
-	this->minY = DEFAULT_MIN_Y;
-	this->maxY = DEFAULT_MAX_Y;
-
-	// Cluster set parameters.
-	this->nClusters = DEFAULT_NCLUSTERS;
-	this->clusterRadius = DEFAULT_CLUSTER_RADIUS;
-
-	this->readConfig();
-}
 
 
-/***************************************************************************
-* Name: setDefaultConfig
-* IN:	N/A
-* OUT:	N/A
-* Description: Sets default values in configuration parameters.
-***************************************************************************/
-void	Config::setDefaultConfig(void)
-{
-	// Set default parameters.
-	this->nPoints = DEFAULT_N_POINTS;
-	this->inFlatFileName = DEFAULT_INPUT_FLAT_FILENAME;
-	this->inDcelFileName = DEFAULT_INPUT_DCEL_FILENAME;
-	this->inGraphFileName = DEFAULT_INPUT_GRAPH_FILENAME;
-	this->inVoronoiFileName = DEFAULT_INPUT_VORONOI_FILENAME;
-	this->inGabrielFileName = DEFAULT_INPUT_GABRIEL_FILENAME;
-	this->outFlatFileName = DEFAULT_OUTPUT_FLAT_FILENAME;
-	this->outDcelFileName = DEFAULT_OUTPUT_DCEL_FILENAME;
-	this->outGraphFileName = DEFAULT_OUTPUT_GRAPH_FILENAME;
-	this->outVoronoiFileName = DEFAULT_OUTPUT_VORONOI_FILENAME;
-	this->outGabrielFileName = DEFAULT_OUTPUT_GABRIEL_FILENAME;
-	this->closestPoint = Point<TYPE>(INVALID, INVALID);
-	this->originPoint = Point<TYPE>(INVALID, INVALID);
-	this->destinationPoint = Point<TYPE>(INVALID, INVALID);
-	this->nAnchors = DEFAULT_ANCHORS;
-	this->minLengthEdge = FLT_MAX;
+/***********************************************************************************************************************
+* Static members section
+***********************************************************************************************************************/
+int Config::nPoints = DEFAULT_N_POINTS;
+string Config::strConfigFileName;
+string Config::inFlatFileName;
+string Config::inDcelFileName;
+string Config::inGraphFileName;
+//string Config::inVoronoiFileName = DEFAULT_INPUT_VORONOI_FILENAME;
+//string Config::inGabrielFileName = DEFAULT_INPUT_GABRIEL_FILENAME;
+string Config::outFlatFileName;
+string Config::outDcelFileName;
+string Config::outGraphFileName;
+string Config::outVoronoiFileName;
+string Config::outGabrielFileName;
+Point<TYPE> Config::closestPoint;
+Point<TYPE> Config::originPoint;
+Point<TYPE> Config::destinationPoint;
+int Config::nAnchors = DEFAULT_ANCHORS;
+TYPE Config::minLengthEdge = FLT_MAX;
 
-	// Initialize window dimensions.
-	this->minX = DEFAULT_MIN_X;
-	this->maxX = DEFAULT_MAX_X;
-	this->minY = DEFAULT_MIN_Y;
-	this->maxY = DEFAULT_MAX_Y;
+// Initialize window dimensions.
+int Config::iMinX = DEFAULT_MIN_X;
+int Config::iMaxX = DEFAULT_MAX_X;
+int Config::iMinY = DEFAULT_MIN_Y;
+int Config::iMaxY = DEFAULT_MAX_Y;
 
-	// Cluster set parameters.
-	this->nClusters = DEFAULT_NCLUSTERS;
-	this->clusterRadius = DEFAULT_CLUSTER_RADIUS;
-}
+// Cluster set parameters.
+int Config::nClusters = DEFAULT_NCLUSTERS;
+int Config::clusterRadius = DEFAULT_CLUSTER_RADIUS;
 
+
+/***********************************************************************************************************************
+* Public methods
+***********************************************************************************************************************/
 /***************************************************************************
 * Name: 	getScreenCoordinates
 * IN:		NONE
@@ -161,257 +106,235 @@ void	Config::setDefaultConfig(void)
 ***************************************************************************/
 void Config::getScreenCoordinates(int &minX, int &minY, int &maxX, int &maxY)
 {
-	if (this->initialized)
-	{
-		// Get screen coordinates.
-		minX = this->minX;
-		maxX = this->maxX;
-		minY = this->minY;
-		maxY = this->maxY;
-	}
-	else
-	{
-		// Get default screen coordinates.
-		minX = DEFAULT_MIN_X;
-		maxX = DEFAULT_MAX_X;
-		minY = DEFAULT_MIN_Y;
-		maxY = DEFAULT_MAX_Y;
-	}
+    // Get screen coordinates.
+    minX = Config::iMinX;
+    maxX = Config::iMaxX;
+    minY = Config::iMinY;
+    maxY = Config::iMaxY;
 }
 
 
-/***************************************************************************
-* Name: 	readConfig
-* IN:		NONE
-* OUT:		NONE
-* IN/OUT:	NONE
-* GLOBAL:	"Config" object updated.
-* RETURN:	true if file exists and parameters are ok. false i.o.c.
-* Description: 	reads the configuration file parameters and updates "Config"
-* 				object. If file does not exists then set default values.
-* 				If a wrong file is found then it is skipped and current
-* 				field value is kept.
-***************************************************************************/
-int 	Config::readConfig()
+bool Config::readConfig(const string &strFileName)
 {
-	int	 ret=SUCCESS;				// Return value.
-	string	line = "";
-	string delimiter = "=";
-	string separator = ",";
-	size_t pos = 0;
-	std::string field;
-	std::string value;
-	ifstream ifs;
-	TYPE newValue=0.0;
+    bool isSuccess=true;				// Return value.
+
+    if (!strFileName.empty())
+    {
+        strConfigFileName = strFileName;
+    }
+
+    // Initialize values to default.
+    Config::setDefaultConfig();
 
 	// Open configuration file.
-	ifs.open(this->configFileName.c_str(), ios::in);
+    ifstream ifs;
+	ifs.open(strConfigFileName, ios::in);
 
 	// Check file is opened.
 	if (ifs.is_open())
 	{
 		// Read lines until end of file.
-		while (getline(ifs, line))
+        string strLine;
+		while (getline(ifs, strLine))
 		{
-			// Trim line and skip blank lines.
-			line = trim(line);
-			if (line.length() > 0)
+            size_t pos = 0;
+            const string strSeparator = ",";
+            string strField;
+            string strValue;
+            TYPE newValue=0.0;
+
+            // Trim line and skip blank lines.
+			strLine = trim(strLine);
+			if (strLine.length() > 0)
 			{
 				// PENDING_REFACTOR: Create function that gets the value.
 				// Extract field and value.
-				while ((pos = line.find(delimiter)) != std::string::npos)
+                const string strDelimiter = "=";
+				while ((pos = strLine.find(strDelimiter)) != std::string::npos)
 				{
-					field = line.substr(0, pos);
-					line.erase(0, pos + delimiter.length());
+                    strField = strLine.substr(0, pos);
+					strLine.erase(0, pos + strDelimiter.length());
 				}
-				value = line;
+                strValue = strLine;
 
 				// PENDING_REFACTOR: Create a function that gets the parameter
 				// option as an integer and remove elfis by a switch.
-				if (field.compare(N_POINTS_PARAM) == 0)
+				if (strField == N_POINTS_PARAM)
 				{
 					// Get input value.
-					std::istringstream ss(value);
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
-					ss >> this->nPoints;
+					ss >> Config::nPoints;
 				}
-				else if (field.compare(INPUT_FLAT_FILE_PARAM) == 0)
+				else if (strField == INPUT_FLAT_FILE_PARAM)
 				{
 					// Get input value.
-					this->inFlatFileName = value;
+					Config::inFlatFileName = strValue;
 				}
-				else if (field.compare(INPUT_DCEL_FILE_PARAM) == 0)
+				else if (strField == INPUT_DCEL_FILE_PARAM)
 				{
 					// Get input value.
-					this->inDcelFileName = value;
+					Config::inDcelFileName = strValue;
 				}
-				else if (field.compare(INPUT_GRAPH_FILE_PARAM) == 0)
+				else if (strField == INPUT_GRAPH_FILE_PARAM)
 				{
 					// Get input value.
-					this->inGraphFileName = value;
+					Config::inGraphFileName = strValue;
 				}
-				else if (field.compare(INPUT_VORONOI_FILE_PARAM) == 0)
+//				else if (strField == INPUT_VORONOI_FILE_PARAM)
+//				{
+//					// Get input value.
+//					Config::inVoronoiFileName = strValue;
+//				}
+//				else if (strField == INPUT_GABRIEL_FILE_PARAM)
+//				{
+//					// Get input value.
+//					Config::inGabrielFileName = strValue;
+//				}
+				else if (strField == OUTPUT_FLAT_FILE_PARAM)
 				{
 					// Get input value.
-					this->inVoronoiFileName = value;
+					Config::outFlatFileName = strValue;
 				}
-				else if (field.compare(INPUT_GABRIEL_FILE_PARAM) == 0)
+				else if (strField == OUTPUT_DCEL_FILE_PARAM)
 				{
 					// Get input value.
-					this->inGabrielFileName = value;
+					Config::outDcelFileName = strValue;
 				}
-				else if (field.compare(OUTPUT_FLAT_FILE_PARAM) == 0)
+				else if (strField == OUTPUT_GRAPH_FILE_PARAM)
 				{
 					// Get input value.
-					this->outFlatFileName = value;
+					Config::outGraphFileName = strValue;
 				}
-				else if (field.compare(OUTPUT_DCEL_FILE_PARAM) == 0)
+				else if (strField == OUTPUT_VORONOI_FILE_PARAM)
 				{
 					// Get input value.
-					this->outDcelFileName = value;
+					Config::outVoronoiFileName = strValue;
 				}
-				else if (field.compare(OUTPUT_GRAPH_FILE_PARAM) == 0)
+				else if (strField == OUTPUT_GABRIEL_FILE_PARAM)
 				{
 					// Get input value.
-					this->outGraphFileName = value;
+					Config::outGabrielFileName = strValue;
 				}
-				else if (field.compare(OUTPUT_VORONOI_FILE_PARAM) == 0)
+				else if (strField == N_ANCHORS_PARAM)
 				{
-					// Get input value.
-					this->outVoronoiFileName = value;
-				}
-				else if (field.compare(OUTPUT_GABRIEL_FILE_PARAM) == 0)
-				{
-					// Get input value.
-					this->outGabrielFileName = value;
-				}
-				else if (field.compare(N_ANCHORS_PARAM) == 0)
-				{
-					std::istringstream ss(value);
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
-					ss >> this->nAnchors;
+					ss >> Config::nAnchors;
 				}
 				// Get point to locate.
-				else if (field.compare(CLOSEST_POINT_PARAM) == 0)
+				else if (strField == CLOSEST_POINT_PARAM)
 				{
 					// Extract two values.
-					field = value;
-					pos = field.find(separator);
-					value = field.substr(0, pos);
-					field.erase(0, pos + separator.length());
-					std::istringstream ss(value);
+					strField = strValue;
+					pos = strField.find(strSeparator);
+                    strValue = strField.substr(0, pos);
+					strField.erase(0, pos + strSeparator.length());
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
 					ss >> newValue;
-					this->closestPoint.setX(newValue);
-					value = field;
-					std::istringstream ss2(value);
+					Config::closestPoint.setX(newValue);
+                    strValue = strField;
+					std::istringstream ss2(strValue);
 					ss2.imbue(std::locale::classic());
 					ss2 >> newValue;
-					this->closestPoint.setY(newValue);
+					Config::closestPoint.setY(newValue);
 				}
 				// Get origin point of the line.
-				else if (field.compare(ORIGIN_POINT_PARAM) == 0)
+				else if (strField == ORIGIN_POINT_PARAM)
 				{
 					// Extract two values.
-					field = value;
-					pos = field.find(separator);
-					value = field.substr(0, pos);
-					field.erase(0, pos + separator.length());
-					std::istringstream ss(value);
+					strField = strValue;
+					pos = strField.find(strSeparator);
+                    strValue = strField.substr(0, pos);
+					strField.erase(0, pos + strSeparator.length());
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
 					ss >> newValue;
-					this->originPoint.setX(newValue);
-					value = field;
-					std::istringstream ss2(value);
+					Config::originPoint.setX(newValue);
+                    strValue = strField;
+					std::istringstream ss2(strValue);
 					ss2.imbue(std::locale::classic());
 					ss2 >> newValue;
-					this->originPoint.setY(newValue);
+					Config::originPoint.setY(newValue);
 				}
 				// Get destination point of the line.
-				else if (field.compare(DESTINATION_POINT_PARAM) == 0)
+				else if (strField == DESTINATION_POINT_PARAM)
 				{
 					// Extract two values.
-					field = value;
-					pos = field.find(separator);
-					value = field.substr(0, pos);
-					field.erase(0, pos + separator.length());
-					std::istringstream ss(value);
+					strField = strValue;
+					pos = strField.find(strSeparator);
+                    strValue = strField.substr(0, pos);
+					strField.erase(0, pos + strSeparator.length());
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
 					ss >> newValue;
-					this->destinationPoint.setX(newValue);
-					value = field;
-					std::istringstream ss2(value);
+					Config::destinationPoint.setX(newValue);
+                    strValue = strField;
+					std::istringstream ss2(strValue);
 					ss2.imbue(std::locale::classic());
 					ss2 >> newValue;
-					this->destinationPoint.setY(newValue);
+					Config::destinationPoint.setY(newValue);
 				}
 				// Check REMOVE_LOWER_EDGES parameter.
-				else if (field.compare(MIN_LENGTH_EDGE_PARAM) == 0)
+				else if (strField == MIN_LENGTH_EDGE_PARAM)
 				{
 					// Get input value.
-					std::istringstream ss(value);
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
-					ss >> this->minLengthEdge;
+					ss >> Config::minLengthEdge;
 				}
 				// Check ZOOM parameter.
-				else if (field.compare(ZOOM_PARAM) == 0)
+				else if (strField == ZOOM_PARAM)
 				{
 					// Extract two values.
-					field = value;
-					pos = field.find(separator);
-					value = field.substr(0, pos);
-					field.erase(0, pos + separator.length());
-					std::istringstream ss(value);
+					strField = strValue;
+					pos = strField.find(strSeparator);
+                    strValue = strField.substr(0, pos);
+					strField.erase(0, pos + strSeparator.length());
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
-					ss >> newValue;
-					this->minX = newValue;
+					ss >> Config::iMinX;
 
-
-					pos = field.find(separator);
-					value = field.substr(0, pos);
-					field.erase(0, pos + separator.length());
-					std::istringstream ss2(value);
+					pos = strField.find(strSeparator);
+                    strValue = strField.substr(0, pos);
+					strField.erase(0, pos + strSeparator.length());
+					std::istringstream ss2(strValue);
 					ss2.imbue(std::locale::classic());
-					ss2 >> newValue;
-					this->maxX = newValue;
+					ss2 >> Config::iMaxX;
 
-					pos = field.find(separator);
-					value = field.substr(0, pos);
-					field.erase(0, pos + separator.length());
-					std::istringstream ss3(value);
+					pos = strField.find(strSeparator);
+                    strValue = strField.substr(0, pos);
+					strField.erase(0, pos + strSeparator.length());
+					std::istringstream ss3(strValue);
 					ss3.imbue(std::locale::classic());
-					ss3 >> newValue;
-					this->minY = newValue;
+					ss3 >> Config::iMinY;
 
-
-					value = field;
-					std::istringstream ss4(value);
+                    strValue = strField;
+					std::istringstream ss4(strValue);
 					ss4.imbue(std::locale::classic());
-					ss4 >> newValue;
-					this->maxY = newValue;
+					ss4 >> Config::iMaxY;
 				}
-				else if (field.compare(CLUSTER_SET_PARAM) == 0)
+				else if (strField == CLUSTER_SET_PARAM)
 				{
 					// Extract two values.
-					field = value;
-					pos = field.find(separator);
-					value = field.substr(0, pos);
-					field.erase(0, pos + separator.length());
-					std::istringstream ss(value);
+					strField = strValue;
+					pos = strField.find(strSeparator);
+                    strValue = strField.substr(0, pos);
+					strField.erase(0, pos + strSeparator.length());
+					std::istringstream ss(strValue);
 					ss.imbue(std::locale::classic());
-					ss >> newValue;
-					this->nClusters = newValue;
-					value = field;
-					std::istringstream ss2(value);
+					ss >> Config::nClusters;
+                    strValue = strField;
+					std::istringstream ss2(strValue);
 					ss2.imbue(std::locale::classic());
-					ss2 >> newValue;
-					this->clusterRadius = newValue;
+					ss2 >> Config::clusterRadius;
 				}
 				// Field does not exist.
-				else if (field.length() > 0)
+				else if (strField.length() > 0)
 				{
-					std::cout << "Unknown parameter. Skipping line " << line << std:: endl;
-					ret = FAILURE;
+					std::cout << "Unknown parameter. Skipping line " << strLine << std:: endl;
+                    isSuccess = FAILURE;
 				}
 			}
 		}
@@ -422,266 +345,52 @@ int 	Config::readConfig()
 	else
 	{
 		Logging::buildText(__FILE__, __FUNCTION__, "Cannot open configuration file ");
-		Logging::buildText(__FILE__, __FUNCTION__, this->configFileName);
+		Logging::buildText(__FILE__, __FUNCTION__, strFileName);
 		Logging::write(true, Warning);
 		Logging::buildText(__FILE__, __FUNCTION__, "Applying default values.");
 		Logging::write(true, Warning);
-		this->setDefaultConfig();
-		ret = FAILURE;
+        isSuccess = FAILURE;
 	}
 
-#ifdef DEBUG_READ_CONFIG
-	std::cout << "----------------------------------------------" << std::endl;
-	std::cout << "Configuration parameters:" << this->configFileName << std::endl;
-	std::cout << "----------------------------------------------" << std::endl;
-	std::cout << "# points:\t\t\t" << this->nPoints << std::endl;
-	std::cout << "Input flat:\t\t\t" << this->inFlatFileName << std::endl;
-	std::cout << "Input DCEL:\t\t\t" << this->inDcelFileName << std::endl;
-	std::cout << "Input graph:\t\t\t" << this->inGraphFileName << std::endl;
-	std::cout << "Input voronoi:\t\t\t" << this->inVoronoiFileName << std::endl;
-	std::cout << "Output flat:\t\t\t" << this->outFlatFileName << std::endl;
-	std::cout << "Output DCEL:\t\t\t" << this->outDcelFileName << std::endl;
-	std::cout << "Output graph:\t\t\t" << this->outDcelFileName << std::endl;
-	std::cout << "Output voronoi:\t\t\t" << this->outVoronoiFileName << std::endl;
-	std::cout << "Closest point:\t\t\t" << this->closestPoint << std::endl;
-	std::cout << "# anchors:\t\t\t" << this->nAnchors << std::endl;
-	std::cout << "Minimum edge length:\t\t" << this->minLengthEdge << std::endl;
-	std::cout << "Window size from \t\t(" << this->min_X << "," << this->min_Y <<
-			") to (" << this->max_X << "," << this->max_Y << ")." << std::endl;
-#endif
-
-	return(ret);
+	return isSuccess;
 }
 
+/***********************************************************************************************************************
+* Private methods
+***********************************************************************************************************************/
 /***************************************************************************
-* Private functions bodies.
+* Name: setDefaultConfig
+* IN:	N/A
+* OUT:	N/A
+* Description: Sets default values in configuration parameters.
 ***************************************************************************/
-int	parse_Int(char *strValue, int *value)
+void Config::setDefaultConfig()
 {
-	int ret=SUCCESS;		// Return value.
+    // Set default parameters.
+    Config::nPoints = DEFAULT_N_POINTS;
+    Config::inFlatFileName = DEFAULT_INPUT_FLAT_FILENAME;
+    Config::inDcelFileName = DEFAULT_INPUT_DCEL_FILENAME;
+    Config::inGraphFileName = DEFAULT_INPUT_GRAPH_FILENAME;
+//    Config::inVoronoiFileName = DEFAULT_INPUT_VORONOI_FILENAME;
+//    Config::inGabrielFileName = DEFAULT_INPUT_GABRIEL_FILENAME;
+    Config::outFlatFileName = DEFAULT_OUTPUT_FLAT_FILENAME;
+    Config::outDcelFileName = DEFAULT_OUTPUT_DCEL_FILENAME;
+    Config::outGraphFileName = DEFAULT_OUTPUT_GRAPH_FILENAME;
+    Config::outVoronoiFileName = DEFAULT_OUTPUT_VORONOI_FILENAME;
+    Config::outGabrielFileName = DEFAULT_OUTPUT_GABRIEL_FILENAME;
+    Config::closestPoint = Point<TYPE>(INVALID, INVALID);
+    Config::originPoint = Point<TYPE>(INVALID, INVALID);
+    Config::destinationPoint = Point<TYPE>(INVALID, INVALID);
+    Config::nAnchors = DEFAULT_ANCHORS;
+    Config::minLengthEdge = FLT_MAX;
 
-	// Convert string into value.
-	(*value) = strtol(strValue, (char **) NULL, 10);
+    // Initialize window dimensions.
+    Config::iMinX = DEFAULT_MIN_X;
+    Config::iMaxX = DEFAULT_MAX_X;
+    Config::iMinY = DEFAULT_MIN_Y;
+    Config::iMaxY = DEFAULT_MAX_Y;
 
-	// Check conversion error.
-	if (errno == ERANGE)
-	{
-		printf("Error parsing integer value %s\n", strValue);
-		ret = FAILURE;
-	}
-
-	return(ret);
+    // Cluster set parameters.
+    Config::nClusters = DEFAULT_NCLUSTERS;
+    Config::clusterRadius = DEFAULT_CLUSTER_RADIUS;
 }
-
-int	parse_TYPE(char *strValue, TYPE *value)
-{
-	int ret=SUCCESS;		// Return value.
-	char* pEnd;
-
-	// Convert string into value.
-	(*value) = strtod(strValue, &pEnd);
-
-	// Check conversion error.
-	if (errno == ERANGE)
-	{
-		printf("Error parsing TYPE value %s\n", strValue);
-		ret = FAILURE;
-	}
-
-	return(ret);
-}
-
-int	parse_Two_Int(char *value, int *value1, int *value2)
-{
-	int ret=SUCCESS;		// Return value.
-	char *pch=NULL;
-	int	length=0;
-	char field[MAX_LINE_LENGTH];
-
-#ifdef DEBUG_PARSE_POINT
-	printf("Input line is %s\n", value);
-#endif
-
-	// Get pointer to ',' character.
-	pch = strchr(value,',');
-
-	// Check if character exists in input string.
-	if (pch == NULL)
-	{
-		ret = FAILURE;
-#ifdef DEBUG_PARSE_POINT
-		printf("Input line %s does not contain ,\n", value);
-#endif
-	}
-	else
-	{
-		length = pch - value;
-
-#ifdef DEBUG_PARSE_POINT
-		printf("Input line contains , at position %d\n", length);
-#endif
-	    // Copy field.
-		strncpy(field, value, length);
-		if (parse_Int(field, value1) == FAILURE)
-		{
-			printf("Error parsing first integer value %s\n", field);
-		}
-		else
-		{
-#ifdef DEBUG_PARSE_POINT
-		printf("Input line field is %d\n", value1);
-#endif
-			// Copy value.
-			strncpy(field, &value[length + 1], strlen(value) - length - 1);
-			if (parse_Int(field, value2) == FAILURE)
-			{
-				printf("Error parsing second integer value %s\n", field);
-			}
-		}
-#ifdef DEBUG_PARSE_POINT
-		printf("Input line value is %d\n", value2);
-#endif
-	}
-
-	return(ret);
-}
-
-int	parse_Point(char *value, Point<TYPE> *p)
-{
-	int ret=SUCCESS;		// Return value.
-	char *pch=NULL;
-	int	length=0;
-	char field[MAX_LINE_LENGTH];
-	TYPE value1;
-	TYPE value2;
-
-#ifdef DEBUG_PARSE_POINT
-	printf("Input line is %s\n", value);
-#endif
-
-	// Get pointer to ',' character.
-	pch = strchr(value,',');
-
-	// Check if character exists in input string.
-	if (pch == NULL)
-	{
-		ret = FAILURE;
-#ifdef DEBUG_PARSE_POINT
-		printf("Input line %s does not contain ,\n", value);
-#endif
-	}
-	else
-	{
-		length = pch - value;
-
-#ifdef DEBUG_PARSE_POINT
-		printf("Input line contains , at position %d\n", length);
-#endif
-	    // Copy field.
-		strncpy(field, value, length);
-		if (parse_TYPE(field, &value1) == FAILURE)
-		{
-			printf("Error parsing first TYPE value %s\n", field);
-		}
-		else
-		{
-#ifdef DEBUG_PARSE_POINT
-			printf("Input line field is %f\n", value1);
-#endif
-			// Copy value.
-			strncpy(field, &value[length + 1], strlen(value) - length - 1);
-			if (parse_TYPE(field, &value2) == FAILURE)
-			{
-				printf("Error parsing second TYPE value %s\n", field);
-			}
-			else
-			{
-				p->setX(value1);
-				p->setY(value2);
-#ifdef DEBUG_PARSE_POINT
-				printf("Input line value is %f\n", value2);
-#endif
-			}
-		}
-	}
-
-	return(ret);
-}
-
-int parse_Zoom(char *line, int *min_X, int *max_X, int *min_Y, int *max_Y)
-{
-	int 	ret=SUCCESS;			// Return value.
-	char 	*pch=NULL;				// Pointer to character in string.
-	int		nItems=0;				// # values read.
-
-#ifdef DEBUG_PARSE_ZOOM
-	printf("Input line is %s\n", line);
-#endif
-
-	// Get next pointer to ',' character.
-	nItems = 0;
-	pch = strtok (line,"=");
-	pch = strtok (line,",");
-	ret = parse_Int(pch, min_X);
-	while (((pch = strtok (NULL,",")) != NULL) && (ret == SUCCESS))
-	{
-#ifdef DEBUG_PARSE_ZOOM
-		printf ("%s\n", pch);
-#endif
-		// Check parameter to set.
-		switch (nItems)
-		{
-			case 0:
-			{
-				if (parse_Int(pch, max_X) == FAILURE)
-				{
-					ret = FAILURE;
-					printf("Error parsing max x coordinate string %s\n", pch);
-				}
-				break;
-			}
-			case 1:
-			{
-				if (parse_Int(pch, min_Y) == FAILURE)
-				{
-					ret = FAILURE;
-					printf("Error parsing min Y coordinate string %s\n", pch);
-				}
-				break;
-			}
-			case 2:
-			{
-				if (parse_Int(pch, max_Y) == FAILURE)
-				{
-					ret = FAILURE;
-					printf("Error parsing max Y coordinate string %s\n", pch);
-				}
-				break;
-			}
-			default:
-			{
-				printf("Error\n");
-				break;
-			}
-		}
-
-		nItems++;
-	}
-
-	if (nItems != 3)
-	{
-		ret = FAILURE;
-#ifdef DEBUG_PARSE_ZOOM
-		printf("Input line %s does not contain 4 points separated by \",\" character\n", line);
-#endif
-	}
-#ifdef DEBUG_PARSE_ZOOM
-	else
-	{
-		printf("New area from (%lf,%lf) to (%lf,%lf)\n", *min_X, *min_Y, *max_X, *max_Y);
-	}
-#endif
-
-	return(ret);
-}
-

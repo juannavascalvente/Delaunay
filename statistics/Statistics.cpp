@@ -250,7 +250,7 @@ void StatisticsStarTriangulationRegister::deallocate()
 * Description: 	analyzes a DCEL built using the star triangulation
 * 				algorithm.
 ***************************************************************************/
-void StatisticsTriangulationData::analyzeTriangulation(Triangulation &triangulation)
+void StatisticsTriangulationData::analyzeTriangulation(StarTriangulation &triangulation)
 {
 	// Get # points, edges and faces.
 	this->setPoints(triangulation.getDcel()->getNVertex());

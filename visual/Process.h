@@ -17,7 +17,7 @@
 #include "Gabriel.h"
 #include "Logging.h"
 #include "Queue.h"
-#include "Triangulation.h"
+#include "StarTriangulation.h"
 #include "Voronoi.h"
 
 
@@ -29,14 +29,13 @@ class Process
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
-	Config 			*config;		// Configuration file.
 	Menu 			m;				// Menu object.
 	Status 			status;			// Current status.
 	Draw			*drawer;		// Pointer to drawer instance.
 
 	Dcel			dcel;			// Dcel data.
 	Delaunay		delaunay;		// Delaunay data.
-	Triangulation	triangulation;	// Star triangulation data.
+	StarTriangulation	triangulation;	// Star triangulation data.
 	Voronoi			voronoi;		// Voronoi diagram data.
 	Gabriel			gabriel;		// Gabriel graph data.
 
@@ -55,7 +54,7 @@ class Process
 	bool findTwoClosest( int &index1, int &index2);
 	bool findFace( Point<TYPE> &point, int &faceId);
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
-	void getPointToLocate(Point<TYPE> &point);
+	static void getPointToLocate(Point<TYPE> &point);
 	void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
 
 protected:
@@ -75,7 +74,7 @@ public:
 	inline Status* getStatus() {return(&this->status); };
 	inline Dcel* getDcel() {return(&this->dcel); };
 	inline Delaunay* getDelaunay() {return(&this->delaunay); };
-	inline Triangulation* getTriangulation() {return(&this->triangulation); };
+	inline StarTriangulation* getTriangulation() {return(&this->triangulation); };
 	inline Voronoi* getVoronoi() {return(&this->voronoi); };
 	inline Gabriel* getGabriel() {return(&this->gabriel); };
 

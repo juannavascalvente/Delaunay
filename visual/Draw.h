@@ -18,7 +18,7 @@
 #include "Polygon.h"
 #include "Point.h"
 #include "Polyline.h"
-#include "Triangulation.h"
+#include "StarTriangulation.h"
 
 #include <GL/glut.h>
 #include "../visual/Status.h"
@@ -76,7 +76,7 @@ class Draw
 
 	static Dcel			 *dcel;			// Dcel data.
 	static Delaunay		 *delaunay;		// Delaunay data.
-	static Triangulation *triangulation;// Star triangulation data.
+	static StarTriangulation *triangulation;// Star triangulation data.
 	static Voronoi		 *voronoi;		// Voronoi diagram data.
 	static Gabriel		 *gabriel;		// Gabriel graph data.
 	static Status 		 *status;		// Current process status.
@@ -133,14 +133,9 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	static Draw* getInstance(int argc, char **argv,
-							 Dcel *dcel,
-							 Delaunay *delaunay,
-							 Triangulation *triangulation,
-							 Voronoi *voronoi,
-							 Gabriel *gabriel,
-							 Status *status,
-							 Config *config);
+	static Draw *
+    getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelaunay, StarTriangulation *inTriangulation,
+                Voronoi *inVoronoi, Gabriel *inGabriel, Status *inStatus);
 	Draw() : windowID(0), pointsSet(NULL), facesSet(NULL) {} ;
 	~Draw() {};
 

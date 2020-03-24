@@ -23,7 +23,7 @@ using namespace std;
 #define	READ_MENU_TEXT					"Read"
 #define	INPUTSET_READ_FLAT_TEXT			"Flat file"
 #define	INPUTSET_READ_DCEL_POINTS_TEXT 	"Points DCEL file"
-#define	INPUTSET_READ_TRIANG_TEXT		"Triangulation file"
+#define	INPUTSET_READ_TRIANG_TEXT		"StarTriangulation file"
 #define	INPUTSET_READ_INCREMENTAL_TEXT	"Incremental files"
 #define	INPUTSET_READ_VORONOI_TEXT		"Voronoi file"
 #define INPUTSET_READ_GABRIEL_TEXT		"Gabriel file"
@@ -32,7 +32,7 @@ using namespace std;
 // Parameters menu entries text.
 #define PARAMETERS_MENU_TEXT			"Read parameters"
 
-// Triangulation menu entries text.
+// StarTriangulation menu entries text.
 #define	TRIANGULATIONS_MENU_TEXT		"Triangulations"
 #define	TRIANGULATIONS_DELAUNAY_TEXT	"Delaunay"
 #define	TRIANGULATIONS_STAR_TEXT		"Star triangulation"
@@ -46,7 +46,7 @@ using namespace std;
 #define FIGURES_GABRIEL_TEXT			"Gabriel"
 #define FIGURES_FILTER_EDGES			"Filter edges"
 #define FIGURES_VORONOI_PATH_TEXT		"Voronoi path"
-#define	FIGURES_TRIANGULATION_PATH_TEXT	"Triangulation path"
+#define	FIGURES_TRIANGULATION_PATH_TEXT	"StarTriangulation path"
 
 // Location menu entries.
 #define LOCATION_MENU_TEXT				"Location"

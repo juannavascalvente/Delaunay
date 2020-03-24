@@ -36,11 +36,10 @@ void 		  *font;
 Draw 		  *Draw::instance=NULL; // Drawer instance.
 Dcel		  *Draw::dcel;			// Dcel data.
 Delaunay	  *Draw::delaunay;		// Delaunay data.
-Triangulation *Draw::triangulation;	// Star triangulation data.
+StarTriangulation *Draw::triangulation;	// Star triangulation data.
 Voronoi		  *Draw::voronoi;		// Voronoi diagram data.
 Gabriel		  *Draw::gabriel;		// Gabriel graph data.
 Status 		  *Draw::status;		// Current process status.
-Config 		  *Draw::config;		// Configuration file.
 
 
 // Internal static functions.
@@ -49,12 +48,8 @@ void refresh(void);
 //------------------------------------------------------------------------
 // Constructor/Destructor
 //------------------------------------------------------------------------
-Draw* Draw::getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelaunay,
-		 	 	 	 	 	 	 	 	 	 	 Triangulation *inTriangulation,
-												 Voronoi *inVoronoi,
-												 Gabriel *inGabriel,
-												 Status *inStatus,
-												 Config *inConfig)
+Draw * Draw::getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelaunay, StarTriangulation *inTriangulation,
+                         Voronoi *inVoronoi, Gabriel *inGabriel, Status *inStatus)
 {
 	int minX, minY, maxX, maxY;		// Window dimension.
 
@@ -85,10 +80,9 @@ Draw* Draw::getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelauna
 		voronoi = inVoronoi;
 		gabriel = inGabriel;
 		status = inStatus;
-		config = inConfig;
 
 		// Set x, y and z axis size.
-		config->getScreenCoordinates(minX, minY, maxX, maxY);
+		Config::getScreenCoordinates(minX, minY, maxX, maxY);
 		glOrtho(minX-100, maxX+100, minY-100, maxY+100, -1, 3);
 		font = GLUT_BITMAP_TIMES_ROMAN_10;
 	}
@@ -249,7 +243,7 @@ void Draw::drawFigures(enum drawingT type, bool error)
 		// Draw the triangulation filtering edges.
 		case FILTEREDGES_DRAW:
 		{
-			this->drawDelaunay(this->config->getMinLengthEdge());
+			this->drawDelaunay(Config::getMinLengthEdge());
 			for (i=0; i<this->pointsSet->getNElements() ;i++)
 			{
 				p = *this->pointsSet->at(i);

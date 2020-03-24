@@ -1,5 +1,5 @@
 /*
- * Triangulation.h
+ * StarTriangulation.h
  *
  *  Created on: Jul 22, 2016
  *      Author: jnavas
@@ -21,7 +21,7 @@ struct ConvexPoint
 /****************************************************************************
 // 						TRIANGULATION CLASS DEFITNION
 ****************************************************************************/
-class Triangulation
+class StarTriangulation
 {
 	//------------------------------------------------------------------------
 	//  Attributes
@@ -45,8 +45,8 @@ public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	Triangulation();
-	~Triangulation();
+	StarTriangulation();
+	~StarTriangulation();
 
 	//------------------------------------------------------------------------
 	// Public functions.
