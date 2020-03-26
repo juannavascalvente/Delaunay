@@ -42,6 +42,7 @@ public:
     * Public methods
     *******************************************************************************************************************/
 	inline int getNElements() { return(vPoints.size()); };
+    inline void getPoints(vector<Point<TYPE>> &vPointsOut) { vPointsOut = vPoints; };
 	inline Point<TYPE> at(int index) { return(vPoints.at(index)); };
 	inline void	add(Point<TYPE> &p) { vPoints.push_back(p); };
 	inline void reset() { vPoints.clear(); };

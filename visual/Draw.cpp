@@ -130,22 +130,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			this->drawGabriel();
 			break;
 		}
-		// Draw set of points and convex hull.
-		case CONVEXHULL_DRAW:
-		{
-			this->drawSet();
-			if (this->status->isDelaunayCreated())
-			{
-				// Draw convex hull using Delaunay.
-				this->draw(this->delaunay->getConvexHull());
-			}
-			else
-			{
-				// Draw convex hull using any triangulation.
-				this->draw(this->triangulation->getConvexHull());
-			}
-			break;
-		}
 		// Draw the triangulation, the point and the closest point.
 		case CLOSESTPOINT_DRAW:
 		case TWOCLOSEST_DRAW:
@@ -270,22 +254,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 // Private functions.
 //------------------------------------------------------------------------
 /***************************************************************************
-* Name: 	drawSet
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draw the DCEL set of points.
-***************************************************************************/
-void Draw::drawSet()
-{
-	// Draw set of points.
-	this->setPointSize(1.0);
-	this->setColor(WHITE);
-	this->drawPoints(this->dcel);
-}
-
-/***************************************************************************
 * Name: 	drawDelaunay
 * IN:		TYPE minLength		min length of the edges.
 * OUT:		NONE
@@ -346,28 +314,6 @@ void Draw::draw(PointT *point)
 	this->finish();
 }
 
-/***************************************************************************
-* Name: 	drawPoints
-* IN:		dcel		DCEL that stores set of points.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draws the set of vertex of the DCEL.
-***************************************************************************/
-void Draw::drawPoints(Dcel *dcel)
-{
-	int	i=0;			// Loop counter.
-
-	this->startPoints();
-
-	// Loop to draw points.
-	for (i=0; i<dcel->getNVertex() ;i++)
-	{
-		this->draw(dcel->getRefPoint(i));
-	}
-
-	this->finish();
-}
 
 /***************************************************************************
 * Name: 	draw
@@ -391,52 +337,6 @@ void Draw::draw(Line *line)
 	this->finish();
 }
 
-/***************************************************************************
-* Name: 	draw
-* IN:		polygon		polygon to draw.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draw lines between every pair of points.
-***************************************************************************/
-void Draw::draw(Polygon *polygon)
-{
-	int		i=0;			// Loop counter.
-	Line	line;			// Temporary line.
-	Point<TYPE> p, q;		// Temporary points.
-
-	this->setColor(GREEN);
-
-#ifdef DEBUG_DRAW_POLYLINE
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of points in convex hull:" );
-	Logging::buildText(__FUNCTION__, __FILE__, polygon->getNElements());
-	Logging::write(true, Info);
-#endif
-	// Computes distance between every pair of points.
-	for (i=0; i<(polygon->getNElements()-1) ;i++)
-	{
-		p = polygon->at(i);
-		q = polygon->at(i+1);
-		line = Line(p, q);
-		this->draw(&line);
-#ifdef DEBUG_DRAW_POLYLINE
-		Logging::buildText(__FUNCTION__, __FILE__, "Drawing point " );
-		Logging::buildText(__FUNCTION__, __FILE__, i);
-		Logging::write(true, Info);
-#endif
-	}
-
-#ifdef DEBUG_DRAW_POLYLINE
-	Logging::buildText(__FUNCTION__, __FILE__, "Drawing last line" );
-	Logging::write(true, Info);
-#endif
-
-	// Close polygon.
-	p = polygon->at(polygon->getNElements()-1);
-	q = polygon->at(0);
-	line = Line(p, q);
-	this->draw(&line);
-}
 
 /***************************************************************************
 * Name: 		draw

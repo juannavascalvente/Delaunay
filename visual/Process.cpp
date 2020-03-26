@@ -821,11 +821,24 @@ void Process::execute()
 			// Computing convex hull.
 			if (this->buildConvexHull())
 			{
-                // Convex hull.
-				//Set<int> *convexHullEdges = this->delaunay.getConvexHullEdges();
-				//convexHullEdges->write("/home/juan/projects/delaunay/code/data/samples/test/input/convexHull/gold/convexHull1_4.txt");
-				this->drawer->drawFigures(CONVEXHULL_DRAW);
-			}
+                Polygon *hull;
+
+                // Computing convex hull.
+                if (this->status.isDelaunayCreated())
+                {
+                    hull = this->delaunay.getConvexHull();
+                }
+                else
+                {
+                    hull = this->triangulation.getConvexHull();
+                }
+
+                // Add points to display manager.
+                vector<Point<TYPE>> vPoints;
+                hull->getPoints(vPoints);
+                dispManager.add(DisplayableFactory::createPolygon(vPoints));
+                dispManager.process();
+            }
 			else
 			{
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull not computed");

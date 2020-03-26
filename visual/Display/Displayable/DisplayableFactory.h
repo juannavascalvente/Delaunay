@@ -21,8 +21,13 @@ using namespace std;
 class DisplayableFactory
 {
 public:
+
     static DispPoint* createPoint(Point<TYPE> &point) { return new DispPoint(point); };
+
     static DispPointsSet* createPointsSet(vector<Point<TYPE>> &vPointsIn) { return new DispPointsSet(vPointsIn); };
+
+    static DispPolygon* createPolygon(vector<Point<TYPE>> &vPointsIn) { return new DispPolygon(vPointsIn); };
+
     static DispDcel* createDcel(Dcel *dcel) { return new DispDcel(dcel); };
 };
 

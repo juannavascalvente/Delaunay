@@ -39,7 +39,6 @@ enum ColorT { RED,
 enum drawingT {
 				  SET_DRAW,
 				  GABRIEL_DRAW,
-				  CONVEXHULL_DRAW,
 				  CLOSESTPOINT_DRAW,
 				  FINDFACE_DRAW,
 				  TRIANGULATION_PATH_DRAW,
@@ -82,19 +81,15 @@ class Draw
 	// Private functions.
 	//------------------------------------------------------------------------
 	// General figures.
-	void drawSet();
 	void drawDelaunay(TYPE minLength);
 	void drawVoronoi();
 	void drawGabriel();
 	void drawPath( Dcel *dcel, Point<TYPE> *p1, Point<TYPE> *p2, Queue<int> &queue);
 
 	// Single figures.
-	void drawPoints( Dcel *dcel);
 	void draw( PointT *point);
 	void draw( Line *line);
-	void draw( Polygon *polygon);
 	void draw( Circle *circle, bool fill);
-	void draw( Dcel *dcel);
 	void draw( Dcel *dcel, TYPE minLength);
 	void drawEdge( int edgeIndex, Dcel *dcel);
 	void draw( Face *face, Dcel *dcel);
