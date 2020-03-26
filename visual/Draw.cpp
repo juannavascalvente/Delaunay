@@ -123,31 +123,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 	// Check type of data to draw.
 	switch(type)
 	{
-		// Clear screen.
-		case CLEAR_SCREEN:
-		{
-			// Do nothing.
-			break;
-		}
-		// Draw set of points.
-		case SET_DRAW:
-		{
-			this->drawSet();
-			break;
-		}
-		// Draw triangulation.
-		case TRIANGULATION_DRAW:
-		{
-			this->drawDelaunay(INVALID);
-			break;
-		}
-		// Draw triangulation and Voronoi graph.
-		case VORONOI_DRAW:
-		{
-			this->drawDelaunay(INVALID);
-			this->drawVoronoi();
-			break;
-		}
 		// Draw triangulation and Gabriel graph.
 		case GABRIEL_DRAW:
 		{

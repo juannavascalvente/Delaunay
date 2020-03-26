@@ -33,14 +33,11 @@ enum ColorT { RED,
               BLUE,
               LIGHT_BLUE,
               YELLOW,
-              WHITE,
-              BLACK};
+              WHITE};
 
 // Type of figure to draw.
-enum drawingT {CLEAR_SCREEN,
+enum drawingT {
 				  SET_DRAW,
-				  TRIANGULATION_DRAW,
-				  VORONOI_DRAW,
 				  GABRIEL_DRAW,
 				  CONVEXHULL_DRAW,
 				  CLOSESTPOINT_DRAW,

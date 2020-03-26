@@ -9,6 +9,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "Process.h"
+#include "DisplayableFactory.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
 #include "DcelGenerator.h"
@@ -26,7 +27,7 @@ typedef Point<TYPE> PointT;
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-Process::Process(int argc, char **argv, bool printData)
+Process::Process(int argc, char **argv, bool printData) : dispManager()
 {
 	string 	fileName;			// Configuration file name.
 
@@ -136,7 +137,7 @@ void Process::executeWrapper()
 ***************************************************************************/
 bool Process::readData(int option)
 {
-	bool success=true; 		// Return value.
+	bool isSuccess=true; 		// Return value.
 
 	// Check option to generate/read set.
 	switch (option)
@@ -144,15 +145,15 @@ bool Process::readData(int option)
 		// Generate random set.
 		case RANDOMLY:
 		{
-		    success = DcelGenerator::generateRandom(Config::getNPoints(), this->dcel);
-			this->status.set(false, success, false, false, false, false);
+            isSuccess = DcelGenerator::generateRandom(Config::getNPoints(), this->dcel);
+            this->status.set(false, isSuccess, false, false, false, false);
 			break;
 		}
 		// Generate clusters set.
 		case CLUSTER:
 		{
-            success = DcelGenerator::generateClusters(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), this->dcel);
-			this->status.set(false, success, false, false, false, false);
+            isSuccess = DcelGenerator::generateClusters(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), this->dcel);
+			this->status.set(false, isSuccess, false, false, false, false);
 			break;
 		}
 		// Read set from flat file.
@@ -162,56 +163,70 @@ bool Process::readData(int option)
 			// Read points from flat file.
 			if(option == READ_POINTS_FLAT_FILE)
 			{
-				success = DcelReader::readPoints(Config::getInFlatFilename(), true, this->dcel);
+                isSuccess = DcelReader::readPoints(Config::getInFlatFilename(), true, this->dcel);
 			}
 			// Read points from DCEL file.
 			else
 			{
-				success = DcelReader::readPoints(Config::getInDCELFilename(), false, this->dcel);
+                isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, this->dcel);
 			}
-			this->status.set(false, success, false, false, false, false);
+			this->status.set(false, isSuccess, false, false, false, false);
 			break;
 		}
-		// Read dcel file.
-		case READ_DCEL:
-		{
-			// PENDING CHECK IF A DCEL IS CONSISTENT?
-			success = DcelReader::read(Config::getInDCELFilename(), false, this->dcel);
-			this->delaunay.setDCEL(&this->dcel);
-			this->status.set(false, true, true, false, false, false);
-			break;
-		}
-		// Read Delaunay incremental algorithm files.
-		case READ_DELAUNAY:
-		{
-			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
-			this->delaunay.setDCEL(&this->dcel);
-			success = DelaunayIO::read(Config::getInDCELFilename(),
-                                       Config::getInGraphFilename(), this->delaunay);
-			this->status.set(false, success, success, success, false, false);
-			this->delaunay.setAlgorithm(INCREMENTAL);
-			break;
-		}
-		// Read Voronoi file.
-		case READ_VORONOI:
-		{
-			// PENDING: What to allow in menu if only voronoi is read.
-			//success = this->voronoi.read(Config::getInVoronoiFilename());
-			//this->status.set(false, true, !success, !success, true, false);
-			cout << "NOT IMPLEMENTED YET" << endl;
-			break;
-		}
-		// Read Gabriel file.
-		default:
-		{
-			// PENDING: What to allow in menu if only voronoi is read.
-			success = GabrielIO::readBinary(Config::getOutGabrielFilename(), this->gabriel);
-			this->status.setGabrielCreated(true);
-			break;
-		}
+//		// Read dcel file.
+//		case READ_DCEL:
+//		{
+//			// PENDING CHECK IF A DCEL IS CONSISTENT?
+//			success = DcelReader::read(Config::getInDCELFilename(), false, this->dcel);
+//			this->delaunay.setDCEL(&this->dcel);
+//			this->status.set(false, true, true, false, false, false);
+//			break;
+//		}
+//		// Read Delaunay incremental algorithm files.
+//		case READ_DELAUNAY:
+//		{
+//			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
+//			this->delaunay.setDCEL(&this->dcel);
+//			success = DelaunayIO::read(Config::getInDCELFilename(),
+//                                       Config::getInGraphFilename(), this->delaunay);
+//			this->status.set(false, success, success, success, false, false);
+//			this->delaunay.setAlgorithm(INCREMENTAL);
+//			break;
+//		}
+//		// Read Voronoi file.
+//		case READ_VORONOI:
+//		{
+//			// PENDING: What to allow in menu if only voronoi is read.
+//			//success = this->voronoi.read(Config::getInVoronoiFilename());
+//			//this->status.set(false, true, !success, !success, true, false);
+//			cout << "NOT IMPLEMENTED YET" << endl;
+//			break;
+//		}
+//		// Read Gabriel file.
+//		default:
+//		{
+//			// PENDING: What to allow in menu if only voronoi is read.
+//			success = GabrielIO::readBinary(Config::getOutGabrielFilename(), this->gabriel);
+//			this->status.setGabrielCreated(true);
+//			break;
+//		}
+        default:
+        {
+            // PENDING: What to allow in menu if only voronoi is read.
+            isSuccess = false;
+            break;
+        }
 	}
 
-	return(success);
+	// Add figure display.
+    vector<Point<TYPE>> vPoints;
+    for (size_t i=0; i< Config::getNPoints(); i++)
+    {
+        vPoints.push_back(*this->dcel.getRefPoint(i));
+    }
+    dispManager.add(DisplayableFactory::createPointsSet(vPoints));
+
+	return isSuccess;
 }
 
 /***************************************************************************
@@ -557,6 +572,7 @@ void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
 		p2.setY(rand() % (int) maxY);
 	}
 }
+void setRed2() {};
 
 /***************************************************************************
 * Name: execute
@@ -603,22 +619,25 @@ void Process::execute()
 			// Check option to generate/read set.
 			if (this->readData(option))
 		    {
-				if (this->status.isVoronoiCreated())
-				{
-					// Clear screen.
-					this->drawer->drawFigures(VORONOI_DRAW);
-				}
-				if (this->status.isDelaunayCreated() ||
-					this->status.isTriangulationCreated())
-				{
-					// Draw triangulation.
-					this->drawer->drawFigures(TRIANGULATION_DRAW);
-				}
-				else
-				{
-					// Draw set of points.
-					this->drawer->drawFigures(SET_DRAW);
-				}
+//				if (this->status.isVoronoiCreated())
+//				{
+//					// Clear screen.
+//					this->drawer->drawFigures(VORONOI_DRAW);
+//				}
+//				if (this->status.isDelaunayCreated() ||
+//					this->status.isTriangulationCreated())
+//				{
+//					// Draw triangulation.
+//					this->drawer->drawFigures(TRIANGULATION_DRAW);
+//				}
+//				else
+//				{
+//					// Draw set of points.
+//                    dispManager.process();
+//					//this->drawer->drawFigures(SET_DRAW);
+//				}
+
+                dispManager.process();
 
 				// Update menu entries.
 				m.updateMenu();
@@ -638,8 +657,11 @@ void Process::execute()
 
 			if (!error)
 			{
-                // Draw triangulation.
-				this->drawer->drawFigures(TRIANGULATION_DRAW);
+                // Draw set of points.
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispDelaunay->setColor(&DisplayService::setRed);
+                dispManager.add(dispDelaunay);
+                dispManager.process();
 
 				// Update menu entries.
 				m.updateMenu();
@@ -663,12 +685,14 @@ void Process::execute()
 				// Check error and update status.
 				if (!error)
 				{
-					//int minX, minY, maxX, maxY;
-					//Config::getScreenCoordinates(minX, minY, maxX, maxY);
-					//this->voronoi.correctBorderPoints(minX, minY, maxX, maxY);
-
 					// Draw Voronoi graph and the triangulation.
-					this->drawer->drawFigures(VORONOI_DRAW);
+					Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispDelaunay->setColor(&DisplayService::setRed);
+                    dispManager.add(dispDelaunay);
+                    Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+                    dispVoronoi->setColor(&DisplayService::setLightBlue);
+                    dispManager.add(dispVoronoi);
+                    dispManager.process();
 
 					// Update execution status flags.
 					status.set(false, true, true, true, true, false);
@@ -979,7 +1003,7 @@ void Process::execute()
 			this->m.updateMenu();
 
 			// Clear screen.
-			this->drawer->drawFigures(CLEAR_SCREEN);
+            dispManager.process();
 
 			// Reset data.
 			break;
@@ -1004,7 +1028,7 @@ void Process::execute()
 			{
 				// Clear screen.
 				firstTime = false;
-				this->drawer->drawFigures(CLEAR_SCREEN);
+                dispManager.process();
 			}
 			break;
 		}
