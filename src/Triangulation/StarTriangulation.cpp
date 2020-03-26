@@ -95,7 +95,7 @@ bool StarTriangulation::convexHull()
 #endif
 
 			// Insert next point.
-			this->hull->add(point);
+			this->hull->add(*point);
 
 			// Get next edge.
 			index = currentEdge->getNext()-1;

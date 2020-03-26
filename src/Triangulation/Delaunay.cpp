@@ -498,7 +498,7 @@ bool Delaunay::convexHull()
 		Logging::write(true, Info);
 #endif
 		// Insert initial point (always in the convex hull).
-		this->hull.add(this->dcel->getRefPoint(this->dcel->getOrigin(0)-1));
+		this->hull.add(*this->dcel->getRefPoint(this->dcel->getOrigin(0)-1));
 
 		// Get an edge departing from 0 point.
 		edgeIndex = this->dcel->getPointEdge(0) - 1;
@@ -542,7 +542,7 @@ bool Delaunay::convexHull()
 		while (!finished)
 		{
 			// Insert next point.
-			this->hull.add(this->dcel->getRefPoint(this->dcel->getOrigin(edgeIndex)-1));
+			this->hull.add(*this->dcel->getRefPoint(this->dcel->getOrigin(edgeIndex)-1));
 			this->hullEdges.add(edgeIndex+1);
 #ifdef DEBUG_GET_CONVEX_HULL
 			Logging::buildText(__FUNCTION__, __FILE__, "Added point ");
@@ -931,7 +931,7 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 	int	 i=0;						// Loop counter.
 	int	 nFacesToAdd=0;				// Loop upper bound.
 	int	 edgeIndex=0;				// Edge index.
-	Set<int> intersectEdges(2);		// Set of edges that intersect convex hull.
+	vector<int> intersectEdges(2);		// Set of edges that intersect convex hull.
 	Point<TYPE> origin, dest;		// Line extreme points.
 	Set<int> extremeFaces(2);		// First and last faces in the path.
 
@@ -994,10 +994,10 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 			{
 				computePath = true;
 				//this->getInitialFaces(line, intersectEdges, initialFace, finalFace);
-				nFacesToAdd = intersectEdges.getNElements();
+				nFacesToAdd = intersectEdges.size();
 				for (i=0; i<nFacesToAdd ;i++)
 				{
-					edgeIndex = (*this->getConvexHullEdges()->at(*intersectEdges.at(i)))-1;
+					edgeIndex = (*this->getConvexHullEdges()->at(intersectEdges.at(i)))-1;
 					faceId = this->dcel->getFace(this->dcel->getTwin(edgeIndex)-1);
 					extremeFaces.add(faceId);
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH

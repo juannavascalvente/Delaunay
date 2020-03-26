@@ -403,7 +403,7 @@ void Draw::draw(Polygon *polygon)
 {
 	int		i=0;			// Loop counter.
 	Line	line;			// Temporary line.
-	Point<TYPE> *p, *q;		// Temporary points.
+	Point<TYPE> p, q;		// Temporary points.
 
 	this->setColor(GREEN);
 
@@ -417,7 +417,7 @@ void Draw::draw(Polygon *polygon)
 	{
 		p = polygon->at(i);
 		q = polygon->at(i+1);
-		line = Line(*p, *q);
+		line = Line(p, q);
 		this->draw(&line);
 #ifdef DEBUG_DRAW_POLYLINE
 		Logging::buildText(__FUNCTION__, __FILE__, "Drawing point " );
@@ -434,7 +434,7 @@ void Draw::draw(Polygon *polygon)
 	// Close polygon.
 	p = polygon->at(polygon->getNElements()-1);
 	q = polygon->at(0);
-	line = Line(*p, *q);
+	line = Line(p, q);
 	this->draw(&line);
 }
 
@@ -1136,7 +1136,7 @@ void Draw::drawFacesInfo(Dcel *dcel)
 #endif
 				// Add origin point to polygon.
 				origin = *dcel->getRefPoint(dcel->getOrigin(edgeIndex)-1);
-				polygon.add(&origin);
+				polygon.add(origin);
 
 				// Next edge in face.
 				edgeIndex = dcel->getNext(edgeIndex)-1;
