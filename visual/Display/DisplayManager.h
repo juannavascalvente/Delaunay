@@ -34,11 +34,15 @@ class DisplayManager
      */
     inline void reset()
     {
+        // Remove displayable objects
         for (auto item : vDisplayables)
         {
             delete item;
         }
         vDisplayables.clear();
+
+        // Reset displayable configuration
+        DisplayableConfigGenerator::reset();
     };
 
     void draw();

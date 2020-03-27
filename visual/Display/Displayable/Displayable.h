@@ -8,6 +8,8 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "DisplayableConfig.h"
+#include "DisplayableConfigGenerator.h"
 #include "DisplayService.h"
 #include "Point.h"
 #include "Dcel.h"
@@ -21,22 +23,38 @@ using namespace std;
 ***********************************************************************************************************************/
 class Displayable
 {
-    void (* f)();
+    /***********************************************************************************************************************
+    * Class members
+    ***********************************************************************************************************************/
+    DisplayableConfig config;
 
+    /***********************************************************************************************************************
+    * Private class methods
+    ***********************************************************************************************************************/
     virtual void runConfig()
     {
         cout << "RUNNING CONFIG " << endl;
-        if ((*f))
-        {
-            (*f)();
-        }
+        DisplayService::setColor(config.getColor());
+        DisplayService::setPointSize(config.getPointSize());
+        DisplayService::setLineSize(config.getLineSize());
     }
 public:
-    Displayable() : f(nullptr) {};
+    explicit Displayable(DisplayableConfig configIn) : config(configIn) {};
     virtual ~Displayable() = default;
+
+    /**
+     * @fn      display
+     * @brief   Sets displayable configuration
+     */
     virtual void display() { runConfig(); };
 
-    virtual void setColor(void (* fIn)()) { f = fIn; };
+    /**
+     * @fn      setPointSize
+     * @brief   Sets point size
+     *
+     * @param   fSize
+     */
+    void setPointSize(float fSize) { config.setPointSize(fSize); };
 };
 
 
@@ -48,7 +66,7 @@ class DispPoint : public Displayable
     Point<TYPE> point;
 
 public:
-    explicit DispPoint(Point<TYPE> &inPoint) : point(inPoint) {};
+    explicit DispPoint(Point<TYPE> &inPoint) : point(inPoint), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
 
     void display() override
     {
@@ -69,7 +87,7 @@ class DispPointsSet : public Displayable
 {
     vector<Point<TYPE>> vPoints;
 public:
-    explicit DispPointsSet(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn) {};
+    explicit DispPointsSet(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
 
     void display() override
     {
@@ -93,7 +111,7 @@ class DispPolygon : public Displayable
 {
     vector<Point<TYPE>> vPoints;
 public:
-    explicit DispPolygon(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn) {};
+    explicit DispPolygon(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
 
     void display() override
     {
@@ -125,14 +143,11 @@ class DispDcel : public Displayable
 {
     Dcel *dcel;
 public:
-    explicit DispDcel(Dcel *dcelIn) : dcel(dcelIn) {};
+    explicit DispDcel(Dcel *dcelIn) : dcel(dcelIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
 
     void display() override
     {
         Displayable::display();
-
-        // Start
-        DisplayService::startPoints();
 
         // Draw all edges.
         for (size_t edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)

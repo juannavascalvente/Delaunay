@@ -10,6 +10,7 @@
 ***********************************************************************************************************************/
 #include <GL/glut.h>
 #include "defines.h"
+#include "DisplayableColor.h"
 
 
 /***********************************************************************************************************************
@@ -63,12 +64,7 @@ public:
     /**
      * Set color functions.
      */
-    static void setRed()        { glColor3f(1.0, 0.0, 0.0); };
-    static void setGreen()      { glColor3f(0.0, 1.0, 0.0); };
-    static void setBlue()       { glColor3f(0.0, 0.0, 1.0); };
-    static void setLightBlue()  { glColor3f(0.0, 1.0, 1.0); };
-    static void setYellow()     { glColor3f(1.0, 1.0, 0.0); };
-    static void setWhite()      { glColor3f(1.0, 1.0, 1.0); };
+    static void setColor(const DisplayableColor &color) {glColor3f(color.getRed(), color.getGreen(),color.getBlue()); };
 
     /**
      * @fn          display

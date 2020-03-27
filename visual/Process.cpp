@@ -494,7 +494,7 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 		else
 		{
 			printf("PENDING TO IMPLEMENT.\n");
-			found = this->delaunay.findClosestPoint(p, Config::getNAnchors(), q, distance);
+			//found = this->delaunay.findClosestPoint(p, Config::getNAnchors(), q, distance);
 		}
 	}
 	else
@@ -657,9 +657,8 @@ void Process::execute()
 
 			if (!error)
 			{
-                // Draw set of points.
+                // Draw Delaunay triangulation
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                dispDelaunay->setColor(&DisplayService::setRed);
                 dispManager.add(dispDelaunay);
                 dispManager.process();
 
@@ -687,10 +686,8 @@ void Process::execute()
 				{
 					// Draw Voronoi graph and the triangulation.
 					Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                    dispDelaunay->setColor(&DisplayService::setRed);
                     dispManager.add(dispDelaunay);
                     Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
-                    dispVoronoi->setColor(&DisplayService::setLightBlue);
                     dispManager.add(dispVoronoi);
                     dispManager.process();
 
@@ -861,10 +858,19 @@ void Process::execute()
 			if (this->findClosest(point, closest, distance))
 			{
 				// Draw the triangulation, the point and the closest point.
-				points.add(point);
-				points.add(closest);
-				this->drawer->setPointsSet(&points);
-				this->drawer->drawFigures(CLOSESTPOINT_DRAW);
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager.add(dispDelaunay);
+
+                // Add points to display.
+                vector<Point<TYPE>> vPoints;
+                vPoints.push_back(point);
+                vPoints.push_back(closest);
+                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
+                closestPoints->setPointSize(3.0);
+                dispManager.add(closestPoints);
+
+                dispManager.process();
 			}
 			else
 			{
@@ -909,11 +915,18 @@ void Process::execute()
 			// Compute the two closest point in the set of points.
 			if (this->findTwoClosest(index1, index2))
 			{
-				// Draw the triangulation and the two closest points.
-				points.add(*this->dcel.getRefPoint(index1));
-				points.add(*this->dcel.getRefPoint(index2));
-				this->drawer->setPointsSet(&points);
-				this->drawer->drawFigures(TWOCLOSEST_DRAW);
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager.add(dispDelaunay);
+
+                // Add points to display.
+                vector<Point<TYPE>> vPoints;
+                vPoints.push_back(*this->dcel.getRefPoint(index1));
+                vPoints.push_back(*this->dcel.getRefPoint(index2));
+                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
+                dispManager.add(closestPoints);
+
+                dispManager.process();
 			}
 			else
 			{
@@ -963,17 +976,6 @@ void Process::execute()
 		case VORONOI_INFO:
 		{
 			this->drawer->drawFigures(VORONOI_INFO_DRAW);
-			break;
-		}
-		// Shake points in DCEL.
-		case SHAKE_POINTS:
-		{
-			// Shake set of points.
-			this->dcel.shake();
-
-			// Draw set of points.
-			this->drawer->drawFigures(SET_DRAW);
-
 			break;
 		}
 		// Write points to a flat file.

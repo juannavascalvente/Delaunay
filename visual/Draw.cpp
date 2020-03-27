@@ -130,19 +130,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			this->drawGabriel();
 			break;
 		}
-		// Draw the triangulation, the point and the closest point.
-		case CLOSESTPOINT_DRAW:
-		case TWOCLOSEST_DRAW:
-		{
-			this->drawDelaunay(INVALID);
-			this->setColor(YELLOW);
-			for (i=0; i<this->pointsSet->getNElements() ;i++)
-			{
-				p = *this->pointsSet->at(i);
-				this->draw(&p);
-			}
-			break;
-		}
 		// Draw the triangulation, the point and its face.
 		case FINDFACE_DRAW:
 		{
