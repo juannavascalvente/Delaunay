@@ -145,7 +145,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 		}
 		// Draw triangulation or Voronoi paths.
 		case TRIANGULATION_PATH_DRAW:
-		case VORONOI_PATH_DRAW:
 		{
 			this->drawDelaunay(INVALID);
 			this->setColor(YELLOW);
@@ -480,8 +479,10 @@ void Draw::drawEdge(int edgeIndex, Dcel *dcel)
 		this->startLine();
 
 		// Draw first point.
+        p1.print(cout);
 		glVertex2f(p1.getX(), p1.getY());
 
+        p2.print(cout);
 		// Draw second point.
 		glVertex2f(p2.getX(), p2.getY());
 

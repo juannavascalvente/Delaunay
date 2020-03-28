@@ -8,11 +8,12 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "Dcel.h"
 #include "DisplayableConfig.h"
 #include "DisplayableConfigGenerator.h"
 #include "DisplayService.h"
 #include "Point.h"
-#include "Dcel.h"
+#include "Polygon.h"
 
 #include <vector>
 using namespace std;
@@ -61,20 +62,22 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class DispPoint : public Displayable
+class DispPolyLine : public Displayable
 {
-    Point<TYPE> point;
-
+    vector<Point<TYPE>> vPoints;
 public:
-    explicit DispPoint(Point<TYPE> &inPoint) : point(inPoint), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
+    explicit DispPolyLine(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
 
     void display() override
     {
         Displayable::display();
 
-        // Draw point.
-        DisplayService::startPoints();
-        glVertex2f(point.getX(), point.getY());
+        // Draw line between all points.
+        DisplayService::startLine();
+        for (auto point : vPoints)
+        {
+            DisplayService::display(point.getX(), point.getY());
+        }
         DisplayService::finish();
     }
 };
@@ -132,6 +135,39 @@ public:
         DisplayService::display(vPoints.at(vPoints.size()-1).getX(), vPoints.at(vPoints.size()-1).getY());
         DisplayService::display(vPoints.at(0).getX(), vPoints.at(0).getY());
         DisplayService::finish();
+    }
+};
+
+
+class DispPolygonSet : public Displayable
+{
+    vector<Polygon> vPolygon;
+public:
+    explicit DispPolygonSet(vector<Polygon> &vPolygonIn) : vPolygon(vPolygonIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
+
+    void display() override
+    {
+        Displayable::display();
+
+        // Polygon iteration
+        for (auto polygon : vPolygon)
+        {
+            // Computes distance between every pair of points.
+            for (size_t i=0; i<polygon.getNElements()-1 ;i++)
+            {
+                // Draw line
+                DisplayService::startLine();
+                DisplayService::display(polygon.at(i).getX(), polygon.at(i).getY());
+                DisplayService::display(polygon.at(i+1).getX(), polygon.at(i+1).getY());
+                DisplayService::finish();
+            }
+
+            // Draw line
+            DisplayService::startLine();
+            DisplayService::display(polygon.at(polygon.getNElements()-1).getX(), polygon.at(polygon.getNElements()-1).getY());
+            DisplayService::display(polygon.at(0).getX(), polygon.at(0).getY());
+            DisplayService::finish();
+        }
     }
 };
 

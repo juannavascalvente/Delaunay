@@ -9,11 +9,12 @@
 * Includes
 ***********************************************************************************************************************/
 #include "Process.h"
-#include "DisplayableFactory.h"
+#include "DcelFigureBuilder.h"
+#include "DcelGenerator.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
-#include "DcelGenerator.h"
 #include "DelaunayIO.h"
+#include "DisplayableFactory.h"
 #include "GabrielIO.h"
 #include "VoronoiIO.h"
 
@@ -790,18 +791,12 @@ void Process::execute()
 				}
 				else
 				{
-					// PENDING https://github.com/juannavascalvente/Delaunay/issues/10
+					// TODO https://github.com/juannavascalvente/Delaunay/issues/10
 					Logging::buildText(__FUNCTION__, __FILE__,
 							"Voronoi path not implemented in normal triangulation");
 					Logging::write(true, Error);
+					error = true;
 				}
-
-				// Draw triangulation, Voronoi, segment and the path.
-				points.add(p1);
-				points.add(p2);
-				this->drawer->setPointsSet(&points);
-				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(VORONOI_PATH_DRAW, error);
 
 				// Check if an error must be printed.
 				if (error)
@@ -809,6 +804,40 @@ void Process::execute()
 					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path");
 					Logging::write(true, Error);
 				}
+				else
+                {
+                    // Draw the triangulation, the point and the closest point.
+                    // Add Delaunay triangulation
+                    Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispManager.add(dispDelaunay);
+
+                    // Add Voronoi
+                    Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+                    dispManager.add(dispVoronoi);
+
+                    // Add points whose path is drawn
+                    vector<Point<TYPE>> vPoints;
+                    vPoints.push_back(p1);
+                    vPoints.push_back(p2);
+                    dispManager.add(DisplayableFactory::createPolygon(vPoints));
+
+                    // Add path faces
+                    vector<Polygon> vPolygons;
+                    for (size_t i=0; i<faces.getNElements() ;i++)
+                    {
+                        vector<Point<TYPE>> vFacesPoints;
+                        DcelFigureBuilder::getFacePoints(*faces.at(i), *this->voronoi.getRefDcel(), vFacesPoints);
+
+                        Polygon polygon;
+                        for (auto point : vFacesPoints)
+                        {
+                            polygon.add(point);
+                        }
+                        vPolygons.push_back(polygon);
+                    }
+                    dispManager.add(DisplayableFactory::createPolygonSet(vPolygons));
+                    dispManager.process();
+                }
 			}
 			break;
 		}

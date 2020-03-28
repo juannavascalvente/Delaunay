@@ -22,11 +22,13 @@ class DisplayableFactory
 {
 public:
 
-    static DispPoint* createPoint(Point<TYPE> &point) { return new DispPoint(point); };
+    static DispPolyLine* createPolyLine(vector<Point<TYPE>> &vPointsIn) { return new DispPolyLine(vPointsIn); };
 
     static DispPointsSet* createPointsSet(vector<Point<TYPE>> &vPointsIn) { return new DispPointsSet(vPointsIn); };
 
     static DispPolygon* createPolygon(vector<Point<TYPE>> &vPointsIn) { return new DispPolygon(vPointsIn); };
+
+    static DispPolygonSet* createPolygonSet(vector<Polygon> &vPolygon) { return new DispPolygonSet(vPolygon); };
 
     static DispDcel* createDcel(Dcel *dcel) { return new DispDcel(dcel); };
 };
