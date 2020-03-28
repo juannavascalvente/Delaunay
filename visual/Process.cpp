@@ -28,7 +28,7 @@ typedef Point<TYPE> PointT;
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-Process::Process(int argc, char **argv, bool printData) : dispManager()
+Process::Process(int argc, char **argv, bool printData)
 {
 	string 	fileName;			// Configuration file name.
 
@@ -39,13 +39,15 @@ Process::Process(int argc, char **argv, bool printData) : dispManager()
 	// Check flag to print data to screen.
 	this->log = new Logging("log.txt", printData);
 
-	// Initialize drawer and menu.
-	this->drawer = this->drawer->getInstance(argc, argv, &this->dcel,
-                                             &this->delaunay,
-                                             &this->triangulation,
-                                             &this->voronoi,
-                                             &this->gabriel,
-                                             &this->status);
+    // Initialize drawer and menu.
+//    this->drawer = this->drawer->getInstance(argc, argv, &this->dcel,
+//                                             &this->delaunay,
+//                                             &this->triangulation,
+//                                             &this->voronoi,
+//                                             &this->gabriel,
+//                                             &this->status);
+    this->dispManager = new DisplayManager(argc, argv);
+
 	this->m = Menu(&this->status);
 
 	// Function to execute by GLUT.
@@ -56,6 +58,8 @@ Process::~Process()
 {
 	// Deallocate draw.
 	delete this->log;
+	delete this->dispManager;
+	
 	// PENDING Really necessary to call destructors.
 	if (this->status.isDelaunayCreated())
 	{
@@ -225,7 +229,7 @@ bool Process::readData(int option)
     {
         vPoints.push_back(*this->dcel.getRefPoint(i));
     }
-    dispManager.add(DisplayableFactory::createPointsSet(vPoints));
+    dispManager->add(DisplayableFactory::createPointsSet(vPoints));
 
 	return isSuccess;
 }
@@ -719,11 +723,11 @@ void Process::execute()
 //				else
 //				{
 //					// Draw set of points.
-//                    dispManager.process();
+//                    dispManager->process();
 //					//this->drawer->drawFigures(SET_DRAW);
 //				}
 
-                dispManager.process();
+                dispManager->process();
 
 				// Update menu entries.
 				m.updateMenu();
@@ -745,8 +749,8 @@ void Process::execute()
 			{
                 // Draw Delaunay triangulation
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                dispManager.add(dispDelaunay);
-                dispManager.process();
+                dispManager->add(dispDelaunay);
+                dispManager->process();
 
 				// Update menu entries.
 				m.updateMenu();
@@ -772,11 +776,11 @@ void Process::execute()
 				{
 					// Draw Voronoi graph and the triangulation.
 					Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                    dispManager.add(dispDelaunay);
+                    dispManager->add(dispDelaunay);
 
                     Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
-                    dispManager.add(dispVoronoi);
-                    dispManager.process();
+                    dispManager->add(dispVoronoi);
+                    dispManager->process();
 
 					// Update execution status flags.
 					status.set(false, true, true, true, true, false);
@@ -825,12 +829,12 @@ void Process::execute()
 
                     // Draw Delaunay
                     Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                    dispManager.add(dispDelaunay);
+                    dispManager->add(dispDelaunay);
 
                     // Add lines
-                    dispManager.add(DisplayableFactory::createPolyLine(vLines));
+                    dispManager->add(DisplayableFactory::createPolyLine(vLines));
 
-                    dispManager.process();
+                    dispManager->process();
 
 					// Update execution status flags.
 					status.set(false, true, true, true, true, true);
@@ -880,13 +884,13 @@ void Process::execute()
                 {
                     // Add Delaunay triangulation
                     Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                    dispManager.add(dispDelaunay);
+                    dispManager->add(dispDelaunay);
 
                     // Add points whose path is drawn
                     vector<Point<TYPE>> vPoints;
                     vPoints.push_back(p1);
                     vPoints.push_back(p2);
-                    dispManager.add(DisplayableFactory::createPolygon(vPoints));
+                    dispManager->add(DisplayableFactory::createPolygon(vPoints));
 
                     // Add path faces
                     vector<Polygon> vPolygons;
@@ -902,8 +906,8 @@ void Process::execute()
                         }
                         vPolygons.push_back(polygon);
                     }
-                    dispManager.add(DisplayableFactory::createPolygonSet(vPolygons));
-                    dispManager.process();
+                    dispManager->add(DisplayableFactory::createPolygonSet(vPolygons));
+                    dispManager->process();
 				}
 			}
 			break;
@@ -948,17 +952,17 @@ void Process::execute()
                 {
                     // Add Delaunay triangulation
                     Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                    dispManager.add(dispDelaunay);
+                    dispManager->add(dispDelaunay);
 
                     // Add Voronoi
                     Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
-                    dispManager.add(dispVoronoi);
+                    dispManager->add(dispVoronoi);
 
                     // Add points whose path is drawn
                     vector<Point<TYPE>> vPoints;
                     vPoints.push_back(p1);
                     vPoints.push_back(p2);
-                    dispManager.add(DisplayableFactory::createPolygon(vPoints));
+                    dispManager->add(DisplayableFactory::createPolygon(vPoints));
 
                     // Add path faces
                     vector<Polygon> vPolygons;
@@ -974,8 +978,8 @@ void Process::execute()
                         }
                         vPolygons.push_back(polygon);
                     }
-                    dispManager.add(DisplayableFactory::createPolygonSet(vPolygons));
-                    dispManager.process();
+                    dispManager->add(DisplayableFactory::createPolygonSet(vPolygons));
+                    dispManager->process();
                 }
 			}
 			break;
@@ -1001,8 +1005,8 @@ void Process::execute()
                 // Add points to display manager.
                 vector<Point<TYPE>> vPoints;
                 hull->getPoints(vPoints);
-                dispManager.add(DisplayableFactory::createPolygon(vPoints));
-                dispManager.process();
+                dispManager->add(DisplayableFactory::createPolygon(vPoints));
+                dispManager->process();
             }
 			else
 			{
@@ -1028,7 +1032,7 @@ void Process::execute()
 				// Draw the triangulation, the point and the closest point.
                 // Add Delaunay triangulation
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                dispManager.add(dispDelaunay);
+                dispManager->add(dispDelaunay);
 
                 // Add points to display.
                 vector<Point<TYPE>> vPoints;
@@ -1036,9 +1040,9 @@ void Process::execute()
                 vPoints.push_back(closest);
                 Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
                 closestPoints->setPointSize(3.0);
-                dispManager.add(closestPoints);
+                dispManager->add(closestPoints);
 
-                dispManager.process();
+                dispManager->process();
 			}
 			else
 			{
@@ -1063,14 +1067,14 @@ void Process::execute()
 				// Draw the triangulation, the point and its face.
                 // Add Delaunay triangulation
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                dispManager.add(dispDelaunay);
+                dispManager->add(dispDelaunay);
 
                 // Add face
                 if (!isImaginaryFace)
                 {
                     vector<Point<TYPE>> vFacesPoints;
                     DcelFigureBuilder::getFacePoints(faceId, this->dcel, vFacesPoints);
-                    dispManager.add(DisplayableFactory::createPolygon(vFacesPoints));
+                    dispManager->add(DisplayableFactory::createPolygon(vFacesPoints));
                 }
 
                 // Add point to draw
@@ -1078,9 +1082,9 @@ void Process::execute()
                 vPoints.push_back(point);
                 Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
                 closestPoints->setPointSize(3.0);
-                dispManager.add(closestPoints);
+                dispManager->add(closestPoints);
 
-                dispManager.process();
+                dispManager->process();
 			}
 			else
 			{
@@ -1099,16 +1103,16 @@ void Process::execute()
 			{
                 // Add Delaunay triangulation
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                dispManager.add(dispDelaunay);
+                dispManager->add(dispDelaunay);
 
                 // Add points to display.
                 vector<Point<TYPE>> vPoints;
                 vPoints.push_back(*this->dcel.getRefPoint(index1));
                 vPoints.push_back(*this->dcel.getRefPoint(index2));
                 Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
-                dispManager.add(closestPoints);
+                dispManager->add(closestPoints);
 
-                dispManager.process();
+                dispManager->process();
 			}
 			else
 			{
@@ -1125,9 +1129,9 @@ void Process::execute()
 			{
                 // Add Delaunay triangulation filtering edges
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel, Config::getMinLengthEdge());
-                dispManager.add(dispDelaunay);
+                dispManager->add(dispDelaunay);
 
-                dispManager.process();
+                dispManager->process();
             }
 			break;
 		}
@@ -1161,13 +1165,13 @@ void Process::execute()
 
                 // Add Delaunay triangulation
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                dispManager.add(dispDelaunay);
+                dispManager->add(dispDelaunay);
 
                 // Add points to display.
                 Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
-                dispManager.add(circles);
+                dispManager->add(circles);
 
-                dispManager.process();
+                dispManager->process();
 			}
 			break;
 		}
@@ -1212,13 +1216,13 @@ void Process::execute()
 
                 // Add Delaunay triangulation
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-                dispManager.add(dispDelaunay);
+                dispManager->add(dispDelaunay);
 
                 // Add points to display.
                 Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
-                dispManager.add(circles);
+                dispManager->add(circles);
 
-                dispManager.process();
+                dispManager->process();
 			}
 			break;
 		}
@@ -1227,24 +1231,24 @@ void Process::execute()
 		{
             // Add Delaunay triangulation
             Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
-            dispManager.add(dispDelaunay);
+            dispManager->add(dispDelaunay);
 
             vector<Text> vPointsInfo;
             this->createDcelPointsInfo(this->dcel, vPointsInfo);
             Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
-            dispManager.add(dispPointsInfo);
+            dispManager->add(dispPointsInfo);
 
             vector<Text> vEdgesInfo;
             this->createDcelEdgeInfo(this->dcel, vEdgesInfo);
             Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
-            dispManager.add(dispEdgesInfo);
+            dispManager->add(dispEdgesInfo);
 
             vector<Text> vFacesInfo;
             this->createDcelFacesInfo(this->dcel, vFacesInfo);
             Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
-            dispManager.add(dispFacesInfo);
+            dispManager->add(dispFacesInfo);
 
-            dispManager.process();
+            dispManager->process();
 			break;
 		}
 		// Print Voronoi data.
@@ -1252,24 +1256,24 @@ void Process::execute()
 		{
             // Add Delaunay triangulation
             Displayable *dispDelaunay = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
-            dispManager.add(dispDelaunay);
+            dispManager->add(dispDelaunay);
 
             vector<Text> vPointsInfo;
             this->createDcelPointsInfo(*this->voronoi.getRefDcel(), vPointsInfo);
             Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
-            dispManager.add(dispPointsInfo);
+            dispManager->add(dispPointsInfo);
 
             vector<Text> vEdgesInfo;
             this->createDcelEdgeInfo(*this->voronoi.getRefDcel(), vEdgesInfo);
             Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
-            dispManager.add(dispEdgesInfo);
+            dispManager->add(dispEdgesInfo);
 
             vector<Text> vFacesInfo;
             this->createDcelFacesInfo(*this->voronoi.getRefDcel(), vFacesInfo);
             Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
-            dispManager.add(dispFacesInfo);
+            dispManager->add(dispFacesInfo);
 
-            dispManager.process();
+            dispManager->process();
 			break;
 		}
 		// Write points to a flat file.
@@ -1312,7 +1316,7 @@ void Process::execute()
 			this->m.updateMenu();
 
 			// Clear screen.
-            dispManager.process();
+            dispManager->process();
 
 			// Reset data.
 			break;
@@ -1337,7 +1341,7 @@ void Process::execute()
 			{
 				// Clear screen.
 				firstTime = false;
-                dispManager.process();
+                dispManager->process();
 			}
 			break;
 		}

@@ -48,7 +48,11 @@ class DisplayManager
     void draw();
 public:
 
-    DisplayManager() : vDisplayables(0) {};
+    DisplayManager(int argc, char **argv) : vDisplayables(0)
+    {
+        // Initialize display
+        DisplayService::init(argc, argv);
+    };
 
     void process();
 

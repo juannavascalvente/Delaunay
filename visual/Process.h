@@ -14,7 +14,6 @@
 ***********************************************************************************************************************/
 #include "DisplayManager.h"
 
-#include "Draw.h"
 #include "Menu.h"
 #include "Status.h"
 #include "Config.h"
@@ -36,14 +35,13 @@ class Process
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    DisplayManager dispManager;
+    DisplayManager *dispManager;
 
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
 	Menu 			m;				// Menu object.
 	Status 			status;			// Current status.
-	Draw			*drawer;		// Pointer to drawer instance.
 
 	Dcel			dcel;			// Dcel data.
 	Delaunay		delaunay;		// Delaunay data.

@@ -19,6 +19,8 @@
 class DisplayService
 {
 public:
+    static void init(int argc, char **argv);
+
     /**
      *
      */
