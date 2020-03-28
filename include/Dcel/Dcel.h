@@ -75,7 +75,7 @@ public:
 	  Constructor/Destructor.
 	------------------------------------------------------------------------*/
 	Dcel();
-	explicit Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
+	Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
 	~Dcel();
 
 	/*------------------------------------------------------------------------

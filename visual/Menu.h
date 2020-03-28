@@ -39,7 +39,6 @@
 #define DCEL_INFO         		71
 #define VORONOI_INFO          	72
 #define CLEAR               	80
-#define	SHAKE_POINTS			81
 #define	CHECK_DCEL  			82
 #define ZOOM 					90
 #define QUIT                	100

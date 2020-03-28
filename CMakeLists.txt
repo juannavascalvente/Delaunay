@@ -42,6 +42,8 @@ file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/statistics
         ${BUILD_PATH}/test
         ${BUILD_PATH}/visual
+        ${BUILD_PATH}/visual/Display
+        ${BUILD_PATH}/visual/Display/Displayable
         )
 
 file(GLOB DELAUNAY_SRC_FILES
@@ -53,6 +55,8 @@ file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/statistics/*.cpp
         ${BUILD_PATH}/test/*.cpp
         ${BUILD_PATH}/visual/*.cpp
+        ${BUILD_PATH}/visual/Display/*.cpp
+        ${BUILD_PATH}/visual/Display/Displayable/*.cpp
         )
 
 ################################################### GTest #############################################################

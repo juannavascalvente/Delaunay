@@ -8,52 +8,96 @@
 #ifndef INCLUDE_POLYGON_H_
 #define INCLUDE_POLYGON_H_
 
+
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Line.h"
 #include "Point.h"
-#include "Set.h"
 
-typedef Point<TYPE> PointSet;
+#include <vector>
+using namespace std;
 
-//****************************************************************************
-//                           	POLYGON CLASS
-//****************************************************************************
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class Polygon
 {
-	//------------------------------------------------------------------------
-	// Attributes
-	//------------------------------------------------------------------------
-	Set<PointSet>	set;		// Set of points.
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+	vector<Point<TYPE>> vPoints;
 
 public:
-	//------------------------------------------------------------------------
-	// Constructor/Destructor
-	//------------------------------------------------------------------------
-	Polygon(){};
-	Polygon(int n) : set(n) {};
-	Polygon(int n, Point<TYPE> *points);
-	virtual ~Polygon() {};
 
-	//------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
-	inline int getNElements() { return(this->set.getNElements()); };
-	inline int getSize() { return(this->set.getSize()); };
-	inline Point<TYPE>* at(int index) { return(this->set.at(index)); };
+    /*******************************************************************************************************************
+    * Constructor/Destructor
+    *******************************************************************************************************************/
+	Polygon() = default;
+	explicit Polygon(int n) : vPoints(n) {};
+	virtual ~Polygon() = default;
 
-	// Modification set functions.
-	inline void	add(PointSet *p) { this->set.add(*p);};
-	inline void reset() { this->set.reset();};
-	inline void resize(int size, bool copy);
+    /*******************************************************************************************************************
+    * Public methods
+    *******************************************************************************************************************/
+	inline int getNElements() { return(vPoints.size()); };
+    inline void getPoints(vector<Point<TYPE>> &vPointsOut) { vPointsOut = vPoints; };
+	inline Point<TYPE> at(size_t szIdx) { return(vPoints.at(szIdx)); };
+	inline void	add(Point<TYPE> &p) { vPoints.push_back(p); };
+	inline void reset() { vPoints.clear(); };
 
-	// Figures functions.
-	virtual double	area();
-	double 	perimeter();
+    /***************************************************************************
+    * Name: 	centroid
+    * IN:		NONE
+    * OUT:		center		polygon centroid.
+    * RETURN:	NONE
+    * GLOBAL:	NONE
+    * Description: 	computes the centroid of the polygon.
+    ***************************************************************************/
 	void 	centroid(Point<TYPE> &center);
-	bool	getIntersections(Line &line, Set<int> &set);
+
+    /***************************************************************************
+    * Name: 	getIntersections
+    * IN:		line		line to check
+    * OUT:		set			set of edges that intersect line.
+    * RETURN:	true 		if intersect.
+    * 			false		i.o.c.
+    * GLOBAL:	NONE
+    * Description: 	gets the set of edges(two maximum) that intersects the
+    * 				polygon.
+    ***************************************************************************/
+	bool	getIntersections(Line &line, vector<int> &intersection);
+
+    /***************************************************************************
+    * Name: 	isInternal
+    * IN:		p			point to check
+    * OUT:		NONE
+    * RETURN:	true 		if point is interior to polygon.
+    * 			false		i.o.c.
+    * GLOBAL:	NONE
+    * Description: 	Checks if the input point is interior to the polygon
+    ***************************************************************************/
 	bool	isInternal(Point<TYPE> &p);
 
-	// I/O functions.
+    /***************************************************************************
+    * Name: 	print
+    * IN:		out			output stream
+    * OUT:		NONE
+    * RETURN:	NONE
+    * GLOBAL:	NONE
+    * Description: 	print the set of points.
+    ***************************************************************************/
 	void 	print(std::ostream& out);
+
+    /***************************************************************************
+    * Name: 	toStr
+    * IN:		NONE
+    * OUT:		NONE
+    * RETURN:	string		set of points as text.
+    * GLOBAL:	NONE
+    * Description: 	convert to string the set of points
+    ***************************************************************************/
 	string 	toStr();
 };
 

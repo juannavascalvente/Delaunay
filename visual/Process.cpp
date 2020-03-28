@@ -9,23 +9,28 @@
 * Includes
 ***********************************************************************************************************************/
 #include "Process.h"
+#include "DcelFigureBuilder.h"
+#include "DcelGenerator.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
-#include "DcelGenerator.h"
 #include "DelaunayIO.h"
+#include "DisplayableFactory.h"
 #include "GabrielIO.h"
 #include "VoronoiIO.h"
 
 #include <GL/glut.h>
 
 
+/***********************************************************************************************************************
+* Static members
+***********************************************************************************************************************/
 Process *Process::instance = nullptr;
 typedef Point<TYPE> PointT;
 
 
-//------------------------------------------------------------------------
-// Constructors / Destructor.
-//------------------------------------------------------------------------
+/***********************************************************************************************************************
+* Public methods definitions
+***********************************************************************************************************************/
 Process::Process(int argc, char **argv, bool printData)
 {
 	string 	fileName;			// Configuration file name.
@@ -37,23 +42,21 @@ Process::Process(int argc, char **argv, bool printData)
 	// Check flag to print data to screen.
 	this->log = new Logging("log.txt", printData);
 
-	// Initialize drawer and menu.
-	this->drawer = this->drawer->getInstance(argc, argv, &this->dcel,
-                                             &this->delaunay,
-                                             &this->triangulation,
-                                             &this->voronoi,
-                                             &this->gabriel,
-                                             &this->status);
+    this->dispManager = new DisplayManager(argc, argv);
+
 	this->m = Menu(&this->status);
 
 	// Function to execute by GLUT.
 	glutDisplayFunc(executeWrapper);
 }
 
+
 Process::~Process()
 {
 	// Deallocate draw.
 	delete this->log;
+	delete this->dispManager;
+	
 	// PENDING Really necessary to call destructors.
 	if (this->status.isDelaunayCreated())
 	{
@@ -72,17 +75,6 @@ Process::~Process()
 }
 
 
-//------------------------------------------------------------------------
-// Public functions.
-//------------------------------------------------------------------------
-/***************************************************************************
-* Name: start
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: starts infinite loop.
-***************************************************************************/
 void Process::start()
 {
 	// GLUT main function.
@@ -90,19 +82,11 @@ void Process::start()
 }
 
 
-/***************************************************************************
-* Name: setInstance
-* IN:		process		instance to be executed by main loop.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	"instance" points to "process"
-* Description: sets "instance" to the object that is going to be executed
-* 				by the main loop process.
-***************************************************************************/
 void Process::setInstance(Process *process)
 {
 	instance = process;
 }
+
 
 /***************************************************************************
 * Name: executeWrapper
@@ -136,7 +120,7 @@ void Process::executeWrapper()
 ***************************************************************************/
 bool Process::readData(int option)
 {
-	bool success=true; 		// Return value.
+	bool isSuccess; 		// Return value.
 
 	// Check option to generate/read set.
 	switch (option)
@@ -144,15 +128,15 @@ bool Process::readData(int option)
 		// Generate random set.
 		case RANDOMLY:
 		{
-		    success = DcelGenerator::generateRandom(Config::getNPoints(), this->dcel);
-			this->status.set(false, success, false, false, false, false);
+            isSuccess = DcelGenerator::generateRandom(Config::getNPoints(), this->dcel);
+            this->status.set(false, isSuccess, false, false, false, false);
 			break;
 		}
 		// Generate clusters set.
 		case CLUSTER:
 		{
-            success = DcelGenerator::generateClusters(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), this->dcel);
-			this->status.set(false, success, false, false, false, false);
+            isSuccess = DcelGenerator::generateClusters(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), this->dcel);
+			this->status.set(false, isSuccess, false, false, false, false);
 			break;
 		}
 		// Read set from flat file.
@@ -162,56 +146,70 @@ bool Process::readData(int option)
 			// Read points from flat file.
 			if(option == READ_POINTS_FLAT_FILE)
 			{
-				success = DcelReader::readPoints(Config::getInFlatFilename(), true, this->dcel);
+                isSuccess = DcelReader::readPoints(Config::getInFlatFilename(), true, this->dcel);
 			}
 			// Read points from DCEL file.
 			else
 			{
-				success = DcelReader::readPoints(Config::getInDCELFilename(), false, this->dcel);
+                isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, this->dcel);
 			}
-			this->status.set(false, success, false, false, false, false);
+			this->status.set(false, isSuccess, false, false, false, false);
 			break;
 		}
-		// Read dcel file.
-		case READ_DCEL:
-		{
-			// PENDING CHECK IF A DCEL IS CONSISTENT?
-			success = DcelReader::read(Config::getInDCELFilename(), false, this->dcel);
-			this->delaunay.setDCEL(&this->dcel);
-			this->status.set(false, true, true, false, false, false);
-			break;
-		}
-		// Read Delaunay incremental algorithm files.
-		case READ_DELAUNAY:
-		{
-			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
-			this->delaunay.setDCEL(&this->dcel);
-			success = DelaunayIO::read(Config::getInDCELFilename(),
-                                       Config::getInGraphFilename(), this->delaunay);
-			this->status.set(false, success, success, success, false, false);
-			this->delaunay.setAlgorithm(INCREMENTAL);
-			break;
-		}
-		// Read Voronoi file.
-		case READ_VORONOI:
-		{
-			// PENDING: What to allow in menu if only voronoi is read.
-			//success = this->voronoi.read(Config::getInVoronoiFilename());
-			//this->status.set(false, true, !success, !success, true, false);
-			cout << "NOT IMPLEMENTED YET" << endl;
-			break;
-		}
-		// Read Gabriel file.
-		default:
-		{
-			// PENDING: What to allow in menu if only voronoi is read.
-			success = GabrielIO::readBinary(Config::getOutGabrielFilename(), this->gabriel);
-			this->status.setGabrielCreated(true);
-			break;
-		}
+//		// Read dcel file.
+//		case READ_DCEL:
+//		{
+//			// PENDING CHECK IF A DCEL IS CONSISTENT?
+//			success = DcelReader::read(Config::getInDCELFilename(), false, this->dcel);
+//			this->delaunay.setDCEL(&this->dcel);
+//			this->status.set(false, true, true, false, false, false);
+//			break;
+//		}
+//		// Read Delaunay incremental algorithm files.
+//		case READ_DELAUNAY:
+//		{
+//			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
+//			this->delaunay.setDCEL(&this->dcel);
+//			success = DelaunayIO::read(Config::getInDCELFilename(),
+//                                       Config::getInGraphFilename(), this->delaunay);
+//			this->status.set(false, success, success, success, false, false);
+//			this->delaunay.setAlgorithm(INCREMENTAL);
+//			break;
+//		}
+//		// Read Voronoi file.
+//		case READ_VORONOI:
+//		{
+//			// PENDING: What to allow in menu if only voronoi is read.
+//			//success = this->voronoi.read(Config::getInVoronoiFilename());
+//			//this->status.set(false, true, !success, !success, true, false);
+//			cout << "NOT IMPLEMENTED YET" << endl;
+//			break;
+//		}
+//		// Read Gabriel file.
+//		default:
+//		{
+//			// PENDING: What to allow in menu if only voronoi is read.
+//			success = GabrielIO::readBinary(Config::getOutGabrielFilename(), this->gabriel);
+//			this->status.setGabrielCreated(true);
+//			break;
+//		}
+        default:
+        {
+            // PENDING: What to allow in menu if only voronoi is read.
+            isSuccess = false;
+            break;
+        }
 	}
 
-	return(success);
+	// Add figure display.
+    vector<Point<TYPE>> vPoints;
+    for (size_t i=0; i< Config::getNPoints(); i++)
+    {
+        vPoints.push_back(*this->dcel.getRefPoint(i));
+    }
+    dispManager->add(DisplayableFactory::createPointsSet(vPoints));
+
+	return isSuccess;
 }
 
 /***************************************************************************
@@ -419,19 +417,18 @@ bool Process::findTwoClosest(int &index1, int &index2)
 }
 
 
-/***************************************************************************
-* Name: 	findTwoClosest
-* IN:		index		index of the point whose face must be located.
-* OUT:		faceId		face id that surrounds input index point.
-* RETURN:	true		if found.
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	finds the two closest points in the set of points. If the
-* 				Delaunay triangulation exists the uses the incremental
-* 				algorithm to locate the points. Otherwise uses a brute force
-* 				algorithm.
-***************************************************************************/
-bool Process::findFace(Point<TYPE> &point, int &faceId)
+/**
+ * @fn      findFace
+ * @brief   Find the face where the input point falls into
+ *
+ * @param   point       (IN)    Point to find
+ * @param   faceId      (OUT)   Face where point falls into
+ * @param   isImaginary (OUT)   Flag for imaginary faces (incremental algorithm)
+ *
+ * @return  true if point found
+ *          false otherwise
+ */
+bool Process::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 {
 	bool found;		// Return value.
 
@@ -440,7 +437,7 @@ bool Process::findFace(Point<TYPE> &point, int &faceId)
 	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
 	if (this->status.isDelaunayCreated())
 	{
-		found = this->delaunay.findFace(point, faceId);
+		found = this->delaunay.findFace(point, faceId, isImaginary);
 	}
 	else
 	{
@@ -465,7 +462,7 @@ bool Process::findFace(Point<TYPE> &point, int &faceId)
 ***************************************************************************/
 bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 {
-	bool found;		    // Return value.
+	bool found=false;		    // Return value.
 	int	pointIndex=0;	// Index of the closest point.
 
 	// Check if Delaunay triangulation computed.
@@ -479,7 +476,7 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 		else
 		{
 			printf("PENDING TO IMPLEMENT.\n");
-			found = this->delaunay.findClosestPoint(p, Config::getNAnchors(), q, distance);
+			//found = this->delaunay.findClosestPoint(p, Config::getNAnchors(), q, distance);
 		}
 	}
 	else
@@ -488,7 +485,7 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 		found = this->triangulation.findClosestPoint(p, q, distance);
 	}
 
-	return(found);
+	return found;
 }
 
 /***************************************************************************
@@ -558,6 +555,93 @@ void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
 	}
 }
 
+
+void Process::createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
+{
+    char	text_Info[50];
+
+    // Draw all points of the set.
+    for (size_t i=0; i < dcelIn.getNVertex() ; i++)
+    {
+        // Get and draw i-point.
+        Point<TYPE> *point = dcelIn.getRefPoint(i);
+        string strText = std::to_string(i+1);
+
+        Text text(point->getX(), point->getY(), strText);
+        info.push_back(text);
+    }
+}
+
+
+void Process::createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info)
+{
+    // Loop all edges.
+    for (size_t edgeIndex=0; edgeIndex<dcelIn.getNEdges() ;edgeIndex++)
+    {
+        // Check if twin edge already visited.
+        if ((edgeIndex+1) < dcelIn.getTwin(edgeIndex))
+        {
+            // Check edge is real.
+            if (!dcelIn.hasNegativeVertex((int) edgeIndex+1))
+            {
+                // Get edge extreme points.
+                Point<TYPE> origin, dest;	// Extreme points of edges.
+                dcelIn.getEdgePoints(edgeIndex, origin, dest);
+
+                // Compute middle point of edge.
+                Point<TYPE> middle;         // Middle point of the edge.
+                Point<TYPE>::middlePoint(&origin, &dest, &middle);
+
+                // Print information.
+                string strText = std::to_string(edgeIndex+1) + " - " + std::to_string(dcelIn.getTwin(edgeIndex));
+
+                Text text(middle.getX(), middle.getY(), strText);
+                info.push_back(text);
+            }
+        }
+    }
+}
+
+
+void Process::createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
+{
+    // Loop all faces (skip external face).
+    for (size_t faceId=0; faceId<dcelIn.getNFaces() ;faceId++)
+    {
+        // If any vertex is imaginary then face is not drawn.
+        if (!dcelIn.imaginaryFace(faceId))
+        {
+            Polygon polygon;
+
+            // Get edge in current face.
+            size_t firstEdgeIndex = dcelIn.getFaceEdge(faceId)-1;
+            size_t edgeIndex = firstEdgeIndex;
+            do
+            {
+                // Add origin point to polygon.
+                Point<TYPE> origin;			// Edge origin point.
+                origin = *dcelIn.getRefPoint(dcelIn.getOrigin(edgeIndex)-1);
+                polygon.add(origin);
+
+                // Next edge in face.
+                edgeIndex = dcelIn.getNext(edgeIndex)-1;
+            } while(edgeIndex != firstEdgeIndex);
+
+            // Compute face centroid.
+            Point<TYPE> center;			// Middle point of the edge.
+            polygon.centroid(center);
+            polygon.reset();
+
+            // Print information.
+            string strText = std::to_string(faceId);
+
+            Text text(center.getX(), center.getY(), strText);
+            info.push_back(text);
+        }
+    }
+}
+
+
 /***************************************************************************
 * Name: execute
 * IN:		NONE
@@ -603,22 +687,25 @@ void Process::execute()
 			// Check option to generate/read set.
 			if (this->readData(option))
 		    {
-				if (this->status.isVoronoiCreated())
-				{
-					// Clear screen.
-					this->drawer->drawFigures(VORONOI_DRAW);
-				}
-				if (this->status.isDelaunayCreated() ||
-					this->status.isTriangulationCreated())
-				{
-					// Draw triangulation.
-					this->drawer->drawFigures(TRIANGULATION_DRAW);
-				}
-				else
-				{
-					// Draw set of points.
-					this->drawer->drawFigures(SET_DRAW);
-				}
+//				if (this->status.isVoronoiCreated())
+//				{
+//					// Clear screen.
+//					this->drawer->drawFigures(VORONOI_DRAW);
+//				}
+//				if (this->status.isDelaunayCreated() ||
+//					this->status.isTriangulationCreated())
+//				{
+//					// Draw triangulation.
+//					this->drawer->drawFigures(TRIANGULATION_DRAW);
+//				}
+//				else
+//				{
+//					// Draw set of points.
+//                    dispManager->process();
+//					//this->drawer->drawFigures(SET_DRAW);
+//				}
+
+                dispManager->process();
 
 				// Update menu entries.
 				m.updateMenu();
@@ -638,8 +725,10 @@ void Process::execute()
 
 			if (!error)
 			{
-                // Draw triangulation.
-				this->drawer->drawFigures(TRIANGULATION_DRAW);
+                // Draw Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager->add(dispDelaunay);
+                dispManager->process();
 
 				// Update menu entries.
 				m.updateMenu();
@@ -663,12 +752,13 @@ void Process::execute()
 				// Check error and update status.
 				if (!error)
 				{
-					//int minX, minY, maxX, maxY;
-					//Config::getScreenCoordinates(minX, minY, maxX, maxY);
-					//this->voronoi.correctBorderPoints(minX, minY, maxX, maxY);
-
 					// Draw Voronoi graph and the triangulation.
-					this->drawer->drawFigures(VORONOI_DRAW);
+					Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispManager->add(dispDelaunay);
+
+                    Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+                    dispManager->add(dispVoronoi);
+                    dispManager->process();
 
 					// Update execution status flags.
 					status.set(false, true, true, true, true, false);
@@ -690,7 +780,39 @@ void Process::execute()
 				if (!error)
 				{
 					// Draw Voronoi graph and the triangulation.
-					this->drawer->drawFigures(GABRIEL_DRAW);
+                    Point<TYPE> *vertex1;	    // First vertex.
+                    Point<TYPE> *vertex2;	    // Second vertex.
+                    Dcel	*dcelRef;
+
+                    // Get reference to gabriel dcel.
+                    dcelRef = gabriel.getDcel();
+
+                    // Draw Gabriel edges.
+                    vector<Line> vLines;
+                    for (size_t edgeIndex=0; edgeIndex<gabriel.getSize() ;edgeIndex++)
+                    {
+                        // Check if current edge mamtches Gabriel restriction.s
+                        if (gabriel.isSet(edgeIndex))
+                        {
+                            // Get origin vertex of edge.
+                            vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
+
+                            // Get destination vertex of edge.
+                            vertex2 = dcelRef->getRefPoint(dcelRef->getOrigin(dcelRef->getTwin(edgeIndex)-1)-1);
+
+                            Line line(*vertex1, *vertex2);
+                            vLines.push_back(line);
+                        }
+                    }
+
+                    // Draw Delaunay
+                    Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispManager->add(dispDelaunay);
+
+                    // Add lines
+                    dispManager->add(DisplayableFactory::createPolyLine(vLines));
+
+                    dispManager->process();
 
 					// Update execution status flags.
 					status.set(false, true, true, true, true, true);
@@ -730,18 +852,40 @@ void Process::execute()
 					Logging::write(true, Error);
 				}
 
-				// Draw triangulation, segment and if no error, the path.
-				points.add(p1);
-				points.add(p2);
-				this->drawer->setPointsSet(&points);
-				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(TRIANGULATION_PATH_DRAW, error);
-
 				// Print error message.
 				if (error)
 				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Delaunay path");
-					Logging::write(true, Error);
+                    Logging::buildText(__FUNCTION__, __FILE__, "Error computing Delaunay path");
+                    Logging::write(true, Error);
+                }
+				else
+                {
+                    // Add Delaunay triangulation
+                    Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispManager->add(dispDelaunay);
+
+                    // Add points whose path is drawn
+                    vector<Point<TYPE>> vPoints;
+                    vPoints.push_back(p1);
+                    vPoints.push_back(p2);
+                    dispManager->add(DisplayableFactory::createPolygon(vPoints));
+
+                    // Add path faces
+                    vector<Polygon> vPolygons;
+                    for (size_t i=0; i<faces.getNElements() ;i++)
+                    {
+                        vector<Point<TYPE>> vFacesPoints;
+                        DcelFigureBuilder::getFacePoints(*faces.at(i), this->dcel, vFacesPoints);
+
+                        Polygon polygon;
+                        for (auto point : vFacesPoints)
+                        {
+                            polygon.add(point);
+                        }
+                        vPolygons.push_back(polygon);
+                    }
+                    dispManager->add(DisplayableFactory::createPolygonSet(vPolygons));
+                    dispManager->process();
 				}
 			}
 			break;
@@ -769,18 +913,12 @@ void Process::execute()
 				}
 				else
 				{
-					// PENDING https://github.com/juannavascalvente/Delaunay/issues/10
+					// TODO https://github.com/juannavascalvente/Delaunay/issues/10
 					Logging::buildText(__FUNCTION__, __FILE__,
 							"Voronoi path not implemented in normal triangulation");
 					Logging::write(true, Error);
+					error = true;
 				}
-
-				// Draw triangulation, Voronoi, segment and the path.
-				points.add(p1);
-				points.add(p2);
-				this->drawer->setPointsSet(&points);
-				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(VORONOI_PATH_DRAW, error);
 
 				// Check if an error must be printed.
 				if (error)
@@ -788,6 +926,39 @@ void Process::execute()
 					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path");
 					Logging::write(true, Error);
 				}
+				else
+                {
+                    // Add Delaunay triangulation
+                    Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispManager->add(dispDelaunay);
+
+                    // Add Voronoi
+                    Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+                    dispManager->add(dispVoronoi);
+
+                    // Add points whose path is drawn
+                    vector<Point<TYPE>> vPoints;
+                    vPoints.push_back(p1);
+                    vPoints.push_back(p2);
+                    dispManager->add(DisplayableFactory::createPolygon(vPoints));
+
+                    // Add path faces
+                    vector<Polygon> vPolygons;
+                    for (size_t i=0; i<faces.getNElements() ;i++)
+                    {
+                        vector<Point<TYPE>> vFacesPoints;
+                        DcelFigureBuilder::getFacePoints(*faces.at(i), *this->voronoi.getRefDcel(), vFacesPoints);
+
+                        Polygon polygon;
+                        for (auto point : vFacesPoints)
+                        {
+                            polygon.add(point);
+                        }
+                        vPolygons.push_back(polygon);
+                    }
+                    dispManager->add(DisplayableFactory::createPolygonSet(vPolygons));
+                    dispManager->process();
+                }
 			}
 			break;
 		}
@@ -797,11 +968,24 @@ void Process::execute()
 			// Computing convex hull.
 			if (this->buildConvexHull())
 			{
-                // Convex hull.
-				//Set<int> *convexHullEdges = this->delaunay.getConvexHullEdges();
-				//convexHullEdges->write("/home/juan/projects/delaunay/code/data/samples/test/input/convexHull/gold/convexHull1_4.txt");
-				this->drawer->drawFigures(CONVEXHULL_DRAW);
-			}
+                Polygon *hull;
+
+                // Computing convex hull.
+                if (this->status.isDelaunayCreated())
+                {
+                    hull = this->delaunay.getConvexHull();
+                }
+                else
+                {
+                    hull = this->triangulation.getConvexHull();
+                }
+
+                // Add points to display manager.
+                vector<Point<TYPE>> vPoints;
+                hull->getPoints(vPoints);
+                dispManager->add(DisplayableFactory::createPolygon(vPoints));
+                dispManager->process();
+            }
 			else
 			{
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull not computed");
@@ -824,10 +1008,19 @@ void Process::execute()
 			if (this->findClosest(point, closest, distance))
 			{
 				// Draw the triangulation, the point and the closest point.
-				points.add(point);
-				points.add(closest);
-				this->drawer->setPointsSet(&points);
-				this->drawer->drawFigures(CLOSESTPOINT_DRAW);
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager->add(dispDelaunay);
+
+                // Add points to display.
+                vector<Point<TYPE>> vPoints;
+                vPoints.push_back(point);
+                vPoints.push_back(closest);
+                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
+                closestPoints->setPointSize(3.0);
+                dispManager->add(closestPoints);
+
+                dispManager->process();
 			}
 			else
 			{
@@ -841,21 +1034,35 @@ void Process::execute()
 		{
 			int faceId=0;				// Face that surrounds point.
 			PointT point;				// Point to locate.
-			Set<int> 	faces(1);		// List of faces.
-			Set<PointT> points(1);	// List of points.
 
 			// Check if input point parameter provided by user.
 			this->getPointToLocate(point);
 
 			// Find face.
-			if (this->findFace(point, faceId))
+			bool isImaginaryFace=false;
+			if (this->findFace(point, faceId, isImaginaryFace))
 			{
 				// Draw the triangulation, the point and its face.
-				points.add(point);
-				this->drawer->setPointsSet(&points);
-				faces.add(faceId);
-				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(FINDFACE_DRAW);
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager->add(dispDelaunay);
+
+                // Add face
+                if (!isImaginaryFace)
+                {
+                    vector<Point<TYPE>> vFacesPoints;
+                    DcelFigureBuilder::getFacePoints(faceId, this->dcel, vFacesPoints);
+                    dispManager->add(DisplayableFactory::createPolygon(vFacesPoints));
+                }
+
+                // Add point to draw
+                vector<Point<TYPE>> vPoints;
+                vPoints.push_back(point);
+                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
+                closestPoints->setPointSize(3.0);
+                dispManager->add(closestPoints);
+
+                dispManager->process();
 			}
 			else
 			{
@@ -872,11 +1079,18 @@ void Process::execute()
 			// Compute the two closest point in the set of points.
 			if (this->findTwoClosest(index1, index2))
 			{
-				// Draw the triangulation and the two closest points.
-				points.add(*this->dcel.getRefPoint(index1));
-				points.add(*this->dcel.getRefPoint(index2));
-				this->drawer->setPointsSet(&points);
-				this->drawer->drawFigures(TWOCLOSEST_DRAW);
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager->add(dispDelaunay);
+
+                // Add points to display.
+                vector<Point<TYPE>> vPoints;
+                vPoints.push_back(*this->dcel.getRefPoint(index1));
+                vPoints.push_back(*this->dcel.getRefPoint(index2));
+                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
+                dispManager->add(closestPoints);
+
+                dispManager->process();
 			}
 			else
 			{
@@ -891,8 +1105,11 @@ void Process::execute()
 			// Check if Delaunay triangulation already created.
 			if (status.isTriangulationCreated())
 			{
-				// Draw triangulation filtering edges.
-				this->drawer->drawFigures(FILTEREDGES_DRAW);
+                // Add Delaunay triangulation filtering edges
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel, Config::getMinLengthEdge());
+                dispManager->add(dispDelaunay);
+
+                dispManager->process();
             }
 			break;
 		}
@@ -903,7 +1120,36 @@ void Process::execute()
 			if (this->status.isDelaunayCreated() ||
 				this->status.isTriangulationCreated())
 			{
-				this->drawer->drawFigures(CIRCUMCENTRES_DRAW);
+                // Add circles
+                vector<Circle> vCircles;
+                for (int faceID=1; faceID<this->dcel.getNFaces() ;faceID++)
+                {
+                    // Skip imaginary faces.
+                    if (!dcel.imaginaryFace(faceID))
+                    {
+                        // Get points of the triangle.
+                        int		points[NPOINTS_TRIANGLE];	// Triangle points.
+                        dcel.getFaceVertices(faceID, points);
+
+                        // Build circle.
+                        vector<Point<TYPE>> vPoints;
+                        vPoints.push_back(*dcel.getRefPoint(points[0]-1));
+                        vPoints.push_back(*dcel.getRefPoint(points[1]-1));
+                        vPoints.push_back(*dcel.getRefPoint(points[2]-1));
+                        Circle circle = Circle(vPoints);
+                        vCircles.push_back(circle);
+                    }
+                }
+
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager->add(dispDelaunay);
+
+                // Add points to display.
+                Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
+                dispManager->add(circles);
+
+                dispManager->process();
 			}
 			break;
 		}
@@ -912,31 +1158,99 @@ void Process::execute()
 			// Check if triangulation created.
 			if (this->status.isTriangulationCreated())
 			{
-				this->drawer->drawFigures(EDGESCIRCLES_DRAW);
+                int		edgeIndex=0;        // Edge index.
+                int		nEdges=0;			// # edges in the DCEL.
+                TYPE  	radius; 			// Circle radius.
+                Line	line;				// Edge line.
+                Point<TYPE> origin, dest;  	// Origin and destination points.
+                Point<TYPE> middle;	    	// Edge middle point.
+
+                // Add circles
+                vector<Circle> vCircles;
+
+                // Loop all faces (but external).
+                nEdges = dcel.getNEdges();
+                for (edgeIndex=0; edgeIndex<nEdges ;edgeIndex++)
+                {
+                    // Skip imaginary edges.
+                    if (!dcel.hasNegativeVertex(edgeIndex+1))
+                    {
+                        // Create line.
+                        dcel.getEdgePoints(edgeIndex, origin, dest);
+                        line = Line(origin, dest);
+
+                        // Compute middle point of edge.
+                        line.getMiddle(middle);
+
+                        // Create circle
+                        radius = origin.distance(middle);
+                        Circle circle = Circle(&middle, radius);
+
+                        // Add circles
+                        vCircles.push_back(circle);
+                    }
+                }
+
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager->add(dispDelaunay);
+
+                // Add points to display.
+                Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
+                dispManager->add(circles);
+
+                dispManager->process();
 			}
 			break;
 		}
 		// Print DCEL data.
 		case DCEL_INFO:
 		{
-			this->drawer->drawFigures(DCEL_INFO_DRAW);
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+            dispManager->add(dispDelaunay);
+
+            vector<Text> vPointsInfo;
+            this->createDcelPointsInfo(this->dcel, vPointsInfo);
+            Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
+            dispManager->add(dispPointsInfo);
+
+            vector<Text> vEdgesInfo;
+            this->createDcelEdgeInfo(this->dcel, vEdgesInfo);
+            Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
+            dispManager->add(dispEdgesInfo);
+
+            vector<Text> vFacesInfo;
+            this->createDcelFacesInfo(this->dcel, vFacesInfo);
+            Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
+            dispManager->add(dispFacesInfo);
+
+            dispManager->process();
 			break;
 		}
 		// Print Voronoi data.
 		case VORONOI_INFO:
 		{
-			this->drawer->drawFigures(VORONOI_INFO_DRAW);
-			break;
-		}
-		// Shake points in DCEL.
-		case SHAKE_POINTS:
-		{
-			// Shake set of points.
-			this->dcel.shake();
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+            dispManager->add(dispDelaunay);
 
-			// Draw set of points.
-			this->drawer->drawFigures(SET_DRAW);
+            vector<Text> vPointsInfo;
+            this->createDcelPointsInfo(*this->voronoi.getRefDcel(), vPointsInfo);
+            Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
+            dispManager->add(dispPointsInfo);
 
+            vector<Text> vEdgesInfo;
+            this->createDcelEdgeInfo(*this->voronoi.getRefDcel(), vEdgesInfo);
+            Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
+            dispManager->add(dispEdgesInfo);
+
+            vector<Text> vFacesInfo;
+            this->createDcelFacesInfo(*this->voronoi.getRefDcel(), vFacesInfo);
+            Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
+            dispManager->add(dispFacesInfo);
+
+            dispManager->process();
 			break;
 		}
 		// Write points to a flat file.
@@ -979,7 +1293,7 @@ void Process::execute()
 			this->m.updateMenu();
 
 			// Clear screen.
-			this->drawer->drawFigures(CLEAR_SCREEN);
+            dispManager->process();
 
 			// Reset data.
 			break;
@@ -1004,7 +1318,7 @@ void Process::execute()
 			{
 				// Clear screen.
 				firstTime = false;
-				this->drawer->drawFigures(CLEAR_SCREEN);
+                dispManager->process();
 			}
 			break;
 		}

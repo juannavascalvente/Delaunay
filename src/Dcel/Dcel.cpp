@@ -139,6 +139,7 @@ Dcel::Dcel(int nPoints, int nEdges, int nFaces)
 	}
 }
 
+
 Dcel::~Dcel()
 {
 	// Reset attributes.

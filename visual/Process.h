@@ -8,7 +8,12 @@
 #ifndef PROCESS_H_
 #define PROCESS_H_
 
-#include "Draw.h"
+
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
+#include "DisplayManager.h"
+
 #include "Menu.h"
 #include "Status.h"
 #include "Config.h"
@@ -18,32 +23,31 @@
 #include "Logging.h"
 #include "Queue.h"
 #include "StarTriangulation.h"
+#include "Text.h"
 #include "Voronoi.h"
 
 
-/****************************************************************************
-// 						PROCESS CLASS DEFITNION
-****************************************************************************/
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class Process
 {
-	//------------------------------------------------------------------------
-	//  Attributes
-	//------------------------------------------------------------------------
-	Menu 			m;				// Menu object.
-	Status 			status;			// Current status.
-	Draw			*drawer;		// Pointer to drawer instance.
-
-	Dcel			dcel;			// Dcel data.
-	Delaunay		delaunay;		// Delaunay data.
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    DisplayManager      *dispManager;
+	Menu 			    m;				// Menu object.
+	Status 			    status;			// Current status.
+	Dcel			    dcel;			// Dcel data.
+	Delaunay		    delaunay;		// Delaunay data.
 	StarTriangulation	triangulation;	// Star triangulation data.
-	Voronoi			voronoi;		// Voronoi diagram data.
-	Gabriel			gabriel;		// Gabriel graph data.
+	Voronoi			    voronoi;		// Voronoi diagram data.
+	Gabriel			    gabriel;		// Gabriel graph data.
+	Logging 		    *log;			// Log file.
 
-	Logging 		*log;			// Log file.
-
-	/*------------------------------------------------------------------------
-	  Private functions.
-	------------------------------------------------------------------------*/
+    /*******************************************************************************************************************
+     * Private methods declaration
+     *******************************************************************************************************************/
 	void execute();
 	static void executeWrapper();
 	bool readData(int option);
@@ -52,34 +56,36 @@ class Process
 	bool buildConvexHull();
 	static bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
 	bool findTwoClosest( int &index1, int &index2);
-	bool findFace( Point<TYPE> &point, int &faceId);
+	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
 	static void getPointToLocate(Point<TYPE> &point);
-	void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
+	static void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
+    static void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info);
+    static void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info);
+    static void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info);
 
 protected:
 	static Process *instance;
 
 public:
-	/*------------------------------------------------------------------------
-	  Constructor/Destructor.
-	------------------------------------------------------------------------*/
+    /*******************************************************************************************************************
+    * Public methods
+    *******************************************************************************************************************/
 	Process(int argc, char **argv, bool printData);
 	~Process();
 
-	/*------------------------------------------------------------------------
-	  Public functions.
-	------------------------------------------------------------------------*/
-	// Get functions.
-	inline Status* getStatus() {return(&this->status); };
-	inline Dcel* getDcel() {return(&this->dcel); };
-	inline Delaunay* getDelaunay() {return(&this->delaunay); };
-	inline StarTriangulation* getTriangulation() {return(&this->triangulation); };
-	inline Voronoi* getVoronoi() {return(&this->voronoi); };
-	inline Gabriel* getGabriel() {return(&this->gabriel); };
-
-	// Main functions.
+    /**
+     * @fn      start
+     * @brief   starts infinite loop
+     */
     static void start();
+
+    /**
+     * @fn      setInstance
+     * @brief   Sets "instance" to the object that is going to be executed
+     *          by the main loop process
+     * @param   process   instance to be executed by main loop
+     */
 	static void setInstance(Process *process);
 };
 

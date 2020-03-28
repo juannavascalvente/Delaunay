@@ -1,5 +1,5 @@
-N_POINTS=10000
-INPUT_FLAT_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/Random/NumSamples_10000/in_flat_Random_10000_3.txt
+N_POINTS=5
+INPUT_FLAT_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/flat.txt
 INPUT_DCEL_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/dcel.txt
 INPUT_GRAPH_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/graph.txt
 INPUT_VORONOI_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/voronoi.txt
