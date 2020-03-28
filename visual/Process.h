@@ -24,6 +24,7 @@
 #include "Logging.h"
 #include "Queue.h"
 #include "StarTriangulation.h"
+#include "Text.h"
 #include "Voronoi.h"
 
 
@@ -67,6 +68,9 @@ class Process
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
 	static void getPointToLocate(Point<TYPE> &point);
 	void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
+    void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info);
+    void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info);
+    void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info);
 
 protected:
 	static Process *instance;

@@ -572,7 +572,93 @@ void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
 		p2.setY(rand() % (int) maxY);
 	}
 }
-void setRed2() {};
+
+
+void Process::createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
+{
+    char	text_Info[50];
+
+    // Draw all points of the set.
+    for (size_t i=0; i < dcelIn.getNVertex() ; i++)
+    {
+        // Get and draw i-point.
+        Point<TYPE> *point = dcelIn.getRefPoint(i);
+        string strText = std::to_string(i+1);
+
+        Text text(point->getX(), point->getY(), strText);
+        info.push_back(text);
+    }
+}
+
+
+void Process::createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info)
+{
+    // Loop all edges.
+    for (size_t edgeIndex=0; edgeIndex<dcelIn.getNEdges() ;edgeIndex++)
+    {
+        // Check if twin edge already visited.
+        if ((edgeIndex+1) < dcelIn.getTwin(edgeIndex))
+        {
+            // Check edge is real.
+            if (!dcelIn.hasNegativeVertex((int) edgeIndex+1))
+            {
+                // Get edge extreme points.
+                Point<TYPE> origin, dest;	// Extreme points of edges.
+                dcelIn.getEdgePoints(edgeIndex, origin, dest);
+
+                // Compute middle point of edge.
+                Point<TYPE> middle;         // Middle point of the edge.
+                Point<TYPE>::middlePoint(&origin, &dest, &middle);
+
+                // Print information.
+                string strText = std::to_string(edgeIndex+1) + " - " + std::to_string(dcelIn.getTwin(edgeIndex));
+
+                Text text(middle.getX(), middle.getY(), strText);
+                info.push_back(text);
+            }
+        }
+    }
+}
+
+
+void Process::createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
+{
+    // Loop all faces (skip external face).
+    for (size_t faceId=0; faceId<dcelIn.getNFaces() ;faceId++)
+    {
+        // If any vertex is imaginary then face is not drawn.
+        if (!dcelIn.imaginaryFace(faceId))
+        {
+            Polygon polygon;
+
+            // Get edge in current face.
+            size_t firstEdgeIndex = dcelIn.getFaceEdge(faceId)-1;
+            size_t edgeIndex = firstEdgeIndex;
+            do
+            {
+                // Add origin point to polygon.
+                Point<TYPE> origin;			// Edge origin point.
+                origin = *dcelIn.getRefPoint(dcelIn.getOrigin(edgeIndex)-1);
+                polygon.add(origin);
+
+                // Next edge in face.
+                edgeIndex = dcelIn.getNext(edgeIndex)-1;
+            } while(edgeIndex != firstEdgeIndex);
+
+            // Compute face centroid.
+            Point<TYPE> center;			// Middle point of the edge.
+            polygon.centroid(center);
+            polygon.reset();
+
+            // Print information.
+            string strText = std::to_string(faceId);
+
+            Text text(center.getX(), center.getY(), strText);
+            info.push_back(text);
+        }
+    }
+}
+
 
 /***************************************************************************
 * Name: execute
@@ -1106,13 +1192,51 @@ void Process::execute()
 		// Print DCEL data.
 		case DCEL_INFO:
 		{
-			this->drawer->drawFigures(DCEL_INFO_DRAW);
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+            dispManager.add(dispDelaunay);
+
+            vector<Text> vPointsInfo;
+            this->createDcelPointsInfo(this->dcel, vPointsInfo);
+            Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
+            dispManager.add(dispPointsInfo);
+
+            vector<Text> vEdgesInfo;
+            this->createDcelEdgeInfo(this->dcel, vEdgesInfo);
+            Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
+            dispManager.add(dispEdgesInfo);
+
+            vector<Text> vFacesInfo;
+            this->createDcelFacesInfo(this->dcel, vFacesInfo);
+            Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
+            dispManager.add(dispFacesInfo);
+
+            dispManager.process();
 			break;
 		}
 		// Print Voronoi data.
 		case VORONOI_INFO:
 		{
-			this->drawer->drawFigures(VORONOI_INFO_DRAW);
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+            dispManager.add(dispDelaunay);
+
+            vector<Text> vPointsInfo;
+            this->createDcelPointsInfo(*this->voronoi.getRefDcel(), vPointsInfo);
+            Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
+            dispManager.add(dispPointsInfo);
+
+            vector<Text> vEdgesInfo;
+            this->createDcelEdgeInfo(*this->voronoi.getRefDcel(), vEdgesInfo);
+            Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
+            dispManager.add(dispEdgesInfo);
+
+            vector<Text> vFacesInfo;
+            this->createDcelFacesInfo(*this->voronoi.getRefDcel(), vFacesInfo);
+            Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
+            dispManager.add(dispFacesInfo);
+
+            dispManager.process();
 			break;
 		}
 		// Write points to a flat file.

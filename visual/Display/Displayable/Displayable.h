@@ -15,6 +15,7 @@
 #include "DisplayService.h"
 #include "Point.h"
 #include "Polygon.h"
+#include "Text.h"
 
 #include <vector>
 using namespace std;
@@ -175,6 +176,36 @@ public:
     }
 };
 
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class DispTextSet : public Displayable
+{
+    vector<Text> vText;
+    void 		  *font;
+public:
+    explicit DispTextSet(vector<Text> &vTextIn) : vText(vTextIn), font(GLUT_BITMAP_TIMES_ROMAN_10), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
+
+    void display() override
+    {
+        Displayable::display();
+
+        // Text iteration
+        for (const auto& text : vText)
+        {
+            // Set the position of the text in the window using the x and y coordinates
+            glRasterPos2f(text.getX(), text.getY());
+
+            //loop to display character by character
+            //for (size_t i=0; i<text.getText().size(); i++)
+            for (auto item : text.getText())
+            {
+                glutBitmapCharacter(font, item);
+            }
+        }
+    }
+};
 
 
 /***********************************************************************************************************************

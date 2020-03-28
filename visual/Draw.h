@@ -36,10 +36,7 @@ enum ColorT { RED,
               WHITE};
 
 // Type of figure to draw.
-enum drawingT {
-				  GABRIEL_DRAW,
-				  DCEL_INFO_DRAW,
-				  VORONOI_INFO_DRAW};
+enum drawingT {GABRIEL_DRAW};
 
 
 //****************************************************************************
@@ -62,12 +59,8 @@ class Draw
 	static Voronoi		 *voronoi;		// Voronoi diagram data.
 	static Gabriel		 *gabriel;		// Gabriel graph data.
 
-	//------------------------------------------------------------------------
-	// Private functions.
-	//------------------------------------------------------------------------
 	// General figures.
 	void drawDelaunay(TYPE minLength);
-	void drawVoronoi();
 	void drawGabriel();
 
 	// Single figures.
@@ -83,16 +76,7 @@ class Draw
 	inline void finish() { glEnd(); };
 
 	// Size and font.
-	inline void setPointSize(float size) { glPointSize(size);} ;
 	void setColor(enum ColorT);
-	void setFont(void *newFont);
-	void drawText(float x, float y, char *string);
-
-	// Information.
-	void drawPointsInfo( Dcel *dcel);
-	void drawEdgesInfo( Dcel *dcel);
-	void drawFacesInfo( Dcel *dcel);
-	void drawInfo( Dcel *dcel);
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
