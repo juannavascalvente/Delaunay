@@ -931,9 +931,9 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 	int	 i=0;						// Loop counter.
 	int	 nFacesToAdd=0;				// Loop upper bound.
 	int	 edgeIndex=0;				// Edge index.
-	vector<int> intersectEdges(2);		// Set of edges that intersect convex hull.
+	vector<int> intersectEdges;		// Set of edges that intersect convex hull.
 	Point<TYPE> origin, dest;		// Line extreme points.
-	Set<int> extremeFaces(2);		// First and last faces in the path.
+	Set<int> extremeFaces(2);	// First and last faces in the path.
 
 	// Get origin and destination points.
 	origin = line.getOrigin();
@@ -1008,14 +1008,6 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 					Logging::write(true, Info);
 #endif
 				}
-			}
-			else
-			{
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull is not intersected.");
-				Logging::write(true, Info);
-#endif
-				found = true;
 			}
 		}
 

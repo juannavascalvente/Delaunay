@@ -143,48 +143,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			}
 			break;
 		}
-		// Draw triangulation or Voronoi paths.
-		case TRIANGULATION_PATH_DRAW:
-		{
-			this->drawDelaunay(INVALID);
-			this->setColor(YELLOW);
-			p = *this->pointsSet->at(0);
-			q = *this->pointsSet->at(1);
-			line = new Line(p, q);
-			this->draw(line);
-
-			// Check type of path to draw.
-			if (type == TRIANGULATION_PATH_DRAW)
-			{
-				if (!error)
-				{
-					// Draw faces.
-					for (i=0; i<this->facesSet->getNElements() ;i++)
-					{
-						faceId = *this->facesSet->at(i);
-						this->drawFace(faceId, this->delaunay->getRefDcel());
-					}
-				}
-			}
-			else
-			{
-				// Draw voronoi and faces.
-				this->drawVoronoi();
-				this->setColor(YELLOW);
-				if (!error)
-				{
-					for (i=0; i<this->facesSet->getNElements() ;i++)
-					{
-						faceId = *this->facesSet->at(i);
-						this->drawFace(faceId, this->voronoi->getRefDcel());
-					}
-				}
-			}
-
-			// Deallocate memory.
-			delete line;
-			break;
-		}
 		// Draw the triangulation filtering edges.
 		case FILTEREDGES_DRAW:
 		{

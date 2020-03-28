@@ -752,18 +752,40 @@ void Process::execute()
 					Logging::write(true, Error);
 				}
 
-				// Draw triangulation, segment and if no error, the path.
-				points.add(p1);
-				points.add(p2);
-				this->drawer->setPointsSet(&points);
-				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(TRIANGULATION_PATH_DRAW, error);
-
 				// Print error message.
 				if (error)
 				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Delaunay path");
-					Logging::write(true, Error);
+                    Logging::buildText(__FUNCTION__, __FILE__, "Error computing Delaunay path");
+                    Logging::write(true, Error);
+                }
+				else
+                {
+                    // Add Delaunay triangulation
+                    Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispManager.add(dispDelaunay);
+
+                    // Add points whose path is drawn
+                    vector<Point<TYPE>> vPoints;
+                    vPoints.push_back(p1);
+                    vPoints.push_back(p2);
+                    dispManager.add(DisplayableFactory::createPolygon(vPoints));
+
+                    // Add path faces
+                    vector<Polygon> vPolygons;
+                    for (size_t i=0; i<faces.getNElements() ;i++)
+                    {
+                        vector<Point<TYPE>> vFacesPoints;
+                        DcelFigureBuilder::getFacePoints(*faces.at(i), this->dcel, vFacesPoints);
+
+                        Polygon polygon;
+                        for (auto point : vFacesPoints)
+                        {
+                            polygon.add(point);
+                        }
+                        vPolygons.push_back(polygon);
+                    }
+                    dispManager.add(DisplayableFactory::createPolygonSet(vPolygons));
+                    dispManager.process();
 				}
 			}
 			break;
@@ -806,7 +828,6 @@ void Process::execute()
 				}
 				else
                 {
-                    // Draw the triangulation, the point and the closest point.
                     // Add Delaunay triangulation
                     Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
                     dispManager.add(dispDelaunay);
