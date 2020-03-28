@@ -43,7 +43,7 @@ public:
     *******************************************************************************************************************/
 	inline int getNElements() { return(vPoints.size()); };
     inline void getPoints(vector<Point<TYPE>> &vPointsOut) { vPointsOut = vPoints; };
-	inline Point<TYPE> at(int index) { return(vPoints.at(index)); };
+	inline Point<TYPE> at(size_t szIdx) { return(vPoints.at(szIdx)); };
 	inline void	add(Point<TYPE> &p) { vPoints.push_back(p); };
 	inline void reset() { vPoints.clear(); };
 
