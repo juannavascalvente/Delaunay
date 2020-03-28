@@ -128,13 +128,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			this->drawGabriel();
 			break;
 		}
-		// Draw the triangulation and the triangles circumcentres.
-		case EDGESCIRCLES_DRAW:
-		{
-			this->drawDelaunay(INVALID);
-			this->drawEdgesCircles(this->dcel);
-			break;
-		}
 		// Draw triangulation information.
 		case DCEL_INFO_DRAW:
 		{
@@ -209,70 +202,6 @@ void Draw::drawGabriel()
 	this->draw(this->gabriel);
 }
 
-/***************************************************************************
-* Name: 	draw
-* IN:		point		reference to point to draw.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: draws a point in the screen.
-***************************************************************************/
-void Draw::draw(PointT *point)
-{
-	// Draw point.
-	this->startPoints();
-	glVertex2f(point->getX(), point->getY());
-	this->finish();
-}
-
-
-/***************************************************************************
-* Name: 	draw
-* IN:		line			line to draw.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draw line between origin and destination points.
-***************************************************************************/
-void Draw::draw(Line *line)
-{
-	// Draw edges of current edge.
-	this->startLine();
-
-	// Draw first point.
-	glVertex2f(line->getOrigin().getX(), line->getOrigin().getY());
-
-	// Draw second point.
-	glVertex2f(line->getDest().getX(), line->getDest().getY());
-
-	this->finish();
-}
-
-
-/***************************************************************************
-* Name: 		draw
-* IN:			circle		circle to draw
-* 				fill		fill circle flag
-* OUT:			NONE
-* RETURN:		NONE
-* GLOBAL:		NONE
-* Description: 	draws circle.
-***************************************************************************/
-void Draw::draw(Circle *circle, bool fill)
-{
-	int		i=0;
-	TYPE 	angle=0.0;
-
-	this->startCircle();
-	for(i=0; i<150; i++)
-	{
-		angle = i*2*PI/150;
-		glVertex2f(circle->getRefCentre()->getX() + (cos(angle) * circle->getRadius()),
-				   circle->getRefCentre()->getY() + (sin(angle) * circle->getRadius()));
-	}
-
-	this->finish();
-}
 
 /***************************************************************************
 * Name: 	draw
@@ -381,107 +310,6 @@ void Draw::draw(Dcel *dcel, TYPE minLength)
 #endif
 }
 
-/***************************************************************************
-* Name: 	drawEdge
-* IN:		edgeIndex	index of the edge to draw.
-* 			dcel		DCEL data
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	Draws the edge of the DCEL whose position is "edgeIndex".
-***************************************************************************/
-void Draw::drawEdge(int edgeIndex, Dcel *dcel)
-{
-	Point<TYPE> p1, p2;			// Points to draw.
-
-	// Check edge is real.
-	if (!dcel->hasNegativeVertex(edgeIndex+1))
-	{
-		// Get edge origin and destination points.
-		dcel->getEdgePoints(edgeIndex, p1, p2);
-
-		// Draw edge.
-		this->startLine();
-
-		// Draw first point.
-        p1.print(cout);
-		glVertex2f(p1.getX(), p1.getY());
-
-        p2.print(cout);
-		// Draw second point.
-		glVertex2f(p2.getX(), p2.getY());
-
-		this->finish();
-	}
-#ifdef DEBUG_DRAW_DRAWEDGE
-	else
-	{
-    	Logging::buildText(__FUNCTION__, __FILE__, "Skipping edge because has no real vertex");
-    	Logging::write(true, Error);
-	}
-#endif
-}
-
-
-/***************************************************************************
-* Name: 	draw
-* IN:		face		pointer to face
-* 			dcel		DCEL data
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draws the triangle of the face. If any of the points is
-* 				imaginary (incremental Delaunay algorithm) then the face
-* 				is not drawn.
-***************************************************************************/
-void Draw::draw(Face *face, Dcel *dcel)
-{
-	// PENDING IS USED THIS FUNCTION?
-//	int	 	edgeIndex=0;		// Edge index.
-//	int		faceId=0;			// Face id.
-
-	// Get face id.
-	//faceId = dcel->getFace(face->getEdge()-1);
-
-	/*
-	// Check face is not imaginary.
-	if (!dcel->imaginaryFace(faceId))
-	{
-		// Get face edge.
-		edgeIndex = face->getEdge()-1;
-		draw(dcel->getRefEdge(edgeIndex), dcel);
-#ifdef DEBUG_DCEL_DRAW_FACE
-    	Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
-    	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-    	Logging::write(true, Info);
-#endif
-
-		// Get next edge.
-		edgeIndex = dcel->getNext(edgeIndex)-1;
-		draw(dcel->getRefEdge(edgeIndex), dcel);
-#ifdef DEBUG_DCEL_DRAW_FACE
-    	Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
-    	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-    	Logging::write(true, Info);
-#endif
-
-		// Get last edge.
-		edgeIndex = dcel->getNext(edgeIndex)-1;
-		draw(dcel->getRefEdge(edgeIndex), dcel);
-#ifdef DEBUG_DCEL_DRAW_FACE
-    	Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
-    	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-    	Logging::write(true, Info);
-#endif
-	}
-#ifdef DEBUG_DCEL_DRAW_FACE
-	else
-	{
-    	Logging::buildText(__FUNCTION__, __FILE__, "Skipping face because is not real");
-    	Logging::write(true, Error);
-	}
-#endif*/
-}
 
 /***************************************************************************
 * Name: 	draw
@@ -554,54 +382,6 @@ void Draw::draw(Gabriel *gabriel)
 	}
 }
 
-
-/***************************************************************************
-* Name: 	drawEdgesCircles
-* IN:		dcel			DCEL data.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draws the triangulation and a circle for each edge.
-***************************************************************************/
-void Draw::drawEdgesCircles(Dcel *dcel)
-{
-	int		edgeIndex=0;        // Edge index.
-	int		nEdges=0;			// # edges in the DCEL.
-	TYPE  	radius=0.0;			// Circle radius.
-	Line	line;				// Edge line.
-	Circle	circle;				// Circle to draw.
-	Point<TYPE> origin, dest;  	// Origin and destination points.
-	Point<TYPE> middle;	    	// Edge middle point.
-
-	this->setLineSize(1.0);
-	this->setColor(BLUE);
-
-    // Loop all faces (but external).
-	nEdges = dcel->getNEdges();
-	for (edgeIndex=0; edgeIndex<nEdges ;edgeIndex++)
-	{
-		// Skip imaginary edges.
-        if (!dcel->hasNegativeVertex(edgeIndex+1))
-        {
-        	// Create line.
-        	dcel->getEdgePoints(edgeIndex, origin, dest);
-        	// PENDING REMOVE CODE.
-        	//origin  = *dcel->getRefPoint(dcel->getOrigin(edgeIndex)-1);
-        	//dest    = *dcel->getRefPoint(dcel->getOrigin(dcel->getTwin(edgeIndex)-1)-1);
-        	line = Line(origin, dest);
-
-            // Compute middle point of edge.
-        	line.getMiddle(middle);
-
-            // Create circle
-        	radius = origin.distance(middle);
-        	circle = Circle(&middle, radius);
-
-            // Draw circle.
-        	this->draw(&circle, false);
-        }
-	}
-}
 
 /***************************************************************************
 * Name: 	setColor

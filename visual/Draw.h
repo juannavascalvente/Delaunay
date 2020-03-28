@@ -38,7 +38,6 @@ enum ColorT { RED,
 // Type of figure to draw.
 enum drawingT {
 				  GABRIEL_DRAW,
-				  EDGESCIRCLES_DRAW,
 				  DCEL_INFO_DRAW,
 				  VORONOI_INFO_DRAW};
 
@@ -72,28 +71,19 @@ class Draw
 	void drawGabriel();
 
 	// Single figures.
-	void draw( PointT *point);
-	void draw( Line *line);
-	void draw( Circle *circle, bool fill);
 	void draw( Dcel *dcel, TYPE minLength);
-	void drawEdge( int edgeIndex, Dcel *dcel);
-	void draw( Face *face, Dcel *dcel);
 	void draw( Gabriel *gabriel);
-	void drawEdgesCircles( Dcel *dcel);
 
 	// Screen API.
 	inline void clear()  { glClear(GL_COLOR_BUFFER_BIT);} ;
 	inline void flush()  { glutSwapBuffers(); };
 
 	// Type of lines.
-	inline void startPoints() { glBegin(GL_POINTS); };
-	inline void startCircle() { glBegin(GL_LINE_LOOP); };
 	inline void startLine()   { glBegin(GL_LINE_STRIP); };
 	inline void finish() { glEnd(); };
 
 	// Size and font.
 	inline void setPointSize(float size) { glPointSize(size);} ;
-	inline void setLineSize(float size) { glLineWidth(size);} ;
 	void setColor(enum ColorT);
 	void setFont(void *newFont);
 	void drawText(float x, float y, char *string);

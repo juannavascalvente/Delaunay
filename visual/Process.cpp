@@ -1057,7 +1057,49 @@ void Process::execute()
 			// Check if triangulation created.
 			if (this->status.isTriangulationCreated())
 			{
-				this->drawer->drawFigures(EDGESCIRCLES_DRAW);
+                int		edgeIndex=0;        // Edge index.
+                int		nEdges=0;			// # edges in the DCEL.
+                TYPE  	radius=0.0;			// Circle radius.
+                Line	line;				// Edge line.
+                Circle	circle;				// Circle to draw.
+                Point<TYPE> origin, dest;  	// Origin and destination points.
+                Point<TYPE> middle;	    	// Edge middle point.
+
+                // Add circles
+                vector<Circle> vCircles;
+
+                // Loop all faces (but external).
+                nEdges = dcel.getNEdges();
+                for (edgeIndex=0; edgeIndex<nEdges ;edgeIndex++)
+                {
+                    // Skip imaginary edges.
+                    if (!dcel.hasNegativeVertex(edgeIndex+1))
+                    {
+                        // Create line.
+                        dcel.getEdgePoints(edgeIndex, origin, dest);
+                        line = Line(origin, dest);
+
+                        // Compute middle point of edge.
+                        line.getMiddle(middle);
+
+                        // Create circle
+                        radius = origin.distance(middle);
+                        circle = Circle(&middle, radius);
+
+                        // Add circles
+                        vCircles.push_back(circle);
+                    }
+                }
+
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager.add(dispDelaunay);
+
+                // Add points to display.
+                Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
+                dispManager.add(circles);
+
+                dispManager.process();
 			}
 			break;
 		}
