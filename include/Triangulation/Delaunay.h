@@ -100,7 +100,7 @@ public:
 	inline Polygon* getConvexHull() {return(&this->hull);};
 	inline Set<int>* getConvexHullEdges() {return(&this->hullEdges);};
 	bool findTwoClosest(int &first, int &second);
-	bool findFace(Point<TYPE> &point, int &faceId);
+	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
 	bool findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
 															int	&poinIndex,
 															double &dist);

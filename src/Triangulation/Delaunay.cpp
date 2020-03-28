@@ -926,8 +926,8 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 {
 	bool found=false;				// Return value.
 	bool computePath=false;			// Both points in external face.
-	int	 faceId=0;					// Initial face in the path.
-	int	 finalFace=0;				// Final face in the path.
+	int	 originFace=0;				// Initial face in the path.
+	int	 destinationFace=0;		    // Final face in the path.
 	int	 i=0;						// Loop counter.
 	int	 nFacesToAdd=0;				// Loop upper bound.
 	int	 edgeIndex=0;				// Edge index.
@@ -940,7 +940,10 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 	dest = line.getDest();
 
 	// Get extreme point faces.
-	if (this->findFace(origin, faceId) && this->findFace(dest, finalFace))
+	bool isImaginaryFace1=false;
+    bool isImaginaryFace2=false;
+	if (this->findFace(origin, originFace, isImaginaryFace1) &&
+        this->findFace(dest, destinationFace, isImaginaryFace2))
 	{
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 		Logging::buildText(__FUNCTION__, __FILE__, "Faces are ");
@@ -950,18 +953,18 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 		Logging::write(true, Info);
 #endif
 		// Add non external faces to set.
-		if (!this->dcel->imaginaryFace(faceId))
+		if (!isImaginaryFace1)
 		{
-			extremeFaces.add(faceId);
+			extremeFaces.add(originFace);
 			computePath = true;
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 			Logging::buildText(__FUNCTION__, __FILE__, "Initial face is real.");
 			Logging::write(true, Info);
 #endif
 		}
-		if (!this->dcel->imaginaryFace(finalFace))
+		if (!isImaginaryFace2)
 		{
-			extremeFaces.add(finalFace);
+			extremeFaces.add(destinationFace);
 			computePath = true;
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 			Logging::buildText(__FUNCTION__, __FILE__, "Final face is real.");
@@ -998,8 +1001,8 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 				for (i=0; i<nFacesToAdd ;i++)
 				{
 					edgeIndex = (*this->getConvexHullEdges()->at(intersectEdges.at(i)))-1;
-					faceId = this->dcel->getFace(this->dcel->getTwin(edgeIndex)-1);
-					extremeFaces.add(faceId);
+                    originFace = this->dcel->getFace(this->dcel->getTwin(edgeIndex) - 1);
+					extremeFaces.add(originFace);
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 					Logging::buildText(__FUNCTION__, __FILE__, "Changing external face to ");
 					Logging::buildText(__FUNCTION__, __FILE__, faceId);
@@ -1184,13 +1187,15 @@ void Delaunay::getInternalFace(Line &line, Set<int> &edgesIndex, int &face)
 * GLOBAL:	NONE
 * Description: 	allocates the graph to be used in incremental Delaunay.
 ***************************************************************************/
-bool Delaunay::findFace(Point<TYPE> &point, int &faceId)
+bool Delaunay::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 {
-	bool 	found=false;		// Return value.
 	int		nodeIndex=0;		// Index of the node assigned to face.
 
+	// Initialize output value
+    isImaginary = false;
+
 	// Locate node.
-	found = this->locateNode(point, nodeIndex);
+	bool found = this->locateNode(point, nodeIndex);
 	if (found)
 	{
 		// Get face in node.
@@ -1204,6 +1209,7 @@ bool Delaunay::findFace(Point<TYPE> &point, int &faceId)
 			Logging::write(true, Info);
 #endif
 			faceId = EXTERNAL_FACE;
+            isImaginary = true;
 		}
 #ifdef DEBUG_DELAUNAY_FINDFACE
 		else

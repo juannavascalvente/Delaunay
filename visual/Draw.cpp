@@ -130,19 +130,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			this->drawGabriel();
 			break;
 		}
-		// Draw the triangulation, the point and its face.
-		case FINDFACE_DRAW:
-		{
-			this->drawDelaunay(INVALID);
-			p = *this->pointsSet->at(0);
-			this->setColor(YELLOW);
-			this->draw(&p);
-			if (this->facesSet->getNElements() > 0)
-			{
-				this->drawFace(*this->facesSet->at(0), this->dcel);
-			}
-			break;
-		}
 		// Draw the triangulation filtering edges.
 		case FILTEREDGES_DRAW:
 		{

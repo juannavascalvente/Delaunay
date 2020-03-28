@@ -63,7 +63,7 @@ class Process
 	bool buildConvexHull();
 	static bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
 	bool findTwoClosest( int &index1, int &index2);
-	bool findFace( Point<TYPE> &point, int &faceId);
+	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
 	static void getPointToLocate(Point<TYPE> &point);
 	void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);

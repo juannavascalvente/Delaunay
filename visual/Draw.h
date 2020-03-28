@@ -38,7 +38,6 @@ enum ColorT { RED,
 // Type of figure to draw.
 enum drawingT {
 				  GABRIEL_DRAW,
-				  FINDFACE_DRAW,
 				  FILTEREDGES_DRAW,
 				  CIRCUMCENTRES_DRAW,
 				  EDGESCIRCLES_DRAW,

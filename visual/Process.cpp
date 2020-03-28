@@ -435,19 +435,18 @@ bool Process::findTwoClosest(int &index1, int &index2)
 }
 
 
-/***************************************************************************
-* Name: 	findTwoClosest
-* IN:		index		index of the point whose face must be located.
-* OUT:		faceId		face id that surrounds input index point.
-* RETURN:	true		if found.
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	finds the two closest points in the set of points. If the
-* 				Delaunay triangulation exists the uses the incremental
-* 				algorithm to locate the points. Otherwise uses a brute force
-* 				algorithm.
-***************************************************************************/
-bool Process::findFace(Point<TYPE> &point, int &faceId)
+/**
+ * @fn      findFace
+ * @brief   Find the face where the input point falls into
+ *
+ * @param   point       (IN)    Point to find
+ * @param   faceId      (OUT)   Face where point falls into
+ * @param   isImaginary (OUT)   Flag for imaginary faces (incremental algorithm)
+ *
+ * @return  true if point found
+ *          false otherwise
+ */
+bool Process::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 {
 	bool found;		// Return value.
 
@@ -456,7 +455,7 @@ bool Process::findFace(Point<TYPE> &point, int &faceId)
 	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
 	if (this->status.isDelaunayCreated())
 	{
-		found = this->delaunay.findFace(point, faceId);
+		found = this->delaunay.findFace(point, faceId, isImaginary);
 	}
 	else
 	{
@@ -934,21 +933,35 @@ void Process::execute()
 		{
 			int faceId=0;				// Face that surrounds point.
 			PointT point;				// Point to locate.
-			Set<int> 	faces(1);		// List of faces.
-			Set<PointT> points(1);	// List of points.
 
 			// Check if input point parameter provided by user.
 			this->getPointToLocate(point);
 
 			// Find face.
-			if (this->findFace(point, faceId))
+			bool isImaginaryFace=false;
+			if (this->findFace(point, faceId, isImaginaryFace))
 			{
 				// Draw the triangulation, the point and its face.
-				points.add(point);
-				this->drawer->setPointsSet(&points);
-				faces.add(faceId);
-				this->drawer->setFacesSet(&faces);
-				this->drawer->drawFigures(FINDFACE_DRAW);
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager.add(dispDelaunay);
+
+                // Add face
+                if (!isImaginaryFace)
+                {
+                    vector<Point<TYPE>> vFacesPoints;
+                    DcelFigureBuilder::getFacePoints(faceId, this->dcel, vFacesPoints);
+                    dispManager.add(DisplayableFactory::createPolygon(vFacesPoints));
+                }
+
+                // Add point to draw
+                vector<Point<TYPE>> vPoints;
+                vPoints.push_back(point);
+                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
+                closestPoints->setPointSize(3.0);
+                dispManager.add(closestPoints);
+
+                dispManager.process();
 			}
 			else
 			{

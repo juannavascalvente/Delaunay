@@ -1,4 +1,4 @@
-N_POINTS=50
+N_POINTS=5
 INPUT_FLAT_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/flat.txt
 INPUT_DCEL_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/dcel.txt
 INPUT_GRAPH_FILE=/home/delaunay/Projects/Git/Delaunay/tmp/output/graph.txt
