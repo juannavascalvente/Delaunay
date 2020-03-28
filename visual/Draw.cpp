@@ -39,7 +39,6 @@ Delaunay	  *Draw::delaunay;		// Delaunay data.
 StarTriangulation *Draw::triangulation;	// Star triangulation data.
 Voronoi		  *Draw::voronoi;		// Voronoi diagram data.
 Gabriel		  *Draw::gabriel;		// Gabriel graph data.
-Status 		  *Draw::status;		// Current process status.
 
 
 // Internal static functions.
@@ -79,7 +78,6 @@ Draw * Draw::getInstance(int argc, char **argv, Dcel *inDcel, Delaunay *inDelaun
 		triangulation = inTriangulation;
 		voronoi = inVoronoi;
 		gabriel = inGabriel;
-		status = inStatus;
 
 		// Set x, y and z axis size.
 		Config::getScreenCoordinates(minX, minY, maxX, maxY);
@@ -128,17 +126,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 		{
 			this->drawDelaunay(INVALID);
 			this->drawGabriel();
-			break;
-		}
-		// Draw the triangulation filtering edges.
-		case FILTEREDGES_DRAW:
-		{
-			this->drawDelaunay(Config::getMinLengthEdge());
-			for (i=0; i<this->pointsSet->getNElements() ;i++)
-			{
-				p = *this->pointsSet->at(i);
-				this->draw(&p);
-			}
 			break;
 		}
 		// Draw the triangulation and the triangles circumcentres.
@@ -437,44 +424,6 @@ void Draw::drawEdge(int edgeIndex, Dcel *dcel)
 
 
 /***************************************************************************
-* Name: 	drawFace
-* IN:		faceId		face id.
-* 			dcel		DCEL data
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draws the "faceId" face of the DCEL.
-***************************************************************************/
-void Draw::drawFace(int faceId, Dcel *dcel)
-{
-	int	edgeIndex=0;		// Edge index.
-	int	firstEdgeIndex=0;
-#ifdef DEBUG_DRAW_DRAWFACE
-	Logging::buildText(__FUNCTION__, __FILE__, "Drawing face ");
-	Logging::buildText(__FUNCTION__, __FILE__, faceId);
-	Logging::write(true, Info);
-#endif
-	// Get edge in face.
-	firstEdgeIndex = dcel->getFaceEdge(faceId)-1;
-	edgeIndex = firstEdgeIndex;
-
-	// Draw face loop.
-	do
-	{
-#ifdef DEBUG_DRAW_DRAWFACE
-		Logging::buildText(__FUNCTION__, __FILE__, "Drawing edge ");
-		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-		Logging::write(true, Info);
-#endif
-		// Draw edge.
-		this->drawEdge(edgeIndex, dcel);
-
-		// Get next edge.
-		edgeIndex = dcel->getNext(edgeIndex)-1;
-	} while (edgeIndex != firstEdgeIndex);
-}
-
-/***************************************************************************
 * Name: 	draw
 * IN:		face		pointer to face
 * 			dcel		DCEL data
@@ -605,63 +554,6 @@ void Draw::draw(Gabriel *gabriel)
 	}
 }
 
-/***************************************************************************
-* Name: 		drawCircumcentres
-* IN:			dcel			DCEL data.
-* OUT:			NONE
-* RETURN:		NONE
-* GLOBAL:		NONE
-* Description: 	draws the circles using the triangles of the input dcel
-* 				as the basis for every circle. For every triangle the circle
-* 				formed by its three points is drawn.
-***************************************************************************/
-void Draw::drawCircumcentres(Dcel *dcel)
-{
-	int		faceID=0;		  			// Loop counter.
-	Circle	circle;						// Circle to draw.
-	int		points[NPOINTS_TRIANGLE];	// Triangle points.
-
-	// Set circles color.
-	this->setColor(BLUE);
-	this->setLineSize(1.0);
-
-	// Draw all points of the set.
-	for (faceID=1; faceID<dcel->getNFaces() ;faceID++)
-	{
-		// Skip imaginary faces.
-        if (!dcel->imaginaryFace(faceID))
-        {
-        	// Get points of the triangle.
-        	dcel->getFaceVertices(faceID, points);
-#ifdef DEBUG_DRAW_CIRCUMCENTRES
-			Logging::buildText(__FUNCTION__, __FILE__, "Drawing face ");
-			Logging::buildText(__FUNCTION__, __FILE__, faceID);
-			Logging::buildText(__FUNCTION__, __FILE__, " circumcentre whose points are ");
-			Logging::buildText(__FUNCTION__, __FILE__, points[0]);
-			Logging::buildText(__FUNCTION__, __FILE__, ",");
-			Logging::buildText(__FUNCTION__, __FILE__, points[1]);
-			Logging::buildText(__FUNCTION__, __FILE__, " and ");
-			Logging::buildText(__FUNCTION__, __FILE__, points[2]);
-			Logging::write(true, Info);
-#endif
-            // Build circle.
-//        	circle = Circle(dcel->getRefPoint(points[0]-1),
-//							dcel->getRefPoint(points[1]-1),
-//							dcel->getRefPoint(points[2]-1));
-
-        	// Draw circle.
-        	this->draw(&circle, false);
-        }
-#ifdef DEBUG_DRAW_CIRCUMCENTRES
-        else
-        {
-			Logging::buildText(__FUNCTION__, __FILE__, "Skipping imaginary face ");
-			Logging::buildText(__FUNCTION__, __FILE__, faceID);
-			Logging::write(true, Info);
-        }
-#endif
-	}
-}
 
 /***************************************************************************
 * Name: 	drawEdgesCircles
@@ -1018,40 +910,6 @@ void Draw::drawInfo(Dcel *dcel)
 	this->drawFacesInfo(dcel);
 }
 
-/***************************************************************************
-* Name: 	drawPath
-* IN:		dcel		DCEL data.
-* 			p1			path origin point.
-* 			p2			path destination point.
-* 			queue		list of faces in the path.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	draw the DCEL data, the segment between p1 and p2 and
-* 				highlights the faces between both points.
-***************************************************************************/
-void Draw::drawPath(Dcel *dcel, Point<TYPE> *p1, Point<TYPE> *p2, Queue<int> &queue)
-{
-	int		i=0;			// Counters.
-	int		nElements=0;	// # elements in queue.
-	Line	line;			// Segment between two points.
-
-	// Draw line.
-	line = Line(*p1, *p2);
-	this->setColor(YELLOW);
-	this->draw(&line);
-
-	// Draw input DCEL.
-	this->draw(dcel, INVALID);
-
-	// Draw faces.
-	nElements = queue.getNElements();
-	for (i=0; i<nElements ;i++)
-	{
-		// PENDING Draw Voronoi face.
-		printf("Face %d is %d\n", i+1, queue.at(i));
-	}
-}
 
 void refresh(void)
 {

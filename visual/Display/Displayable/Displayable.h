@@ -211,9 +211,11 @@ public:
 ***********************************************************************************************************************/
 class DispDcel : public Displayable
 {
-    Dcel *dcel;
+    TYPE    minLength;
+    Dcel    *dcel;
 public:
-    explicit DispDcel(Dcel *dcelIn) : dcel(dcelIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
+    explicit DispDcel(Dcel *dcelIn, TYPE minLengthIn=INVALID) : dcel(dcelIn), minLength(minLengthIn),
+                                                            Displayable(DisplayableConfigGenerator::getNextConfig()) {};
 
     void display() override
     {
@@ -234,17 +236,26 @@ public:
                     // Get destination vertex of edge.
                     Point<TYPE> *vertex2 = dcel->getRefPoint(dcel->getOrigin(dcel->getTwin(edgeIndex)-1)-1);
 
-                    // Start line
-                    DisplayService::startLine();
+                    // If minLength is NOT INVALID -> check if distance between point is higher than minimum
+                    TYPE dist=0.0;
+                    if (minLength != INVALID)
+                    {
+                        dist = vertex1->distance(*vertex2);
+                    }
+                    if ((minLength == INVALID) || (dist > minLength))
+                    {
+                        // Start line
+                        DisplayService::startLine();
 
-                    // Draw first point
-                    DisplayService::display(vertex1->getX(), vertex1->getY());
+                        // Draw first point
+                        DisplayService::display(vertex1->getX(), vertex1->getY());
 
-                    // Draw second point
-                    DisplayService::display(vertex2->getX(), vertex2->getY());
+                        // Draw second point
+                        DisplayService::display(vertex2->getX(), vertex2->getY());
 
-                    // End line
-                    DisplayService::finish();
+                        // End line
+                        DisplayService::finish();
+                    }
                 }
             }
         }

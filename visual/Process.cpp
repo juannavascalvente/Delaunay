@@ -1004,8 +1004,11 @@ void Process::execute()
 			// Check if Delaunay triangulation already created.
 			if (status.isTriangulationCreated())
 			{
-				// Draw triangulation filtering edges.
-				this->drawer->drawFigures(FILTEREDGES_DRAW);
+                // Add Delaunay triangulation filtering edges
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel, Config::getMinLengthEdge());
+                dispManager.add(dispDelaunay);
+
+                dispManager.process();
             }
 			break;
 		}

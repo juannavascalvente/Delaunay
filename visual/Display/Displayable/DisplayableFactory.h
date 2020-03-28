@@ -32,7 +32,7 @@ public:
 
     static DispCircleSet* createCircleSet(vector<Circle> &vCircles) { return new DispCircleSet(vCircles); };
 
-    static DispDcel* createDcel(Dcel *dcel) { return new DispDcel(dcel); };
+    static DispDcel *createDcel(Dcel *dcel, TYPE minLength=INVALID) { return new DispDcel(dcel, minLength); };
 };
 
 

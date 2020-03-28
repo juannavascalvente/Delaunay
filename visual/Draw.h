@@ -38,7 +38,6 @@ enum ColorT { RED,
 // Type of figure to draw.
 enum drawingT {
 				  GABRIEL_DRAW,
-				  FILTEREDGES_DRAW,
 				  EDGESCIRCLES_DRAW,
 				  DCEL_INFO_DRAW,
 				  VORONOI_INFO_DRAW};
