@@ -1,49 +1,88 @@
-/*
- * Circle.h
- *
- *  Created on: Jul 28, 2016
- *      Author: jnavas
- */
 #ifndef INCLUDE_CIRCLE_H_
 #define INCLUDE_CIRCLE_H_
 
+
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Point.h"
 
-//****************************************************************************
-//                           	CIRCLE CLASS
-//****************************************************************************
+#include <vector>
+using namespace std;
+
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
+#define NUM_POINTS_IN_CIRCLE            (3)
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class Circle
 {
-	//------------------------------------------------------------------------
-	// Attributes
-	//------------------------------------------------------------------------
-	Point<TYPE> p,q,r;			// Points in circle.
-	Point<TYPE> centre;			// Circle centre.
-	TYPE radius;				// Circle radius.
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    vector<Point<TYPE>> vPoints;    // Points in circle.
 
-	//------------------------------------------------------------------------
-	// Private functions.
-	//------------------------------------------------------------------------
+	Point<TYPE> centre;			    // Circle centre.
+	TYPE radius;				    // Circle radius.
+
+    /*******************************************************************************************************************
+    * Private class methods
+    *******************************************************************************************************************/
 	void computeCentre();
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Circle(void);
+	Circle() : radius(0) {}
 	Circle(Point<TYPE> *centre, TYPE radius);
-	Circle(Point<TYPE> *p,	Point<TYPE> *q, Point<TYPE> *r);
+	// TODO Circle must contain only 3 elements in vector: https://github.com/juannavascalvente/Delaunay/issues/58
+	explicit Circle(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn)
+    {
+        // Initialize fields.
+        computeCentre();
+        this->radius = this->centre.distance(vPointsIn.at(0));
+    };
 
-	//------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
-	inline double area(void) { return(PI*pow(this->radius,2)); };
-	inline double perimeter(void) { return(2*PI*this->radius); };
-	bool inCircle(Point<TYPE> *s);
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    /**
+     * @fn      area
+     * @brief   Computes circle area
+     *
+     * @return  circle area
+     */
+	inline double area() { return(PI*pow(this->radius,2)); };
 
-	// GET/SET functions.
-	inline Point<TYPE>* getRefCentre(void) { return( &this->centre); };
-	inline double getRadius(void) { return(this->radius); };
+    /**
+     * @fn      perimeter
+     * @brief   Computes circle perimeter
+     *
+     * @return  circle perimeter
+     */
+	inline double perimeter() { return(2*PI*this->radius); };
+
+    /**
+     * @fn      inCircle
+     * @brief   Checks if input point falls into circle
+     *
+     * @param   p   (IN)    Point to check
+     * @return  true if points falls into circle
+     *          false otherwise
+     */
+	bool inCircle(Point<TYPE> &p);
+
+    /*******************************************************************************************************************
+    * Getter/Setter
+    *******************************************************************************************************************/
+	inline Point<TYPE>* getRefCentre() { return( &this->centre); };
+	inline double getRadius() { return(this->radius); };
 };
 
 #endif /* INCLUDE_CIRCLE_H_ */

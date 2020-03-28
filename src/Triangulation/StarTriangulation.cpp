@@ -597,9 +597,11 @@ bool StarTriangulation::delaunay()
 			if (!this->dcel->isExternalEdge(edgeIndex))
 			{
 				// Create face circle.
-				circle = Circle(this->dcel->getRefPoint(edge->getOrigin()-1),
-								this->dcel->getRefPoint(this->dcel->getOrigin(edge->getNext()-1)-1),
-								this->dcel->getRefPoint(this->dcel->getOrigin(edge->getPrevious()-1)-1));
+				vector<Point<TYPE>> vPoints;
+                vPoints.push_back(*this->dcel->getRefPoint(edge->getOrigin()-1));
+                vPoints.push_back(*this->dcel->getRefPoint(this->dcel->getOrigin(edge->getNext()-1)-1));
+                vPoints.push_back(*this->dcel->getRefPoint(this->dcel->getOrigin(edge->getPrevious()-1)-1));
+				circle = Circle(vPoints);
 
 				// Get twin edge.
 				twin = this->dcel->getRefEdge(this->dcel->getTwin(edgeIndex)-1);
@@ -617,7 +619,7 @@ bool StarTriangulation::delaunay()
 #endif
 
 				// Check if remaining point from adjacent face is in circle.
-				if (circle.inCircle(this->dcel->getRefPoint(this->dcel->getOrigin(twin->getPrevious()-1)-1)))
+				if (circle.inCircle(*this->dcel->getRefPoint(this->dcel->getOrigin(twin->getPrevious()-1)-1)))
 				{
 #ifdef STATISTICS_STAR_TRIANGULATION
 					this->nFlips++;

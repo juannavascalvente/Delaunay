@@ -142,13 +142,6 @@ void Draw::drawFigures(enum drawingT type, bool error)
 			break;
 		}
 		// Draw the triangulation and the triangles circumcentres.
-		case CIRCUMCENTRES_DRAW:
-		{
-			this->drawDelaunay(INVALID);
-			this->drawCircumcentres(this->dcel);
-			break;
-		}
-		// Draw the triangulation and the triangles circumcentres.
 		case EDGESCIRCLES_DRAW:
 		{
 			this->drawDelaunay(INVALID);
@@ -652,9 +645,9 @@ void Draw::drawCircumcentres(Dcel *dcel)
 			Logging::write(true, Info);
 #endif
             // Build circle.
-        	circle = Circle(dcel->getRefPoint(points[0]-1),
-							dcel->getRefPoint(points[1]-1),
-							dcel->getRefPoint(points[2]-1));
+//        	circle = Circle(dcel->getRefPoint(points[0]-1),
+//							dcel->getRefPoint(points[1]-1),
+//							dcel->getRefPoint(points[2]-1));
 
         	// Draw circle.
         	this->draw(&circle, false);

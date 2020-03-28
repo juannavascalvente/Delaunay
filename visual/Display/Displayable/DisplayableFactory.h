@@ -30,6 +30,8 @@ public:
 
     static DispPolygonSet* createPolygonSet(vector<Polygon> &vPolygon) { return new DispPolygonSet(vPolygon); };
 
+    static DispCircleSet* createCircleSet(vector<Circle> &vCircles) { return new DispCircleSet(vCircles); };
+
     static DispDcel* createDcel(Dcel *dcel) { return new DispDcel(dcel); };
 };
 

@@ -375,7 +375,11 @@ void Voronoi::computeCircumcentres(bool isIncremental)
 			this->triangulation->getFacePoints(faceId, p, q, r);
 
 		    // Build circle.
-			circle = Circle(&p, &q, &r);
+            vector<Point<TYPE>> vPoints;
+            vPoints.push_back(p);
+            vPoints.push_back(q);
+            vPoints.push_back(r);
+			circle = Circle(vPoints);
 
 			// Add circumcentre.
 			this->voronoi.addVertex(circle.getRefCentre(), INVALID);

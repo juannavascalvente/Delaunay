@@ -39,16 +39,10 @@ enum ColorT { RED,
 enum drawingT {
 				  GABRIEL_DRAW,
 				  FILTEREDGES_DRAW,
-				  CIRCUMCENTRES_DRAW,
 				  EDGESCIRCLES_DRAW,
 				  DCEL_INFO_DRAW,
 				  VORONOI_INFO_DRAW};
 
-// Type of information to draw.
-enum drawingInfoT {	PointsInfo,
-					EdgesInfo,
-					FacesInfo,
-					AllInfo};
 
 //****************************************************************************
 //                           	DRAW CLASS
@@ -69,7 +63,6 @@ class Draw
 	static StarTriangulation *triangulation;// Star triangulation data.
 	static Voronoi		 *voronoi;		// Voronoi diagram data.
 	static Gabriel		 *gabriel;		// Gabriel graph data.
-	static Status 		 *status;		// Current process status.
 
 	//------------------------------------------------------------------------
 	// Private functions.
@@ -78,7 +71,6 @@ class Draw
 	void drawDelaunay(TYPE minLength);
 	void drawVoronoi();
 	void drawGabriel();
-	void drawPath( Dcel *dcel, Point<TYPE> *p1, Point<TYPE> *p2, Queue<int> &queue);
 
 	// Single figures.
 	void draw( PointT *point);
@@ -87,9 +79,7 @@ class Draw
 	void draw( Dcel *dcel, TYPE minLength);
 	void drawEdge( int edgeIndex, Dcel *dcel);
 	void draw( Face *face, Dcel *dcel);
-	void drawFace( int faceId, Dcel *dcel);
 	void draw( Gabriel *gabriel);
-	void drawCircumcentres( Dcel *dcel);
 	void drawEdgesCircles( Dcel *dcel);
 
 	// Screen API.
@@ -123,12 +113,6 @@ public:
                 Voronoi *inVoronoi, Gabriel *inGabriel, Status *inStatus);
 	Draw() : windowID(0), pointsSet(NULL), facesSet(NULL) {} ;
 	~Draw() {};
-
-	//------------------------------------------------------------------------
-	// Public API.
-	//------------------------------------------------------------------------
-	inline void setPointsSet(Set<PointT> *set) { this->pointsSet = set; };
-	inline void setFacesSet(Set<int> *faces) { this->facesSet = faces; };
 
 	// Main function.
 	void drawFigures(enum drawingT type, bool error=false);

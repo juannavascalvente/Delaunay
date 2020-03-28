@@ -1016,7 +1016,36 @@ void Process::execute()
 			if (this->status.isDelaunayCreated() ||
 				this->status.isTriangulationCreated())
 			{
-				this->drawer->drawFigures(CIRCUMCENTRES_DRAW);
+                // Add circles
+                vector<Circle> vCircles;
+                for (int faceID=1; faceID<this->dcel.getNFaces() ;faceID++)
+                {
+                    // Skip imaginary faces.
+                    if (!dcel.imaginaryFace(faceID))
+                    {
+                        // Get points of the triangle.
+                        int		points[NPOINTS_TRIANGLE];	// Triangle points.
+                        dcel.getFaceVertices(faceID, points);
+
+                        // Build circle.
+                        vector<Point<TYPE>> vPoints;
+                        vPoints.push_back(*dcel.getRefPoint(points[0]-1));
+                        vPoints.push_back(*dcel.getRefPoint(points[1]-1));
+                        vPoints.push_back(*dcel.getRefPoint(points[2]-1));
+                        Circle circle = Circle(vPoints);
+                        vCircles.push_back(circle);
+                    }
+                }
+
+                // Add Delaunay triangulation
+                Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                dispManager.add(dispDelaunay);
+
+                // Add points to display.
+                Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
+                dispManager.add(circles);
+
+                dispManager.process();
 			}
 			break;
 		}

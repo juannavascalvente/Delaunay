@@ -8,6 +8,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "Circle.h"
 #include "Dcel.h"
 #include "DisplayableConfig.h"
 #include "DisplayableConfigGenerator.h"
@@ -139,6 +140,9 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class DispPolygonSet : public Displayable
 {
     vector<Polygon> vPolygon;
@@ -166,6 +170,36 @@ public:
             DisplayService::startLine();
             DisplayService::display(polygon.at(polygon.getNElements()-1).getX(), polygon.at(polygon.getNElements()-1).getY());
             DisplayService::display(polygon.at(0).getX(), polygon.at(0).getY());
+            DisplayService::finish();
+        }
+    }
+};
+
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class DispCircleSet : public Displayable
+{
+    vector<Circle> vCircles;
+public:
+    explicit DispCircleSet(vector<Circle> &vCircleIn) : vCircles(vCircleIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
+
+    void display() override
+    {
+        Displayable::display();
+
+        for (auto circle : vCircles)
+        {
+            DisplayService::startCircle();
+            for (size_t i=0; i<150; i++)
+            {
+                TYPE angle = ((float) i)*((float) (2*PI/150));
+                glVertex2f(circle.getRefCentre()->getX() + (cos(angle) * circle.getRadius()),
+                           circle.getRefCentre()->getY() + (sin(angle) * circle.getRadius()));
+            }
+
             DisplayService::finish();
         }
     }
