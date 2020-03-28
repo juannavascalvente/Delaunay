@@ -40,6 +40,12 @@ bool Circle::inCircle(Point<TYPE> &p)
 	bool	isInCircle=false;
 	double 	temp[9];		// Intermediate values.
 
+	// If circle is empty -> has not been initialized.
+	if (vPoints.empty())
+    {
+	    return isInCircle;
+    }
+
 	// Compute Ax - Dx, Ay - Dy and (Ax-Dx)² + (Ay-Dy)²
 	temp[0] = (vPoints.at(0).getX() - p.getX());
 	temp[1] = (vPoints.at(0).getY() - p.getY());

@@ -36,10 +36,9 @@ class Circle
 	void computeCentre();
 
 public:
-	//------------------------------------------------------------------------
-	// Constructor/Destructor
-	//------------------------------------------------------------------------
-	Circle() : radius(0) {}
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
 	Circle(Point<TYPE> *centre, TYPE radius);
 	// TODO Circle must contain only 3 elements in vector: https://github.com/juannavascalvente/Delaunay/issues/58
 	explicit Circle(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn)
@@ -49,9 +48,6 @@ public:
         this->radius = this->centre.distance(vPointsIn.at(0));
     };
 
-    /*******************************************************************************************************************
-    * Public class methods
-    *******************************************************************************************************************/
     /**
      * @fn      area
      * @brief   Computes circle area

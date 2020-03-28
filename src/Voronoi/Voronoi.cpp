@@ -348,8 +348,7 @@ void Voronoi::computeCircumcentres(bool isIncremental)
 	int			edgeIndex=0;		// Edge index.
 	int			twinEdgeIndex=0;	// Twin edge index.
 	bool		realFaceFound;		// Adjacent face is real.
-	Circle		circle;				// Circle to compute cicurmcentre.
-	Point<TYPE>	p, q, r;			// Vertices points.
+    Point<TYPE>	p, q, r;			// Vertices points.
 	Point<TYPE>	*centre;			// Vertices points.
 	Point<TYPE>	externalCentre;		// Circuemcentre in external face.
 	Point<TYPE>	invalidPoint;		// Point to use in imaginary faces.
@@ -379,7 +378,7 @@ void Voronoi::computeCircumcentres(bool isIncremental)
             vPoints.push_back(p);
             vPoints.push_back(q);
             vPoints.push_back(r);
-			circle = Circle(vPoints);
+            Circle circle = Circle(vPoints);
 
 			// Add circumcentre.
 			this->voronoi.addVertex(circle.getRefCentre(), INVALID);

@@ -561,7 +561,6 @@ bool StarTriangulation::delaunay()
 	int		originPoint;		// Origin point.
 	Edge	*edge;				// Pointer to current edge.
 	Edge	*twin;				// Pointer to twin edge of current edge.
-	Circle	circle;
 #ifdef STATISTICS_STAR_TRIANGULATION
 	this->nFlips = 0;
 #endif
@@ -601,7 +600,7 @@ bool StarTriangulation::delaunay()
                 vPoints.push_back(*this->dcel->getRefPoint(edge->getOrigin()-1));
                 vPoints.push_back(*this->dcel->getRefPoint(this->dcel->getOrigin(edge->getNext()-1)-1));
                 vPoints.push_back(*this->dcel->getRefPoint(this->dcel->getOrigin(edge->getPrevious()-1)-1));
-				circle = Circle(vPoints);
+				Circle circle = Circle(vPoints);
 
 				// Get twin edge.
 				twin = this->dcel->getRefEdge(this->dcel->getTwin(edgeIndex)-1);

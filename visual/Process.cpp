@@ -1162,7 +1162,6 @@ void Process::execute()
                 int		nEdges=0;			// # edges in the DCEL.
                 TYPE  	radius; 			// Circle radius.
                 Line	line;				// Edge line.
-                Circle	circle;				// Circle to draw.
                 Point<TYPE> origin, dest;  	// Origin and destination points.
                 Point<TYPE> middle;	    	// Edge middle point.
 
@@ -1185,7 +1184,7 @@ void Process::execute()
 
                         // Create circle
                         radius = origin.distance(middle);
-                        circle = Circle(&middle, radius);
+                        Circle circle = Circle(&middle, radius);
 
                         // Add circles
                         vCircles.push_back(circle);

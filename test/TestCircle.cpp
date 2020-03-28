@@ -5,34 +5,6 @@
 #include <gtest/gtest.h>
 
 /**
- * DESCRIPTION: creates default circle and checks all Circle class functions
- *
- */
-TEST (CircleUnitTest, Test_Default_Constructor)
-{
-	Circle circle;
-
-    // Check circle center coordinates.
-    Point<TYPE> *centre;
-    centre = circle.getRefCentre();
-    EXPECT_EQ(0.0, centre->getX());
-    EXPECT_NE(1.0, centre->getX());
-    EXPECT_EQ(0.0, centre->getY());
-    EXPECT_NE(1.0, centre->getY());
-
-    // Check radius, area and perimeter.
-    EXPECT_EQ(0.0, circle.getRadius());
-    EXPECT_EQ(0.0, circle.area());
-    EXPECT_EQ(0.0, circle.perimeter());
-
-    // Check circle contains no point.
-	Point<TYPE> p;
-	Point<TYPE> q(2.0,3.0);
-    EXPECT_EQ(false, circle.inCircle(p));
-    EXPECT_EQ(false, circle.inCircle(q));
-}
-
-/**
  * DESCRIPTION: creates a circle given its center and its radius and checks
  * all Circle class functions.
  *
