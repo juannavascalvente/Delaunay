@@ -21,13 +21,16 @@
 #include <GL/glut.h>
 
 
+/***********************************************************************************************************************
+* Static members
+***********************************************************************************************************************/
 Process *Process::instance = nullptr;
 typedef Point<TYPE> PointT;
 
 
-//------------------------------------------------------------------------
-// Constructors / Destructor.
-//------------------------------------------------------------------------
+/***********************************************************************************************************************
+* Public methods definitions
+***********************************************************************************************************************/
 Process::Process(int argc, char **argv, bool printData)
 {
 	string 	fileName;			// Configuration file name.
@@ -39,13 +42,6 @@ Process::Process(int argc, char **argv, bool printData)
 	// Check flag to print data to screen.
 	this->log = new Logging("log.txt", printData);
 
-    // Initialize drawer and menu.
-//    this->drawer = this->drawer->getInstance(argc, argv, &this->dcel,
-//                                             &this->delaunay,
-//                                             &this->triangulation,
-//                                             &this->voronoi,
-//                                             &this->gabriel,
-//                                             &this->status);
     this->dispManager = new DisplayManager(argc, argv);
 
 	this->m = Menu(&this->status);
@@ -53,6 +49,7 @@ Process::Process(int argc, char **argv, bool printData)
 	// Function to execute by GLUT.
 	glutDisplayFunc(executeWrapper);
 }
+
 
 Process::~Process()
 {
@@ -78,17 +75,6 @@ Process::~Process()
 }
 
 
-//------------------------------------------------------------------------
-// Public functions.
-//------------------------------------------------------------------------
-/***************************************************************************
-* Name: start
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: starts infinite loop.
-***************************************************************************/
 void Process::start()
 {
 	// GLUT main function.
@@ -96,19 +82,11 @@ void Process::start()
 }
 
 
-/***************************************************************************
-* Name: setInstance
-* IN:		process		instance to be executed by main loop.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	"instance" points to "process"
-* Description: sets "instance" to the object that is going to be executed
-* 				by the main loop process.
-***************************************************************************/
 void Process::setInstance(Process *process)
 {
 	instance = process;
 }
+
 
 /***************************************************************************
 * Name: executeWrapper
@@ -142,7 +120,7 @@ void Process::executeWrapper()
 ***************************************************************************/
 bool Process::readData(int option)
 {
-	bool isSuccess=true; 		// Return value.
+	bool isSuccess; 		// Return value.
 
 	// Check option to generate/read set.
 	switch (option)
@@ -484,7 +462,7 @@ bool Process::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 ***************************************************************************/
 bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 {
-	bool found;		    // Return value.
+	bool found=false;		    // Return value.
 	int	pointIndex=0;	// Index of the closest point.
 
 	// Check if Delaunay triangulation computed.
@@ -507,7 +485,7 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 		found = this->triangulation.findClosestPoint(p, q, distance);
 	}
 
-	return(found);
+	return found;
 }
 
 /***************************************************************************
@@ -1182,7 +1160,7 @@ void Process::execute()
 			{
                 int		edgeIndex=0;        // Edge index.
                 int		nEdges=0;			// # edges in the DCEL.
-                TYPE  	radius=0.0;			// Circle radius.
+                TYPE  	radius; 			// Circle radius.
                 Line	line;				// Edge line.
                 Circle	circle;				// Circle to draw.
                 Point<TYPE> origin, dest;  	// Origin and destination points.

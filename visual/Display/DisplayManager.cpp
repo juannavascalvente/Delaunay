@@ -38,7 +38,6 @@ void DisplayManager::draw()
     // Iterate all elements and display them
     for (auto item : vDisplayables)
     {
-        printf("DISPLAY ELEMENT\n");
         item->display();
     }
 }

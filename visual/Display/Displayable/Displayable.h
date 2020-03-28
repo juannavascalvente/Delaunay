@@ -36,7 +36,6 @@ class Displayable
     ***********************************************************************************************************************/
     virtual void runConfig()
     {
-        cout << "RUNNING CONFIG " << endl;
         DisplayService::setColor(config.getColor());
         DisplayService::setPointSize(config.getPointSize());
         DisplayService::setLineSize(config.getLineSize());
