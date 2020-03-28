@@ -59,24 +59,6 @@ class Draw
 	static Voronoi		 *voronoi;		// Voronoi diagram data.
 	static Gabriel		 *gabriel;		// Gabriel graph data.
 
-	// General figures.
-	void drawDelaunay(TYPE minLength);
-	void drawGabriel();
-
-	// Single figures.
-	void draw( Dcel *dcel, TYPE minLength);
-	void draw( Gabriel *gabriel);
-
-	// Screen API.
-	inline void clear()  { glClear(GL_COLOR_BUFFER_BIT);} ;
-	inline void flush()  { glutSwapBuffers(); };
-
-	// Type of lines.
-	inline void startLine()   { glBegin(GL_LINE_STRIP); };
-	inline void finish() { glEnd(); };
-
-	// Size and font.
-	void setColor(enum ColorT);
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
@@ -86,8 +68,5 @@ public:
                 Voronoi *inVoronoi, Gabriel *inGabriel, Status *inStatus);
 	Draw() : windowID(0), pointsSet(NULL), facesSet(NULL) {} ;
 	~Draw() {};
-
-	// Main function.
-	void drawFigures(enum drawingT type, bool error=false);
 };
 #endif /* DRAW_H_ */

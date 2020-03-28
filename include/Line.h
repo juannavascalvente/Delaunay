@@ -51,19 +51,18 @@ class Line
 	//------------------------------------------------------------------------
 	// 	Private functions.
 	//------------------------------------------------------------------------
-	void 		setSlopeAndN(void);
-	Direction_E getDirection(void);
+	void 		setSlopeAndN();
+	Direction_E getDirection();
 
-	inline void	setSlope(TYPE m)	{ this->m = m; };
-	inline void setN(TYPE n) 		{ this->n = n; };
-	inline void setSlopeType(Line_Slope_Enum enSlopeType)
-									{ this->enSlopeType = enSlopeType; };
+	inline void	setSlope(TYPE mIn)	{ this->m = mIn; };
+	inline void setN(TYPE nIn) 		{ this->n = nIn; };
+	inline void setSlopeType(Line_Slope_Enum enSlopeTypeIn) { this->enSlopeType = enSlopeTypeIn; };
 
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor.
 	//------------------------------------------------------------------------
-	Line(void);
+	Line();
 	Line(Point<TYPE> p, Point<TYPE> q);
 
 	//------------------------------------------------------------------------
@@ -76,11 +75,11 @@ public:
 	enum Turn_T	checkTurn(Point<TYPE> *p);
 
 	// GET/SET functions.
-	inline Point<TYPE> 	getOrigin(void) 		{ return(this->origin); };
-	inline Point<TYPE> 	getDest(void) 			{ return(this->destination); };
-	inline TYPE getSlope(void)					{ return(this->m); };
-	inline TYPE getN(void) 						{ return(this->n); };
-	inline Line_Slope_Enum getSlopeType(void) 	{ return(this->enSlopeType); };
+	inline Point<TYPE> 	getOrigin() 		{ return(this->origin); };
+	inline Point<TYPE> 	getDest() 			{ return(this->destination); };
+	inline TYPE getSlope()					{ return(this->m); };
+	inline TYPE getN() 						{ return(this->n); };
+	inline Line_Slope_Enum getSlopeType() 	{ return(this->enSlopeType); };
 
 	void   setOrigin(Point<TYPE> *p);
 	void   setDestination(Point<TYPE> *p);;

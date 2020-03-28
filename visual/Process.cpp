@@ -773,6 +773,7 @@ void Process::execute()
 					// Draw Voronoi graph and the triangulation.
 					Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
                     dispManager.add(dispDelaunay);
+
                     Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
                     dispManager.add(dispVoronoi);
                     dispManager.process();
@@ -797,7 +798,39 @@ void Process::execute()
 				if (!error)
 				{
 					// Draw Voronoi graph and the triangulation.
-					this->drawer->drawFigures(GABRIEL_DRAW);
+                    Point<TYPE> *vertex1;	    // First vertex.
+                    Point<TYPE> *vertex2;	    // Second vertex.
+                    Dcel	*dcelRef;
+
+                    // Get reference to gabriel dcel.
+                    dcelRef = gabriel.getDcel();
+
+                    // Draw Gabriel edges.
+                    vector<Line> vLines;
+                    for (size_t edgeIndex=0; edgeIndex<gabriel.getSize() ;edgeIndex++)
+                    {
+                        // Check if current edge mamtches Gabriel restriction.s
+                        if (gabriel.isSet(edgeIndex))
+                        {
+                            // Get origin vertex of edge.
+                            vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
+
+                            // Get destination vertex of edge.
+                            vertex2 = dcelRef->getRefPoint(dcelRef->getOrigin(dcelRef->getTwin(edgeIndex)-1)-1);
+
+                            Line line(*vertex1, *vertex2);
+                            vLines.push_back(line);
+                        }
+                    }
+
+                    // Draw Delaunay
+                    Displayable *dispDelaunay = DisplayableFactory::createDcel(&this->dcel);
+                    dispManager.add(dispDelaunay);
+
+                    // Add lines
+                    dispManager.add(DisplayableFactory::createPolyLine(vLines));
+
+                    dispManager.process();
 
 					// Update execution status flags.
 					status.set(false, true, true, true, true, true);

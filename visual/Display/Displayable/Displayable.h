@@ -66,21 +66,22 @@ public:
 ***********************************************************************************************************************/
 class DispPolyLine : public Displayable
 {
-    vector<Point<TYPE>> vPoints;
+    vector<Line> vLines;
 public:
-    explicit DispPolyLine(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
+    explicit DispPolyLine(vector<Line> &vLinesIn) : vLines(vLinesIn), Displayable(DisplayableConfigGenerator::getNextConfig()) {};
 
     void display() override
     {
         Displayable::display();
 
-        // Draw line between all points.
-        DisplayService::startLine();
-        for (auto point : vPoints)
+        // Draw lines
+        for (auto line : vLines)
         {
-            DisplayService::display(point.getX(), point.getY());
+            DisplayService::startLine();
+            DisplayService::display(line.getOrigin().getX(), line.getOrigin().getY());
+            DisplayService::display(line.getDest().getX(), line.getDest().getY());
+            DisplayService::finish();
         }
-        DisplayService::finish();
     }
 };
 

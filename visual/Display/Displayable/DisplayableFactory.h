@@ -24,7 +24,7 @@ public:
 
     static DispTextSet* createTextSet(vector<Text> &vText) { return new DispTextSet(vText); };
 
-    static DispPolyLine* createPolyLine(vector<Point<TYPE>> &vPointsIn) { return new DispPolyLine(vPointsIn); };
+    static DispPolyLine* createPolyLine(vector<Line> &vLinesIn) { return new DispPolyLine(vLinesIn); };
 
     static DispPointsSet* createPointsSet(vector<Point<TYPE>> &vPointsIn) { return new DispPointsSet(vPointsIn); };
 
