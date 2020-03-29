@@ -23,6 +23,7 @@
 #include "Logging.h"
 #include "Queue.h"
 #include "StarTriangulation.h"
+#include "StoreService.h"
 #include "Text.h"
 #include "Voronoi.h"
 
@@ -36,9 +37,11 @@ class Process
     * Class members
     *******************************************************************************************************************/
     DisplayManager      *dispManager;
+    StoreService        *storeService;
+
 	Menu 			    m;				// Menu object.
 	Status 			    status;			// Current status.
-	Dcel			    dcel;			// Dcel data.
+//	Dcel			    dcel;			// Dcel data.
 	Delaunay		    delaunay;		// Delaunay data.
 	StarTriangulation	triangulation;	// Star triangulation data.
 	Voronoi			    voronoi;		// Voronoi diagram data.
@@ -71,7 +74,7 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-	Process(int argc, char **argv, bool printData);
+    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn);
 	~Process();
 
     /**

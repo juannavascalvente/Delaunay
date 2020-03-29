@@ -28,6 +28,8 @@ protected:
     virtual void printRunnableMsg() {};
 
     virtual bool runCommand() = 0;
+
+    bool isSuccess;
 public:
     /***********************************************************************************************************************
     * Public class methods
@@ -41,15 +43,20 @@ public:
      */
     bool run()
     {
+        isSuccess = false;
+
         // Check command can be executed
         if (!isRunnable())
         {
             printRunnableMsg();
-            return false;
+        }
+        else
+        {
+            // Run command
+            isSuccess = runCommand();
         }
 
-        // Run command
-        return runCommand();
+        return isSuccess;
     }
 };
 
