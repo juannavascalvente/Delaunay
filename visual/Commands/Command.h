@@ -21,19 +21,26 @@
 class Command
 {
 protected:
+
+    /***********************************************************************************************************************
+    * Protected class members
+    ***********************************************************************************************************************/
+    bool isSuccess;
+
     /***********************************************************************************************************************
     * Protected class methods
     ***********************************************************************************************************************/
     virtual bool isRunnable() { return true; };
     virtual void printRunnableMsg() {};
-
     virtual bool runCommand() = 0;
 
-    bool isSuccess;
 public:
+
     /***********************************************************************************************************************
     * Public class methods
     ***********************************************************************************************************************/
+    Command() : isSuccess(false) {};
+
     /**
      * @fn      run
      * @brief   runs command if command can be executed
@@ -58,6 +65,8 @@ public:
 
         return isSuccess;
     }
+
+    virtual void postProcess() {};
 };
 
 
@@ -182,6 +191,15 @@ public:
         // Run command
         return DcelGenerator::generateRandom(in->getNumPoints(), out->getDcel());
     }
+
+    /**
+     * @fn      postProcess
+     * @brief   Updates status to update menu options
+     */
+    void postProcess() override
+    {
+        in->getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
+    }
 };
 
 
@@ -255,6 +273,15 @@ public:
     {
         // Run command
         return DcelGenerator::generateClusters(in->getNumPoints(), in->getSzNumClusters(), in->getFRadius(), out->getDcel());
+    }
+
+    /**
+     * @fn      postProcess
+     * @brief   Updates status to update menu options
+     */
+    void postProcess() override
+    {
+        in->getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
     }
 };
 

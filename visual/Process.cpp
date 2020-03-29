@@ -678,7 +678,7 @@ void Process::execute()
 		case PARAMETERS:
 		{
 			// Read configuration file.
-			cmd = CommandFactory::create(option, storeService->getDcel());
+			cmd = CommandFactory::create(option, storeService);
             cmd->run();
             dispManager->process();
 			break;
@@ -690,8 +690,12 @@ void Process::execute()
             this->resetData();
 
             // Read configuration file.
-            cmd = CommandFactory::create(option, storeService->getDcel());
+            cmd = CommandFactory::create(option, storeService);
             isSuccess = cmd->run();
+            if (isSuccess)
+            {
+                cmd->postProcess();
+            }
 
             //	// Add figure display.
             vector<Point<TYPE>> vPoints;
@@ -703,7 +707,6 @@ void Process::execute()
             dispManager->process();
 
             // Update menu entries.
-            this->status.set(false, isSuccess, false, false, false, false);
             m.updateMenu();
 
             break;

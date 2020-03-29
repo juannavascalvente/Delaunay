@@ -12,17 +12,28 @@
 #include "defines.h"
 
 #include <cstddef>
+#include <Store/StoreService.h>
+
+class CmdParamIn
+{
+    StoreService *storeService;
+public:
+    explicit CmdParamIn(StoreService *storeServiceIn) : storeService(storeServiceIn) {};
+
+    StoreService *getStoreService() const { return storeService; }
+};
 
 
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class GeneratorCmdParamIn
+class GeneratorCmdParamIn : public CmdParamIn
 {
     size_t szNumPoints;
 
 public:
-    explicit GeneratorCmdParamIn(size_t szNumPointsIn) : szNumPoints(szNumPointsIn) {};
+    GeneratorCmdParamIn(size_t szNumPointsIn, StoreService *storeService) : szNumPoints(szNumPointsIn),
+                                                                            CmdParamIn(storeService) {};
 
     /**
      * Getter/Setter
@@ -39,10 +50,11 @@ class GeneratorClusterCmdParamIn : public GeneratorCmdParamIn
     TYPE fRadius;
     size_t szNumClusters;
 public:
-    explicit GeneratorClusterCmdParamIn(size_t szNumPointsIn, size_t szNumClustersIn, TYPE fRadiusIn) : GeneratorCmdParamIn(szNumPointsIn),
-                                                                                                        szNumClusters(szNumClustersIn),
-                                                                                                        fRadius(fRadiusIn)
-                                                                                                        {};
+    GeneratorClusterCmdParamIn(size_t szNumPointsIn, size_t szNumClustersIn, TYPE fRadiusIn, StoreService *storeService) :
+                                                                        GeneratorCmdParamIn(szNumPointsIn, storeService),
+                                                                        szNumClusters(szNumClustersIn),
+                                                                        fRadius(fRadiusIn)
+                                                                        {};
     /**
      * Getter/Setter
      */

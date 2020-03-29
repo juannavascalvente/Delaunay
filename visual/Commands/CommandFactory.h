@@ -22,15 +22,15 @@ class CommandFactory
     ***********************************************************************************************************************/
     static Command *createNull();
     static Command *createReadCfg();
-    static Command *createRandomGenerator(size_t szNumPoints, Dcel *dcel);
-    static Command *createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, Dcel *dcel);
+    static Command *createRandomGenerator(size_t szNumPoints, StoreService *storeService);
+    static Command *createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, StoreService *storeService);
 
 public:
 
     /***********************************************************************************************************************
     * Public method declarations
     ***********************************************************************************************************************/
-    static Command *create(size_t szOptionCmdId, Dcel *dcel);
+    static Command *create(size_t szOptionCmdId, StoreService *storeService);
 };
 
 

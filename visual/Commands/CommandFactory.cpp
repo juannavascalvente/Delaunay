@@ -5,6 +5,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include <Store/StoreService.h>
 #include "Command.h"
 #include "CommandFactory.h"
 #include "MenuOption.h"
@@ -13,7 +14,7 @@
 /***********************************************************************************************************************
 * Public method definitions
 ***********************************************************************************************************************/
-Command *CommandFactory::create(size_t szOptionCmdId, Dcel *dcel)
+Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService)
 {
     // Return value
     Command *command;
@@ -29,13 +30,13 @@ Command *CommandFactory::create(size_t szOptionCmdId, Dcel *dcel)
         // Generate random set of points
         case RANDOMLY:
         {
-            command = createRandomGenerator(Config::getNPoints(), dcel);
+            command = createRandomGenerator(Config::getNPoints(), storeService);
             break;
         }
         // Generate random set of points grouped in clusters
         case CLUSTER:
         {
-            command = createClusterGenerator(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), dcel);
+            command = createClusterGenerator(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), storeService);
             break;
         }
         default:
@@ -67,21 +68,21 @@ Command *CommandFactory::createReadCfg()
 }
 
 
-Command *CommandFactory::createRandomGenerator(size_t szNumPoints, Dcel *dcel)
+Command *CommandFactory::createRandomGenerator(size_t szNumPoints, StoreService *storeService)
 {
     // Create parameters
-    GeneratorCmdParamIn in(szNumPoints);
-    GeneratorCmdParamOut out(dcel);
+    GeneratorCmdParamIn in(szNumPoints, storeService);
+    GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
     return new CommandGenerateRandom(&in, &out);
 }
 
-Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, Dcel *dcel)
+Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, StoreService *storeService)
 {
     // Create parameters
-    GeneratorClusterCmdParamIn in(szNumPoints, szNumClusters, radius);
-    GeneratorCmdParamOut out(dcel);
+    GeneratorClusterCmdParamIn in(szNumPoints, szNumClusters, radius, storeService);
+    GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
     return new CommandGenerateCluster(&in, &out);
