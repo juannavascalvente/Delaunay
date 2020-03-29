@@ -11,6 +11,7 @@
 ***********************************************************************************************************************/
 #include "CommandParamIn.h"
 #include "CommandParamOut.h"
+#include "CommandResult.h"
 #include "Config.h"
 #include "DcelGenerator.h"
 
@@ -22,25 +23,33 @@ class Command
 {
 protected:
 
-    /***********************************************************************************************************************
+    /*******************************************************************************************************************
     * Protected class members
-    ***********************************************************************************************************************/
+    *******************************************************************************************************************/
     bool isSuccess;
+    CommandResult *result;
 
-    /***********************************************************************************************************************
+    /*******************************************************************************************************************
     * Protected class methods
-    ***********************************************************************************************************************/
+    *******************************************************************************************************************/
     virtual bool isRunnable() { return true; };
     virtual void printRunnableMsg() {};
-    virtual bool runCommand() = 0;
+    virtual CommandResult * runCommand() { return createResult(); };
+    virtual CommandResult* createResult() { return new CommandResultNull(false); };
 
 public:
 
-    /***********************************************************************************************************************
+    /*******************************************************************************************************************
     * Public class methods
-    ***********************************************************************************************************************/
-    Command() : isSuccess(false) {};
-    virtual ~Command() = default;
+    *******************************************************************************************************************/
+    Command() : isSuccess(false), result(nullptr) {};
+    virtual ~Command() { delete result; };
+
+    /*******************************************************************************************************************
+    * Getter/Setter
+    *******************************************************************************************************************/
+    bool getSuccess() const { return isSuccess; }
+    CommandResult *getResult() const { return result;}
 
     /**
      * @fn      run
@@ -49,7 +58,7 @@ public:
      * @return  true if command was ran
      *          false otherwise
      */
-    bool run()
+    void run()
     {
         isSuccess = false;
 
@@ -61,13 +70,9 @@ public:
         else
         {
             // Run command
-            isSuccess = runCommand();
+            result = runCommand();
         }
-
-        return isSuccess;
     }
-
-    virtual void postProcess() {};
 };
 
 
@@ -103,9 +108,9 @@ public:
      *
      * @return  true
      */
-    bool runCommand() override
+    CommandResult * runCommand() override
     {
-        return false;
+        return new CommandResultNull(false);
     }
 };
 
@@ -129,9 +134,13 @@ public:
      * @return  true if file read successfully
      *          false otherwise
      */
-    bool runCommand() override
+    CommandResult * runCommand() override
     {
-        return Config::readConfig();
+        // Run command
+        this->isSuccess = Config::readConfig();
+
+        // Build result
+        return new CommandResultNull(this->isSuccess);
     }
 };
 
@@ -187,19 +196,22 @@ public:
      * @return  true is set generated successfully
      *          false otherwise
      */
-    bool runCommand() override
+    CommandResult * runCommand() override
     {
         // Run command
-        return DcelGenerator::generateRandom(in.getNumPoints(), out.getDcel());
+        this->isSuccess = DcelGenerator::generateRandom(in.getNumPoints(), out.getDcel());
+
+        // Build result
+        return createResult();
     }
 
     /**
-     * @fn      postProcess
-     * @brief   Updates status to update menu options
+     * @fn      createResult
+     * @brief   Creates command result
      */
-    void postProcess() override
+    CommandResult *createResult() override
     {
-        in.getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
+        return new CommandResultRead(getSuccess(), in.getStoreService(), &out.getDcel());
     }
 };
 
@@ -270,19 +282,22 @@ public:
      * @return  true is set generated successfully
      *          false otherwise
      */
-    bool runCommand() override
+    CommandResult * runCommand() override
     {
         // Run command
-        return DcelGenerator::generateClusters(in.getNumPoints(), in.getSzNumClusters(), in.getFRadius(), out.getDcel());
+        this->isSuccess = DcelGenerator::generateClusters(in.getNumPoints(), in.getSzNumClusters(), in.getFRadius(), out.getDcel());
+
+        // Build result
+        return createResult();
     }
 
     /**
-     * @fn      postProcess
-     * @brief   Updates status to update menu options
+     * @fn      createResult
+     * @brief   Creates command result
      */
-    void postProcess() override
+    CommandResult *createResult() override
     {
-        in.getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
+        return new CommandResultRead(getSuccess(), in.getStoreService(), &out.getDcel());
     }
 };
 

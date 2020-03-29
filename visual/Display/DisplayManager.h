@@ -63,6 +63,14 @@ public:
      * @param   displayable
      */
     void add(Displayable *displayable) { vDisplayables.push_back(displayable); };
+
+    /**
+     * @fn      add
+     * @brief   Add a vector of displayables
+     *
+     * @param   vector of displayable
+     */
+    void add(vector<Displayable*> &vDisplayablesIn) { vDisplayables = vDisplayablesIn; };
 };
 
 

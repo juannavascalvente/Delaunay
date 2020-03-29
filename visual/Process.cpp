@@ -48,7 +48,7 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
     storeService = storeServiceIn;
     dispManager = new DisplayManager(argc, argv);
 
-	this->m = Menu(&this->status);
+	this->m = Menu(storeServiceIn->getStatus());
 
 	// Function to execute by GLUT.
 	glutDisplayFunc(executeWrapper);
@@ -660,6 +660,7 @@ void Process::createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
 void Process::execute()
 {
     Command *cmd=nullptr;           // Command to execute
+    CommandResult *result;
     bool isSuccess;
 
 	static bool firstTime=true;
@@ -691,20 +692,29 @@ void Process::execute()
 
             // Read configuration file.
             cmd = CommandFactory::create(option, storeService);
-            isSuccess = cmd->run();
-            if (isSuccess)
+            cmd->run();
+            result = cmd->getResult();
+            if (result->wasSuccess())
             {
-                cmd->postProcess();
+                // Update menu status
+                result->updateStatus();
+
+                // Get displaybale elements
+                vector<Displayable*> vDisplayable;
+                result->createDisplayables(vDisplayable);
+                dispManager->add(vDisplayable);
+
+                dispManager->process();
             }
 
-            //	// Add figure display.
-            vector<Point<TYPE>> vPoints;
-            for (size_t i=0; i< Config::getNPoints(); i++)
-            {
-                vPoints.push_back(*storeService->getDcel()->getRefPoint(i));
-            }
-            dispManager->add(DisplayableFactory::createPointsSet(vPoints));
-            dispManager->process();
+//            //	// Add figure display.
+//            vector<Point<TYPE>> vPoints;
+//            for (size_t i=0; i< Config::getNPoints(); i++)
+//            {
+//                vPoints.push_back(*storeService->getDcel()->getRefPoint(i));
+//            }
+//            dispManager->add(DisplayableFactory::createPointsSet(vPoints));
+//            dispManager->process();
 
             // Update menu entries.
             m.updateMenu();
