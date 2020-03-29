@@ -19,7 +19,7 @@ using namespace std;
 
 #define STATISTICS_EXECUTION	"-stat"
 #define TEST_EXECUTION			"-test"
-#define VISUAL_EXECUTION		"-visual"
+#define VISUAL_EXECUTION		"-Visual"
 #define PRINT_DEBUG_DATA		"-print"
 
 #define UNKNOWN					-1
@@ -49,7 +49,7 @@ int	 getExecutionType(char *type)
 	{
 		executionType = TEST;
 	}
-	// Check "visual" execution.
+	// Check "Visual" execution.
 	else if (strcmp( type, VISUAL_EXECUTION) == 0)
 	{
 		executionType = VISUAL;
@@ -78,7 +78,7 @@ void printUsage(int type, char *exec)
 		case GENERAL:
 		{
 			std::cerr << "Usage: " << exec << " type [configFile]" << std::endl;
-			std::cerr << "type(enumerated):\t\tvisual (" << VISUAL_EXECUTION <<
+			std::cerr << "type(enumerated):\t\tVisual (" << VISUAL_EXECUTION <<
 					") or test (" << TEST_EXECUTION << ")" << std::endl;
 			std::cerr << "configFile(string):\t\tconfiguration file (only " <<
 					VISUAL_EXECUTION << ")" << std::endl;
@@ -87,7 +87,7 @@ void printUsage(int type, char *exec)
 		}
 		case VISUAL:
 		{
-			std::cerr << "Usage: " << exec << " -visual configFile [";
+			std::cerr << "Usage: " << exec << " -Visual configFile [";
 			std::cerr << PRINT_DEBUG_DATA << "]." << std::endl;
 			std::cerr << std::endl << std::endl;
 			break;
@@ -134,14 +134,14 @@ int executeTests(int argc, char** argv)
 * RETURN:	SUCCESS 	if execution finished successfully
 * 			FAILURE		i.o.c.
 * GLOBAL:	NONE
-* Description: 	executes the application in visual mode.
+* Description: 	executes the application in Visual mode.
 ***************************************************************************/
 int executeVisual(int argc, char** argv)
 {
 	int 	ret=SUCCESS;			// Return value.
 	bool	printData=false;		// Print data into screen.
 
-	// Check visual arguments.
+	// Check Visual arguments.
 	switch (argc)
 	{
 		case 3:
@@ -165,7 +165,7 @@ int executeVisual(int argc, char** argv)
 		}
 		default:
 		{
-			std::cout << "Wrong number of arguments in visual mode: " << argc;
+			std::cout << "Wrong number of arguments in Visual mode: " << argc;
 			std::cout << ". Must be 3 or 4." << std::endl << std::endl;
 			ret = FAILURE;
 			break;

@@ -9,6 +9,8 @@
 * Includes
 ***********************************************************************************************************************/
 #include "Process.h"
+#include "Command.h"
+#include "CommandFactory.h"
 #include "DcelFigureBuilder.h"
 #include "DcelGenerator.h"
 #include "DcelReader.h"
@@ -16,6 +18,7 @@
 #include "DelaunayIO.h"
 #include "DisplayableFactory.h"
 #include "GabrielIO.h"
+#include "MenuOption.h"
 #include "VoronoiIO.h"
 
 #include <GL/glut.h>
@@ -653,6 +656,8 @@ void Process::createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
 ***************************************************************************/
 void Process::execute()
 {
+    Command *cmd;           // Command to execute
+
 	static bool firstTime=true;
 	int		option=0;			// Option to be executed.
 	bool	error=false;		// Error executing any function.
@@ -669,12 +674,21 @@ void Process::execute()
 		case PARAMETERS:
 		{
 			// Read configuration file.
-            Config::readConfig();
+			cmd = CommandFactory::create(option, nullptr);
+            cmd->run();
 			break;
 		}
 		// New set of points (generated or read).
 		case RANDOMLY:
 		case CLUSTER:
+        {
+            this->resetData();
+
+            // Read configuration file.
+            cmd = CommandFactory::create(option, nullptr);
+            cmd->run();
+            break;
+        }
 		case READ_POINTS_FLAT_FILE:
 		case READ_POINTS_DCEL_FILE:
 		case READ_DCEL:

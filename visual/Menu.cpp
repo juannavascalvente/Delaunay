@@ -10,7 +10,8 @@
 #include <iostream>
 using namespace std;
 
-#include "../visual/Menu.h"
+#include "Menu.h"
+#include "MenuOption.h"
 
 /**************************************************************************
 * 							Defines section
