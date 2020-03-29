@@ -659,7 +659,7 @@ void Process::createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
 ***************************************************************************/
 void Process::execute()
 {
-    Command *cmd;           // Command to execute
+    Command *cmd=nullptr;           // Command to execute
     bool isSuccess;
 
 	static bool firstTime=true;
@@ -1359,6 +1359,9 @@ void Process::execute()
 			break;
 		}
 	}
+
+	// Delete iteration resources
+    delete cmd;
 
 	// Exit application.
 	if (quit)

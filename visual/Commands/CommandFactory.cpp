@@ -75,7 +75,7 @@ Command *CommandFactory::createRandomGenerator(size_t szNumPoints, StoreService 
     GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
-    return new CommandGenerateRandom(&in, &out);
+    return new CommandGenerateRandom(in, out);
 }
 
 Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, StoreService *storeService)
@@ -85,5 +85,5 @@ Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNum
     GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
-    return new CommandGenerateCluster(&in, &out);
+    return new CommandGenerateCluster(in, out);
 }

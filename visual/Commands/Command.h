@@ -40,6 +40,7 @@ public:
     * Public class methods
     ***********************************************************************************************************************/
     Command() : isSuccess(false) {};
+    virtual ~Command() = default;
 
     /**
      * @fn      run
@@ -143,15 +144,15 @@ class CommandGenerateRandom : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    GeneratorCmdParamIn *in;
-    GeneratorCmdParamOut *out;
+    GeneratorCmdParamIn in;
+    GeneratorCmdParamOut out;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateRandom(GeneratorCmdParamIn *inParam, GeneratorCmdParamOut *outParam) : in(inParam), out(outParam) {}
+    CommandGenerateRandom(GeneratorCmdParamIn &inParam, GeneratorCmdParamOut &outParam) : in(inParam), out(outParam) {}
 
     /**
      * @fn      isRunnable
@@ -163,7 +164,7 @@ public:
     bool isRunnable() override
     {
         // Number of points higher than 0
-        return (in->getNumPoints() > 0);
+        return (in.getNumPoints() > 0);
     };
 
     /**
@@ -173,7 +174,7 @@ public:
     void printRunnableMsg() override
     {
         // Check number of points
-        if (in->getNumPoints() == 0)
+        if (in.getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -189,7 +190,7 @@ public:
     bool runCommand() override
     {
         // Run command
-        return DcelGenerator::generateRandom(in->getNumPoints(), out->getDcel());
+        return DcelGenerator::generateRandom(in.getNumPoints(), out.getDcel());
     }
 
     /**
@@ -198,7 +199,7 @@ public:
      */
     void postProcess() override
     {
-        in->getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
+        in.getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
     }
 };
 
@@ -211,15 +212,15 @@ class CommandGenerateCluster : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    GeneratorClusterCmdParamIn *in;
-    GeneratorCmdParamOut *out;
+    GeneratorClusterCmdParamIn in;
+    GeneratorCmdParamOut out;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateCluster(GeneratorClusterCmdParamIn *inParam, GeneratorCmdParamOut *outParam) : in(inParam), out(outParam) {}
+    CommandGenerateCluster(GeneratorClusterCmdParamIn &inParam, GeneratorCmdParamOut &outParam) : in(inParam), out(outParam) {}
 
     /**
      * @fn      isRunnable
@@ -234,7 +235,7 @@ public:
     bool isRunnable() override
     {
         // All values are higher than 0
-        return (in->getFRadius() > 0.0) && (in->getSzNumClusters() > 0) && (in->getNumPoints() > 0);
+        return (in.getFRadius() > 0.0) && (in.getSzNumClusters() > 0) && (in.getNumPoints() > 0);
     };
 
     /**
@@ -244,19 +245,19 @@ public:
     void printRunnableMsg() override
     {
         // Check radius
-        if (in->getFRadius() <= 0.0)
+        if (in.getFRadius() <= 0.0)
         {
             cout << "One of the values is not higher than 0" << endl;
         }
 
         // Check number of clusters
-        if (in->getSzNumClusters() == 0)
+        if (in.getSzNumClusters() == 0)
         {
             cout << "Number of cluster to generate is zero" << endl;
         }
 
         // Check number of points
-        if (in->getNumPoints() == 0)
+        if (in.getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -272,7 +273,7 @@ public:
     bool runCommand() override
     {
         // Run command
-        return DcelGenerator::generateClusters(in->getNumPoints(), in->getSzNumClusters(), in->getFRadius(), out->getDcel());
+        return DcelGenerator::generateClusters(in.getNumPoints(), in.getSzNumClusters(), in.getFRadius(), out.getDcel());
     }
 
     /**
@@ -281,7 +282,7 @@ public:
      */
     void postProcess() override
     {
-        in->getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
+        in.getStoreService()->getStatus()->set(false, isSuccess, false, false, false, false);
     }
 };
 
