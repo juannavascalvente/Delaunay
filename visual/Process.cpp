@@ -590,7 +590,6 @@ void Process::execute()
 {
     Command *cmd=nullptr;           // Command to execute
     CommandResult *result;
-    bool isSuccess;
 
 	static bool firstTime=true;
 	int		option=0;			// Option to be executed.
@@ -1311,12 +1310,6 @@ void Process::execute()
 	{
 		// PENDING. Anything to deallocate.
 		delete this->log;
-        Status *status = storeService->getStatus();
-		if (status->isDelaunayCreated())
-		{
-            Delaunay *delaunay = storeService->getDelaunay();
-			delaunay->~Delaunay();
-		}
 		exit(0);
 	}
 	else
