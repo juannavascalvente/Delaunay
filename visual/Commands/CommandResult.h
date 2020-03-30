@@ -197,7 +197,7 @@ public:
 
             // Draw Gabriel edges.
             vector<Line> vLines;
-            // https://github.com/juannavascalvente/Delaunay/issues/60
+            // TODO https://github.com/juannavascalvente/Delaunay/issues/60
             for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
             {
                 // Check if current edge mamtches Gabriel restriction.s
