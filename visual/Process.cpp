@@ -608,6 +608,7 @@ void Process::execute()
 		case STAR_TRIANGULATION:
 		case DELAUNAY:
 		case CONVEX_HULL:
+        case VORONOI:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -698,41 +699,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Build Voronoi diagram.
-		case VORONOI:
-		{
-			// PENDING CALL VORONOI
-            Status *status = storeService->getStatus();
-			if (status->isDelaunayCreated())
-			{
-				// Initialize voronoi data.
-				error = !this->voronoi.init(storeService->getDcel());
-				if (!error)
-				{
-					// Compute Voronoi diagram.
-					error = !this->voronoi.build(true);
-				}
-
-				// Check error and update status.
-				if (!error)
-				{
-					// Draw Voronoi graph and the triangulation.
-					Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                    dispManager->add(dispDelaunay);
-
-                    Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
-                    dispManager->add(dispVoronoi);
-                    dispManager->process();
-
-					// Update execution status flags.
-					status->set(false, true, true, true, true, false);
-
-					// Update menu entries.
-					m.updateMenu();
-				}
-			}
 			break;
 		}
 		case GABRIEL:

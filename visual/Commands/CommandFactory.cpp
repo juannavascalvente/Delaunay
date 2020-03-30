@@ -56,6 +56,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createConvexHull(storeService);
             break;
         }
+        case VORONOI:
+        {
+            command = createVoronoi(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -137,4 +142,15 @@ Command *CommandFactory::createConvexHull(StoreService *storeService)
 
     // Create command
     return new CommandConvexHull(in, out);
+}
+
+
+Command *CommandFactory::createVoronoi(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandVoronoi(in, out);
 }

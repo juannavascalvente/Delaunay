@@ -519,4 +519,74 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandVoronoi : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandVoronoi(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks Delaunay triangulation has been created
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Delaunay must be created to create Voronoi diagram
+        return in.getStoreService()->getStatus()->isDelaunayCreated();
+    };
+
+    /**
+     * @fn      run
+     * @brief   Builds star triangulation
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult * runCommand() override
+    {
+        // Initialize voronoi data.
+        Dcel *dcel = in.getStoreService()->getDcel();
+        Voronoi *voronoi = in.getStoreService()->getVoronoi();
+        this->isSuccess = voronoi->init(dcel);
+
+        // Check init was success
+        if (this->isSuccess)
+        {
+            // Compute Voronoi diagram.
+            this->isSuccess = voronoi->build(true);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = out.getStoreService()->getDcel();
+        Voronoi *voronoi = in.getStoreService()->getVoronoi();
+        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi);
+    }
+};
+
+
+
 #endif //DELAUNAY_COMMAND_H

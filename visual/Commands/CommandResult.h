@@ -134,4 +134,29 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResulVoronoi : public CommandResult
+{
+    Dcel *dcel;
+    Voronoi *voronoi;
+public:
+    CommandResulVoronoi(bool isSuccess, StoreService *service, Dcel *dcelIn, Voronoi *voronoiIn) :  CommandResult(isSuccess, service),
+                                                                                                    dcel(dcelIn),
+                                                                                                    voronoi(voronoiIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        // Add delaunay and voronoi
+        vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
+        vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getVoronoi()->getRefDcel()));
+    };
+
+    void updateStatus() override
+    {
+        storeService->getStatus()->set(false, true, true, true, true, false);
+    };
+};
+
 #endif //DELAUNAY_COMMANDRESULT_H
