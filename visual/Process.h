@@ -49,12 +49,11 @@ class Process
 	static void executeWrapper();
 	bool readData(int option);
 	void resetData();
-	static bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
+	static bool findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, vector<int> &vFaces);
 	bool findTwoClosest( int &index1, int &index2);
 	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
 	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
 	static void getPointToLocate(Point<TYPE> &point);
-	static void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
     static void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info);
     static void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info);
     static void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info);

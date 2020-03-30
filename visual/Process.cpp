@@ -18,6 +18,7 @@
 #include "DelaunayIO.h"
 #include "DisplayableFactory.h"
 #include "GabrielIO.h"
+#include "LineFactory.h"
 #include "MenuOption.h"
 #include "VoronoiIO.h"
 
@@ -238,7 +239,7 @@ void Process::resetData()
 * Description: 	finds the list of faces in the "dcel"between "line"
 * 				extreme points.
 ***************************************************************************/
-bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, Set<int> &pathFaces)
+bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, vector<int> &vFaces)
 {
 	bool found=false;			// Return value.
 	int	 initialFace=0;			// Initial face in the path.
@@ -277,7 +278,7 @@ bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, Set<int
 #endif
 
 		// Find path.
-		found = voronoi.getRefDcel()->findPath(extremeFaces, line, pathFaces);
+		found = voronoi.getRefDcel()->findPath(extremeFaces, line, vFaces);
 	}
 #ifdef DEBUG_PROCESS_FIND_PATH
 	else
@@ -435,41 +436,6 @@ void Process::getPointToLocate(Point<TYPE> &point)
 	}
 }
 
-/***************************************************************************
-* Name: 	getPointToLocate
-* IN:		NONE
-* OUT:		point		point to locate.
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	if a point was set in the configuration file then this
-* 				method sets in the output parameter that point. Otherwise
-* 				it is generated randomly.
-***************************************************************************/
-void Process::getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2)
-{
-	int minX, minY, maxX, maxY;
-
-	// Get point from configuration.
-	p1 = Config::getOriginPoint();
-	p2 = Config::getDestinationPoint();
-
-	// Check if input point parameter provided by user.
-	if ((p1.getX() == INVALID) || (p2.getX() == INVALID))
-	{
-		// Get min and max coordiantes.
-		Config::getScreenCoordinates(minX, minY, maxX, maxY);
-
-		// Generate seed.
-		srand(time(nullptr));
-
-		// Create a random points.
-		p1.setX(rand() % (int) maxX);
-		p1.setY(rand() % (int) maxY);
-		p2.setX(rand() % (int) maxX);
-		p2.setY(rand() % (int) maxY);
-	}
-}
-
 
 void Process::createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
 {
@@ -590,6 +556,7 @@ void Process::execute()
 		case CONVEX_HULL:
         case VORONOI:
         case GABRIEL:
+        case TRIANGULATION_PATH:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -605,7 +572,7 @@ void Process::execute()
                 result->updateStatus();
 
                 // Get displaybale elements
-                vector<Displayable*> vDisplayable;
+                vector<Displayable*> vDisplayable(0);
                 result->createDisplayables(vDisplayable);
                 dispManager->add(vDisplayable);
 
@@ -682,97 +649,25 @@ void Process::execute()
 		    }
 			break;
 		}
-//		// Compute path between two points.
-		case TRIANGULATION_PATH:
-		{
-			Point<TYPE> p1, p2;						// Segment points.
-			Line line;								// Segment line.
-			Set<PointT> points(1);				// List of points.
-			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
-
-			// Check Delaunay triangulation already created.
-            Status *status = storeService->getStatus();
-			if (status->isDelaunayCreated())
-			{
-				// Get points.
-				this->getLineToLocate(p1, p2);
-				line = Line(p1, p2);
-
-				// Check incremental triangulation computed.
-                Delaunay *delaunay = storeService->getDelaunay();
-				if (delaunay->getAlgorithm() == INCREMENTAL)
-				{
-					// Compute triangles path between two points.
-					error = !delaunay->findPath(line, faces);
-				}
-				else
-				{
-					// PENDING https://github.com/juannavascalvente/Delaunay/issues/10
-					Logging::buildText(__FUNCTION__, __FILE__,
-							"StarTriangulation path not implemented in normal triangulation");
-					Logging::write(true, Error);
-				}
-
-				// Print error message.
-				if (error)
-				{
-                    Logging::buildText(__FUNCTION__, __FILE__, "Error computing Delaunay path");
-                    Logging::write(true, Error);
-                }
-				else
-                {
-                    // Add Delaunay triangulation
-                    Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                    dispManager->add(dispDelaunay);
-
-                    // Add points whose path is drawn
-                    vector<Point<TYPE>> vPoints;
-                    vPoints.push_back(p1);
-                    vPoints.push_back(p2);
-                    dispManager->add(DisplayableFactory::createPolygon(vPoints));
-
-                    // Add path faces
-                    vector<Polygon> vPolygons;
-                    for (size_t i=0; i<faces.getNElements() ;i++)
-                    {
-                        vector<Point<TYPE>> vFacesPoints;
-                        DcelFigureBuilder::getFacePoints(*faces.at(i), *storeService->getDcel(), vFacesPoints);
-
-                        Polygon polygon;
-                        for (auto point : vFacesPoints)
-                        {
-                            polygon.add(point);
-                        }
-                        vPolygons.push_back(polygon);
-                    }
-                    dispManager->add(DisplayableFactory::createPolygonSet(vPolygons));
-                    dispManager->process();
-				}
-			}
-			break;
-		}
 		// Compute Voronoi path between two points.
 		case VORONOI_PATH:
 		{
-			Point<TYPE> p1, p2;						// Segment points.
-			Line line;								// Segment line.
-			Set<PointT> points(1);				// List of points.
-			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
+            vector<int> vFaces;
 
 			// Check Delaunay triangulation already created.
             Status *status = storeService->getStatus();
 			if (status->isVoronoiCreated())
 			{
-				// Get points.
-				this->getLineToLocate(p1, p2);
-				line = Line(p1, p2);
+                // Get points.
+                vector<Line> vLines;
+                LineFactory::readFromConfig(vLines);
 
 				// Check incremental triangulation computed.
                 Delaunay *delaunay = storeService->getDelaunay();
 				if (delaunay->getAlgorithm() == INCREMENTAL)
 				{
 					// Compute triangles path between two points.
-					error = !this->findPath(*delaunay, *storeService->getVoronoi(), line, faces);
+					error = !this->findPath(*delaunay, *storeService->getVoronoi(), vLines.at(0), vFaces);
 				}
 				else
 				{
@@ -801,16 +696,16 @@ void Process::execute()
 
                     // Add points whose path is drawn
                     vector<Point<TYPE>> vPoints;
-                    vPoints.push_back(p1);
-                    vPoints.push_back(p2);
+                    vPoints.push_back(vLines.at(0).getOrigin());
+                    vPoints.push_back(vLines.at(0).getDest());
                     dispManager->add(DisplayableFactory::createPolygon(vPoints));
 
                     // Add path faces
                     vector<Polygon> vPolygons;
-                    for (size_t i=0; i<faces.getNElements() ;i++)
+                    for (auto face : vFaces)
                     {
                         vector<Point<TYPE>> vFacesPoints;
-                        DcelFigureBuilder::getFacePoints(*faces.at(i), *storeService->getVoronoi()->getRefDcel(), vFacesPoints);
+                        DcelFigureBuilder::getFacePoints(face, *storeService->getVoronoi()->getRefDcel(), vFacesPoints);
 
                         Polygon polygon;
                         for (auto point : vFacesPoints)
@@ -825,38 +720,6 @@ void Process::execute()
 			}
 			break;
 		}
-//		// Compute convex hull.
-//		case CONVEX_HULL:
-//		{
-//			// Computing convex hull.
-//			if (this->buildConvexHull())
-//			{
-//                Polygon *hull;
-//
-//                // Computing convex hull.
-//                if (status->isDelaunayCreated())
-//                {
-//                    hull = this->delaunay.getConvexHull();
-//                }
-//                else
-//                {
-//                    StarTriangulation *triangulation = storeService->getStarTriang();
-//                    hull = triangulation->getConvexHull();
-//                }
-//
-//                // Add points to display manager.
-//                vector<Point<TYPE>> vPoints;
-//                hull->getPoints(vPoints);
-//                dispManager->add(DisplayableFactory::createPolygon(vPoints));
-//                dispManager->process();
-//            }
-//			else
-//			{
-//				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull not computed");
-//				Logging::write(true, Error);
-//			}
-//			break;
-//		}
 		// Find closest point to a given point.
 		case CLOSEST_POINT:
 		{

@@ -30,8 +30,21 @@ protected:
 
 public:
     CommandResult(bool isSuccessIn, StoreService *storeServiceIn) : isSuccess(isSuccessIn), storeService(storeServiceIn) {};
+
+    /**
+     * @fn      updateStatus
+     * @brief   Updates status based on result execution
+     */
     virtual void updateStatus() {};
+
+    /**
+     * @fn      createDisplayables
+     * @brief   Add elements to display
+     *
+     * @param   vDisplayable    (OUT) Vector that contains elements to display
+     */
     virtual void createDisplayables(vector<Displayable*> &vDisplayable) {};
+
 
     /*******************************************************************************************************************
     * Getter/Setter
@@ -61,12 +74,15 @@ public:
 
     void updateStatus() override
     {
-        storeService->getStatus()->set(false, isSuccess, false, false, false, false);
+        if (wasSuccess())
+        {
+            storeService->getStatus()->set(false, true, false, false, false, false);
+        }
     };
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        if (isSuccess)
+        if (wasSuccess())
         {
             // Add figure display.
             vector<Point<TYPE>> vPoints;
@@ -92,12 +108,15 @@ public:
 
     void updateStatus() override
     {
-        storeService->getStatus()->set(false, true, true, false, false, false);
+        if (wasSuccess())
+        {
+            storeService->getStatus()->set(false, true, true, false, false, false);
+        }
     };
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        if (isSuccess)
+        if (wasSuccess())
         {
             vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
         }
@@ -110,13 +129,15 @@ public:
 ***********************************************************************************************************************/
 class CommandResultDelaunay : public CommandResultTriangulation
 {
-    Dcel *dcel;
 public:
     CommandResultDelaunay(bool isSuccess, StoreService *service, Dcel *dcelIn) : CommandResultTriangulation(isSuccess, service, dcelIn) {};
 
     void updateStatus() override
     {
-        storeService->getStatus()->set(false, true, true, true, false, false);
+        if (wasSuccess())
+        {
+            storeService->getStatus()->set(false, true, true, true, false, false);
+        }
     };
 };
 
@@ -132,7 +153,7 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        if (isSuccess)
+        if (wasSuccess())
         {
             // Add polygon points
             vector<Point<TYPE>> vPoints;
@@ -157,7 +178,7 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        if (isSuccess)
+        if (wasSuccess())
         {
             // Add delaunay and voronoi
             vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
@@ -167,7 +188,10 @@ public:
 
     void updateStatus() override
     {
-        storeService->getStatus()->set(false, true, true, true, true, false);
+        if (wasSuccess())
+        {
+            storeService->getStatus()->set(false, true, true, true, true, false);
+        }
     };
 };
 
@@ -186,7 +210,7 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        if (isSuccess)
+        if (wasSuccess())
         {
             Point<TYPE> *vertex1;	    // First vertex.
             Point<TYPE> *vertex2;	    // Second vertex.
@@ -222,7 +246,47 @@ public:
 
     void updateStatus() override
     {
-        storeService->getStatus()->set(false, true, true, true, true, true);
+        if (wasSuccess())
+        {
+            storeService->getStatus()->set(false, true, true, true, true, true);
+        }
+    };
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResultPath : public CommandResult
+{
+    Dcel *dcel;
+    Line line;
+    vector<Polygon> vPolygons;
+
+public:
+    CommandResultPath(bool isSuccess, StoreService *service, Dcel *dcelIn, Line &lineIn, vector<Polygon> &vPolygonsIn) :
+                                                                                        CommandResult(isSuccess, service),
+                                                                                        dcel(dcelIn),
+                                                                                        line(lineIn),
+                                                                                        vPolygons(vPolygonsIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        if (wasSuccess())
+        {
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayable.push_back(dispDelaunay);
+
+            // Add points whose path is drawn
+            vector<Point<TYPE>> vPoints;
+            vPoints.push_back(line.getOrigin());
+            vPoints.push_back(line.getDest());
+            vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
+
+            // Add faces
+            vDisplayable.push_back(DisplayableFactory::createPolygonSet(vPolygons));
+        }
     };
 };
 

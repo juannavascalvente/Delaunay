@@ -73,6 +73,7 @@ public:
 	void getMiddle(Point<TYPE> &middle);
 	void extendToBoundary(Point<TYPE> &extreme);
 	enum Turn_T	checkTurn(Point<TYPE> *p);
+    bool isInvalid() { return origin.isInvalid() && destination.isInvalid(); }
 
 	// GET/SET functions.
 	inline Point<TYPE> 	getOrigin() 		{ return(this->origin); };

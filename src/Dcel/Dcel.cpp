@@ -10,6 +10,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -1557,7 +1558,7 @@ bool Dcel::getEdgeInserection(Line &line, int face, int &edgeId)
 * GLOBAL:	NONE
 * Description: 	finds the list of faces where input line lays.
 ***************************************************************************/
-bool Dcel::findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces)
+bool Dcel::findPath(Set<int> &extremeFaces, Line &line, vector<int> &vFacesId)
 {
 	bool found=true;		// Return value.
 	int	edgeId=INVALID;		// Edge id.
@@ -1583,7 +1584,7 @@ bool Dcel::findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces)
 			if (this->getEdgeInserection(line, firstFace, edgeId))
 			{
 				// Insert current face.
-				faces.add(firstFace);
+				vFacesId.push_back(firstFace);
 #ifdef DEBUG_DELAUNAY_FIND_PATH
 				Logging::buildText(__FUNCTION__, __FILE__, "Intersected edge is ");
 				Logging::buildText(__FUNCTION__, __FILE__, edgeId);
@@ -1630,7 +1631,7 @@ bool Dcel::findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces)
 	Logging::write(true, Info);
 #endif
 	// Insert last face.
-	faces.add(firstFace);
+    vFacesId.push_back(firstFace);
 
 	return(found);
 }

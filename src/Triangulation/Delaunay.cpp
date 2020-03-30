@@ -911,7 +911,7 @@ bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, do
 * GLOBAL:	NONE
 * Description: 	determines the set of faces where the input line lays on.
 ***************************************************************************/
-bool Delaunay::findPath(Line &line, Set<int> &facesPath)
+bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 {
 	bool found=false;				// Return value.
 	bool computePath=false;			// Both points in external face.
@@ -1007,7 +1007,7 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 		if (computePath)
 		{
 			// Find path.
-			found = this->getRefDcel()->findPath(extremeFaces, line, facesPath);
+			found = this->getRefDcel()->findPath(extremeFaces, line, vFacesId);
 		}
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 		else

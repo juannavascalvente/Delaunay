@@ -37,6 +37,7 @@ file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include
         ${BUILD_PATH}/include/Dcel
         ${BUILD_PATH}/include/Figures
+        ${BUILD_PATH}/include/Figures/Generators
         ${BUILD_PATH}/include/Gabriel
         ${BUILD_PATH}/include/Store
         ${BUILD_PATH}/include/Triangulation
@@ -54,6 +55,7 @@ file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/src/*.cpp
         ${BUILD_PATH}/src/Dcel/*.cpp
         ${BUILD_PATH}/src/Figures/*.cpp
+        ${BUILD_PATH}/src/Figures/Generators/*.cpp
         ${BUILD_PATH}/src/Gabriel/*.cpp
         ${BUILD_PATH}/src/Store/*.cpp
         ${BUILD_PATH}/src/Triangulation/*.cpp

@@ -13,7 +13,9 @@
 #include "CommandParamOut.h"
 #include "CommandResult.h"
 #include "Config.h"
+#include "LineFactory.h"
 #include "DcelGenerator.h"
+#include "DcelFigureBuilder.h"
 
 
 /***********************************************************************************************************************
@@ -100,7 +102,7 @@ public:
      * @fn       printRunnableMsg
      * @brief    Prints message to explain null command has no task
      */
-    void printRunnableMsg() override { cout << "Null command does not execute any task" << endl; };
+    void printRunnableMsg() override { cout << "Null command does not execute any action" << endl; };
 
     /**
      * @fn      runCommand
@@ -321,6 +323,16 @@ public:
     CommandStarTriangulation(StarTriangulationParamCmdIn &inParam, GeneratorCmdParamOut &outParam) : in(inParam), out(outParam) {};
 
     /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that triangulation has been already computed
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Triangulation already computed" << endl;
+    };
+
+
+    /**
      * @fn      isRunnable
      * @brief   Checks nor star triangulation nor Delaunay are already displayed
      *
@@ -379,6 +391,16 @@ public:
     * Public class methods
     *******************************************************************************************************************/
     CommandDelaunay(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that Delaunay triangulation has been already computed
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Triangulation already computed" << endl;
+    };
+
 
     /**
      * @fn      isRunnable
@@ -462,7 +484,18 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandConvexHull(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    CommandConvexHull(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam), hull(nullptr) {};
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that a triangulation is required
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Triangulation was not computed computed" << endl;
+    };
+
 
     /**
      * @fn      isRunnable
@@ -477,6 +510,7 @@ public:
         return (in.getStoreService()->getStatus()->isTriangulationCreated() ||
                 in.getStoreService()->getStatus()->isDelaunayCreated());
     };
+
 
     /**
      * @fn      run
@@ -508,6 +542,7 @@ public:
         return createResult();
     }
 
+
     /**
      * @fn      createResult
      * @brief   Creates command result
@@ -537,6 +572,17 @@ public:
     *******************************************************************************************************************/
     CommandVoronoi(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
 
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that Delaunay triangulation is required
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Delaunay triangulation is required" << endl;
+    };
+
+
     /**
      * @fn      isRunnable
      * @brief   Checks Delaunay triangulation has been created
@@ -549,6 +595,7 @@ public:
         // Delaunay must be created to create Voronoi diagram
         return in.getStoreService()->getStatus()->isDelaunayCreated();
     };
+
 
     /**
      * @fn      run
@@ -574,6 +621,7 @@ public:
         // Build result
         return createResult();
     }
+
 
     /**
      * @fn      createResult
@@ -606,6 +654,17 @@ public:
     *******************************************************************************************************************/
     CommandGabriel(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
 
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that Delaunay triangulation and Voronoi diagram are required
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Delaunay triangulation and Voronoi diagram are required" << endl;
+    }
+
+
     /**
      * @fn      isRunnable
      * @brief   Checks Delaunay triangulation has been created
@@ -618,11 +677,12 @@ public:
         // Delaunay and Voronoi must exist
         Status *status = in.getStoreService()->getStatus();
         return status->isDelaunayCreated() && status->isVoronoiCreated();
-    };
+    }
+
 
     /**
      * @fn      run
-     * @brief   Builds star triangulation
+     * @brief   Builds Gabriel graph in a given triangulation
      *
      * @return  true built was successfully
      *          false otherwise
@@ -639,6 +699,7 @@ public:
         // Build result
         return createResult();
     }
+
 
     /**
      * @fn      createResult
@@ -663,6 +724,8 @@ class CommandTriangulationPath : public Command
     *******************************************************************************************************************/
     CmdParamIn  in;
     CmdParamOut out;
+    Line line;
+    vector<Polygon> vPolygons;
 
 public:
 
@@ -671,9 +734,20 @@ public:
     *******************************************************************************************************************/
     CommandTriangulationPath(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
 
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that triangulation path can be only computed using incremental Delaunay
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Triangulation is not Delaunay or it was not computed using incremenal algorithm" << endl;
+    }
+
+
     /**
      * @fn      isRunnable
-     * @brief   Checks Delaunay triangulation has been created
+     * @brief   Checks Delaunay triangulation has been created and it as built using incremental algorithm
      *
      * @return  true if command can be ran
      *          false otherwise
@@ -682,8 +756,10 @@ public:
     {
         // Delaunay and Voronoi must exist
         Status *status = in.getStoreService()->getStatus();
-        return status->isDelaunayCreated();
-    };
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        return status->isDelaunayCreated() && (delaunay->getAlgorithm() == INCREMENTAL);
+    }
+
 
     /**
      * @fn      run
@@ -694,16 +770,43 @@ public:
      */
     CommandResult * runCommand() override
     {
-        // Build Gabriel graph.
+        // Get points.
+        vector<Line> vLines;
+        LineFactory::readFromConfig(vLines);
+        line = vLines.at(0);
+        if (line.isInvalid())
+        {
+            LineFactory::generateRandom(1, vLines);
+            line = vLines.at(1);
+        }
+
+        // https://github.com/juannavascalvente/Delaunay/issues/61
+        // Compute triangles path between two points.
+
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        Gabriel *gabriel = in.getStoreService()->getGabriel();
-        gabriel->init(delaunay->getRefDcel(), voronoi);
-        this->isSuccess = gabriel->build();
+        vector<int> vFacesId;
+        this->isSuccess = delaunay->findPath(line, vFacesId);
+
+        if (this->isSuccess)
+        {
+            for (auto face : vFacesId)
+            {
+                vector<Point<TYPE>> vFacesPoints;
+                DcelFigureBuilder::getFacePoints(face, *in.getStoreService()->getDcel(), vFacesPoints);
+
+                Polygon polygon;
+                for (auto point : vFacesPoints)
+                {
+                    polygon.add(point);
+                }
+                vPolygons.push_back(polygon);
+            }
+        }
 
         // Build result
         return createResult();
     }
+
 
     /**
      * @fn      createResult
@@ -711,9 +814,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = out.getStoreService()->getDcel();
-        Gabriel *gabriel = in.getStoreService()->getGabriel();
-        return new CommandResultGabriel(getSuccess(), in.getStoreService(), dcel, gabriel);
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons);
     }
 };
 
