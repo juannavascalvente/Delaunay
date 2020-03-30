@@ -57,29 +57,9 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 
 Process::~Process()
 {
-	// Deallocate draw.
+	// Deallocate resources
 	delete this->log;
 	delete this->dispManager;
-	
-	// PENDING Really necessary to call destructors.
-    Status *status = storeService->getStatus();
-	if (status->isDelaunayCreated())
-	{
-	    Delaunay *delaunay = storeService->getDelaunay();
-		delaunay->~Delaunay();
-	}
-
-	if (status->isTriangulationCreated())
-	{
-        StarTriangulation *triangulation = storeService->getStarTriang();
-		triangulation->~StarTriangulation();
-	}
-
-	if (status->isVoronoiCreated())
-	{
-		this->gabriel.~Gabriel();
-	}
-
 	delete storeService;
 }
 
@@ -241,7 +221,7 @@ void Process::resetData()
 	// Check if voronoi must be reset.
 	if (status->isVoronoiCreated())
 	{
-		this->voronoi.reset();
+        storeService->getVoronoi()->reset();
 	}
 }
 
@@ -405,7 +385,7 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 		if (status->isVoronoiCreated())
 		{
             Delaunay *delaunay = storeService->getDelaunay();
-			found = delaunay->findClosestPoint(p, this->voronoi, q, pointIndex, distance);
+			found = delaunay->findClosestPoint(p, *storeService->getVoronoi(), q, pointIndex, distance);
 		}
 		else
 		{
@@ -792,7 +772,7 @@ void Process::execute()
 				if (delaunay->getAlgorithm() == INCREMENTAL)
 				{
 					// Compute triangles path between two points.
-					error = !this->findPath(*delaunay, this->voronoi, line, faces);
+					error = !this->findPath(*delaunay, *storeService->getVoronoi(), line, faces);
 				}
 				else
 				{
@@ -816,7 +796,7 @@ void Process::execute()
                     dispManager->add(dispDelaunay);
 
                     // Add Voronoi
-                    Displayable *dispVoronoi = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+                    Displayable *dispVoronoi = DisplayableFactory::createDcel(storeService->getVoronoi()->getRefDcel());
                     dispManager->add(dispVoronoi);
 
                     // Add points whose path is drawn
@@ -830,7 +810,7 @@ void Process::execute()
                     for (size_t i=0; i<faces.getNElements() ;i++)
                     {
                         vector<Point<TYPE>> vFacesPoints;
-                        DcelFigureBuilder::getFacePoints(*faces.at(i), *this->voronoi.getRefDcel(), vFacesPoints);
+                        DcelFigureBuilder::getFacePoints(*faces.at(i), *storeService->getVoronoi()->getRefDcel(), vFacesPoints);
 
                         Polygon polygon;
                         for (auto point : vFacesPoints)
@@ -1118,22 +1098,24 @@ void Process::execute()
 		// Print Voronoi data.
 		case VORONOI_INFO:
 		{
+		    Voronoi *voronoi = storeService->getVoronoi();
+
             // Add Delaunay triangulation
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(this->voronoi.getRefDcel());
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(voronoi->getRefDcel());
             dispManager->add(dispDelaunay);
 
             vector<Text> vPointsInfo;
-            this->createDcelPointsInfo(*this->voronoi.getRefDcel(), vPointsInfo);
+            this->createDcelPointsInfo(*voronoi->getRefDcel(), vPointsInfo);
             Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
             dispManager->add(dispPointsInfo);
 
             vector<Text> vEdgesInfo;
-            this->createDcelEdgeInfo(*this->voronoi.getRefDcel(), vEdgesInfo);
+            this->createDcelEdgeInfo(*voronoi->getRefDcel(), vEdgesInfo);
             Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
             dispManager->add(dispEdgesInfo);
 
             vector<Text> vFacesInfo;
-            this->createDcelFacesInfo(*this->voronoi.getRefDcel(), vFacesInfo);
+            this->createDcelFacesInfo(*voronoi->getRefDcel(), vFacesInfo);
             Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
             dispManager->add(dispFacesInfo);
 
@@ -1162,13 +1144,13 @@ void Process::execute()
 		// Write voronoi DCEL file.
 		case WRITE_VORONOI:
 		{
-			VoronoiIO::write(Config::getOutVoronoiFilename(), this->voronoi);
+			VoronoiIO::write(Config::getOutVoronoiFilename(), *storeService->getVoronoi());
 			break;
 		}
 		// Write Gabriel graph data.
 		case WRITE_GABRIEL:
 		{
-			GabrielIO::writeBinary(Config::getOutGabrielFilename(), this->gabriel);
+			GabrielIO::writeBinary(Config::getOutGabrielFilename(), *storeService->getGabriel());
 			break;
 		}
 		// Clear data.

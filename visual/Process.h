@@ -40,8 +40,6 @@ class Process
     StoreService        *storeService;
 
 	Menu 			    m;				// Menu object.
-	Voronoi			    voronoi;		// Voronoi diagram data.
-	Gabriel			    gabriel;		// Gabriel graph data.
 	Logging 		    *log;			// Log file.
 
     /*******************************************************************************************************************
