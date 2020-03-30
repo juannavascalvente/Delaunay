@@ -5,7 +5,7 @@
  *      Author: jnavas
  */
 
-#include "Line.h"
+#include "Figures/Line.h"
 #include "Logging.h"
 #include <float.h>
 #include <limits.h>

@@ -29,6 +29,7 @@ class CommandFactory
     static Command *createConvexHull(StoreService *storeService);
     static Command *createVoronoi(StoreService *storeService);
     static Command *createGabriel(StoreService *storeService);
+    static Command *createTriangulationPath(StoreService *storeService);
 
 public:
 

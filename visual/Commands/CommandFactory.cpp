@@ -66,6 +66,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createGabriel(storeService);
             break;
         }
+        case TRIANGULATION_PATH:
+        {
+            command = createTriangulationPath(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -169,4 +174,14 @@ Command *CommandFactory::createGabriel(StoreService *storeService)
 
     // Create command
     return new CommandGabriel(in, out);
+}
+
+Command *CommandFactory::createTriangulationPath(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandTriangulationPath(in, out);
 }
