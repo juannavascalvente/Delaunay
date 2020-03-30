@@ -41,9 +41,7 @@ class Process
 
 	Menu 			    m;				// Menu object.
 	Status 			    status;			// Current status.
-//	Dcel			    dcel;			// Dcel data.
 	Delaunay		    delaunay;		// Delaunay data.
-	//StarTriangulation	triangulation;	// Star triangulation data.
 	Voronoi			    voronoi;		// Voronoi diagram data.
 	Gabriel			    gabriel;		// Gabriel graph data.
 	Logging 		    *log;			// Log file.
@@ -55,7 +53,6 @@ class Process
 	static void executeWrapper();
 	bool readData(int option);
 	void resetData();
-	bool buildTriangulation(int option);
 	bool buildConvexHull();
 	static bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
 	bool findTwoClosest( int &index1, int &index2);

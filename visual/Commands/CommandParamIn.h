@@ -15,6 +15,9 @@
 #include <cstddef>
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class CmdParamIn
 {
     StoreService *storeService;
@@ -67,11 +70,11 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class StarTriangulationCmdIn : public CmdParamIn
+class StarTriangulationParamCmdIn : public CmdParamIn
 {
     Dcel *dcel;
 public:
-    explicit StarTriangulationCmdIn(Dcel *dcelIn, StoreService *storeService) : dcel(dcelIn), CmdParamIn(storeService) {};
+    explicit StarTriangulationParamCmdIn(Dcel *dcelIn, StoreService *storeService) : dcel(dcelIn), CmdParamIn(storeService) {};
 
     /**
      * Getter/Setter

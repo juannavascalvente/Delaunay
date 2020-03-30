@@ -15,6 +15,19 @@
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
+class CmdParamOut
+{
+    StoreService *storeService;
+public:
+    explicit CmdParamOut(StoreService *storeServiceIn) : storeService(storeServiceIn) {};
+
+    StoreService *getStoreService() const { return storeService; }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class GeneratorCmdParamOut
 {
     Dcel *dcel;

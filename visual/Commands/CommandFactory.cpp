@@ -42,7 +42,13 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
         // Create start triangulation from set of points
         case STAR_TRIANGULATION:
         {
-            command = createClusterGenerator(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), storeService);
+            command = createStarTriangulation(storeService);
+            break;
+        }
+        // Create Delaunay triangulation
+        case DELAUNAY:
+        {
+            command = createDelaunay(storeService);
             break;
         }
         default:
@@ -97,9 +103,19 @@ Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNum
 Command *CommandFactory::createStarTriangulation(StoreService *storeService)
 {
     // Create parameters
-    StarTriangulationCmdIn in(storeService->getDcel(), storeService);
+    StarTriangulationParamCmdIn in(storeService->getDcel(), storeService);
     GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
     return new CommandStarTriangulation(in, out);
+}
+
+Command *CommandFactory::createDelaunay(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandDelaunay(in, out);
 }

@@ -241,66 +241,6 @@ void Process::resetData()
 	}
 }
 
-/***************************************************************************
-* Name: 	buildTriangulation
-* IN:		option				option selected in menu.
-* OUT:		NONE
-* RETURN:	true				if successfully built.
-* 			false				i.o.c.
-* GLOBAL:	NONE
-* Description: 	build a triangulation depending on input option:
-* 				1.- STAR triangulation
-* 				2.- Delaunay triangulation. If this option is selected, the
-* 				triangulation can be computed from scratch or computed using
-* 				and initial triangulation.
-***************************************************************************/
-bool Process::buildTriangulation(int option)
-{
-	bool built=true;		// Return value.
-
-	// Check triangulation type.
-	if (option == STAR_TRIANGULATION)
-	{
-		// Check if star triangulation already computed.
-		if (!this->status.isTriangulationCreated())
-		{
-            StarTriangulation *triangulation = storeService->getStarTriang();
-			built = triangulation->build(storeService->getDcel());
-			if (built)
-			{
-				status.set(false, true, true, false, false, false);
-			}
-		}
-	}
-	else
-	{
-		// Get reference to current DCEL.
-		this->delaunay.setDCEL(storeService->getDcel());
-
-		// Build Delaunay from Star triangulation.
-		if (this->status.isTriangulationCreated())
-		{
-            StarTriangulation *triangulation = storeService->getStarTriang();
-			built = triangulation->delaunay();
-			this->delaunay.setAlgorithm(FROM_STAR);
-		}
-		else
-		{
-			// Build Delaunay from DCEL.
-			if (!this->status.isDelaunayCreated())
-			{
-				built = this->delaunay.incremental();
-			}
-		}
-
-		if (built)
-		{
-			status.set(false, true, true, true, false, false);
-		}
-	}
-
-	return(built);
-}
 
 /***************************************************************************
 * Name: 	buildConvexHull
@@ -684,11 +624,33 @@ void Process::execute()
 	{
 		// Read parameters from configuration file.
 		case PARAMETERS:
+		case STAR_TRIANGULATION:
+		case DELAUNAY:
 		{
-			// Read configuration file.
-			cmd = CommandFactory::create(option, storeService);
+//			// Read configuration file.
+//			cmd = CommandFactory::create(option, storeService);
+//            cmd->run();
+//            dispManager->process();
+            // Read configuration file.
+            cmd = CommandFactory::create(option, storeService);
             cmd->run();
-            dispManager->process();
+            result = cmd->getResult();
+            if (result->wasSuccess())
+            {
+                // Update menu status
+                result->updateStatus();
+
+                // Get displaybale elements
+                vector<Displayable*> vDisplayable;
+                result->createDisplayables(vDisplayable);
+                dispManager->add(vDisplayable);
+
+                dispManager->process();
+            }
+
+            // Update menu entries.
+            m.updateMenu();
+
 			break;
 		}
 		// New set of points (generated or read).
@@ -754,29 +716,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Build STAR or DELAUNAY triangulation
-		case STAR_TRIANGULATION:
-		case DELAUNAY:
-		{
-			// Check if Delaunay already created.
-			if (!this->status.isDelaunayCreated())
-			{
-				// Build triangulation.
-				error = !this->buildTriangulation(option);
-			}
-
-			if (!error)
-			{
-                // Draw Delaunay triangulation
-                Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                dispManager->add(dispDelaunay);
-                dispManager->process();
-
-				// Update menu entries.
-				m.updateMenu();
-			}
 			break;
 		}
 		// Build Voronoi diagram.
