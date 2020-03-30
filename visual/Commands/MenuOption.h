@@ -12,6 +12,7 @@
 #define	PARAMETERS				1
 #define RANDOMLY 				11
 #define CLUSTER					12
+
 #define READ_POINTS_FLAT_FILE	13
 #define READ_POINTS_DCEL_FILE	14
 #define	READ_DCEL				15

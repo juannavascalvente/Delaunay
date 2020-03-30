@@ -63,4 +63,20 @@ public:
     size_t getSzNumClusters() const { return szNumClusters; }
 };
 
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class StarTriangulationCmdIn : public CmdParamIn
+{
+    Dcel *dcel;
+public:
+    explicit StarTriangulationCmdIn(Dcel *dcelIn, StoreService *storeService) : dcel(dcelIn), CmdParamIn(storeService) {};
+
+    /**
+     * Getter/Setter
+     */
+    Dcel &getDcel() { return(*dcel); }
+};
+
 #endif //DELAUNAY_COMMANDPARAMIN_H

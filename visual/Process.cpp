@@ -69,7 +69,8 @@ Process::~Process()
 
 	if (this->status.isTriangulationCreated())
 	{
-		this->triangulation.~StarTriangulation();
+        StarTriangulation *triangulation = storeService->getStarTriang();
+		triangulation->~StarTriangulation();
 	}
 
 	if (this->status.isVoronoiCreated())
@@ -263,7 +264,8 @@ bool Process::buildTriangulation(int option)
 		// Check if star triangulation already computed.
 		if (!this->status.isTriangulationCreated())
 		{
-			built = this->triangulation.build(storeService->getDcel());
+            StarTriangulation *triangulation = storeService->getStarTriang();
+			built = triangulation->build(storeService->getDcel());
 			if (built)
 			{
 				status.set(false, true, true, false, false, false);
@@ -278,7 +280,8 @@ bool Process::buildTriangulation(int option)
 		// Build Delaunay from Star triangulation.
 		if (this->status.isTriangulationCreated())
 		{
-			built = this->triangulation.delaunay();
+            StarTriangulation *triangulation = storeService->getStarTriang();
+			built = triangulation->delaunay();
 			this->delaunay.setAlgorithm(FROM_STAR);
 		}
 		else
@@ -320,7 +323,8 @@ bool Process::buildConvexHull()
 	}
 	else
 	{
-		built = this->triangulation.convexHull();
+        StarTriangulation *triangulation = storeService->getStarTriang();
+		built = triangulation->convexHull();
 	}
 
 	return(built);
@@ -416,7 +420,8 @@ bool Process::findTwoClosest(int &index1, int &index2)
 	}
 	else
 	{
-		found = this->triangulation.findTwoClosest(index1, index2);
+        StarTriangulation *triangulation = storeService->getStarTriang();
+		found = triangulation->findTwoClosest(index1, index2);
 	}
 
 	return(found);
@@ -447,7 +452,8 @@ bool Process::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 	}
 	else
 	{
-		found = this->triangulation.findFace(point, faceId);
+        StarTriangulation *triangulation = storeService->getStarTriang();
+		found = triangulation->findFace(point, faceId);
 	}
 
 	return(found);
@@ -488,7 +494,8 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 	else
 	{
 		// Find closest using brute force.
-		found = this->triangulation.findClosestPoint(p, q, distance);
+        StarTriangulation *triangulation = storeService->getStarTriang();
+		found = triangulation->findClosestPoint(p, q, distance);
 	}
 
 	return found;
@@ -706,15 +713,6 @@ void Process::execute()
 
                 dispManager->process();
             }
-
-//            //	// Add figure display.
-//            vector<Point<TYPE>> vPoints;
-//            for (size_t i=0; i< Config::getNPoints(); i++)
-//            {
-//                vPoints.push_back(*storeService->getDcel()->getRefPoint(i));
-//            }
-//            dispManager->add(DisplayableFactory::createPointsSet(vPoints));
-//            dispManager->process();
 
             // Update menu entries.
             m.updateMenu();
@@ -1023,7 +1021,8 @@ void Process::execute()
                 }
                 else
                 {
-                    hull = this->triangulation.getConvexHull();
+                    StarTriangulation *triangulation = storeService->getStarTriang();
+                    hull = triangulation->getConvexHull();
                 }
 
                 // Add points to display manager.

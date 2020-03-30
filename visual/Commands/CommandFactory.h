@@ -24,7 +24,7 @@ class CommandFactory
     static Command *createReadCfg();
     static Command *createRandomGenerator(size_t szNumPoints, StoreService *storeService);
     static Command *createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, StoreService *storeService);
-
+    static Command *createStarTriangulation(StoreService *storeService);
 public:
 
     /***********************************************************************************************************************

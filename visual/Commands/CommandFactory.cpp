@@ -39,6 +39,12 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createClusterGenerator(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), storeService);
             break;
         }
+        // Create start triangulation from set of points
+        case STAR_TRIANGULATION:
+        {
+            command = createClusterGenerator(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -86,4 +92,14 @@ Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNum
 
     // Create command
     return new CommandGenerateCluster(in, out);
+}
+
+Command *CommandFactory::createStarTriangulation(StoreService *storeService)
+{
+    // Create parameters
+    StarTriangulationCmdIn in(storeService->getDcel(), storeService);
+    GeneratorCmdParamOut out(storeService->getDcel());
+
+    // Create command
+    return new CommandStarTriangulation(in, out);
 }

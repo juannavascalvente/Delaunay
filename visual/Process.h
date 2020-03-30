@@ -43,7 +43,7 @@ class Process
 	Status 			    status;			// Current status.
 //	Dcel			    dcel;			// Dcel data.
 	Delaunay		    delaunay;		// Delaunay data.
-	StarTriangulation	triangulation;	// Star triangulation data.
+	//StarTriangulation	triangulation;	// Star triangulation data.
 	Voronoi			    voronoi;		// Voronoi diagram data.
 	Gabriel			    gabriel;		// Gabriel graph data.
 	Logging 		    *log;			// Log file.

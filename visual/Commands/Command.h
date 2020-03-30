@@ -301,4 +301,64 @@ public:
     }
 };
 
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandStarTriangulation : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    StarTriangulationCmdIn in;
+    GeneratorCmdParamOut out;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandStarTriangulation(StarTriangulationCmdIn &inParam, GeneratorCmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks nor star triangulation nor Delaunay are already displayed
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Star triangulation and Delaunay have not been already created
+        return (!in.getStoreService()->getStatus()->isTriangulationCreated() &&
+                !in.getStoreService()->getStatus()->isDelaunayCreated());
+    };
+
+    /**
+     * @fn      run
+     * @brief   Builds star triangulation
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult * runCommand() override
+    {
+        // Run command
+        StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+        this->isSuccess = triangulation->build(in.getStoreService()->getDcel());
+
+        // Build result
+        return createResult();
+    }
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        return new CommandResultStarTriangulation(getSuccess(), in.getStoreService(), &out.getDcel());
+    }
+};
+
 #endif //DELAUNAY_COMMAND_H

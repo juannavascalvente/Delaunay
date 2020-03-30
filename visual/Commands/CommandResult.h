@@ -66,13 +66,35 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        //	// Add figure display.
+        // Add figure display.
         vector<Point<TYPE>> vPoints;
         for (size_t i=0; i< Config::getNPoints(); i++)
         {
             vPoints.push_back(*dcel->getRefPoint(i));
         }
         vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
+    };
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+// TODO This could be the same as CommandResultRead
+class CommandResultStarTriangulation : public CommandResult
+{
+    Dcel *dcel;
+public:
+    CommandResultStarTriangulation(bool isSuccess, StoreService *service, Dcel *dcelIn) : CommandResult(isSuccess, service), dcel(dcelIn) {};
+
+    void updateStatus() override
+    {
+        storeService->getStatus()->set(false, true, true, false, false, false);
+    };
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
     };
 };
 
