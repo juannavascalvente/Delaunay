@@ -51,6 +51,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createDelaunay(storeService);
             break;
         }
+        case CONVEX_HULL:
+        {
+            command = createConvexHull(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -90,6 +95,7 @@ Command *CommandFactory::createRandomGenerator(size_t szNumPoints, StoreService 
     return new CommandGenerateRandom(in, out);
 }
 
+
 Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, StoreService *storeService)
 {
     // Create parameters
@@ -99,6 +105,7 @@ Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNum
     // Create command
     return new CommandGenerateCluster(in, out);
 }
+
 
 Command *CommandFactory::createStarTriangulation(StoreService *storeService)
 {
@@ -110,6 +117,7 @@ Command *CommandFactory::createStarTriangulation(StoreService *storeService)
     return new CommandStarTriangulation(in, out);
 }
 
+
 Command *CommandFactory::createDelaunay(StoreService *storeService)
 {
     // Create parameters
@@ -118,4 +126,15 @@ Command *CommandFactory::createDelaunay(StoreService *storeService)
 
     // Create command
     return new CommandDelaunay(in, out);
+}
+
+
+Command *CommandFactory::createConvexHull(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandConvexHull(in, out);
 }

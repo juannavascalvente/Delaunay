@@ -62,18 +62,20 @@ Process::~Process()
 	delete this->dispManager;
 	
 	// PENDING Really necessary to call destructors.
-	if (this->status.isDelaunayCreated())
+    Status *status = storeService->getStatus();
+	if (status->isDelaunayCreated())
 	{
-		this->delaunay.~Delaunay();
+	    Delaunay *delaunay = storeService->getDelaunay();
+		delaunay->~Delaunay();
 	}
 
-	if (this->status.isTriangulationCreated())
+	if (status->isTriangulationCreated())
 	{
         StarTriangulation *triangulation = storeService->getStarTriang();
 		triangulation->~StarTriangulation();
 	}
 
-	if (this->status.isVoronoiCreated())
+	if (status->isVoronoiCreated())
 	{
 		this->gabriel.~Gabriel();
 	}
@@ -136,14 +138,14 @@ bool Process::readData(int option)
 //		case RANDOMLY:
 //		{
 //            isSuccess = DcelGenerator::generateRandom(Config::getNPoints(), this->dcel);
-//            this->status.set(false, isSuccess, false, false, false, false);
+//            status->set(false, isSuccess, false, false, false, false);
 //			break;
 //		}
 //		// Generate clusters set.
 //		case CLUSTER:
 //		{
 //            isSuccess = DcelGenerator::generateClusters(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), this->dcel);
-//			this->status.set(false, isSuccess, false, false, false, false);
+//			status->set(false, isSuccess, false, false, false, false);
 //			break;
 //		}
 //		// Read set from flat file.
@@ -160,7 +162,7 @@ bool Process::readData(int option)
 //			{
 //                isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, this->dcel);
 //			}
-//			this->status.set(false, isSuccess, false, false, false, false);
+//			status->set(false, isSuccess, false, false, false, false);
 //			break;
 //		}
 //		// Read dcel file.
@@ -169,7 +171,7 @@ bool Process::readData(int option)
 //			// PENDING CHECK IF A DCEL IS CONSISTENT?
 //			success = DcelReader::read(Config::getInDCELFilename(), false, this->dcel);
 //			this->delaunay.setDCEL(&this->dcel);
-//			this->status.set(false, true, true, false, false, false);
+//			status->set(false, true, true, false, false, false);
 //			break;
 //		}
 //		// Read Delaunay incremental algorithm files.
@@ -179,7 +181,7 @@ bool Process::readData(int option)
 //			this->delaunay.setDCEL(&this->dcel);
 //			success = DelaunayIO::read(Config::getInDCELFilename(),
 //                                       Config::getInGraphFilename(), this->delaunay);
-//			this->status.set(false, success, success, success, false, false);
+//			status->set(false, success, success, success, false, false);
 //			this->delaunay.setAlgorithm(INCREMENTAL);
 //			break;
 //		}
@@ -188,7 +190,7 @@ bool Process::readData(int option)
 //		{
 //			// PENDING: What to allow in menu if only voronoi is read.
 //			//success = this->voronoi.read(Config::getInVoronoiFilename());
-//			//this->status.set(false, true, !success, !success, true, false);
+//			//status->set(false, true, !success, !success, true, false);
 //			cout << "NOT IMPLEMENTED YET" << endl;
 //			break;
 //		}
@@ -197,7 +199,7 @@ bool Process::readData(int option)
 //		{
 //			// PENDING: What to allow in menu if only voronoi is read.
 //			success = GabrielIO::readBinary(Config::getOutGabrielFilename(), this->gabriel);
-//			this->status.setGabrielCreated(true);
+//			status->setGabrielCreated(true);
 //			break;
 //		}
 //        default:
@@ -230,45 +232,19 @@ bool Process::readData(int option)
 void Process::resetData()
 {
 	// Check if Delaunay must be reset.
-	if (this->status.isDelaunayCreated())
+    Status *status = storeService->getStatus();
+	if (status->isDelaunayCreated())
 	{
-		this->delaunay.reset();
+        Delaunay *delaunay = storeService->getDelaunay();
+		delaunay->reset();
 	}
 	// Check if voronoi must be reset.
-	if (this->status.isVoronoiCreated())
+	if (status->isVoronoiCreated())
 	{
 		this->voronoi.reset();
 	}
 }
 
-
-/***************************************************************************
-* Name: 	buildConvexHull
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	true				if successfully built.
-* 			false				i.o.c.
-* GLOBAL:	NONE
-* Description: 	build the convex hull of a set of points. The triangulation
-* 				can be any triangulation or a Delaunay triangulation.
-***************************************************************************/
-bool Process::buildConvexHull()
-{
-	bool built;		// Return value.
-
-	// Computing convex hull.
-	if (this->status.isDelaunayCreated())
-	{
-		built = this->delaunay.convexHull();
-	}
-	else
-	{
-        StarTriangulation *triangulation = storeService->getStarTriang();
-		built = triangulation->convexHull();
-	}
-
-	return(built);
-}
 
 /***************************************************************************
 * Name: 	findPath
@@ -354,9 +330,11 @@ bool Process::findTwoClosest(int &index1, int &index2)
 	// Check if Delaunay triangulation computed.
 	// PENDING ALSO EXECUTES THIS IF THE DELAUNAY WAS BUILD FROM STAR? IF
 	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
-	if (this->status.isDelaunayCreated())
+    Status *status = storeService->getStatus();
+	if (status->isDelaunayCreated())
 	{
-		found = this->delaunay.findTwoClosest(index1, index2);
+        Delaunay *delaunay = storeService->getDelaunay();
+		found = delaunay->findTwoClosest(index1, index2);
 	}
 	else
 	{
@@ -386,9 +364,11 @@ bool Process::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 	// Check if Delaunay triangulation computed.
 	// PENDING ALSO EXECUTES THIS IF THE DELAUNAY WAS BUILD FROM STAR? IF
 	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
-	if (this->status.isDelaunayCreated())
+    Status *status = storeService->getStatus();
+	if (status->isDelaunayCreated())
 	{
-		found = this->delaunay.findFace(point, faceId, isImaginary);
+        Delaunay *delaunay = storeService->getDelaunay();
+		found = delaunay->findFace(point, faceId, isImaginary);
 	}
 	else
 	{
@@ -418,12 +398,14 @@ bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
 	int	pointIndex=0;	// Index of the closest point.
 
 	// Check if Delaunay triangulation computed.
-	if (this->status.isDelaunayCreated())
+    Status *status = storeService->getStatus();
+	if (status->isDelaunayCreated())
 	{
 		// Find node that surrounds input point p.
-		if (this->status.isVoronoiCreated())
+		if (status->isVoronoiCreated())
 		{
-			found = this->delaunay.findClosestPoint(p, this->voronoi, q, pointIndex, distance);
+            Delaunay *delaunay = storeService->getDelaunay();
+			found = delaunay->findClosestPoint(p, this->voronoi, q, pointIndex, distance);
 		}
 		else
 		{
@@ -626,14 +608,15 @@ void Process::execute()
 		case PARAMETERS:
 		case STAR_TRIANGULATION:
 		case DELAUNAY:
+		case CONVEX_HULL:
 		{
-//			// Read configuration file.
-//			cmd = CommandFactory::create(option, storeService);
-//            cmd->run();
-//            dispManager->process();
-            // Read configuration file.
+            // Create command
             cmd = CommandFactory::create(option, storeService);
+
+            // Run command
             cmd->run();
+
+            // Process results
             result = cmd->getResult();
             if (result->wasSuccess())
             {
@@ -693,13 +676,13 @@ void Process::execute()
 			// Check option to generate/read set.
 			if (this->readData(option))
 		    {
-//				if (this->status.isVoronoiCreated())
+//				if (status->isVoronoiCreated())
 //				{
 //					// Clear screen.
 //					this->drawer->drawFigures(VORONOI_DRAW);
 //				}
-//				if (this->status.isDelaunayCreated() ||
-//					this->status.isTriangulationCreated())
+//				if (status->isDelaunayCreated() ||
+//					status->isTriangulationCreated())
 //				{
 //					// Draw triangulation.
 //					this->drawer->drawFigures(TRIANGULATION_DRAW);
@@ -722,7 +705,8 @@ void Process::execute()
 		case VORONOI:
 		{
 			// PENDING CALL VORONOI
-			if (this->status.isDelaunayCreated())
+            Status *status = storeService->getStatus();
+			if (status->isDelaunayCreated())
 			{
 				// Initialize voronoi data.
 				error = !this->voronoi.init(storeService->getDcel());
@@ -744,7 +728,7 @@ void Process::execute()
                     dispManager->process();
 
 					// Update execution status flags.
-					status.set(false, true, true, true, true, false);
+					status->set(false, true, true, true, true, false);
 
 					// Update menu entries.
 					m.updateMenu();
@@ -754,11 +738,13 @@ void Process::execute()
 		}
 		case GABRIEL:
 		{
-			if (this->status.isDelaunayCreated() &&
-				this->status.isVoronoiCreated())
+            Status *status = storeService->getStatus();
+			if (status->isDelaunayCreated() &&
+				status->isVoronoiCreated())
 			{
 				// Build Gabriel graph.
-				this->gabriel.init(this->delaunay.getRefDcel(), &this->voronoi);
+                Delaunay *delaunay = storeService->getDelaunay();
+				this->gabriel.init(delaunay->getRefDcel(), &this->voronoi);
 				error = !this->gabriel.build();
 				if (!error)
 				{
@@ -798,7 +784,7 @@ void Process::execute()
                     dispManager->process();
 
 					// Update execution status flags.
-					status.set(false, true, true, true, true, true);
+					status->set(false, true, true, true, true, true);
 
 					// Update menu entries.
 					m.updateMenu();
@@ -815,17 +801,19 @@ void Process::execute()
 			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
 
 			// Check Delaunay triangulation already created.
-			if (this->status.isDelaunayCreated())
+            Status *status = storeService->getStatus();
+			if (status->isDelaunayCreated())
 			{
 				// Get points.
 				this->getLineToLocate(p1, p2);
 				line = Line(p1, p2);
 
 				// Check incremental triangulation computed.
-				if (this->delaunay.getAlgorithm() == INCREMENTAL)
+                Delaunay *delaunay = storeService->getDelaunay();
+				if (delaunay->getAlgorithm() == INCREMENTAL)
 				{
 					// Compute triangles path between two points.
-					error = !this->delaunay.findPath(line, faces);
+					error = !delaunay->findPath(line, faces);
 				}
 				else
 				{
@@ -882,17 +870,19 @@ void Process::execute()
 			Set<int> faces(DEFAULT_QUEUE_SIZE);		// Set of faces.
 
 			// Check Delaunay triangulation already created.
-			if (this->status.isVoronoiCreated())
+            Status *status = storeService->getStatus();
+			if (status->isVoronoiCreated())
 			{
 				// Get points.
 				this->getLineToLocate(p1, p2);
 				line = Line(p1, p2);
 
 				// Check incremental triangulation computed.
-				if (this->delaunay.getAlgorithm() == INCREMENTAL)
+                Delaunay *delaunay = storeService->getDelaunay();
+				if (delaunay->getAlgorithm() == INCREMENTAL)
 				{
 					// Compute triangles path between two points.
-					error = !this->findPath(this->delaunay, this->voronoi, line, faces);
+					error = !this->findPath(*delaunay, this->voronoi, line, faces);
 				}
 				else
 				{
@@ -945,38 +935,38 @@ void Process::execute()
 			}
 			break;
 		}
-		// Compute convex hull.
-		case CONVEX_HULL:
-		{
-			// Computing convex hull.
-			if (this->buildConvexHull())
-			{
-                Polygon *hull;
-
-                // Computing convex hull.
-                if (this->status.isDelaunayCreated())
-                {
-                    hull = this->delaunay.getConvexHull();
-                }
-                else
-                {
-                    StarTriangulation *triangulation = storeService->getStarTriang();
-                    hull = triangulation->getConvexHull();
-                }
-
-                // Add points to display manager.
-                vector<Point<TYPE>> vPoints;
-                hull->getPoints(vPoints);
-                dispManager->add(DisplayableFactory::createPolygon(vPoints));
-                dispManager->process();
-            }
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull not computed");
-				Logging::write(true, Error);
-			}
-			break;
-		}
+//		// Compute convex hull.
+//		case CONVEX_HULL:
+//		{
+//			// Computing convex hull.
+//			if (this->buildConvexHull())
+//			{
+//                Polygon *hull;
+//
+//                // Computing convex hull.
+//                if (status->isDelaunayCreated())
+//                {
+//                    hull = this->delaunay.getConvexHull();
+//                }
+//                else
+//                {
+//                    StarTriangulation *triangulation = storeService->getStarTriang();
+//                    hull = triangulation->getConvexHull();
+//                }
+//
+//                // Add points to display manager.
+//                vector<Point<TYPE>> vPoints;
+//                hull->getPoints(vPoints);
+//                dispManager->add(DisplayableFactory::createPolygon(vPoints));
+//                dispManager->process();
+//            }
+//			else
+//			{
+//				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull not computed");
+//				Logging::write(true, Error);
+//			}
+//			break;
+//		}
 		// Find closest point to a given point.
 		case CLOSEST_POINT:
 		{
@@ -1087,7 +1077,8 @@ void Process::execute()
 		case FILTER_EDGES:
 		{
 			// Check if Delaunay triangulation already created.
-			if (status.isTriangulationCreated())
+            Status *status = storeService->getStatus();
+			if (status->isTriangulationCreated())
 			{
                 // Add Delaunay triangulation filtering edges
                 Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel(), Config::getMinLengthEdge());
@@ -1101,8 +1092,9 @@ void Process::execute()
 		case CIRCUMCENTRES:
 		{
 			// Check if triangulation created.
-			if (this->status.isDelaunayCreated() ||
-				this->status.isTriangulationCreated())
+            Status *status = storeService->getStatus();
+			if (status->isDelaunayCreated() ||
+				status->isTriangulationCreated())
 			{
                 // Add circles
                 vector<Circle> vCircles;
@@ -1140,7 +1132,8 @@ void Process::execute()
 		case EDGE_CIRCLES:
 		{
 			// Check if triangulation created.
-			if (this->status.isTriangulationCreated())
+            Status *status = storeService->getStatus();
+			if (status->isTriangulationCreated())
 			{
                 int		edgeIndex=0;        // Edge index.
                 int		nEdges=0;			// # edges in the storeService->getDcel()->
@@ -1252,7 +1245,8 @@ void Process::execute()
 		// Write DCEL and graph files.
 		case WRITE_DELAUNAY:
 		{
-            DelaunayIO::write(Config::getOutDCELFilename(), Config::getOutGraphFilename(), this->delaunay);
+            Delaunay *delaunay = storeService->getDelaunay();
+            DelaunayIO::write(Config::getOutDCELFilename(), Config::getOutGraphFilename(), *delaunay);
 			break;
 		}
 		// Write voronoi DCEL file.
@@ -1271,7 +1265,8 @@ void Process::execute()
 		case CLEAR:
 		{
 			// Update execution status flags.
-			this->status.reset();
+            Status *status = storeService->getStatus();
+			status->reset();
 
 			// Update menu entries.
 			this->m.updateMenu();
@@ -1316,9 +1311,11 @@ void Process::execute()
 	{
 		// PENDING. Anything to deallocate.
 		delete this->log;
-		if (this->status.isDelaunayCreated())
+        Status *status = storeService->getStatus();
+		if (status->isDelaunayCreated())
 		{
-			this->delaunay.~Delaunay();
+            Delaunay *delaunay = storeService->getDelaunay();
+			delaunay->~Delaunay();
 		}
 		exit(0);
 	}

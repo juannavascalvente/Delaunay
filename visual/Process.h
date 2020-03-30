@@ -40,8 +40,6 @@ class Process
     StoreService        *storeService;
 
 	Menu 			    m;				// Menu object.
-	Status 			    status;			// Current status.
-	Delaunay		    delaunay;		// Delaunay data.
 	Voronoi			    voronoi;		// Voronoi diagram data.
 	Gabriel			    gabriel;		// Gabriel graph data.
 	Logging 		    *log;			// Log file.
@@ -53,7 +51,6 @@ class Process
 	static void executeWrapper();
 	bool readData(int option);
 	void resetData();
-	bool buildConvexHull();
 	static bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
 	bool findTwoClosest( int &index1, int &index2);
 	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);

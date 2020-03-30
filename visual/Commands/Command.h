@@ -445,4 +445,78 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandConvexHull : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    Polygon *hull;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandConvexHull(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks Delaunay triangulation is not already displayed
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Star triangulation and Delaunay or have been already created
+        return (in.getStoreService()->getStatus()->isTriangulationCreated() ||
+                in.getStoreService()->getStatus()->isDelaunayCreated());
+    };
+
+    /**
+     * @fn      run
+     * @brief   Builds star triangulation
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult * runCommand() override
+    {
+        // Get reference to status
+        Status *status = in.getStoreService()->getStatus();
+
+        // Computing convex hull.
+        if (status->isDelaunayCreated())
+        {
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            this->isSuccess = delaunay->convexHull();
+            hull = in.getStoreService()->getDelaunay()->getConvexHull();
+        }
+        else
+        {
+            StarTriangulation *triangulation = out.getStoreService()->getStarTriang();
+            this->isSuccess = triangulation->convexHull();
+            hull = triangulation->getConvexHull();
+        }
+
+        // Build result
+        return createResult();
+    }
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        return new CommandResultPolygon(getSuccess(), in.getStoreService(), hull);
+    }
+};
+
+
 #endif //DELAUNAY_COMMAND_H

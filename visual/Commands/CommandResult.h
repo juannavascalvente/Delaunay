@@ -114,4 +114,24 @@ public:
     };
 };
 
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResultPolygon : public CommandResult
+{
+    Polygon *polygon;
+public:
+    CommandResultPolygon(bool isSuccess, StoreService *service, Polygon *polygonIn) : CommandResult(isSuccess, service), polygon(polygonIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        // Add polygon points
+        vector<Point<TYPE>> vPoints;
+        polygon->getPoints(vPoints);
+        vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
+    };
+};
+
+
 #endif //DELAUNAY_COMMANDRESULT_H

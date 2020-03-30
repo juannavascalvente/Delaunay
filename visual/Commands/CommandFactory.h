@@ -26,6 +26,7 @@ class CommandFactory
     static Command *createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, StoreService *storeService);
     static Command *createStarTriangulation(StoreService *storeService);
     static Command *createDelaunay(StoreService *storeService);
+    static Command *createConvexHull(StoreService *storeService);
 
 public:
 
