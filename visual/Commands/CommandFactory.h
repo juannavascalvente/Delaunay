@@ -28,6 +28,7 @@ class CommandFactory
     static Command *createDelaunay(StoreService *storeService);
     static Command *createConvexHull(StoreService *storeService);
     static Command *createVoronoi(StoreService *storeService);
+    static Command *createGabriel(StoreService *storeService);
 
 public:
 

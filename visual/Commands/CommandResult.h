@@ -66,13 +66,16 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        // Add figure display.
-        vector<Point<TYPE>> vPoints;
-        for (size_t i=0; i< Config::getNPoints(); i++)
+        if (isSuccess)
         {
-            vPoints.push_back(*dcel->getRefPoint(i));
+            // Add figure display.
+            vector<Point<TYPE>> vPoints;
+            for (size_t i=0; i< Config::getNPoints(); i++)
+            {
+                vPoints.push_back(*dcel->getRefPoint(i));
+            }
+            vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
         }
-        vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
     };
 };
 
@@ -94,7 +97,10 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
+        if (isSuccess)
+        {
+            vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
+        }
     };
 };
 
@@ -126,10 +132,13 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        // Add polygon points
-        vector<Point<TYPE>> vPoints;
-        polygon->getPoints(vPoints);
-        vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
+        if (isSuccess)
+        {
+            // Add polygon points
+            vector<Point<TYPE>> vPoints;
+            polygon->getPoints(vPoints);
+            vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
+        }
     };
 };
 
@@ -148,9 +157,12 @@ public:
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
-        // Add delaunay and voronoi
-        vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
-        vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getVoronoi()->getRefDcel()));
+        if (isSuccess)
+        {
+            // Add delaunay and voronoi
+            vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
+            vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getVoronoi()->getRefDcel()));
+        }
     };
 
     void updateStatus() override
@@ -158,5 +170,61 @@ public:
         storeService->getStatus()->set(false, true, true, true, true, false);
     };
 };
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResultGabriel : public CommandResult
+{
+    Dcel *dcel;
+    Gabriel *gabriel;
+public:
+    CommandResultGabriel(bool isSuccess, StoreService *service, Dcel *dcelIn, Gabriel *gabrielIn) : CommandResult(isSuccess, service),
+                                                                                                    dcel(dcelIn),
+                                                                                                    gabriel(gabrielIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        if (isSuccess)
+        {
+            Point<TYPE> *vertex1;	    // First vertex.
+            Point<TYPE> *vertex2;	    // Second vertex.
+            Dcel	*dcelRef;
+
+            // Get reference to gabriel dcel.
+            dcelRef = gabriel->getDcel();
+
+            // Draw Gabriel edges.
+            vector<Line> vLines;
+            // https://github.com/juannavascalvente/Delaunay/issues/60
+            for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
+            {
+                // Check if current edge mamtches Gabriel restriction.s
+                if (gabriel->isSet(edgeIndex))
+                {
+                    // Get origin vertex of edge.
+                    vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
+
+                    // Get destination vertex of edge.
+                    vertex2 = dcelRef->getRefPoint(dcelRef->getOrigin(dcelRef->getTwin(edgeIndex)-1)-1);
+
+                    Line line(*vertex1, *vertex2);
+                    vLines.push_back(line);
+                }
+            }
+
+            // Add Delaunay and gabriel graph
+            vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
+            vDisplayable.push_back(DisplayableFactory::createPolyLine(vLines));
+        }
+    };
+
+    void updateStatus() override
+    {
+        storeService->getStatus()->set(false, true, true, true, true, true);
+    };
+};
+
 
 #endif //DELAUNAY_COMMANDRESULT_H

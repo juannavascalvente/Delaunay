@@ -609,6 +609,7 @@ void Process::execute()
 		case DELAUNAY:
 		case CONVEX_HULL:
         case VORONOI:
+        case GABRIEL:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -701,62 +702,62 @@ void Process::execute()
 		    }
 			break;
 		}
-		case GABRIEL:
-		{
-            Status *status = storeService->getStatus();
-			if (status->isDelaunayCreated() &&
-				status->isVoronoiCreated())
-			{
-				// Build Gabriel graph.
-                Delaunay *delaunay = storeService->getDelaunay();
-				this->gabriel.init(delaunay->getRefDcel(), &this->voronoi);
-				error = !this->gabriel.build();
-				if (!error)
-				{
-					// Draw Voronoi graph and the triangulation.
-                    Point<TYPE> *vertex1;	    // First vertex.
-                    Point<TYPE> *vertex2;	    // Second vertex.
-                    Dcel	*dcelRef;
-
-                    // Get reference to gabriel dcel.
-                    dcelRef = gabriel.getDcel();
-
-                    // Draw Gabriel edges.
-                    vector<Line> vLines;
-                    for (size_t edgeIndex=0; edgeIndex<gabriel.getSize() ;edgeIndex++)
-                    {
-                        // Check if current edge mamtches Gabriel restriction.s
-                        if (gabriel.isSet(edgeIndex))
-                        {
-                            // Get origin vertex of edge.
-                            vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
-
-                            // Get destination vertex of edge.
-                            vertex2 = dcelRef->getRefPoint(dcelRef->getOrigin(dcelRef->getTwin(edgeIndex)-1)-1);
-
-                            Line line(*vertex1, *vertex2);
-                            vLines.push_back(line);
-                        }
-                    }
-
-                    // Draw Delaunay
-                    Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                    dispManager->add(dispDelaunay);
-
-                    // Add lines
-                    dispManager->add(DisplayableFactory::createPolyLine(vLines));
-
-                    dispManager->process();
-
-					// Update execution status flags.
-					status->set(false, true, true, true, true, true);
-
-					// Update menu entries.
-					m.updateMenu();
-				}
-			}
-			break;
-		}
+//		case GABRIEL:
+//		{
+//            Status *status = storeService->getStatus();
+//			if (status->isDelaunayCreated() &&
+//				status->isVoronoiCreated())
+//			{
+//				// Build Gabriel graph.
+//                Delaunay *delaunay = storeService->getDelaunay();
+//				this->gabriel.init(delaunay->getRefDcel(), &this->voronoi);
+//				error = !this->gabriel.build();
+//				if (!error)
+//				{
+//					// Draw Voronoi graph and the triangulation.
+//                    Point<TYPE> *vertex1;	    // First vertex.
+//                    Point<TYPE> *vertex2;	    // Second vertex.
+//                    Dcel	*dcelRef;
+//
+//                    // Get reference to gabriel dcel.
+//                    dcelRef = gabriel.getDcel();
+//
+//                    // Draw Gabriel edges.
+//                    vector<Line> vLines;
+//                    for (size_t edgeIndex=0; edgeIndex<gabriel.getSize() ;edgeIndex++)
+//                    {
+//                        // Check if current edge mamtches Gabriel restriction.s
+//                        if (gabriel.isSet(edgeIndex))
+//                        {
+//                            // Get origin vertex of edge.
+//                            vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
+//
+//                            // Get destination vertex of edge.
+//                            vertex2 = dcelRef->getRefPoint(dcelRef->getOrigin(dcelRef->getTwin(edgeIndex)-1)-1);
+//
+//                            Line line(*vertex1, *vertex2);
+//                            vLines.push_back(line);
+//                        }
+//                    }
+//
+//                    // Draw Delaunay
+//                    Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
+//                    dispManager->add(dispDelaunay);
+//
+//                    // Add lines
+//                    dispManager->add(DisplayableFactory::createPolyLine(vLines));
+//
+//                    dispManager->process();
+//
+//					// Update execution status flags.
+//					status->set(false, true, true, true, true, true);
+//
+//					// Update menu entries.
+//					m.updateMenu();
+//				}
+//			}
+//			break;
+//		}
 		// Compute path between two points.
 		case TRIANGULATION_PATH:
 		{

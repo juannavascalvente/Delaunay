@@ -61,6 +61,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createVoronoi(storeService);
             break;
         }
+        case GABRIEL:
+        {
+            command = createGabriel(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -153,4 +158,15 @@ Command *CommandFactory::createVoronoi(StoreService *storeService)
 
     // Create command
     return new CommandVoronoi(in, out);
+}
+
+
+Command *CommandFactory::createGabriel(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandGabriel(in, out);
 }

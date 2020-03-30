@@ -588,5 +588,69 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandGabriel : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandGabriel(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks Delaunay triangulation has been created
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Delaunay and Voronoi must exist
+        Status *status = in.getStoreService()->getStatus();
+        return status->isDelaunayCreated() && status->isVoronoiCreated();
+    };
+
+    /**
+     * @fn      run
+     * @brief   Builds star triangulation
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult * runCommand() override
+    {
+        // Build Gabriel graph.
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        Voronoi *voronoi = in.getStoreService()->getVoronoi();
+        Gabriel *gabriel = in.getStoreService()->getGabriel();
+        gabriel->init(delaunay->getRefDcel(), voronoi);
+        this->isSuccess = gabriel->build();
+
+        // Build result
+        return createResult();
+    }
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = out.getStoreService()->getDcel();
+        Gabriel *gabriel = in.getStoreService()->getGabriel();
+        return new CommandResultGabriel(getSuccess(), in.getStoreService(), dcel, gabriel);
+    }
+};
+
 
 #endif //DELAUNAY_COMMAND_H
