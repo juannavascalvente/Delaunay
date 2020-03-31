@@ -106,6 +106,21 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createEdgeCircle(storeService);
             break;
         }
+        case DCEL_INFO:
+        {
+            command = createDcelInfo(storeService);
+            break;
+        }
+        case VORONOI_INFO:
+        {
+            command = createVoronoiInfo(storeService);
+            break;
+        }
+        case CLEAR:
+        {
+            command = createClear(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -289,4 +304,34 @@ Command *CommandFactory::createEdgeCircle(StoreService *storeService)
 
     // Create command
     return new CommandEdgeCircle(in, out);
+}
+
+Command *CommandFactory::createDcelInfo(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandDcelInfo(in, out);
+}
+
+Command *CommandFactory::createVoronoiInfo(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandVoronoiInfo(in, out);
+}
+
+Command *CommandFactory::createClear(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandClear(in, out);
 }

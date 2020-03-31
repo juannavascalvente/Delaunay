@@ -48,9 +48,6 @@ class Process
 	void execute();
 	static void executeWrapper();
 	bool readData(int option);
-    static void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info);
-    static void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info);
-    static void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info);
 
 protected:
 	static Process *instance;

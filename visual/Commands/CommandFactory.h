@@ -37,6 +37,9 @@ class CommandFactory
     static Command *createFilterEdges(StoreService *storeService, TYPE minLen);
     static Command *createCircumcentres(StoreService *storeService);
     static Command *createEdgeCircle(StoreService *storeService);
+    static Command *createDcelInfo(StoreService *storeService);
+    static Command *createVoronoiInfo(StoreService *storeService);
+    static Command *createClear(StoreService *storeService);
 
 public:
 

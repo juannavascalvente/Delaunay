@@ -1,9 +1,3 @@
-/*
- * Process.cpp
- *
- *  Created on: Jun 29, 2016
- *      Author: jnavas
- */
 
 /***********************************************************************************************************************
 * Includes
@@ -202,90 +196,6 @@ bool Process::readData(int option)
 }
 
 
-void Process::createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
-{
-    // Draw all points of the set.
-    for (size_t i=0; i < dcelIn.getNVertex() ; i++)
-    {
-        // Get and draw i-point.
-        Point<TYPE> *point = dcelIn.getRefPoint(i);
-        string strText = std::to_string(i+1);
-
-        Text text(point->getX(), point->getY(), strText);
-        info.push_back(text);
-    }
-}
-
-
-void Process::createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info)
-{
-    // Loop all edges.
-    for (size_t edgeIndex=0; edgeIndex<dcelIn.getNEdges() ;edgeIndex++)
-    {
-        // Check if twin edge already visited.
-        if ((edgeIndex+1) < dcelIn.getTwin(edgeIndex))
-        {
-            // Check edge is real.
-            if (!dcelIn.hasNegativeVertex((int) edgeIndex+1))
-            {
-                // Get edge extreme points.
-                Point<TYPE> origin, dest;	// Extreme points of edges.
-                dcelIn.getEdgePoints(edgeIndex, origin, dest);
-
-                // Compute middle point of edge.
-                Point<TYPE> middle;         // Middle point of the edge.
-                Point<TYPE>::middlePoint(&origin, &dest, &middle);
-
-                // Print information.
-                string strText = std::to_string(edgeIndex+1) + " - " + std::to_string(dcelIn.getTwin(edgeIndex));
-
-                Text text(middle.getX(), middle.getY(), strText);
-                info.push_back(text);
-            }
-        }
-    }
-}
-
-
-void Process::createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
-{
-    // Loop all faces (skip external face).
-    for (size_t faceId=0; faceId<dcelIn.getNFaces() ;faceId++)
-    {
-        // If any vertex is imaginary then face is not drawn.
-        if (!dcelIn.imaginaryFace(faceId))
-        {
-            Polygon polygon;
-
-            // Get edge in current face.
-            size_t firstEdgeIndex = dcelIn.getFaceEdge(faceId)-1;
-            size_t edgeIndex = firstEdgeIndex;
-            do
-            {
-                // Add origin point to polygon.
-                Point<TYPE> origin;			// Edge origin point.
-                origin = *dcelIn.getRefPoint(dcelIn.getOrigin(edgeIndex)-1);
-                polygon.add(origin);
-
-                // Next edge in face.
-                edgeIndex = dcelIn.getNext(edgeIndex)-1;
-            } while(edgeIndex != firstEdgeIndex);
-
-            // Compute face centroid.
-            Point<TYPE> center;			// Middle point of the edge.
-            polygon.centroid(center);
-            polygon.reset();
-
-            // Print information.
-            string strText = std::to_string(faceId);
-
-            Text text(center.getX(), center.getY(), strText);
-            info.push_back(text);
-        }
-    }
-}
-
-
 /***************************************************************************
 * Name: execute
 * IN:		NONE
@@ -329,6 +239,9 @@ void Process::execute()
         case FILTER_EDGES:
         case CIRCUMCENTRES:
         case EDGE_CIRCLES:
+        case DCEL_INFO:
+        case VORONOI_INFO:
+        case CLEAR:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -391,58 +304,7 @@ void Process::execute()
 		    }
 			break;
 		}
-		// Print DCEL data.
-		case DCEL_INFO:
-		{
-            // Add Delaunay triangulation
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-            dispManager->add(dispDelaunay);
 
-            vector<Text> vPointsInfo;
-            this->createDcelPointsInfo(*storeService->getDcel(), vPointsInfo);
-            Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
-            dispManager->add(dispPointsInfo);
-
-            vector<Text> vEdgesInfo;
-            this->createDcelEdgeInfo(*storeService->getDcel(), vEdgesInfo);
-            Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
-            dispManager->add(dispEdgesInfo);
-
-            vector<Text> vFacesInfo;
-            this->createDcelFacesInfo(*storeService->getDcel(), vFacesInfo);
-            Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
-            dispManager->add(dispFacesInfo);
-
-            dispManager->process();
-			break;
-		}
-		// Print Voronoi data.
-		case VORONOI_INFO:
-		{
-		    Voronoi *voronoi = storeService->getVoronoi();
-
-            // Add Delaunay triangulation
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(voronoi->getRefDcel());
-            dispManager->add(dispDelaunay);
-
-            vector<Text> vPointsInfo;
-            this->createDcelPointsInfo(*voronoi->getRefDcel(), vPointsInfo);
-            Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
-            dispManager->add(dispPointsInfo);
-
-            vector<Text> vEdgesInfo;
-            this->createDcelEdgeInfo(*voronoi->getRefDcel(), vEdgesInfo);
-            Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
-            dispManager->add(dispEdgesInfo);
-
-            vector<Text> vFacesInfo;
-            this->createDcelFacesInfo(*voronoi->getRefDcel(), vFacesInfo);
-            Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
-            dispManager->add(dispFacesInfo);
-
-            dispManager->process();
-			break;
-		}
 		// Write points to a flat file.
 		case WRITE_POINTS:
 		{
@@ -474,34 +336,11 @@ void Process::execute()
 			GabrielIO::writeBinary(Config::getOutGabrielFilename(), *storeService->getGabriel());
 			break;
 		}
-		// Clear data.
-		case CLEAR:
-		{
-			// Update execution status flags.
-            Status *status = storeService->getStatus();
-			status->reset();
-
-			// Update menu entries.
-			this->m.updateMenu();
-
-			// Clear screen.
-            dispManager->process();
-
-			// Reset data.
-			break;
-		}
 		// Quit application.
 		case QUIT:
 		{
 			// Quit application.
 			quit = true;
-			break;
-		}
-		// Not implemented functionality.
-		case CHECK_DCEL:
-		case ZOOM:
-		{
-			std::cout << "Not implemented." << std::endl;
 			break;
 		}
 		default:

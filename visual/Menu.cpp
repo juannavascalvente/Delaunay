@@ -274,7 +274,6 @@ void Menu::updateMenu()
 			glutAddSubMenu(INFORMATION_MENU_TEXT, sub_Menu_Id5);
 		}
 		glutAddMenuEntry(CLEAR_MENU_TEXT, CLEAR);
-		glutAddMenuEntry(ZOOM_MENU_TEXT, ZOOM);
 		glutAddMenuEntry(QUIT_MENU_TEXT, QUIT);
 		glutAttachMenu(GLUT_RIGHT_BUTTON);
 	}

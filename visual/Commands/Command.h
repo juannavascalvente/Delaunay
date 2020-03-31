@@ -1539,4 +1539,249 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandDcelInfo : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    vector<Displayable*> vDisplayable;
+
+    void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
+    {
+        // Draw all points of the set.
+        for (size_t i=0; i < dcelIn.getNVertex() ; i++)
+        {
+            // Get and draw i-point.
+            Point<TYPE> *point = dcelIn.getRefPoint(i);
+            string strText = std::to_string(i+1);
+
+            Text text(point->getX(), point->getY(), strText);
+            info.push_back(text);
+        }
+    }
+
+
+    void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info)
+    {
+        // Loop all edges.
+        for (size_t edgeIndex=0; edgeIndex<dcelIn.getNEdges() ;edgeIndex++)
+        {
+            // Check if twin edge already visited.
+            if ((edgeIndex+1) < dcelIn.getTwin(edgeIndex))
+            {
+                // Check edge is real.
+                if (!dcelIn.hasNegativeVertex((int) edgeIndex+1))
+                {
+                    // Get edge extreme points.
+                    Point<TYPE> origin, dest;	// Extreme points of edges.
+                    dcelIn.getEdgePoints(edgeIndex, origin, dest);
+
+                    // Compute middle point of edge.
+                    Point<TYPE> middle;         // Middle point of the edge.
+                    Point<TYPE>::middlePoint(&origin, &dest, &middle);
+
+                    // Print information.
+                    string strText = std::to_string(edgeIndex+1) + " - " + std::to_string(dcelIn.getTwin(edgeIndex));
+
+                    Text text(middle.getX(), middle.getY(), strText);
+                    info.push_back(text);
+                }
+            }
+        }
+    }
+
+
+    void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
+    {
+        // Loop all faces (skip external face).
+        for (size_t faceId=0; faceId<dcelIn.getNFaces() ;faceId++)
+        {
+            // If any vertex is imaginary then face is not drawn.
+            if (!dcelIn.imaginaryFace(faceId))
+            {
+                Polygon polygon;
+
+                // Get edge in current face.
+                size_t firstEdgeIndex = dcelIn.getFaceEdge(faceId)-1;
+                size_t edgeIndex = firstEdgeIndex;
+                do
+                {
+                    // Add origin point to polygon.
+                    Point<TYPE> origin;			// Edge origin point.
+                    origin = *dcelIn.getRefPoint(dcelIn.getOrigin(edgeIndex)-1);
+                    polygon.add(origin);
+
+                    // Next edge in face.
+                    edgeIndex = dcelIn.getNext(edgeIndex)-1;
+                } while(edgeIndex != firstEdgeIndex);
+
+                // Compute face centroid.
+                Point<TYPE> center;			// Middle point of the edge.
+                polygon.centroid(center);
+                polygon.reset();
+
+                // Print information.
+                string strText = std::to_string(faceId);
+
+                Text text(center.getX(), center.getY(), strText);
+                info.push_back(text);
+            }
+        }
+    }
+
+protected:
+    Dcel *dcel;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandDcelInfo(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam)
+    {
+        dcel = in.getStoreService()->getDcel();
+    };
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that a triangulation must exist
+     */
+    void printRunnableMsg() override
+    {
+        cout << "A triangulation must exist" << endl;
+    }
+
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks a triangulation exist
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Triangulation must exist
+        Status *status = in.getStoreService()->getStatus();
+        return status->isTriangulationCreated();
+    }
+
+    /**
+     * @fn      run
+     * @brief   Do nothing as job is done in display results
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        this->isSuccess = true;
+
+        // Add Delaunay triangulation
+        Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+        vDisplayable.push_back(dispDelaunay);
+
+        vector<Text> vPointsInfo;
+        this->createDcelPointsInfo(*dcel, vPointsInfo);
+        Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
+        vDisplayable.push_back(dispPointsInfo);
+
+        vector<Text> vEdgesInfo;
+        this->createDcelEdgeInfo(*dcel, vEdgesInfo);
+        Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
+        vDisplayable.push_back(dispEdgesInfo);
+
+        vector<Text> vFacesInfo;
+        this->createDcelFacesInfo(*dcel, vFacesInfo);
+        Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
+        vDisplayable.push_back(dispFacesInfo);
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandVoronoiInfo : public CommandDcelInfo
+{
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandVoronoiInfo(CmdParamIn &inParam, CmdParamOut &outParam) : CommandDcelInfo(inParam, outParam)
+    {
+        dcel = inParam.getStoreService()->getVoronoi()->getRefDcel();
+    };
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandClear : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandClear(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Do nothing as job is done in display results
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        this->isSuccess = true;
+
+        // Reset
+        in.getStoreService()->getStatus()->reset();
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+    }
+};
+
+
+
 #endif //DELAUNAY_COMMAND_H

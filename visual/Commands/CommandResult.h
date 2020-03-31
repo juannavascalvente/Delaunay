@@ -387,4 +387,23 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResultDisplay : public CommandResult
+{
+    vector<Displayable*> vDisplayable;
+
+public:
+    CommandResultDisplay(bool isSuccess, StoreService *service, vector<Displayable*> &vDisplayableIn) :
+                                                                                    CommandResult(isSuccess, service),
+                                                                                    vDisplayable(vDisplayableIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayableOut) override
+    {
+        vDisplayableOut = vDisplayable;
+    }
+};
+
+
 #endif //DELAUNAY_COMMANDRESULT_H
