@@ -29,6 +29,12 @@ public:
     static StarTriangulation *getStarTriang() { return StoreData::getStarTriang(); };
     static Voronoi *getVoronoi() { return StoreData::getVoronoi(); };
     static Gabriel *getGabriel() { return StoreData::getGabriel(); };
+
+    /**
+     * @fn      reset
+     * @brief   Resets Delaunay and Voronoi
+     */
+    static void reset();
 };
 
 

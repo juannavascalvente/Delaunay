@@ -203,6 +203,9 @@ public:
      */
     CommandResult * runCommand() override
     {
+        // Reset store data
+        in.getStoreService()->reset();
+
         // Run command
         this->isSuccess = DcelGenerator::generateRandom(in.getNumPoints(), out.getDcel());
 
@@ -268,6 +271,9 @@ public:
      */
     void printRunnableMsg() override
     {
+        // Reset store data
+        in.getStoreService()->reset();
+
         // Check radius
         if (in.getFRadius() <= 0.0)
         {

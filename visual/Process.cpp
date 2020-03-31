@@ -201,30 +201,6 @@ bool Process::readData(int option)
 	return isSuccess;
 }
 
-/***************************************************************************
-* Name: 	resetData
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	resets the data of the process class.
-***************************************************************************/
-void Process::resetData()
-{
-	// Check if Delaunay must be reset.
-    Status *status = storeService->getStatus();
-	if (status->isDelaunayCreated())
-	{
-        Delaunay *delaunay = storeService->getDelaunay();
-		delaunay->reset();
-	}
-	// Check if voronoi must be reset.
-	if (status->isVoronoiCreated())
-	{
-        storeService->getVoronoi()->reset();
-	}
-}
-
 
 void Process::createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
 {
@@ -338,6 +314,8 @@ void Process::execute()
 	{
 		// Read parameters from configuration file.
 		case PARAMETERS:
+        case RANDOMLY:
+        case CLUSTER:
 		case STAR_TRIANGULATION:
 		case DELAUNAY:
 		case CONVEX_HULL:
@@ -378,34 +356,6 @@ void Process::execute()
 
 			break;
 		}
-		// New set of points (generated or read).
-		case RANDOMLY:
-		case CLUSTER:
-        {
-            this->resetData();
-
-            // Read configuration file.
-            cmd = CommandFactory::create(option, storeService);
-            cmd->run();
-            result = cmd->getResult();
-            if (result->wasSuccess())
-            {
-                // Update menu status
-                result->updateStatus();
-
-                // Get displaybale elements
-                vector<Displayable*> vDisplayable;
-                result->createDisplayables(vDisplayable);
-                dispManager->add(vDisplayable);
-
-                dispManager->process();
-            }
-
-            // Update menu entries.
-            m.updateMenu();
-
-            break;
-        }
 		case READ_POINTS_FLAT_FILE:
 		case READ_POINTS_DCEL_FILE:
 		case READ_DCEL:
@@ -413,8 +363,6 @@ void Process::execute()
 		case READ_VORONOI:
 		case READ_GABRIEL:
 		{
-			this->resetData();
-
 			// Check option to generate/read set.
 			if (this->readData(option))
 		    {
