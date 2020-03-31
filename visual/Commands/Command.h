@@ -14,6 +14,10 @@
 #include "CommandResult.h"
 #include "Config.h"
 #include "DcelGenerator.h"
+#include "DcelWriter.h"
+#include "DelaunayIO.h"
+#include "VoronoiIO.h"
+#include "GabrielIO.h"
 #include "DcelFigureBuilder.h"
 #include "LineFactory.h"
 #include "PointFactory.h"
@@ -1783,5 +1787,168 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandWriteFile : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandWriteFile(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Write set of points to file
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Write points to file
+        this->isSuccess = DcelWriter::writePoints(Config::getOutFlatFilename(), INVALID, *in.getStoreService()->getDcel());
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+    }
+
+    CmdParamIn *getInput() { return &in; }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandWriteFileDcel : public CommandWriteFile
+{
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandWriteFileDcel(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+
+    /**
+     * @fn      run
+     * @brief   Write Dcel to file
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Write dcel to file
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), false, *getInput()->getStoreService()->getDcel());
+
+        // Build result
+        return createResult();
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandWriteFileDelaunay : public CommandWriteFile
+{
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandWriteFileDelaunay(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+
+    /**
+     * @fn      run
+     * @brief   Write Delaunay to file
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Write dcel to file
+        this->isSuccess = DelaunayIO::write(Config::getOutDCELFilename(), Config::getOutGraphFilename(), *getInput()->getStoreService()->getDelaunay());
+
+        // Build result
+        return createResult();
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandWriteFileVoronoi : public CommandWriteFile
+{
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandWriteFileVoronoi(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+
+    /**
+     * @fn      run
+     * @brief   Write Delaunay to file
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Write dcel to file
+        this->isSuccess = VoronoiIO::write(Config::getOutVoronoiFilename(), *getInput()->getStoreService()->getVoronoi());
+
+        // Build result
+        return createResult();
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandWriteFileGabriel : public CommandWriteFile
+{
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandWriteFileGabriel(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+
+    /**
+     * @fn      run
+     * @brief   Write Delaunay to file
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Write dcel to file
+        this->isSuccess = GabrielIO::writeBinary(Config::getOutGabrielFilename(), *getInput()->getStoreService()->getGabriel());
+
+        // Build result
+        return createResult();
+    }
+};
 
 #endif //DELAUNAY_COMMAND_H

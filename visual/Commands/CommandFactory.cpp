@@ -121,6 +121,31 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createClear(storeService);
             break;
         }
+        case WRITE_POINTS:
+        {
+            command = createWritePoints(storeService);
+            break;
+        }
+        case WRITE_DCEL:
+        {
+            command = createWriteDcel(storeService);
+            break;
+        }
+        case WRITE_DELAUNAY:
+        {
+            command = createWriteDelaunay(storeService);
+            break;
+        }
+        case WRITE_VORONOI:
+        {
+            command = createWriteVoronoi(storeService);
+            break;
+        }
+        case WRITE_GABRIEL:
+        {
+            command = createWriteGabriel(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -334,4 +359,54 @@ Command *CommandFactory::createClear(StoreService *storeService)
 
     // Create command
     return new CommandClear(in, out);
+}
+
+Command *CommandFactory::createWritePoints(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandWriteFile(in, out);
+}
+
+Command *CommandFactory::createWriteDcel(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandWriteFileDcel(in, out);
+}
+
+Command *CommandFactory::createWriteDelaunay(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandWriteFileDelaunay(in, out);
+}
+
+Command *CommandFactory::createWriteVoronoi(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandWriteFileVoronoi(in, out);
+}
+
+Command *CommandFactory::createWriteGabriel(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandWriteFileGabriel(in, out);
 }

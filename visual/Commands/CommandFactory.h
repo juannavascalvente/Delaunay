@@ -40,6 +40,11 @@ class CommandFactory
     static Command *createDcelInfo(StoreService *storeService);
     static Command *createVoronoiInfo(StoreService *storeService);
     static Command *createClear(StoreService *storeService);
+    static Command *createWritePoints(StoreService *storeService);
+    static Command *createWriteDcel(StoreService *storeService);
+    static Command *createWriteDelaunay(StoreService *storeService);
+    static Command *createWriteVoronoi(StoreService *storeService);
+    static Command *createWriteGabriel(StoreService *storeService);
 
 public:
 

@@ -42,7 +42,7 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
     storeService = storeServiceIn;
     dispManager = new DisplayManager(argc, argv);
 
-	this->m = Menu(storeServiceIn->getStatus());
+	this->menu = Menu(storeServiceIn->getStatus());
 
 	// Function to execute by GLUT.
 	glutDisplayFunc(executeWrapper);
@@ -52,8 +52,8 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 Process::~Process()
 {
 	// Deallocate resources
-	delete this->log;
-	delete this->dispManager;
+	delete log;
+	delete dispManager;
 	delete storeService;
 }
 
@@ -212,12 +212,9 @@ void Process::execute()
 
 	static bool firstTime=true;
 	int		option=0;			// Option to be executed.
-	bool	error=false;		// Error executing any function.
-	bool	quit=false;			// Quit application flag.
-	int		index1, index2;		// Index of the two closest points.
 
 	// Get option to be executed.
-	option = m.getMenuOption();
+	option = menu.getMenuOption();
 
 	// Execute option.
 	switch(option)
@@ -242,6 +239,11 @@ void Process::execute()
         case DCEL_INFO:
         case VORONOI_INFO:
         case CLEAR:
+        case WRITE_POINTS:
+        case WRITE_DCEL:
+        case WRITE_DELAUNAY:
+        case WRITE_VORONOI:
+        case WRITE_GABRIEL:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -265,7 +267,7 @@ void Process::execute()
             }
 
             // Update menu entries.
-            m.updateMenu();
+            menu.updateMenu();
 
 			break;
 		}
@@ -300,48 +302,18 @@ void Process::execute()
                 dispManager->process();
 
 				// Update menu entries.
-				m.updateMenu();
+				menu.updateMenu();
 		    }
-			break;
-		}
-
-		// Write points to a flat file.
-		case WRITE_POINTS:
-		{
-			DcelWriter::writePoints(Config::getOutFlatFilename(), INVALID, *storeService->getDcel());
-			break;
-		}
-		// Write points to a DCEL file.
-		case WRITE_DCEL:
-		{
-			DcelWriter::write(Config::getOutDCELFilename(), false, *storeService->getDcel());
-			break;
-		}
-		// Write DCEL and graph files.
-		case WRITE_DELAUNAY:
-		{
-            Delaunay *delaunay = storeService->getDelaunay();
-            DelaunayIO::write(Config::getOutDCELFilename(), Config::getOutGraphFilename(), *delaunay);
-			break;
-		}
-		// Write voronoi DCEL file.
-		case WRITE_VORONOI:
-		{
-			VoronoiIO::write(Config::getOutVoronoiFilename(), *storeService->getVoronoi());
-			break;
-		}
-		// Write Gabriel graph data.
-		case WRITE_GABRIEL:
-		{
-			GabrielIO::writeBinary(Config::getOutGabrielFilename(), *storeService->getGabriel());
 			break;
 		}
 		// Quit application.
 		case QUIT:
 		{
 			// Quit application.
-			quit = true;
-			break;
+            delete log;
+            delete dispManager;
+            delete storeService;
+            exit(0);
 		}
 		default:
 		{
@@ -358,16 +330,6 @@ void Process::execute()
 	// Delete iteration resources
     delete cmd;
 
-	// Exit application.
-	if (quit)
-	{
-		// PENDING. Anything to deallocate.
-		delete this->log;
-		exit(0);
-	}
-	else
-	{
-		// Reset menu option.
-		m.resetMenuOption();
-	}
+    // Reset menu option.
+	menu.resetMenuOption();
 }

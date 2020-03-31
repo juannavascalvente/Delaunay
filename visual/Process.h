@@ -39,7 +39,7 @@ class Process
     DisplayManager      *dispManager;
     StoreService        *storeService;
 
-	Menu 			    m;				// Menu object.
+	Menu 			    menu;		    // Menu object.
 	Logging 		    *log;			// Log file.
 
     /*******************************************************************************************************************
