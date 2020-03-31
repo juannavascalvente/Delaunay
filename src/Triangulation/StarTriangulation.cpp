@@ -133,8 +133,8 @@ bool StarTriangulation::findTwoClosest(int &first, int &second)
 	int	 i=0, j=0;					// Loop counters.
 	Point<TYPE>	*origin;			// First point.
 	Point<TYPE>	*dest;				// Second point.
-	double	distance=0.0;			// Current distance.
-	double	lowestDistance=DBL_MAX;	// Current distance.
+	double	distance;	    		// Current distance.
+	auto	lowestDistance=DBL_MAX;	// Current distance.
 
 	// Loop all vertex.
 	for (i=0; i<this->dcel->getNVertex(); i++)

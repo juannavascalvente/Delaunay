@@ -11,7 +11,6 @@
 #include "Process.h"
 #include "Command.h"
 #include "CommandFactory.h"
-#include "DcelFigureBuilder.h"
 #include "DcelGenerator.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
@@ -386,6 +385,7 @@ void Process::execute()
         case VORONOI_PATH:
         case CLOSEST_POINT:
         case FIND_FACE:
+        case TWO_CLOSEST:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -476,34 +476,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Find the two closest point in the set.
-		case TWO_CLOSEST:
-		{
-			Set<PointT> points(2);	// List of points.
-
-			// Compute the two closest point in the set of points.
-			if (this->findTwoClosest(index1, index2))
-			{
-                // Add Delaunay triangulation
-                Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                dispManager->add(dispDelaunay);
-
-                // Add points to display.
-                vector<Point<TYPE>> vPoints;
-                vPoints.push_back(*storeService->getDcel()->getRefPoint(index1));
-                vPoints.push_back(*storeService->getDcel()->getRefPoint(index2));
-                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
-                dispManager->add(closestPoints);
-
-                dispManager->process();
-			}
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "The two closest points not found");
-				Logging::write(true, Error);
-			}
 			break;
 		}
 		// Filter edges whose length is lower than a threshold.

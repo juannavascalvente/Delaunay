@@ -86,6 +86,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createFindFace(storeService);
             break;
         }
+        case TWO_CLOSEST:
+        {
+            command = createTwoClosest(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -229,4 +234,14 @@ Command *CommandFactory::createFindFace(StoreService *storeService)
 
     // Create command
     return new CommandFindFace(in, out);
+}
+
+Command *CommandFactory::createTwoClosest(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandTwoClosest(in, out);
 }

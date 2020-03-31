@@ -33,6 +33,7 @@ class CommandFactory
     static Command *createVoronoiPath(StoreService *storeService);
     static Command *createClosestPoint(StoreService *storeService);
     static Command *createFindFace(StoreService *storeService);
+    static Command *createTwoClosest(StoreService *storeService);
 
 public:
 
