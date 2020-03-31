@@ -25,3 +25,25 @@ void PointFactory::generateRandom(size_t szNum, vector<Point<TYPE>> &vPoints)
         vPoints.push_back(p);
     }
 }
+
+
+void PointFactory::readFromConfig(Point<TYPE> &point)
+{
+    // Get point from configuration.
+    point = Config::getClosestPoint();
+
+    // Check if input point parameter provided by user.
+    if (point.getX() == INVALID)
+    {
+        // Get min and max coordiantes.
+        int minX, minY, maxX, maxY;
+        Config::getScreenCoordinates(minX, minY, maxX, maxY);
+
+        // Generate seed.
+        point.random();
+
+        // Create a random point.
+        point.setX(((int) point.getX()) % (int) maxX);
+        point.setY(((int) point.getY()) % (int) maxY);
+    }
+}

@@ -297,48 +297,6 @@ bool Process::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 }
 
 
-/***************************************************************************
-* Name: 	findTwoClosest
-* IN:		index		index of the point whose face must be located.
-* OUT:		faceId		face id that surrounds input index point.
-* RETURN:	true		if found.
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	finds the two closest points in the set of points. If the
-* 				Delaunay triangulation exists the uses the incremental
-* 				algorithm to locate the points. Otherwise uses a brute force
-* 				algorithm.
-***************************************************************************/
-bool Process::findClosest(Point<TYPE> &p, Point<TYPE> &q, double &distance)
-{
-	bool found=false;		    // Return value.
-	int	pointIndex=0;	// Index of the closest point.
-
-	// Check if Delaunay triangulation computed.
-    Status *status = storeService->getStatus();
-	if (status->isDelaunayCreated())
-	{
-		// Find node that surrounds input point p.
-		if (status->isVoronoiCreated())
-		{
-            Delaunay *delaunay = storeService->getDelaunay();
-			found = delaunay->findClosestPoint(p, *storeService->getVoronoi(), q, pointIndex, distance);
-		}
-		else
-		{
-			printf("PENDING TO IMPLEMENT.\n");
-			//found = this->delaunay.findClosestPoint(p, Config::getNAnchors(), q, distance);
-		}
-	}
-	else
-	{
-		// Find closest using brute force.
-        StarTriangulation *triangulation = storeService->getStarTriang();
-		found = triangulation->findClosestPoint(p, q, distance);
-	}
-
-	return found;
-}
 
 /***************************************************************************
 * Name: 	getPointToLocate
@@ -494,6 +452,7 @@ void Process::execute()
         case GABRIEL:
         case TRIANGULATION_PATH:
         case VORONOI_PATH:
+        case CLOSEST_POINT:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -584,42 +543,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Find closest point to a given point.
-		case CLOSEST_POINT:
-		{
-			Point<TYPE> point;			// Point to locate.
-			Point<TYPE> closest;		// Closest point.
-			double distance=0.0;		// Distance between point and closest.
-			Set<PointT> points(2);	// List of points.
-
-			// Check if input point parameter provided by user.
-			this->getPointToLocate(point);
-
-			// Find closest point to point.
-			if (this->findClosest(point, closest, distance))
-			{
-				// Draw the triangulation, the point and the closest point.
-                // Add Delaunay triangulation
-                Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                dispManager->add(dispDelaunay);
-
-                // Add points to display.
-                vector<Point<TYPE>> vPoints;
-                vPoints.push_back(point);
-                vPoints.push_back(closest);
-                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
-                closestPoints->setPointSize(3.0);
-                dispManager->add(closestPoints);
-
-                dispManager->process();
-			}
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Error closest point to a given point");
-				Logging::write(true, Error);
-			}
 			break;
 		}
 		// Locate face that surrounds input point.

@@ -66,11 +66,11 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandResultRead : public CommandResult
+class CommandResultPoints : public CommandResult
 {
-    Dcel *dcel;
+    vector<Point<TYPE>> vPoints;
 public:
-    CommandResultRead(bool isSuccess, StoreService *service, Dcel *dcelIn) : CommandResult(isSuccess, service), dcel(dcelIn) {};
+    CommandResultPoints(bool isSuccess, StoreService *service, vector<Point<TYPE>> &vPointsIn) : CommandResult(isSuccess, service), vPoints(vPointsIn) {};
 
     void updateStatus() override
     {
@@ -84,12 +84,7 @@ public:
     {
         if (wasSuccess())
         {
-            // Add figure display.
-            vector<Point<TYPE>> vPoints;
-            for (size_t i=0; i< Config::getNPoints(); i++)
-            {
-                vPoints.push_back(*dcel->getRefPoint(i));
-            }
+            // Add figure display
             vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
         }
     };
@@ -286,6 +281,37 @@ public:
 
             // Add faces
             vDisplayable.push_back(DisplayableFactory::createPolygonSet(vPolygons));
+        }
+    };
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResultClosestPoint : public CommandResult
+{
+    Dcel *dcel;
+    vector<Point<TYPE>> &vPoints;
+
+public:
+    CommandResultClosestPoint(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Point<TYPE>> &vPointsIn) :
+                                                                                    CommandResult(isSuccess, service),
+                                                                                    dcel(dcelIn),
+                                                                                    vPoints(vPointsIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        if (wasSuccess())
+        {
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayable.push_back(dispDelaunay);
+
+            // Add points (point to locate and closest point)
+            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
+            dispPoints->setPointSize(5.0);
+            vDisplayable.push_back(dispPoints);
         }
     };
 };

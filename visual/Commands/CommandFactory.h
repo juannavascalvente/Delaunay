@@ -31,7 +31,7 @@ class CommandFactory
     static Command *createGabriel(StoreService *storeService);
     static Command *createTriangulationPath(StoreService *storeService);
     static Command *createVoronoiPath(StoreService *storeService);
-
+    static Command *createClosestPoint(StoreService *storeService);
 public:
 
     /***********************************************************************************************************************

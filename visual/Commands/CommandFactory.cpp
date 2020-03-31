@@ -76,6 +76,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createVoronoiPath(storeService);
             break;
         }
+        case CLOSEST_POINT:
+        {
+            command = createClosestPoint(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -199,4 +204,14 @@ Command *CommandFactory::createVoronoiPath(StoreService *storeService)
 
     // Create command
     return new CommandVoronoiPath(in, out);
+}
+
+Command *CommandFactory::createClosestPoint(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandClosestPoint(in, out);
 }

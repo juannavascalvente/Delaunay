@@ -13,9 +13,10 @@
 #include "CommandParamOut.h"
 #include "CommandResult.h"
 #include "Config.h"
-#include "LineFactory.h"
 #include "DcelGenerator.h"
 #include "DcelFigureBuilder.h"
+#include "LineFactory.h"
+#include "PointFactory.h"
 
 
 /***********************************************************************************************************************
@@ -68,6 +69,7 @@ public:
         if (!isRunnable())
         {
             printRunnableMsg();
+            result = this->createResult();
         }
         else
         {
@@ -157,6 +159,7 @@ class CommandGenerateRandom : public Command
     *******************************************************************************************************************/
     GeneratorCmdParamIn in;
     GeneratorCmdParamOut out;
+    vector<Point<TYPE>> vPoints;
 
 public:
 
@@ -203,6 +206,12 @@ public:
         // Run command
         this->isSuccess = DcelGenerator::generateRandom(in.getNumPoints(), out.getDcel());
 
+        // Add point display
+        for (size_t i=0; i< in.getNumPoints(); i++)
+        {
+            vPoints.push_back(*out.getDcel().getRefPoint(i));
+        }
+
         // Build result
         return createResult();
     }
@@ -213,7 +222,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultRead(getSuccess(), in.getStoreService(), &out.getDcel());
+        return new CommandResultPoints(getSuccess(), in.getStoreService(), vPoints);
     }
 };
 
@@ -228,6 +237,7 @@ class CommandGenerateCluster : public Command
     *******************************************************************************************************************/
     GeneratorClusterCmdParamIn in;
     GeneratorCmdParamOut out;
+    vector<Point<TYPE>> vPoints;
 
 public:
 
@@ -289,6 +299,12 @@ public:
         // Run command
         this->isSuccess = DcelGenerator::generateClusters(in.getNumPoints(), in.getSzNumClusters(), in.getFRadius(), out.getDcel());
 
+        // Add point display
+        for (size_t i=0; i< in.getNumPoints(); i++)
+        {
+            vPoints.push_back(*out.getDcel().getRefPoint(i));
+        }
+
         // Build result
         return createResult();
     }
@@ -299,7 +315,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultRead(getSuccess(), in.getStoreService(), &out.getDcel());
+        return new CommandResultPoints(getSuccess(), in.getStoreService(), vPoints);
     }
 };
 
@@ -939,6 +955,114 @@ public:
     {
         Dcel *dcel = in.getStoreService()->getVoronoi()->getRefDcel();
         return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons);
+    }
+};
+
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandClosestPoint : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    vector<Point<TYPE>> vPoints;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandClosestPoint(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that triangulation must exist
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Incremental Delaunay and Voronoi required, or triangulation built with no incremental" << endl;
+    }
+
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks delauany and voronoi or triangulation was not incremental
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Triangulation must exist
+        Status *status = in.getStoreService()->getStatus();
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        return status->isTriangulationCreated() &&
+        ((status->isDelaunayCreated() && status->isVoronoiCreated()) || (delaunay->getAlgorithm() != INCREMENTAL));
+    }
+
+
+    /**
+     * @fn      run
+     * @brief   Builds set of faces path in a triangulation between two points
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Get point to locate
+        Point<TYPE> point, closest;
+        PointFactory::readFromConfig(point);
+
+        // Find closest point
+        int	pointIndex=0;	// Index of the closest point.
+        double distance;
+
+        // Check if Delaunay triangulation computed.
+        Status *status = in.getStoreService()->getStatus();
+        if (status->isDelaunayCreated())
+        {
+            // Find node that surrounds input point p.
+            if (status->isVoronoiCreated())
+            {
+                Delaunay *delaunay = in.getStoreService()->getDelaunay();
+                Voronoi *voronoi = in.getStoreService()->getVoronoi();
+                this->isSuccess = delaunay->findClosestPoint(point, *voronoi, closest, pointIndex, distance);
+            }
+        }
+        else
+        {
+            // Find closest using brute force.
+            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+            this->isSuccess = triangulation->findClosestPoint(point, closest, distance);
+        }
+
+        // Add point to locate and closest point
+        if (this->isSuccess)
+        {
+            vPoints.push_back(point);
+            vPoints.push_back(closest);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints);
     }
 };
 
