@@ -1067,4 +1067,117 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandFindFace : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    vector<Point<TYPE>> vPoints;
+    vector<Polygon> vPolygons;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandFindFace(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that Incremental Delaunay must exist
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Incremental Delaunay must exist to find face" << endl;
+    }
+
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks a triangulation exist
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Triangulation must exist
+        Status *status = in.getStoreService()->getStatus();
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        return status->isDelaunayCreated() && (delaunay->getAlgorithm() == INCREMENTAL);
+    }
+
+
+    /**
+     * @fn      run
+     * @brief   Builds set of faces path in a triangulation between two points
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        int faceId=0;			// Face to find
+        Point<TYPE> point;		// Point to locate
+
+        // Check if input point parameter provided by user.
+        PointFactory::readFromConfig(point);
+
+        // Find face.
+        // Check if Delaunay triangulation computed.
+        // PENDING ALSO EXECUTES THIS IF THE DELAUNAY WAS BUILD FROM STAR? IF
+        // SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
+        Status *status = in.getStoreService()->getStatus();
+        bool isImaginaryFace=false;
+        if (status->isDelaunayCreated())
+        {
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            this->isSuccess = delaunay->findFace(point, faceId, isImaginaryFace);
+        }
+        else
+        {
+            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+            this->isSuccess = triangulation->findFace(point, faceId);
+        }
+
+        // Add point to locate
+        vPoints.push_back(point);
+
+        // Add face if it is not imaginary
+        if (this->isSuccess && !isImaginaryFace)
+        {
+            vector<Point<TYPE>> vFacesPoints;
+            DcelFigureBuilder::getFacePoints(faceId, *in.getStoreService()->getDcel(), vFacesPoints);
+
+            Polygon polygon;
+            for (auto item : vFacesPoints)
+            {
+                polygon.add(item);
+            }
+            vPolygons.push_back(polygon);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultFace(getSuccess(), in.getStoreService(), dcel, vPoints, vPolygons);
+    }
+};
+
+
 #endif //DELAUNAY_COMMAND_H

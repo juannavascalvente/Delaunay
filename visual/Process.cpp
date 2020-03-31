@@ -263,74 +263,6 @@ bool Process::findTwoClosest(int &index1, int &index2)
 }
 
 
-/**
- * @fn      findFace
- * @brief   Find the face where the input point falls into
- *
- * @param   point       (IN)    Point to find
- * @param   faceId      (OUT)   Face where point falls into
- * @param   isImaginary (OUT)   Flag for imaginary faces (incremental algorithm)
- *
- * @return  true if point found
- *          false otherwise
- */
-bool Process::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
-{
-	bool found;		// Return value.
-
-	// Check if Delaunay triangulation computed.
-	// PENDING ALSO EXECUTES THIS IF THE DELAUNAY WAS BUILD FROM STAR? IF
-	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
-    Status *status = storeService->getStatus();
-	if (status->isDelaunayCreated())
-	{
-        Delaunay *delaunay = storeService->getDelaunay();
-		found = delaunay->findFace(point, faceId, isImaginary);
-	}
-	else
-	{
-        StarTriangulation *triangulation = storeService->getStarTriang();
-		found = triangulation->findFace(point, faceId);
-	}
-
-	return(found);
-}
-
-
-
-/***************************************************************************
-* Name: 	getPointToLocate
-* IN:		NONE
-* OUT:		point		point to locate.
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	if a point was set in the configuration file then this
-* 				method sets in the output parameter that point. Otherwise
-* 				it is generated randomly.
-***************************************************************************/
-void Process::getPointToLocate(Point<TYPE> &point)
-{
-	int minX, minY, maxX, maxY;
-
-	// Get point from configuration.
-	point = Config::getClosestPoint();
-
-	// Check if input point parameter provided by user.
-	if (point.getX() == INVALID)
-	{
-		// Get min and max coordiantes.
-		Config::getScreenCoordinates(minX, minY, maxX, maxY);
-
-		// Generate seed.
-		srand(time(nullptr));
-
-		// Create a random point.
-		point.setX(rand() % (int) maxX);
-		point.setY(rand() % (int) maxY);
-	}
-}
-
-
 void Process::createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
 {
     char	text_Info[50];
@@ -453,6 +385,7 @@ void Process::execute()
         case TRIANGULATION_PATH:
         case VORONOI_PATH:
         case CLOSEST_POINT:
+        case FIND_FACE:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -543,48 +476,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Locate face that surrounds input point.
-		case FIND_FACE:
-		{
-			int faceId=0;				// Face that surrounds point.
-			PointT point;				// Point to locate.
-
-			// Check if input point parameter provided by user.
-			this->getPointToLocate(point);
-
-			// Find face.
-			bool isImaginaryFace=false;
-			if (this->findFace(point, faceId, isImaginaryFace))
-			{
-				// Draw the triangulation, the point and its face.
-                // Add Delaunay triangulation
-                Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                dispManager->add(dispDelaunay);
-
-                // Add face
-                if (!isImaginaryFace)
-                {
-                    vector<Point<TYPE>> vFacesPoints;
-                    DcelFigureBuilder::getFacePoints(faceId, *storeService->getDcel(), vFacesPoints);
-                    dispManager->add(DisplayableFactory::createPolygon(vFacesPoints));
-                }
-
-                // Add point to draw
-                vector<Point<TYPE>> vPoints;
-                vPoints.push_back(point);
-                Displayable *closestPoints = DisplayableFactory::createPointsSet(vPoints);
-                closestPoints->setPointSize(3.0);
-                dispManager->add(closestPoints);
-
-                dispManager->process();
-			}
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Error face not found");
-				Logging::write(true, Error);
-			}
 			break;
 		}
 		// Find the two closest point in the set.

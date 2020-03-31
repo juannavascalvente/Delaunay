@@ -195,7 +195,7 @@ bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
 {
 	bool 	found=false;		// Return value.
 
-	// PENDING TO IMPLEMENT
+	// TODO https://github.com/juannavascalvente/Delaunay/issues/63
 
 	return(found);
 }

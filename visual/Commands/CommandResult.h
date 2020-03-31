@@ -317,4 +317,42 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResultFace : public CommandResult
+{
+    Dcel *dcel;
+    vector<Point<TYPE>> &vPoints;
+    vector<Polygon> vPolygons;
+
+public:
+    CommandResultFace(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Point<TYPE>> &vPointsIn, vector<Polygon> &vPolygonsIn) :
+                                                                                CommandResult(isSuccess, service),
+                                                                                dcel(dcelIn),
+                                                                                vPoints(vPointsIn),
+                                                                                vPolygons(vPolygonsIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        if (wasSuccess())
+        {
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayable.push_back(dispDelaunay);
+
+            // Add points (point to locate and closest point)
+            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
+            dispPoints->setPointSize(3.0);
+            vDisplayable.push_back(dispPoints);
+
+            // Add faces
+            Displayable *dispFace = DisplayableFactory::createPolygonSet(vPolygons);
+            dispFace->setPointSize(3.0);
+            vDisplayable.push_back(dispFace);
+        }
+    };
+};
+
+
 #endif //DELAUNAY_COMMANDRESULT_H

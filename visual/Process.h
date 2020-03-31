@@ -50,8 +50,6 @@ class Process
 	bool readData(int option);
 	void resetData();
 	bool findTwoClosest( int &index1, int &index2);
-	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
-	static void getPointToLocate(Point<TYPE> &point);
     static void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info);
     static void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info);
     static void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info);
