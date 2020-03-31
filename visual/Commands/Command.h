@@ -763,7 +763,7 @@ public:
 
     /**
      * @fn      run
-     * @brief   Builds star triangulation
+     * @brief   Builds set of faces path in a trianguatlion between two points
      *
      * @return  true built was successfully
      *          false otherwise
@@ -782,7 +782,6 @@ public:
 
         // https://github.com/juannavascalvente/Delaunay/issues/61
         // Compute triangles path between two points.
-
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         vector<int> vFacesId;
         this->isSuccess = delaunay->findPath(line, vFacesId);
@@ -815,6 +814,130 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandVoronoiPath : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    Line line;
+    vector<Polygon> vPolygons;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandVoronoiPath(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that triangulation path can be only computed using incremental Delaunay
+     */
+    void printRunnableMsg() override
+    {
+        cout << "Triangulation is not Delaunay or it was not computed using incremenal algorithm" << endl;
+    }
+
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks Delaunay and Voronoi have been created and it as built using incremental algorithm
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Delaunay and Voronoi must exist
+        // TODO https://github.com/juannavascalvente/Delaunay/issues/10
+        Status *status = in.getStoreService()->getStatus();
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        return status->isVoronoiCreated() && (delaunay->getAlgorithm() == INCREMENTAL);
+    }
+
+
+    /**
+     * @fn      run
+     * @brief   Builds set of faces path in a trianguatlion between two points
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult * runCommand() override
+    {
+        // Get points.
+        vector<Line> vLines;
+        LineFactory::readFromConfig(vLines);
+        line = vLines.at(0);
+        if (line.isInvalid())
+        {
+            LineFactory::generateRandom(1, vLines);
+            line = vLines.at(1);
+        }
+
+        // Compute triangles path between two points.
+        vector<int> vFacesId(0);
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        Voronoi *voronoi = in.getStoreService()->getVoronoi();
+        int	 initialFace=0;			// Initial face in the path.
+        int	 finalFace=0;			// Final face in the path.
+        Point<TYPE> closest;		// Closest point.
+        double distance=0.0;		// Distance between points.
+        Set<int> extremeFaces(2);	// First and last faces in the path.
+
+        // Get extreme point faces.
+        https://github.com/juannavascalvente/Delaunay/issues/62
+        this->isSuccess = false;
+        if (delaunay->findClosestPoint(line.getOrigin(), *voronoi, closest, initialFace, distance) &&
+            delaunay->findClosestPoint(line.getDest(), *voronoi, closest, finalFace, distance))
+        {
+            // Add faces to set.
+            extremeFaces.add(initialFace+1);
+            extremeFaces.add(finalFace+1);
+
+            // Find path.
+            this->isSuccess = voronoi->getRefDcel()->findPath(extremeFaces, line, vFacesId);
+        }
+
+        if (this->isSuccess)
+        {
+            for (auto face : vFacesId)
+            {
+                vector<Point<TYPE>> vFacesPoints;
+                DcelFigureBuilder::getFacePoints(face, *voronoi->getRefDcel(), vFacesPoints);
+
+                Polygon polygon;
+                for (auto point : vFacesPoints)
+                {
+                    polygon.add(point);
+                }
+                vPolygons.push_back(polygon);
+            }
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getVoronoi()->getRefDcel();
         return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons);
     }
 };

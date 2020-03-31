@@ -30,6 +30,7 @@ class CommandFactory
     static Command *createVoronoi(StoreService *storeService);
     static Command *createGabriel(StoreService *storeService);
     static Command *createTriangulationPath(StoreService *storeService);
+    static Command *createVoronoiPath(StoreService *storeService);
 
 public:
 

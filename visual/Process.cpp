@@ -228,70 +228,6 @@ void Process::resetData()
 
 
 /***************************************************************************
-* Name: 	findPath
-* IN:		delaunay			Delaunay triangulation data.
-* 			voronoi				Voronoi data.
-* 			line				line whose path must be searched.
-* OUT:		faces				queue where points are inserted.
-* RETURN:	true				if path found.
-* 			false				i.o.c.
-* GLOBAL:	NONE
-* Description: 	finds the list of faces in the "dcel"between "line"
-* 				extreme points.
-***************************************************************************/
-bool Process::findPath(Delaunay &delaunay, Voronoi &voronoi, Line &line, vector<int> &vFaces)
-{
-	bool found=false;			// Return value.
-	int	 initialFace=0;			// Initial face in the path.
-	int	 finalFace=0;			// Final face in the path.
-	Point<TYPE> origin, dest;	// Line extreme points.
-	Point<TYPE> closest;		// Closest point.
-	double distance=0.0;		// Distance between points.
-	Set<int> extremeFaces(2);	// First and last faces in the path.
-
-	// Get origin and destination points.
-	origin = line.getOrigin();
-	dest = line.getDest();
-
-#ifdef DEBUG_PROCESS_FIND_PATH
-	Logging::buildText(__FUNCTION__, __FILE__, "Line origin point is ");
-	Logging::buildText(__FUNCTION__, __FILE__, &origin);
-	Logging::buildText(__FUNCTION__, __FILE__, " and line destination point is ");
-	Logging::buildText(__FUNCTION__, __FILE__, &dest);
-	Logging::write(true, Info);
-#endif
-
-	// Get extreme point faces.
-	if (delaunay.findClosestPoint(origin, voronoi, closest, initialFace, distance) &&
-		delaunay.findClosestPoint(dest, voronoi, closest, finalFace, distance))
-	{
-		// Add faces to set.
-		extremeFaces.add(initialFace+1);
-		extremeFaces.add(finalFace+1);
-
-#ifdef DEBUG_PROCESS_FIND_PATH
-		Logging::buildText(__FUNCTION__, __FILE__, "Origin face is ");
-		Logging::buildText(__FUNCTION__, __FILE__, *extremeFaces.at(0));
-		Logging::buildText(__FUNCTION__, __FILE__, " and destination ");
-		Logging::buildText(__FUNCTION__, __FILE__, *extremeFaces.at(1));
-		Logging::write(true, Info);
-#endif
-
-		// Find path.
-		found = voronoi.getRefDcel()->findPath(extremeFaces, line, vFaces);
-	}
-#ifdef DEBUG_PROCESS_FIND_PATH
-	else
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Error computing initial faces");
-		Logging::write(true, Error);
-	}
-#endif
-
-	return(found);
-}
-
-/***************************************************************************
 * Name: 	findTwoClosest
 * IN:		NONE
 * OUT:		index1				index of the first point
@@ -557,6 +493,7 @@ void Process::execute()
         case VORONOI:
         case GABRIEL:
         case TRIANGULATION_PATH:
+        case VORONOI_PATH:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -647,77 +584,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Compute Voronoi path between two points.
-		case VORONOI_PATH:
-		{
-            vector<int> vFaces;
-
-			// Check Delaunay triangulation already created.
-            Status *status = storeService->getStatus();
-			if (status->isVoronoiCreated())
-			{
-                // Get points.
-                vector<Line> vLines;
-                LineFactory::readFromConfig(vLines);
-
-				// Check incremental triangulation computed.
-                Delaunay *delaunay = storeService->getDelaunay();
-				if (delaunay->getAlgorithm() == INCREMENTAL)
-				{
-					// Compute triangles path between two points.
-					error = !this->findPath(*delaunay, *storeService->getVoronoi(), vLines.at(0), vFaces);
-				}
-				else
-				{
-					// TODO https://github.com/juannavascalvente/Delaunay/issues/10
-					Logging::buildText(__FUNCTION__, __FILE__,
-							"Voronoi path not implemented in normal triangulation");
-					Logging::write(true, Error);
-					error = true;
-				}
-
-				// Check if an error must be printed.
-				if (error)
-				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Error computing Voronoi path");
-					Logging::write(true, Error);
-				}
-				else
-                {
-                    // Add Delaunay triangulation
-                    Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                    dispManager->add(dispDelaunay);
-
-                    // Add Voronoi
-                    Displayable *dispVoronoi = DisplayableFactory::createDcel(storeService->getVoronoi()->getRefDcel());
-                    dispManager->add(dispVoronoi);
-
-                    // Add points whose path is drawn
-                    vector<Point<TYPE>> vPoints;
-                    vPoints.push_back(vLines.at(0).getOrigin());
-                    vPoints.push_back(vLines.at(0).getDest());
-                    dispManager->add(DisplayableFactory::createPolygon(vPoints));
-
-                    // Add path faces
-                    vector<Polygon> vPolygons;
-                    for (auto face : vFaces)
-                    {
-                        vector<Point<TYPE>> vFacesPoints;
-                        DcelFigureBuilder::getFacePoints(face, *storeService->getVoronoi()->getRefDcel(), vFacesPoints);
-
-                        Polygon polygon;
-                        for (auto point : vFacesPoints)
-                        {
-                            polygon.add(point);
-                        }
-                        vPolygons.push_back(polygon);
-                    }
-                    dispManager->add(DisplayableFactory::createPolygonSet(vPolygons));
-                    dispManager->process();
-                }
-			}
 			break;
 		}
 		// Find closest point to a given point.

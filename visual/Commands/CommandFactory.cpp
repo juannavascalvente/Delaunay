@@ -71,6 +71,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createTriangulationPath(storeService);
             break;
         }
+        case VORONOI_PATH:
+        {
+            command = createVoronoiPath(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -184,4 +189,14 @@ Command *CommandFactory::createTriangulationPath(StoreService *storeService)
 
     // Create command
     return new CommandTriangulationPath(in, out);
+}
+
+Command *CommandFactory::createVoronoiPath(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandVoronoiPath(in, out);
 }
