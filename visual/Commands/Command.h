@@ -1316,7 +1316,7 @@ public:
 
     /**
      * @fn      run
-     * @brief   Do nothing as job is done in display resuls
+     * @brief   Do nothing as job is done in display results
      *
      * @return  true built was successfully
      *          false otherwise
@@ -1388,7 +1388,7 @@ public:
 
     /**
      * @fn      run
-     * @brief   Do nothing as job is done in display resuls
+     * @brief   Do nothing as job is done in display results
      *
      * @return  true built was successfully
      *          false otherwise
@@ -1414,6 +1414,104 @@ public:
                 vPoints.push_back(*dcel->getRefPoint(points[1]-1));
                 vPoints.push_back(*dcel->getRefPoint(points[2]-1));
                 Circle circle = Circle(vPoints);
+                vCircles.push_back(circle);
+            }
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandEdgeCircle : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    vector<Circle> vCircles;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandEdgeCircle(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that a triangulation must exist
+     */
+    void printRunnableMsg() override
+    {
+        cout << "A triangulation must exist" << endl;
+    }
+
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks a triangulation exist
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Triangulation must exist
+        Status *status = in.getStoreService()->getStatus();
+        return status->isTriangulationCreated();
+    }
+
+    /**
+     * @fn      run
+     * @brief   Do nothing as job is done in display results
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        this->isSuccess = true;
+
+        // Loop all faces (but external).
+        Dcel *dcel = in.getStoreService()->getDcel();
+        for (size_t edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
+        {
+            // Skip imaginary edges.
+            if (!dcel->hasNegativeVertex(edgeIndex+1))
+            {
+                Point<TYPE> origin, dest;  	// Origin and destination points.
+                Point<TYPE> middle;	    	// Edge middle point.
+
+                // Create line.
+                dcel->getEdgePoints(edgeIndex, origin, dest);
+                Line line = Line(origin, dest);
+
+                // Compute middle point of edge.
+                line.getMiddle(middle);
+
+                // Create circle
+                TYPE radius = origin.distance(middle);
+                Circle circle = Circle(&middle, radius);
+
+                // Add circles
                 vCircles.push_back(circle);
             }
         }

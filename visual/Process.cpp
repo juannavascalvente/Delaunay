@@ -226,46 +226,8 @@ void Process::resetData()
 }
 
 
-/***************************************************************************
-* Name: 	findTwoClosest
-* IN:		NONE
-* OUT:		index1				index of the first point
-* 			index2				index of the second point
-* RETURN:	true				if found.
-* 			false				i.o.c.
-* GLOBAL:	NONE
-* Description: 	finds the two closest points in the set of points. If the
-* 				Delaunay triangulation exists the uses the incremental
-* 				algorithm to locate the points. Otherwise uses a brute force
-* 				algorithm.
-***************************************************************************/
-bool Process::findTwoClosest(int &index1, int &index2)
-{
-	bool found;		// Return value.
-
-	// Check if Delaunay triangulation computed.
-	// PENDING ALSO EXECUTES THIS IF THE DELAUNAY WAS BUILD FROM STAR? IF
-	// SO THERE SHOULD BE NOT GRAPH AND IT IS NOT POSSIBLE TO USE THE GRAPH.
-    Status *status = storeService->getStatus();
-	if (status->isDelaunayCreated())
-	{
-        Delaunay *delaunay = storeService->getDelaunay();
-		found = delaunay->findTwoClosest(index1, index2);
-	}
-	else
-	{
-        StarTriangulation *triangulation = storeService->getStarTriang();
-		found = triangulation->findTwoClosest(index1, index2);
-	}
-
-	return(found);
-}
-
-
 void Process::createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
 {
-    char	text_Info[50];
-
     // Draw all points of the set.
     for (size_t i=0; i < dcelIn.getNVertex() ; i++)
     {
@@ -388,6 +350,7 @@ void Process::execute()
         case TWO_CLOSEST:
         case FILTER_EDGES:
         case CIRCUMCENTRES:
+        case EDGE_CIRCLES:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -478,57 +441,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		case EDGE_CIRCLES:
-		{
-			// Check if triangulation created.
-            Status *status = storeService->getStatus();
-			if (status->isTriangulationCreated())
-			{
-                int		edgeIndex=0;        // Edge index.
-                int		nEdges=0;			// # edges in the storeService->getDcel()->
-                TYPE  	radius; 			// Circle radius.
-                Line	line;				// Edge line.
-                Point<TYPE> origin, dest;  	// Origin and destination points.
-                Point<TYPE> middle;	    	// Edge middle point.
-
-                // Add circles
-                vector<Circle> vCircles;
-
-                // Loop all faces (but external).
-                nEdges = storeService->getDcel()->getNEdges();
-                for (edgeIndex=0; edgeIndex<nEdges ;edgeIndex++)
-                {
-                    // Skip imaginary edges.
-                    if (!storeService->getDcel()->hasNegativeVertex(edgeIndex+1))
-                    {
-                        // Create line.
-                        storeService->getDcel()->getEdgePoints(edgeIndex, origin, dest);
-                        line = Line(origin, dest);
-
-                        // Compute middle point of edge.
-                        line.getMiddle(middle);
-
-                        // Create circle
-                        radius = origin.distance(middle);
-                        Circle circle = Circle(&middle, radius);
-
-                        // Add circles
-                        vCircles.push_back(circle);
-                    }
-                }
-
-                // Add Delaunay triangulation
-                Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                dispManager->add(dispDelaunay);
-
-                // Add points to display.
-                Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
-                dispManager->add(circles);
-
-                dispManager->process();
-			}
 			break;
 		}
 		// Print DCEL data.

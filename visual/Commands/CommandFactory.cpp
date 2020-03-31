@@ -101,6 +101,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createCircumcentres(storeService);
             break;
         }
+        case EDGE_CIRCLES:
+        {
+            command = createEdgeCircle(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -274,4 +279,14 @@ Command *CommandFactory::createCircumcentres(StoreService *storeService)
 
     // Create command
     return new CommandCircumcentres(in, out);
+}
+
+Command *CommandFactory::createEdgeCircle(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandEdgeCircle(in, out);
 }
