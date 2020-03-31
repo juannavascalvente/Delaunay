@@ -96,6 +96,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createFilterEdges(storeService, Config::getMinLengthEdge());
             break;
         }
+        case CIRCUMCENTRES:
+        {
+            command = createCircumcentres(storeService);
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -259,4 +264,14 @@ Command *CommandFactory::createFilterEdges(StoreService *storeService, TYPE minL
 
     // Create command
     return new CommandFilterEdges(in, out, minLen);
+}
+
+Command *CommandFactory::createCircumcentres(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandCircumcentres(in, out);
 }

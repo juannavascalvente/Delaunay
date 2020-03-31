@@ -359,4 +359,32 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandResultCircles : public CommandResult
+{
+    Dcel *dcel;
+    vector<Circle> vCircles;
+
+public:
+    CommandResultCircles(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Circle> &vCirclesIn) :
+                                                                                    CommandResult(isSuccess, service),
+                                                                                    dcel(dcelIn),
+                                                                                    vCircles(vCirclesIn) {};
+
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
+    {
+        if (wasSuccess())
+        {
+            // Add Delaunay triangulation
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+
+            // Add points to display.
+            vDisplayable.push_back(DisplayableFactory::createCircleSet(vCircles));
+        }
+    }
+};
+
+
 #endif //DELAUNAY_COMMANDRESULT_H

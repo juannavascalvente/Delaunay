@@ -35,6 +35,7 @@ class CommandFactory
     static Command *createFindFace(StoreService *storeService);
     static Command *createTwoClosest(StoreService *storeService);
     static Command *createFilterEdges(StoreService *storeService, TYPE minLen);
+    static Command *createCircumcentres(StoreService *storeService);
 
 public:
 

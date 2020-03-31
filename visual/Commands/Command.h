@@ -1342,4 +1342,97 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandCircumcentres : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    vector<Circle> vCircles;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandCircumcentres(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that a triangulation must exist
+     */
+    void printRunnableMsg() override
+    {
+        cout << "A triangulation must exist" << endl;
+    }
+
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks a triangulation exist
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Triangulation must exist
+        Status *status = in.getStoreService()->getStatus();
+        return status->isTriangulationCreated();
+    }
+
+    /**
+     * @fn      run
+     * @brief   Do nothing as job is done in display resuls
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        this->isSuccess = true;
+
+        // Add circles
+        Dcel *dcel = in.getStoreService()->getDcel();
+        for (int faceID=1; faceID<dcel->getNFaces() ;faceID++)
+        {
+            // Skip imaginary faces.
+            if (!dcel->imaginaryFace(faceID))
+            {
+                // Get points of the triangle.
+                int		points[NPOINTS_TRIANGLE];	        // Triangle points.
+                dcel->getFaceVertices(faceID, points);
+
+                // Build circle.
+                vector<Point<TYPE>> vPoints;
+                vPoints.push_back(*dcel->getRefPoint(points[0]-1));
+                vPoints.push_back(*dcel->getRefPoint(points[1]-1));
+                vPoints.push_back(*dcel->getRefPoint(points[2]-1));
+                Circle circle = Circle(vPoints);
+                vCircles.push_back(circle);
+            }
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles);
+    }
+};
+
+
 #endif //DELAUNAY_COMMAND_H

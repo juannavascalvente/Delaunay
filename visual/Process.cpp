@@ -387,6 +387,7 @@ void Process::execute()
         case FIND_FACE:
         case TWO_CLOSEST:
         case FILTER_EDGES:
+        case CIRCUMCENTRES:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -477,47 +478,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Draw triangles circumcentres.
-		case CIRCUMCENTRES:
-		{
-			// Check if triangulation created.
-            Status *status = storeService->getStatus();
-			if (status->isDelaunayCreated() ||
-				status->isTriangulationCreated())
-			{
-                // Add circles
-                vector<Circle> vCircles;
-                for (int faceID=1; faceID<storeService->getDcel()->getNFaces() ;faceID++)
-                {
-                    // Skip imaginary faces.
-                    if (!storeService->getDcel()->imaginaryFace(faceID))
-                    {
-                        // Get points of the triangle.
-                        int		points[NPOINTS_TRIANGLE];	// Triangle points.
-                        storeService->getDcel()->getFaceVertices(faceID, points);
-
-                        // Build circle.
-                        vector<Point<TYPE>> vPoints;
-                        vPoints.push_back(*storeService->getDcel()->getRefPoint(points[0]-1));
-                        vPoints.push_back(*storeService->getDcel()->getRefPoint(points[1]-1));
-                        vPoints.push_back(*storeService->getDcel()->getRefPoint(points[2]-1));
-                        Circle circle = Circle(vPoints);
-                        vCircles.push_back(circle);
-                    }
-                }
-
-                // Add Delaunay triangulation
-                Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel());
-                dispManager->add(dispDelaunay);
-
-                // Add points to display.
-                Displayable *circles = DisplayableFactory::createCircleSet(vCircles);
-                dispManager->add(circles);
-
-                dispManager->process();
-			}
 			break;
 		}
 		case EDGE_CIRCLES:
