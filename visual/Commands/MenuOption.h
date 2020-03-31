@@ -23,7 +23,6 @@
 #define CONVEX_HULL         	30
 #define DELAUNAY            	40
 #define CIRCUMCENTRES       	50
-#define CORRIDOR            	51
 #define EDGE_CIRCLES        	52
 #define VORONOI             	60
 #define GABRIEL             	61

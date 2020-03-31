@@ -7,13 +7,10 @@
 #include "CommandFactory.h"
 #include "DcelGenerator.h"
 #include "DcelReader.h"
-#include "DcelWriter.h"
 #include "DelaunayIO.h"
 #include "DisplayableFactory.h"
-#include "GabrielIO.h"
 #include "LineFactory.h"
 #include "MenuOption.h"
-#include "VoronoiIO.h"
 
 #include <GL/glut.h>
 
@@ -22,7 +19,6 @@
 * Static members
 ***********************************************************************************************************************/
 Process *Process::instance = nullptr;
-typedef Point<TYPE> PointT;
 
 
 /***********************************************************************************************************************
