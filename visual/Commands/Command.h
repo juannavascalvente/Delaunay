@@ -10,7 +10,6 @@
 * Includes
 ***********************************************************************************************************************/
 #include "CommandParamIn.h"
-#include "CommandParamOut.h"
 #include "CommandResult.h"
 #include "Config.h"
 #include "DcelGenerator.h"
@@ -162,7 +161,6 @@ class CommandGenerateRandom : public Command
     * Class members
     *******************************************************************************************************************/
     GeneratorCmdParamIn in;
-    GeneratorCmdParamOut out;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -170,7 +168,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateRandom(GeneratorCmdParamIn &inParam, GeneratorCmdParamOut &outParam) : in(inParam), out(outParam) {}
+    CommandGenerateRandom(GeneratorCmdParamIn &inParam) : in(inParam) {}
 
     /**
      * @fn      isRunnable
@@ -211,12 +209,13 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        this->isSuccess = DcelGenerator::generateRandom(in.getNumPoints(), out.getDcel());
+        Dcel *dcel = in.getStoreService()->getDcel();
+        this->isSuccess = DcelGenerator::generateRandom(in.getNumPoints(), *dcel);
 
         // Add point display
         for (size_t i=0; i< in.getNumPoints(); i++)
         {
-            vPoints.push_back(*out.getDcel().getRefPoint(i));
+            vPoints.push_back(*dcel->getRefPoint(i));
         }
 
         // Build result
@@ -243,7 +242,6 @@ class CommandGenerateCluster : public Command
     * Class members
     *******************************************************************************************************************/
     GeneratorClusterCmdParamIn in;
-    GeneratorCmdParamOut out;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -251,7 +249,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateCluster(GeneratorClusterCmdParamIn &inParam, GeneratorCmdParamOut &outParam) : in(inParam), out(outParam) {}
+    CommandGenerateCluster(GeneratorClusterCmdParamIn &inParam) : in(inParam) {}
 
     /**
      * @fn      isRunnable
@@ -307,12 +305,13 @@ public:
     CommandResult * runCommand() override
     {
         // Run command
-        this->isSuccess = DcelGenerator::generateClusters(in.getNumPoints(), in.getSzNumClusters(), in.getFRadius(), out.getDcel());
+        Dcel *dcel = in.getStoreService()->getDcel();
+        this->isSuccess = DcelGenerator::generateClusters(in.getNumPoints(), in.getSzNumClusters(), in.getFRadius(), *dcel);
 
         // Add point display
         for (size_t i=0; i< in.getNumPoints(); i++)
         {
-            vPoints.push_back(*out.getDcel().getRefPoint(i));
+            vPoints.push_back(*dcel->getRefPoint(i));
         }
 
         // Build result
@@ -339,14 +338,13 @@ class CommandStarTriangulation : public Command
     * Class members
     *******************************************************************************************************************/
     StarTriangulationParamCmdIn in;
-    GeneratorCmdParamOut out;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandStarTriangulation(StarTriangulationParamCmdIn &inParam, GeneratorCmdParamOut &outParam) : in(inParam), out(outParam) {};
+    CommandStarTriangulation(StarTriangulationParamCmdIn &inParam) : in(inParam) {};
 
     /**
      * @fn       printRunnableMsg
@@ -395,7 +393,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), &out.getDcel());
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel);
     }
 };
 
@@ -409,14 +408,13 @@ class CommandDelaunay : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandDelaunay(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    CommandDelaunay(CmdParamIn &inParam) : in(inParam) {};
 
     /**
      * @fn       printRunnableMsg
@@ -451,17 +449,17 @@ public:
     CommandResult * runCommand() override
     {
         // Get reference to current DCEL and Delaunay
-        Dcel *dcel = out.getStoreService()->getDcel();
-        Delaunay *delaunay = out.getStoreService()->getDelaunay();
+        Dcel *dcel = in.getStoreService()->getDcel();
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
         delaunay->setDCEL(dcel);
 
         // Get reference to status
-        Status *status = out.getStoreService()->getStatus();
+        Status *status = in.getStoreService()->getStatus();
 
         // Build Delaunay from Star triangulation.
         if (status->isTriangulationCreated())
         {
-            StarTriangulation *triangulation = out.getStoreService()->getStarTriang();
+            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
             this->isSuccess = triangulation->delaunay();
             delaunay->setAlgorithm(FROM_STAR);
         }
@@ -487,7 +485,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = out.getStoreService()->getDcel();
+        Dcel *dcel = in.getStoreService()->getDcel();
         return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel);
     }
 };
@@ -502,7 +500,6 @@ class CommandConvexHull : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     Polygon *hull;
 
 public:
@@ -510,7 +507,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandConvexHull(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam), hull(nullptr) {};
+    explicit CommandConvexHull(CmdParamIn &inParam) : in(inParam), hull(nullptr) {};
 
 
     /**
@@ -559,7 +556,7 @@ public:
         }
         else
         {
-            StarTriangulation *triangulation = out.getStoreService()->getStarTriang();
+            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
             this->isSuccess = triangulation->convexHull();
             hull = triangulation->getConvexHull();
         }
@@ -589,14 +586,13 @@ class CommandVoronoi : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandVoronoi(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandVoronoi(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -655,7 +651,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = out.getStoreService()->getDcel();
+        Dcel *dcel = in.getStoreService()->getDcel();
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
         return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi);
     }
@@ -671,14 +667,13 @@ class CommandGabriel : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGabriel(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandGabriel(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -733,7 +728,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = out.getStoreService()->getDcel();
+        Dcel *dcel = in.getStoreService()->getDcel();
         Gabriel *gabriel = in.getStoreService()->getGabriel();
         return new CommandResultGabriel(getSuccess(), in.getStoreService(), dcel, gabriel);
     }
@@ -749,7 +744,6 @@ class CommandTriangulationPath : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     Line line;
     vector<Polygon> vPolygons;
 
@@ -758,7 +752,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandTriangulationPath(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandTriangulationPath(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -854,7 +848,6 @@ class CommandVoronoiPath : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     Line line;
     vector<Polygon> vPolygons;
 
@@ -863,7 +856,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandVoronoiPath(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandVoronoiPath(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -979,7 +972,6 @@ class CommandClosestPoint : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -987,7 +979,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandClosestPoint(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandClosestPoint(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -1086,7 +1078,6 @@ class CommandFindFace : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Point<TYPE>> vPoints;
     vector<Polygon> vPolygons;
 
@@ -1095,7 +1086,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandFindFace(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandFindFace(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -1196,7 +1187,6 @@ class CommandTwoClosest : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -1204,7 +1194,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandTwoClosest(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandTwoClosest(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -1287,7 +1277,6 @@ class CommandFilterEdges : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     TYPE minLen;
 
 public:
@@ -1295,9 +1284,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandFilterEdges(CmdParamIn &inParam, CmdParamOut &outParam, TYPE minLenIn) : in(inParam),
-                                                                                    out(outParam),
-                                                                                    minLen(minLenIn) {};
+    explicit CommandFilterEdges(CmdParamIn &inParam, TYPE minLenIn) : in(inParam), minLen(minLenIn) {};
 
 
     /**
@@ -1361,7 +1348,6 @@ class CommandCircumcentres : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Circle> vCircles;
 
 public:
@@ -1369,7 +1355,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandCircumcentres(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandCircumcentres(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -1454,7 +1440,6 @@ class CommandEdgeCircle : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Circle> vCircles;
 
 public:
@@ -1462,7 +1447,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandEdgeCircle(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandEdgeCircle(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -1552,10 +1537,9 @@ class CommandDcelInfo : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Displayable*> vDisplayable;
 
-    void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
+    static void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
     {
         // Draw all points of the set.
         for (size_t i=0; i < dcelIn.getNVertex() ; i++)
@@ -1570,7 +1554,7 @@ class CommandDcelInfo : public Command
     }
 
 
-    void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info)
+    static void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info)
     {
         // Loop all edges.
         for (size_t edgeIndex=0; edgeIndex<dcelIn.getNEdges() ;edgeIndex++)
@@ -1600,7 +1584,7 @@ class CommandDcelInfo : public Command
     }
 
 
-    void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
+    static void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
     {
         // Loop all faces (skip external face).
         for (size_t faceId=0; faceId<dcelIn.getNFaces() ;faceId++)
@@ -1646,7 +1630,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandDcelInfo(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam)
+    explicit CommandDcelInfo(CmdParamIn &inParam) : in(inParam)
     {
         dcel = in.getStoreService()->getDcel();
     };
@@ -1731,7 +1715,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandVoronoiInfo(CmdParamIn &inParam, CmdParamOut &outParam) : CommandDcelInfo(inParam, outParam)
+    explicit  CommandVoronoiInfo(CmdParamIn &inParam) : CommandDcelInfo(inParam)
     {
         dcel = inParam.getStoreService()->getVoronoi()->getRefDcel();
     };
@@ -1747,14 +1731,13 @@ class CommandClear : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Displayable*> vDisplayable;
 
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandClear(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandClear(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -1796,14 +1779,13 @@ class CommandWriteFile : public Command
     * Class members
     *******************************************************************************************************************/
     CmdParamIn  in;
-    CmdParamOut out;
     vector<Displayable*> vDisplayable;
 
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandWriteFile(CmdParamIn &inParam, CmdParamOut &outParam) : in(inParam), out(outParam) {};
+    explicit CommandWriteFile(CmdParamIn &inParam) : in(inParam) {};
 
 
     /**
@@ -1845,7 +1827,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandWriteFileDcel(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+    explicit CommandWriteFileDcel(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
 
     /**
      * @fn      run
@@ -1874,7 +1856,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandWriteFileDelaunay(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+    explicit CommandWriteFileDelaunay(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
 
     /**
      * @fn      run
@@ -1903,7 +1885,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandWriteFileVoronoi(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+    explicit CommandWriteFileVoronoi(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
 
     /**
      * @fn      run
@@ -1932,7 +1914,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandWriteFileGabriel(CmdParamIn &inParam, CmdParamOut &outParam) : CommandWriteFile(inParam, outParam) {};
+    explicit CommandWriteFileGabriel(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
 
     /**
      * @fn      run

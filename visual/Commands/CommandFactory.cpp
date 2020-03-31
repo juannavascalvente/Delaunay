@@ -179,10 +179,9 @@ Command *CommandFactory::createRandomGenerator(size_t szNumPoints, StoreService 
 {
     // Create parameters
     GeneratorCmdParamIn in(szNumPoints, storeService);
-    GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
-    return new CommandGenerateRandom(in, out);
+    return new CommandGenerateRandom(in);
 }
 
 
@@ -190,10 +189,9 @@ Command *CommandFactory::createClusterGenerator(size_t szNumPoints, size_t szNum
 {
     // Create parameters
     GeneratorClusterCmdParamIn in(szNumPoints, szNumClusters, radius, storeService);
-    GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
-    return new CommandGenerateCluster(in, out);
+    return new CommandGenerateCluster(in);
 }
 
 
@@ -201,10 +199,9 @@ Command *CommandFactory::createStarTriangulation(StoreService *storeService)
 {
     // Create parameters
     StarTriangulationParamCmdIn in(storeService->getDcel(), storeService);
-    GeneratorCmdParamOut out(storeService->getDcel());
 
     // Create command
-    return new CommandStarTriangulation(in, out);
+    return new CommandStarTriangulation(in);
 }
 
 
@@ -212,10 +209,9 @@ Command *CommandFactory::createDelaunay(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandDelaunay(in, out);
+    return new CommandDelaunay(in);
 }
 
 
@@ -223,10 +219,9 @@ Command *CommandFactory::createConvexHull(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandConvexHull(in, out);
+    return new CommandConvexHull(in);
 }
 
 
@@ -234,10 +229,9 @@ Command *CommandFactory::createVoronoi(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandVoronoi(in, out);
+    return new CommandVoronoi(in);
 }
 
 
@@ -245,168 +239,151 @@ Command *CommandFactory::createGabriel(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandGabriel(in, out);
+    return new CommandGabriel(in);
 }
 
 Command *CommandFactory::createTriangulationPath(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandTriangulationPath(in, out);
+    return new CommandTriangulationPath(in);
 }
 
 Command *CommandFactory::createVoronoiPath(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandVoronoiPath(in, out);
+    return new CommandVoronoiPath(in);
 }
 
 Command *CommandFactory::createClosestPoint(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandClosestPoint(in, out);
+    return new CommandClosestPoint(in);
 }
 
 Command *CommandFactory::createFindFace(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandFindFace(in, out);
+    return new CommandFindFace(in);
 }
 
 Command *CommandFactory::createTwoClosest(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandTwoClosest(in, out);
+    return new CommandTwoClosest(in);
 }
 
 Command *CommandFactory::createFilterEdges(StoreService *storeService, TYPE minLen)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandFilterEdges(in, out, minLen);
+    return new CommandFilterEdges(in, minLen);
 }
 
 Command *CommandFactory::createCircumcentres(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandCircumcentres(in, out);
+    return new CommandCircumcentres(in);
 }
 
 Command *CommandFactory::createEdgeCircle(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandEdgeCircle(in, out);
+    return new CommandEdgeCircle(in);
 }
 
 Command *CommandFactory::createDcelInfo(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandDcelInfo(in, out);
+    return new CommandDcelInfo(in);
 }
 
 Command *CommandFactory::createVoronoiInfo(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandVoronoiInfo(in, out);
+    return new CommandVoronoiInfo(in);
 }
 
 Command *CommandFactory::createClear(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandClear(in, out);
+    return new CommandClear(in);
 }
 
 Command *CommandFactory::createWritePoints(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandWriteFile(in, out);
+    return new CommandWriteFile(in);
 }
 
 Command *CommandFactory::createWriteDcel(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandWriteFileDcel(in, out);
+    return new CommandWriteFileDcel(in);
 }
 
 Command *CommandFactory::createWriteDelaunay(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandWriteFileDelaunay(in, out);
+    return new CommandWriteFileDelaunay(in);
 }
 
 Command *CommandFactory::createWriteVoronoi(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandWriteFileVoronoi(in, out);
+    return new CommandWriteFileVoronoi(in);
 }
 
 Command *CommandFactory::createWriteGabriel(StoreService *storeService)
 {
     // Create parameters
     CmdParamIn  in(storeService);
-    CmdParamOut out(storeService);
 
     // Create command
-    return new CommandWriteFileGabriel(in, out);
+    return new CommandWriteFileGabriel(in);
 }
