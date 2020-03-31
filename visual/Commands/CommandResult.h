@@ -98,8 +98,12 @@ public:
 class CommandResultTriangulation : public CommandResult
 {
     Dcel *dcel;
+    TYPE minLength;
 public:
-    CommandResultTriangulation(bool isSuccess, StoreService *service, Dcel *dcelIn) : CommandResult(isSuccess, service), dcel(dcelIn) {};
+    CommandResultTriangulation(bool isSuccess, StoreService *service, Dcel *dcelIn, TYPE minLengthIn=INVALID) :
+                                                                                        CommandResult(isSuccess, service),
+                                                                                        dcel(dcelIn),
+                                                                                        minLength(minLengthIn) {};
 
     void updateStatus() override
     {
@@ -113,7 +117,7 @@ public:
     {
         if (wasSuccess())
         {
-            vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
+            vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel(), minLength));
         }
     };
 };

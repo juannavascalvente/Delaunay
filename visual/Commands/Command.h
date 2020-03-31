@@ -1199,11 +1199,11 @@ public:
 
     /**
      * @fn       printRunnableMsg
-     * @brief    Prints message to explain that Incremental Delaunay must exist
+     * @brief    Prints message to explain that a triangulation must exist
      */
     void printRunnableMsg() override
     {
-        cout << "Incremental Delaunay must exist to find face" << endl;
+        cout << "A triangulation must exist to find two closest points" << endl;
     }
 
 
@@ -1264,6 +1264,80 @@ public:
     {
         Dcel *dcel = in.getStoreService()->getDcel();
         return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandFilterEdges : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    CmdParamOut out;
+    TYPE minLen;
+
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandFilterEdges(CmdParamIn &inParam, CmdParamOut &outParam, TYPE minLenIn) : in(inParam),
+                                                                                    out(outParam),
+                                                                                    minLen(minLenIn) {};
+
+
+    /**
+     * @fn       printRunnableMsg
+     * @brief    Prints message to explain that a triangulation must exist
+     */
+    void printRunnableMsg() override
+    {
+        cout << "A triangulation must exist" << endl;
+    }
+
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks a triangulation exist
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Triangulation must exist
+        Status *status = in.getStoreService()->getStatus();
+        return status->isTriangulationCreated();
+    }
+
+    /**
+     * @fn      run
+     * @brief   Do nothing as job is done in display resuls
+     *
+     * @return  true built was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        this->isSuccess = true;
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, minLen);
     }
 };
 

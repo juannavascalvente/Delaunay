@@ -91,6 +91,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createTwoClosest(storeService);
             break;
         }
+        case FILTER_EDGES:
+        {
+            command = createFilterEdges(storeService, Config::getMinLengthEdge());
+            break;
+        }
         default:
         {
             command = CommandFactory::createNull();
@@ -244,4 +249,14 @@ Command *CommandFactory::createTwoClosest(StoreService *storeService)
 
     // Create command
     return new CommandTwoClosest(in, out);
+}
+
+Command *CommandFactory::createFilterEdges(StoreService *storeService, TYPE minLen)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+    CmdParamOut out(storeService);
+
+    // Create command
+    return new CommandFilterEdges(in, out, minLen);
 }

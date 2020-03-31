@@ -386,6 +386,7 @@ void Process::execute()
         case CLOSEST_POINT:
         case FIND_FACE:
         case TWO_CLOSEST:
+        case FILTER_EDGES:
 		{
             // Create command
             cmd = CommandFactory::create(option, storeService);
@@ -476,21 +477,6 @@ void Process::execute()
 				// Update menu entries.
 				m.updateMenu();
 		    }
-			break;
-		}
-		// Filter edges whose length is lower than a threshold.
-		case FILTER_EDGES:
-		{
-			// Check if Delaunay triangulation already created.
-            Status *status = storeService->getStatus();
-			if (status->isTriangulationCreated())
-			{
-                // Add Delaunay triangulation filtering edges
-                Displayable *dispDelaunay = DisplayableFactory::createDcel(storeService->getDcel(), Config::getMinLengthEdge());
-                dispManager->add(dispDelaunay);
-
-                dispManager->process();
-            }
 			break;
 		}
 		// Draw triangles circumcentres.
