@@ -121,6 +121,40 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
             command = createClear(storeService);
             break;
         }
+        case READ_POINTS_FLAT_FILE:
+        {
+            command = createReadPoints(storeService);
+            break;
+        }
+        case READ_POINTS_DCEL_FILE:
+        {
+            command = createReadPointsDcel(storeService);
+            break;
+        }
+        case READ_DCEL:
+        {
+            command = createReadDcel(storeService);
+            break;
+        }
+        case READ_DELAUNAY:
+        {
+            command = createReadDelaunay(storeService);
+            break;
+        }
+        case READ_VORONOI:
+        {
+            command = CommandFactory::createNull();
+            cout << "Error creating command. Read Voronoi is not implemented " << endl;
+            //command = createReadVoronoi(storeService);
+            break;
+        }
+        case READ_GABRIEL:
+        {
+            command = CommandFactory::createNull();
+            cout << "Error creating command. Read Gabriel is not implemented " << endl;
+            //command = createReadGabriel(storeService);
+            break;
+        }
         case WRITE_POINTS:
         {
             command = createWritePoints(storeService);
@@ -342,6 +376,60 @@ Command *CommandFactory::createClear(StoreService *storeService)
     // Create command
     return new CommandClear(in);
 }
+
+Command *CommandFactory::createReadPoints(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+
+    // Create command
+    return new CommandReadPoints(in);
+}
+
+Command *CommandFactory::createReadPointsDcel(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+
+    // Create command
+    return new CommandReadPointsDcel(in);
+}
+
+Command *CommandFactory::createReadDcel(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+
+    // Create command
+    return new CommandReadDcel(in);
+}
+
+Command *CommandFactory::createReadDelaunay(StoreService *storeService)
+{
+    // Create parameters
+    CmdParamIn  in(storeService);
+
+    // Create command
+    return new CommandReadDelaunay(in);
+}
+
+//Command *CommandFactory::createReadVoronoi(StoreService *storeService)
+//{
+//    // Create parameters
+//    CmdParamIn  in(storeService);
+//
+//    // Create command
+//    return new CommandReadVoronoi(in);
+//}
+//
+//Command *CommandFactory::createReadGabriel(StoreService *storeService)
+//{
+//    // Create parameters
+//    CmdParamIn  in(storeService);
+//
+//    // Create command
+//    return new CommandClear(in);
+//}
 
 Command *CommandFactory::createWritePoints(StoreService *storeService)
 {

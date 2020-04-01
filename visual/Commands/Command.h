@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 #ifndef DELAUNAY_COMMAND_H
 #define DELAUNAY_COMMAND_H
 
@@ -13,6 +9,7 @@
 #include "CommandResult.h"
 #include "Config.h"
 #include "DcelGenerator.h"
+#include "DcelReader.h"
 #include "DcelWriter.h"
 #include "DelaunayIO.h"
 #include "VoronoiIO.h"
@@ -1539,13 +1536,13 @@ class CommandDcelInfo : public Command
     CmdParamIn  in;
     vector<Displayable*> vDisplayable;
 
-    static void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info)
+    void createDcelPointsInfo(vector<Text> &info)
     {
         // Draw all points of the set.
-        for (size_t i=0; i < dcelIn.getNVertex() ; i++)
+        for (size_t i=0; i < dcel->getNVertex() ; i++)
         {
             // Get and draw i-point.
-            Point<TYPE> *point = dcelIn.getRefPoint(i);
+            Point<TYPE> *point = dcel->getRefPoint(i);
             string strText = std::to_string(i+1);
 
             Text text(point->getX(), point->getY(), strText);
@@ -1554,27 +1551,27 @@ class CommandDcelInfo : public Command
     }
 
 
-    static void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info)
+    void createDcelEdgeInfo(vector<Text> &info)
     {
         // Loop all edges.
-        for (size_t edgeIndex=0; edgeIndex<dcelIn.getNEdges() ;edgeIndex++)
+        for (size_t edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
         {
             // Check if twin edge already visited.
-            if ((edgeIndex+1) < dcelIn.getTwin(edgeIndex))
+            if ((edgeIndex+1) < dcel->getTwin(edgeIndex))
             {
                 // Check edge is real.
-                if (!dcelIn.hasNegativeVertex((int) edgeIndex+1))
+                if (!dcel->hasNegativeVertex((int) edgeIndex+1))
                 {
                     // Get edge extreme points.
                     Point<TYPE> origin, dest;	// Extreme points of edges.
-                    dcelIn.getEdgePoints(edgeIndex, origin, dest);
+                    dcel->getEdgePoints(edgeIndex, origin, dest);
 
                     // Compute middle point of edge.
                     Point<TYPE> middle;         // Middle point of the edge.
                     Point<TYPE>::middlePoint(&origin, &dest, &middle);
 
                     // Print information.
-                    string strText = std::to_string(edgeIndex+1) + " - " + std::to_string(dcelIn.getTwin(edgeIndex));
+                    string strText = std::to_string(edgeIndex+1) + " - " + std::to_string(dcel->getTwin(edgeIndex));
 
                     Text text(middle.getX(), middle.getY(), strText);
                     info.push_back(text);
@@ -1584,28 +1581,28 @@ class CommandDcelInfo : public Command
     }
 
 
-    static void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info)
+    void createDcelFacesInfo(vector<Text> &info)
     {
         // Loop all faces (skip external face).
-        for (size_t faceId=0; faceId<dcelIn.getNFaces() ;faceId++)
+        for (size_t faceId=0; faceId<dcel->getNFaces() ;faceId++)
         {
             // If any vertex is imaginary then face is not drawn.
-            if (!dcelIn.imaginaryFace(faceId))
+            if (!dcel->imaginaryFace(faceId))
             {
                 Polygon polygon;
 
                 // Get edge in current face.
-                size_t firstEdgeIndex = dcelIn.getFaceEdge(faceId)-1;
+                size_t firstEdgeIndex = dcel->getFaceEdge(faceId)-1;
                 size_t edgeIndex = firstEdgeIndex;
                 do
                 {
                     // Add origin point to polygon.
                     Point<TYPE> origin;			// Edge origin point.
-                    origin = *dcelIn.getRefPoint(dcelIn.getOrigin(edgeIndex)-1);
+                    origin = *dcel->getRefPoint(dcel->getOrigin(edgeIndex)-1);
                     polygon.add(origin);
 
                     // Next edge in face.
-                    edgeIndex = dcelIn.getNext(edgeIndex)-1;
+                    edgeIndex = dcel->getNext(edgeIndex)-1;
                 } while(edgeIndex != firstEdgeIndex);
 
                 // Compute face centroid.
@@ -1676,17 +1673,17 @@ public:
         vDisplayable.push_back(dispDelaunay);
 
         vector<Text> vPointsInfo;
-        this->createDcelPointsInfo(*dcel, vPointsInfo);
+        this->createDcelPointsInfo(vPointsInfo);
         Displayable *dispPointsInfo = DisplayableFactory::createTextSet(vPointsInfo);
         vDisplayable.push_back(dispPointsInfo);
 
         vector<Text> vEdgesInfo;
-        this->createDcelEdgeInfo(*dcel, vEdgesInfo);
+        this->createDcelEdgeInfo(vEdgesInfo);
         Displayable *dispEdgesInfo = DisplayableFactory::createTextSet(vEdgesInfo);
         vDisplayable.push_back(dispEdgesInfo);
 
         vector<Text> vFacesInfo;
-        this->createDcelFacesInfo(*dcel, vFacesInfo);
+        this->createDcelFacesInfo(vFacesInfo);
         Displayable *dispFacesInfo = DisplayableFactory::createTextSet(vFacesInfo);
         vDisplayable.push_back(dispFacesInfo);
 
@@ -1766,6 +1763,308 @@ public:
     CommandResult *createResult() override
     {
         return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandReadPoints : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    vector<Point<TYPE>> vPoints;
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadPoints(CmdParamIn &inParam) : in(inParam) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Read points from a flat file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+        Dcel *dcel = in.getStoreService()->getDcel();
+        this->isSuccess = DcelReader::readPoints(Config::getInFlatFilename(), true, *dcel);
+
+        if (this->isSuccess)
+        {
+            // Add point display
+            for (size_t i=0; i< dcel->getNVertex() ; i++)
+            {
+                vPoints.push_back(*dcel->getRefPoint(i));
+            }
+
+            // Add points
+            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
+            vDisplayable.push_back(dispPoints);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandReadPointsDcel : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    vector<Point<TYPE>> vPoints;
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadPointsDcel(CmdParamIn &inParam) : in(inParam) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Read points from a dcel file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+        Dcel *dcel = in.getStoreService()->getDcel();
+        this->isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, *dcel);
+
+        if (this->isSuccess)
+        {
+            // Add point display
+            for (size_t i=0; i< dcel->getNVertex() ; i++)
+            {
+                vPoints.push_back(*dcel->getRefPoint(i));
+            }
+
+            // Add points
+            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
+            vDisplayable.push_back(dispPoints);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandReadDcel : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadDcel(CmdParamIn &inParam) : in(inParam) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Read dcel from file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+        Dcel *dcel = in.getStoreService()->getDcel();
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), false, *dcel);
+
+        if (this->isSuccess)
+        {
+            delaunay->setDCEL(dcel);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandReadDelaunay : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadDelaunay(CmdParamIn &inParam) : in(inParam) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Read Delaunay from file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+        Dcel *dcel = in.getStoreService()->getDcel();
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        delaunay->setDCEL(dcel);
+        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+
+        if (this->isSuccess)
+        {
+            delaunay->setAlgorithm(INCREMENTAL);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandReadVoronoi : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    CmdParamIn  in;
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadVoronoi(CmdParamIn &inParam) : in(inParam) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Read Delaunay from file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+        Dcel *dcel = in.getStoreService()->getDcel();
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        delaunay->setDCEL(dcel);
+        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+
+        if (this->isSuccess)
+        {
+            delaunay->setAlgorithm(INCREMENTAL);
+        }
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        Dcel *dcel = in.getStoreService()->getDcel();
+        Voronoi *voronoi = in.getStoreService()->getVoronoi();
+        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi);
     }
 };
 

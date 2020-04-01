@@ -104,20 +104,6 @@ bool Process::readData(int option)
 //	// Check option to generate/read set.
 //	switch (option)
 //	{
-//		// Generate random set.
-//		case RANDOMLY:
-//		{
-//            isSuccess = DcelGenerator::generateRandom(Config::getNPoints(), this->dcel);
-//            status->set(false, isSuccess, false, false, false, false);
-//			break;
-//		}
-//		// Generate clusters set.
-//		case CLUSTER:
-//		{
-//            isSuccess = DcelGenerator::generateClusters(Config::getNPoints(), Config::getNClusters(), Config::getRadius(), this->dcel);
-//			status->set(false, isSuccess, false, false, false, false);
-//			break;
-//		}
 //		// Read set from flat file.
 //		case READ_POINTS_FLAT_FILE:
 //		case READ_POINTS_DCEL_FILE:
@@ -235,6 +221,12 @@ void Process::execute()
         case DCEL_INFO:
         case VORONOI_INFO:
         case CLEAR:
+        case READ_POINTS_FLAT_FILE:
+        case READ_POINTS_DCEL_FILE:
+        case READ_DCEL:
+        case READ_DELAUNAY:
+        case READ_VORONOI:
+        case READ_GABRIEL:
         case WRITE_POINTS:
         case WRITE_DCEL:
         case WRITE_DELAUNAY:
@@ -265,41 +257,6 @@ void Process::execute()
             // Update menu entries.
             menu.updateMenu();
 
-			break;
-		}
-		case READ_POINTS_FLAT_FILE:
-		case READ_POINTS_DCEL_FILE:
-		case READ_DCEL:
-		case READ_DELAUNAY:
-		case READ_VORONOI:
-		case READ_GABRIEL:
-		{
-			// Check option to generate/read set.
-			if (this->readData(option))
-		    {
-//				if (status->isVoronoiCreated())
-//				{
-//					// Clear screen.
-//					this->drawer->drawFigures(VORONOI_DRAW);
-//				}
-//				if (status->isDelaunayCreated() ||
-//					status->isTriangulationCreated())
-//				{
-//					// Draw triangulation.
-//					this->drawer->drawFigures(TRIANGULATION_DRAW);
-//				}
-//				else
-//				{
-//					// Draw set of points.
-//                    dispManager->process();
-//					//this->drawer->drawFigures(SET_DRAW);
-//				}
-
-                dispManager->process();
-
-				// Update menu entries.
-				menu.updateMenu();
-		    }
 			break;
 		}
 		// Quit application.

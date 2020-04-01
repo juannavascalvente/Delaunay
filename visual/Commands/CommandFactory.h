@@ -40,6 +40,12 @@ class CommandFactory
     static Command *createDcelInfo(StoreService *storeService);
     static Command *createVoronoiInfo(StoreService *storeService);
     static Command *createClear(StoreService *storeService);
+    static Command *createReadPoints(StoreService *storeService);
+    static Command *createReadPointsDcel(StoreService *storeService);
+    static Command *createReadDcel(StoreService *storeService);
+    static Command *createReadDelaunay(StoreService *storeService);
+//    static Command *createReadVoronoi(StoreService *storeService);
+//    static Command *createReadGabriel(StoreService *storeService);
     static Command *createWritePoints(StoreService *storeService);
     static Command *createWriteDcel(StoreService *storeService);
     static Command *createWriteDelaunay(StoreService *storeService);
