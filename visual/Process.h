@@ -39,6 +39,7 @@ class Process
      *******************************************************************************************************************/
 	void execute();
 	static void executeWrapper();
+    void deallocateResources() const;
 
 protected:
 	static Process *instance;

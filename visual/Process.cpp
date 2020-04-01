@@ -25,13 +25,13 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 	fileName = argv[2];
 	Config::readConfig(fileName);
 
-	// Check flag to print data to screen.
+	// Allocate resources
 	this->log = new Logging("log.txt", printData);
-
     configService = configServiceIn;
     storeService = storeServiceIn;
     dispManager = new DisplayManager(argc, argv);
 
+    // Initialize menu
 	this->menu = Menu(storeServiceIn->getStatus());
 
 	// Function to execute by GLUT.
@@ -42,10 +42,7 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 Process::~Process()
 {
 	// Deallocate resources
-	delete log;
-	delete dispManager;
-	delete storeService;
-	delete configService;
+    deallocateResources();
 }
 
 
@@ -84,10 +81,7 @@ void Process::execute()
 	if (option == QUIT)
     {
         // Quit application.
-        delete log;
-        delete dispManager;
-        delete storeService;
-        delete configService;
+        deallocateResources();
         exit(0);
     }
 
@@ -120,4 +114,17 @@ void Process::execute()
 
     // Reset menu option.
 	menu.resetMenuOption();
+}
+
+
+/**
+ * @fn      deallocateResources
+ * @brief   Free allocated resources
+ */
+void Process::deallocateResources() const
+{
+    delete log;
+    delete dispManager;
+    delete storeService;
+    delete configService;
 }
