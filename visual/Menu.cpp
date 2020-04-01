@@ -189,7 +189,7 @@ void Menu::updateMenu()
 		glutAddSubMenu(READ_MENU_TEXT, this->subMenuGenerate);
 
 		// Triangulations submenu.
-		if (this->status->isSetCreated())
+		if (this->status->isSet())
 		{
 			sub_Menu_Id2 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(TRIANGULATIONS_STAR_TEXT, STAR_TRIANGULATION);
@@ -197,7 +197,7 @@ void Menu::updateMenu()
 		}
 
 		// Main figures submenu.
-		if (this->status->isTriangulationCreated() || this->status->isDelaunayCreated())
+		if (this->status->isTriangulation() || this->status->isDelaunay())
 		{
 			sub_Menu_Id3 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(FIGURES_CONVEX_TEXT, CONVEX_HULL);
@@ -210,7 +210,7 @@ void Menu::updateMenu()
 			glutAddMenuEntry(FIGURES_TRIANGULATION_PATH_TEXT, TRIANGULATION_PATH);
 			glutAddMenuEntry(FIGURES_FILTER_EDGES, FILTER_EDGES);
 
-			if (this->status->isVoronoiCreated())
+			if (this->status->isVoronoi())
 			{
 				glutAddMenuEntry(FIGURES_GABRIEL_TEXT, GABRIEL);
 				glutAddMenuEntry(FIGURES_VORONOI_PATH_TEXT, VORONOI_PATH);
@@ -218,22 +218,22 @@ void Menu::updateMenu()
 		}
 
 		// Output data submenu.
-		if (this->status->isSetCreated())
+		if (this->status->isSet())
 		{
 			sub_Menu_Id4 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(EXPORT_FLAT_FILE, WRITE_POINTS);
-			if (this->status->isTriangulationCreated())
+			if (this->status->isTriangulation())
 			{
 				glutAddMenuEntry(EXPORT_DCEL_FILE, WRITE_DCEL);
-				if (this->status->isDelaunayCreated())
+				if (this->status->isDelaunay())
 				{
 					glutAddMenuEntry(EXPORT_DELAUNAY_FILE, WRITE_DELAUNAY);
 				}
-				if (this->status->isVoronoiCreated())
+				if (this->status->isVoronoi())
 				{
 					glutAddMenuEntry(EXPORT_VORONOI_FILE, WRITE_VORONOI);
 				}
-				if (this->status->isGabrielCreated())
+				if (this->status->isGabriel())
 				{
 					glutAddMenuEntry(EXPORT_GABRIEL_FILE, WRITE_GABRIEL);
 				}
@@ -241,11 +241,11 @@ void Menu::updateMenu()
 		}
 
 		// Information submenu.
-		if (this->status->isSetCreated())
+		if (this->status->isSet())
 		{
 			sub_Menu_Id5 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(INFORMATION_DCEL_TEXT, DCEL_INFO);
-			if (this->status->isVoronoiCreated())
+			if (this->status->isVoronoi())
 			{
 				glutAddMenuEntry(INFORMATION_VORONOI_TEXT, VORONOI_INFO);
 			}
@@ -255,19 +255,19 @@ void Menu::updateMenu()
 		menu_Id = glutCreateMenu(menu_level_1);
 		glutAddSubMenu(INPUTSET_MENU_TEXT, sub_Menu_Input);
 		glutAddMenuEntry(PARAMETERS_MENU_TEXT, PARAMETERS);
-		if (this->status->isSetCreated())
+		if (this->status->isSet())
 		{
 			glutAddSubMenu(TRIANGULATIONS_MENU_TEXT, sub_Menu_Id2);
 		}
-		if (this->status->isTriangulationCreated() || this->status->isDelaunayCreated())
+		if (this->status->isTriangulation() || this->status->isDelaunay())
 		{
 			glutAddSubMenu(FIGURES_MENU_TEXT, sub_Menu_Id3);
 		}
-		if (this->status->isSetCreated())
+		if (this->status->isSet())
 		{
 			glutAddSubMenu(EXPORT_MENU_TEXT, sub_Menu_Id4);
 		}
-		if (this->status->isSetCreated())
+		if (this->status->isSet())
 		{
 			glutAddSubMenu(INFORMATION_MENU_TEXT, sub_Menu_Id5);
 		}

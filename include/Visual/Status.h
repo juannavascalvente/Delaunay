@@ -1,10 +1,25 @@
-#ifndef VISUAL_STATUS_H_
-#define VISUAL_STATUS_H_
+//
+// Created by delaunay on 1/4/20.
+//
+
+#ifndef DELAUNAY_STATUSMODEL_H
+#define DELAUNAY_STATUSMODEL_H
+
 
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "StatusModel.h"
+
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
+#define FIRST_TIME_DEFAULT          (true)
+#define IS_SET_DEFAULT              (false)
+#define IS_TRIANGULATION_DEFAULT    (false)
+#define IS_DELAUNAY_DEFAULT         (false)
+#define IS_VORONOI_DEFAULT          (false)
+#define IS_GABRIEL_DEFAULT          (false)
 
 
 /***********************************************************************************************************************
@@ -15,46 +30,68 @@ class Status
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    StatusModel status;
+    bool	hasFirstTime;		// First time execution flag.
+    bool	hasSet;             // Set of points created or read flag.
+    bool	hasTriangulation;	// Star triangulation created flag.
+    bool	hasDelaunay;        // Delaunay triangulation created flag.
+    bool	hasVoronoi;			// Voronoi diagram computed flag.
+    bool	hasGabriel;			// Gabriel graph computed flag.
 
 public:
-    /*******************************************************************************************************************
-    * Public methods declarations
-    *******************************************************************************************************************/
-	Status() = default;
+    Status() : hasFirstTime(FIRST_TIME_DEFAULT), hasSet(IS_SET_DEFAULT), hasTriangulation(IS_TRIANGULATION_DEFAULT),
+                    hasDelaunay(IS_DELAUNAY_DEFAULT),
+                    hasVoronoi(IS_VORONOI_DEFAULT),
+                    hasGabriel(IS_GABRIEL_DEFAULT) {};
 
-
-	/**
-	 * @fn      StatusModel
-	 * @brief   Set status to value in input parameter
-	 *
-	 * @param   statusIn        (IN) Values to set to
-	 */
-    void set(const StatusModel &statusIn) { status = statusIn; }
+    Status(bool isFirstTime, bool isSet, bool isTriangulation, bool isDelaunay, bool isVoronoi, bool isGabriel) :
+            hasFirstTime(isFirstTime),
+            hasSet(isSet),
+            hasTriangulation(isTriangulation),
+            hasDelaunay(isDelaunay),
+            hasVoronoi(isVoronoi),
+            hasGabriel(isGabriel) {};
 
 
     /**
      * @fn      reset
-     * @brief   Reset status to its initial values
+     * @brief   reset to default status
      */
-	void reset() { status.reset();};
+    void reset()
+    {
+        hasFirstTime = FIRST_TIME_DEFAULT;
+        hasSet = IS_SET_DEFAULT;
+        hasTriangulation = IS_TRIANGULATION_DEFAULT;
+        hasDelaunay = IS_DELAUNAY_DEFAULT;
+        hasVoronoi = IS_VORONOI_DEFAULT;
+        hasGabriel = IS_GABRIEL_DEFAULT;
+    }
+
+
+    /**
+     * @fn      StatusModel
+     * @brief   Set status to value in input parameter
+     *
+     * @param   statusIn        (IN) Values to set to
+     */
+    void set(const Status &statusIn) { (*this) = statusIn; }
 
 
     /*******************************************************************************************************************
     * Getters/Setters
     *******************************************************************************************************************/
-	inline bool isFirstTime() { return(status.isFirstTime());};
-	inline bool isSetCreated() { return(status.isSet());};
-	inline bool isTriangulationCreated() {return(status.isTriangulation());};
-	inline bool isDelaunayCreated() { return(status.isDelaunay());};
-	inline bool isVoronoiCreated() { return(status.isVoronoi());};
-	inline bool isGabrielCreated() { return(status.isGabriel());};
-	inline void setFirstTime(bool value) { status.setFirstTime(value);};
-	inline void setSetCreated(bool value) { status.setSet(value); };
-	inline void seTriangulationCreated(bool value) { status.setTriangulation(value); };
-	inline void setDelaunayCreated(bool value) { status.setDelaunay(value); };
-	inline void setVoronoiCreated(bool value) { status.setVoronoi(value); };
-	inline void setGabrielCreated(bool value) { status.setGabriel(value);};
+    bool isFirstTime() const { return hasFirstTime; }
+    bool isSet() const { return hasSet; }
+    bool isTriangulation() const { return hasTriangulation;}
+    bool isDelaunay() const { return hasDelaunay; }
+    bool isVoronoi() const { return hasVoronoi; }
+    bool isGabriel() const { return hasGabriel; }
+    void setFirstTime(bool isFirstTimeIn) { hasFirstTime = isFirstTimeIn; }
+    void setSet(bool isSetIn) { hasSet = isSetIn; }
+    void setTriangulation(bool isTriangulationIn) { hasTriangulation = isTriangulationIn; }
+    void setDelaunay(bool isDelaunayIn) { hasDelaunay = isDelaunayIn; }
+    void setVoronoi(bool isVoronoiIn) { hasVoronoi = isVoronoiIn; }
+    void setGabriel(bool isGabrielIn) { hasGabriel = isGabrielIn; }
 };
 
-#endif /* VISUAL_STATUS_H_ */
+
+#endif //DELAUNAY_STATUSMODEL_H

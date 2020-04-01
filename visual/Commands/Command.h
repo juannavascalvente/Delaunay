@@ -362,8 +362,8 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay have not been already created
-        return (!in.getStoreService()->getStatus()->isTriangulationCreated() &&
-                !in.getStoreService()->getStatus()->isDelaunayCreated());
+        return (!in.getStoreService()->getStatus()->isTriangulation() &&
+                !in.getStoreService()->getStatus()->isDelaunay());
     };
 
     /**
@@ -427,7 +427,7 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay have not been already created
-        return !in.getStoreService()->getStatus()->isDelaunayCreated();
+        return !in.getStoreService()->getStatus()->isDelaunay();
     };
 
     /**
@@ -448,7 +448,7 @@ public:
         Status *status = in.getStoreService()->getStatus();
 
         // Build Delaunay from Star triangulation.
-        if (status->isTriangulationCreated())
+        if (status->isTriangulation())
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
             this->isSuccess = triangulation->delaunay();
@@ -457,7 +457,7 @@ public:
         else
         {
             // Build Delaunay from DCEL.
-            if (!status->isDelaunayCreated())
+            if (!status->isDelaunay())
             {
                 this->isSuccess = delaunay->incremental();
             }
@@ -520,8 +520,8 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay or have been already created
-        return (in.getStoreService()->getStatus()->isTriangulationCreated() ||
-                in.getStoreService()->getStatus()->isDelaunayCreated());
+        return (in.getStoreService()->getStatus()->isTriangulation() ||
+                in.getStoreService()->getStatus()->isDelaunay());
     };
 
 
@@ -538,7 +538,7 @@ public:
         Status *status = in.getStoreService()->getStatus();
 
         // Computing convex hull.
-        if (status->isDelaunayCreated())
+        if (status->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             this->isSuccess = delaunay->convexHull();
@@ -600,7 +600,7 @@ public:
     bool isRunnable() override
     {
         // Delaunay must be created to create Voronoi diagram
-        return in.getStoreService()->getStatus()->isDelaunayCreated();
+        return in.getStoreService()->getStatus()->isDelaunay();
     };
 
 
@@ -677,7 +677,7 @@ public:
     {
         // Delaunay and Voronoi must exist
         Status *status = in.getStoreService()->getStatus();
-        return status->isDelaunayCreated() && status->isVoronoiCreated();
+        return status->isDelaunay() && status->isVoronoi();
     }
 
 
@@ -756,7 +756,7 @@ public:
         // Delaunay and Voronoi must exist
         Status *status = in.getStoreService()->getStatus();
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isDelaunayCreated() && (delaunay->getAlgorithm() == INCREMENTAL);
+        return status->isDelaunay() && (delaunay->getAlgorithm() == INCREMENTAL);
     }
 
 
@@ -860,7 +860,7 @@ public:
         // TODO https://github.com/juannavascalvente/Delaunay/issues/10
         Status *status = in.getStoreService()->getStatus();
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isVoronoiCreated() && (delaunay->getAlgorithm() == INCREMENTAL);
+        return status->isVoronoi() && (delaunay->getAlgorithm() == INCREMENTAL);
     }
 
 
@@ -981,8 +981,8 @@ public:
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isTriangulationCreated() &&
-        ((status->isDelaunayCreated() && status->isVoronoiCreated()) || (delaunay->getAlgorithm() != INCREMENTAL));
+        return status->isTriangulation() &&
+        ((status->isDelaunay() && status->isVoronoi()) || (delaunay->getAlgorithm() != INCREMENTAL));
     }
 
 
@@ -1005,10 +1005,10 @@ public:
 
         // Check if Delaunay triangulation computed.
         Status *status = in.getStoreService()->getStatus();
-        if (status->isDelaunayCreated())
+        if (status->isDelaunay())
         {
             // Find node that surrounds input point p.
-            if (status->isVoronoiCreated())
+            if (status->isVoronoi())
             {
                 Delaunay *delaunay = in.getStoreService()->getDelaunay();
                 Voronoi *voronoi = in.getStoreService()->getVoronoi();
@@ -1087,7 +1087,7 @@ public:
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isDelaunayCreated() && (delaunay->getAlgorithm() == INCREMENTAL);
+        return status->isDelaunay() && (delaunay->getAlgorithm() == INCREMENTAL);
     }
 
 
@@ -1109,7 +1109,7 @@ public:
         // Find face.
         Status *status = in.getStoreService()->getStatus();
         bool isImaginaryFace=false;
-        if (status->isDelaunayCreated())
+        if (status->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             this->isSuccess = delaunay->findFace(point, faceId, isImaginaryFace);
@@ -1193,7 +1193,7 @@ public:
     {
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulationCreated();
+        return status->isTriangulation();
     }
 
 
@@ -1208,7 +1208,7 @@ public:
     {
         int iPointIdx1, iPointIdx2;
         Status *status = in.getStoreService()->getStatus();
-        if (status->isDelaunayCreated())
+        if (status->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             this->isSuccess = delaunay->findTwoClosest(iPointIdx1, iPointIdx2);
@@ -1277,7 +1277,7 @@ public:
     {
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulationCreated();
+        return status->isTriangulation();
     }
 
     /**
@@ -1347,7 +1347,7 @@ public:
     {
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulationCreated();
+        return status->isTriangulation();
     }
 
     /**
@@ -1438,7 +1438,7 @@ public:
     {
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulationCreated();
+        return status->isTriangulation();
     }
 
     /**
@@ -1623,7 +1623,7 @@ public:
     {
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulationCreated();
+        return status->isTriangulation();
     }
 
     /**
