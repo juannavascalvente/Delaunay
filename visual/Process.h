@@ -13,18 +13,9 @@
 * Includes
 ***********************************************************************************************************************/
 #include "DisplayManager.h"
-
-#include "Menu.h"
-#include "Status.h"
-#include "Config.h"
-#include "Dcel.h"
-#include "Delaunay.h"
-#include "Gabriel.h"
 #include "Logging.h"
-#include "Queue.h"
-#include "StarTriangulation.h"
-#include "Text.h"
-#include "Voronoi.h"
+#include "Menu.h"
+#include "StoreService.h"
 
 
 /***********************************************************************************************************************
@@ -36,13 +27,9 @@ class Process
     * Class members
     *******************************************************************************************************************/
     DisplayManager      *dispManager;
-	Menu 			    m;				// Menu object.
-	Status 			    status;			// Current status.
-	Dcel			    dcel;			// Dcel data.
-	Delaunay		    delaunay;		// Delaunay data.
-	StarTriangulation	triangulation;	// Star triangulation data.
-	Voronoi			    voronoi;		// Voronoi diagram data.
-	Gabriel			    gabriel;		// Gabriel graph data.
+    StoreService        *storeService;
+
+	Menu 			    menu;		    // Menu object.
 	Logging 		    *log;			// Log file.
 
     /*******************************************************************************************************************
@@ -50,19 +37,6 @@ class Process
      *******************************************************************************************************************/
 	void execute();
 	static void executeWrapper();
-	bool readData(int option);
-	void resetData();
-	bool buildTriangulation(int option);
-	bool buildConvexHull();
-	static bool findPath(Delaunay &delaunay, Voronoi &vor, Line &l, Set<int> &faces);
-	bool findTwoClosest( int &index1, int &index2);
-	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
-	bool findClosest( Point<TYPE> &point, Point<TYPE> &q, double &distance);
-	static void getPointToLocate(Point<TYPE> &point);
-	static void getLineToLocate(Point<TYPE> &p1, Point<TYPE> &p2);
-    static void createDcelPointsInfo(const Dcel &dcelIn, vector<Text> &info);
-    static void createDcelEdgeInfo(const Dcel &dcelIn, vector<Text> &info);
-    static void createDcelFacesInfo(const Dcel &dcelIn, vector<Text> &info);
 
 protected:
 	static Process *instance;
@@ -71,14 +45,14 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-	Process(int argc, char **argv, bool printData);
+    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn);
 	~Process();
 
     /**
      * @fn      start
      * @brief   starts infinite loop
      */
-    static void start();
+    void start();
 
     /**
      * @fn      setInstance

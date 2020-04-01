@@ -48,13 +48,22 @@ class DisplayManager
     void draw();
 public:
 
+    /*******************************************************************************************************************
+     * Public methods declaration
+     *******************************************************************************************************************/
     DisplayManager(int argc, char **argv) : vDisplayables(0)
     {
         // Initialize display
         DisplayService::init(argc, argv);
     };
 
+
+    /**
+     * @fn      process
+     * @brief   Process items to be siplayed in the screen
+     */
     void process();
+
 
     /**
      * @fn      add
@@ -63,6 +72,29 @@ public:
      * @param   displayable
      */
     void add(Displayable *displayable) { vDisplayables.push_back(displayable); };
+
+
+    /**
+     * @fn      add
+     * @brief   Add a vector of displayables
+     *
+     * @param   vector of displayable
+     */
+    void add(vector<Displayable*> &vDisplayablesIn) { vDisplayables = vDisplayablesIn; };
+
+
+    /**
+     * @fn      startLoop
+     * @brief   Starts glu main loop
+     */
+    void startLoop() { DisplayService::startLoop(); }
+
+
+    /**
+     * @fn      setLoopFunction
+     * @brief   Set function to be executed in glu main loop
+     */
+    void setLoopFunction(void (* f)()) { glutDisplayFunc((*f)); }
 };
 
 

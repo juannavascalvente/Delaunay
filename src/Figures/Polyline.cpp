@@ -5,7 +5,7 @@
  *      Author: jnavas
  */
 
-#include "Polyline.h"
+#include "Figures/Polyline.h"
 #include <string.h>
 
 //------------------------------------------------------------------------

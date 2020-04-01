@@ -44,7 +44,7 @@ class Config
     static Point<TYPE>	destinationPoint;	// Line destination point.
 
     static int		nClusters;		    // # clusters in set when generating cluster set.
-    static int 	    clusterRadius;	    // Cluster radius.
+    static TYPE 	clusterRadius;	    // Cluster radius.
 
     static int		nAnchors;		    // # anchors to locate point.
 
@@ -79,7 +79,7 @@ public:
     static inline int getNPoints()  { return(Config::nPoints); };
     static inline int getNClusters(){ return(Config::nClusters); };
 	static inline int getNAnchors() { return(Config::nAnchors); };
-	static inline int getRadius()   { return(Config::clusterRadius); };
+	static inline TYPE getRadius()   { return(Config::clusterRadius); };
 	static inline string getInFlatFilename()    { return(Config::inFlatFileName); };
 	static inline string getInDCELFilename()    { return(Config::inDcelFileName); };
 	static inline string getInGraphFilename()   { return(Config::inGraphFileName); };

@@ -36,12 +36,17 @@ endif (BUILD_DEBUG)
 file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include
         ${BUILD_PATH}/include/Dcel
+        ${BUILD_PATH}/include/Figures
+        ${BUILD_PATH}/include/Figures/Generators
         ${BUILD_PATH}/include/Gabriel
+        ${BUILD_PATH}/include/Store
         ${BUILD_PATH}/include/Triangulation
+        ${BUILD_PATH}/include/Visual
         ${BUILD_PATH}/include/Voronoi
         ${BUILD_PATH}/statistics
         ${BUILD_PATH}/test
         ${BUILD_PATH}/visual
+        ${BUILD_PATH}/visual/Commands
         ${BUILD_PATH}/visual/Display
         ${BUILD_PATH}/visual/Display/Displayable
         )
@@ -49,12 +54,17 @@ file(GLOB DELAUNAY_HEADER_FILES
 file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/src/*.cpp
         ${BUILD_PATH}/src/Dcel/*.cpp
+        ${BUILD_PATH}/src/Figures/*.cpp
+        ${BUILD_PATH}/src/Figures/Generators/*.cpp
         ${BUILD_PATH}/src/Gabriel/*.cpp
+        ${BUILD_PATH}/src/Store/*.cpp
         ${BUILD_PATH}/src/Triangulation/*.cpp
+        ${BUILD_PATH}/src/Visual/*.cpp
         ${BUILD_PATH}/src/Voronoi/*.cpp
         ${BUILD_PATH}/statistics/*.cpp
         ${BUILD_PATH}/test/*.cpp
         ${BUILD_PATH}/visual/*.cpp
+        ${BUILD_PATH}/visual/Commands/*.cpp
         ${BUILD_PATH}/visual/Display/*.cpp
         ${BUILD_PATH}/visual/Display/Displayable/*.cpp
         )

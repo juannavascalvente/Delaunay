@@ -11,6 +11,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include <vector>
 #include "Edge.h"
 #include "Face.h"
 #include "Line.h"
@@ -164,7 +165,7 @@ public:
 
 	// Figures? PENDING. Move to another module?
 	bool 	getEdgeInserection(Line &line, int face, int &edgeId);
-	bool 	findPath(Set<int> &extremeFaces, Line &line, Set<int> &faces);
+	bool 	findPath(Set<int> &extremeFaces, Line &line, vector<int> &vFacesId);
 
 	bool operator==(const Dcel& other) const;
 };

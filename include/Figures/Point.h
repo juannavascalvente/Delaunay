@@ -14,7 +14,7 @@
 #include <fstream>
 #include <sstream>
 using namespace std;
-#include <math.h>
+#include <cmath>
 
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_POINT_CHECK_TURN
@@ -59,8 +59,8 @@ public:
 	Point(A_Type x, A_Type y) {this->x = x; this->y = y;}
 
 	// Set/Get operations.
-	inline void 	setX(const A_Type x) {this->x = x;};
-	inline void 	setY(const A_Type y) {this->y = y;};
+	inline void 	setX(const A_Type xIn) {this->x = xIn;};
+	inline void 	setY(const A_Type yIn) {this->y = yIn;};
 	inline A_Type 	getX() const {return(this->x);};
 	inline A_Type 	getY() const {return(this->y);};
 	inline void 	setOrigin() {this->x = 0.0; this->y = 0.0;};
@@ -85,15 +85,16 @@ public:
 	double signedArea(const Point &p, const Point &q);
 
 	// Location interface.
-	bool has_Extreme_Coordinates(void);
+	bool has_Extreme_Coordinates();
 	enum Turn_T	check_Turn(const Point<A_Type> &p, const Point<A_Type> &q);
 	static bool lowerY(Point<TYPE> *p, Point<TYPE> *q);
 	static bool lexicographicHigher(const Point<TYPE> *p, const Point<TYPE> *q);
 	static bool higher_Point(const Point<TYPE> *p1, const Point<TYPE> *p2, \
 						bool (*f)(const Point<TYPE> *, const Point<TYPE> *));
-	static bool inCircle(Point<TYPE> *p1, Point<TYPE> *p2, Point<TYPE> *q1, Point<TYPE> *q2);
+	static bool inCircle(Point<TYPE> *p1, Point<TYPE> *p2, Point<TYPE> *p3, Point<TYPE> *q);
 	static void middlePoint(Point<TYPE> *p, Point<TYPE> *q, Point<TYPE> *middle);
 
+	bool isInvalid() { return (this->getX() == INVALID) && (this->getY() == INVALID); }
 	void random();
 	void shake();
 	inline void shift(TYPE deltaX, TYPE deltaY) {this->x += deltaX; this->y += deltaY;};
@@ -143,12 +144,10 @@ template <class A_Type> A_Type Point<A_Type>::distance(const Point &p)
 *****************************************************************************/
 template <class A_Type> double Point<A_Type>::signedArea(const Point &p, const Point &q)
 {
-	double area=0.0;	// Return value.
-
 	// Compute signed area.
-	area = - (((double) p.x)*((double) this->y)) + (((double) q.x)*((double) this->y))
-		   + (((double) this->x)*((double) p.y)) - (((double) q.x)*((double) p.y))
-		   - (((double) this->x)*((double) q.y)) + (((double) p.x)*((double) q.y));
+    double area = - (((double) p.x)*((double) this->y)) + (((double) q.x)*((double) this->y)) +
+                  (((double) this->x)*((double) p.y)) - (((double) q.x)*((double) p.y)) -
+                  (((double) this->x)*((double) q.y)) + (((double) p.x)*((double) q.y));
 
 	return(area);
 }
@@ -160,7 +159,7 @@ template <class A_Type> double Point<A_Type>::signedArea(const Point &p, const P
  * Output: 	True if out of bounds. False otherwise.
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> bool Point<A_Type>::has_Extreme_Coordinates(void)
+template <class A_Type> bool Point<A_Type>::has_Extreme_Coordinates()
 {
 	bool	hasExtreme=false;			// Return value.
 
@@ -184,8 +183,8 @@ template <class A_Type> bool Point<A_Type>::has_Extreme_Coordinates(void)
 // PENDING CHANGE PARAMETERS TO BE reference.
 template <class A_Type> enum Turn_T Point<A_Type>::check_Turn(const Point<A_Type> &p, const Point<A_Type> &q)
 {
-	double          area=0.0;       // Signed area.
-	enum Turn_T     turn;           // Return value.
+	double          area;       // Signed area.
+	enum Turn_T     turn;       // Return value.
 
 	// Compute signed area of the triangle formed by p1, p2 and p3.
 	//area = signed_Area(p1, p2, p3);
@@ -230,7 +229,7 @@ template <class A_Type> enum Turn_T Point<A_Type>::check_Turn(const Point<A_Type
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> void Point<A_Type>::random(void)
+template <class A_Type> void Point<A_Type>::random()
 {
 	// Generate random coordinates.
 	this->x = (A_Type) drand48()*MAX_X_COORD;
@@ -244,7 +243,7 @@ template <class A_Type> void Point<A_Type>::random(void)
  * Output: 		NONE
  * Complexity:	O(1)
 *****************************************************************************/
-template <class A_Type> void Point<A_Type>::shake(void)
+template <class A_Type> void Point<A_Type>::shake()
 {
 	A_Type delta=0.0;
 
@@ -431,7 +430,7 @@ template <class A_Type> bool Point<A_Type>::inCircle(Point<TYPE> *p1,
 						Point<TYPE> *p2, Point<TYPE> *p3, Point<TYPE> *q)
 {
 	bool inCircle=false;	// Return value.
-	TYPE value=0.0;			// Determinant value.
+	TYPE value;			    // Determinant value.
 	TYPE temp[9];			// Intermediate values.
 
 	// Compute Ax - Dx, Ay - Dy and (Ax-Dx)² + (Ay-Dy)²

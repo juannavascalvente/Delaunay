@@ -10,7 +10,7 @@
 #include "Point.h"
 #include "Queue.h"
 #include "Voronoi.h"
-#include <float.h>
+#include <cfloat>
 #include "DcelReader.h"
 #include "DcelWriter.h"
 
@@ -41,12 +41,8 @@
 //------------------------------------------------------------------------
 Delaunay::~Delaunay()
 {
-	this->dcel = NULL;
-	if (this->graph != NULL)
-	{
-		// Delete graph.
-		delete this->graph;
-	}
+	this->dcel = nullptr;
+    delete this->graph;
 	this->setGraphAllocated(false);
 	this->setConvexHullComputed(false);
 }
@@ -99,10 +95,10 @@ void Delaunay::reset()
 //#define DELAUNAY_STATISTICS
 bool Delaunay::incremental()
 {
-	bool 	built=true;		// Return value.
-	bool	inserted=true;	// Point inserted flag.
-	int  	pointIndex=0;	// Points loop counter.
-	int	 	nPoints=0;		// Loop upper bound.
+	bool 	built=true;		        // Return value.
+	bool	inserted;	            // Point inserted flag.
+	int  	pointIndex=0;	        // Points loop counter.
+	int	 	nPoints=0;		        // Loop upper bound.
 	int  	highestPointIndex=0;	// Index of the highest point.
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	this->nFlips = 0;
@@ -115,7 +111,7 @@ bool Delaunay::incremental()
 	this->setAlgorithm(INCREMENTAL);
 
 	// Check if DCEL data is referenced.
-	if (this->dcel == NULL)
+	if (this->dcel == nullptr)
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "DCEL not referenced");
 		Logging::write(true, Error);
@@ -188,10 +184,10 @@ bool Delaunay::incremental()
 
 void Delaunay::checkEdge(int edge_ID)
 {
-	bool flipEdges=false;			// Flip needed flag.
-	int	 edgeIndex=0;				// Edge index.
+	bool flipEdges;		// Flip needed flag.
+	int	 edgeIndex=0;	// Edge index.
 
-	Point<TYPE> *common1=NULL, *common2=NULL, *p=NULL, *q=NULL;
+	Point<TYPE> *common1=nullptr, *common2=nullptr, *p=nullptr, *q=nullptr;
 
 	// Get edge index.
 	edgeIndex = edge_ID-1;
@@ -481,7 +477,7 @@ void Delaunay::flipEdges(int edge_ID)
 ***************************************************************************/
 bool Delaunay::convexHull()
 {
-	bool finished=false;		// Loop control flag.
+	bool finished;      		// Loop control flag.
 	int	edgeIndex=0;			// Edge index.
 	int firstIndex;				// First edge index of he convex hull.
 
@@ -585,13 +581,6 @@ bool Delaunay::convexHull()
 }
 
 
-int  selectClosest(int index)
-{
-	int	ret=SUCCESS;			// Return value.
-
-	return(ret);
-}
-
 /***************************************************************************
 * Name: 	findTwoClosest
 * IN:		NONE
@@ -611,8 +600,8 @@ bool Delaunay::findTwoClosest(int &first, int &second)
 	int  firstEdgeId=0;				// First edge for current point.
 	int	 currentEdgeId=0;			// Current edge id.
 	int	 currentEdgeIndex=0;		// Current edge index.
-	double	distance=0.0;			// Current distance.
-	double	lowestDistance=DBL_MAX;	// Current distance.
+	double	distance;   			// Current distance.
+	auto	lowestDistance=DBL_MAX;	// Current distance.
 	Point<TYPE>	*origin;			// First point.
 	Point<TYPE>	*dest;				// Second point.
 	int	destination=0;				// Destination point id.
@@ -725,7 +714,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 															int	&pointIndex,
 															double &dist)
 {
-	bool found=false;			// Return value.
+	bool found;     			// Return value.
 	int	 nodeIndex=0;			// Node index.
 	int	 firstPointIndex=0;		// First point in loop.
 	int	 currentPointIndex=0;	// Current point in loop.
@@ -867,14 +856,14 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 // PENDING
 bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, double &distance)
 {
-	bool 	found=false;		// Return value.
+	bool 	found;		        // Return value.
 	int		pointIndex=0;		// Loop counter.
 	int		id=0;				// Point identifier.
 	Point<TYPE> currentPoint;	// Current point.
-	TYPE 	dist=0.0;			// New distance.
+	TYPE 	dist;	    		// New distance.
 
 	// Create seed.
-	srand48((int) time(NULL));
+	srand48((int) time(nullptr));
 
 	// Set current distance.
 	distance = FLT_MAX;
@@ -922,7 +911,7 @@ bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, do
 * GLOBAL:	NONE
 * Description: 	determines the set of faces where the input line lays on.
 ***************************************************************************/
-bool Delaunay::findPath(Line &line, Set<int> &facesPath)
+bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 {
 	bool found=false;				// Return value.
 	bool computePath=false;			// Both points in external face.
@@ -1018,7 +1007,7 @@ bool Delaunay::findPath(Line &line, Set<int> &facesPath)
 		if (computePath)
 		{
 			// Find path.
-			found = this->getRefDcel()->findPath(extremeFaces, line, facesPath);
+			found = this->getRefDcel()->findPath(extremeFaces, line, vFacesId);
 		}
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 		else
@@ -1144,7 +1133,7 @@ void Delaunay::getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace,
 void Delaunay::getInternalFace(Line &line, Set<int> &edgesIndex, int &face)
 {
 	int		i=0;				// Loop counter.
-	bool	found=false;		// Loop control flag.
+	bool	found;		        // Loop control flag.
 	int		edgeIndex=0;		// Edge index.
 
 	// Initialize loop variables.
@@ -1307,7 +1296,7 @@ bool Delaunay::addPointToDelaunay(int index)
 {
 	bool	inserted=false;		// Return value.
 	int		nodeIndex=0;		// Current node index.
-	Point<TYPE> *point=NULL;   	// Pointer to points in DCEL.
+	Point<TYPE> *point=nullptr;   	// Pointer to points in DCEL.
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	this->nNodesCheckedIndex = index;
 	this->nNodesChecked[nNodesCheckedIndex] = 1;
@@ -1368,7 +1357,7 @@ bool Delaunay::addPointToDelaunay(int index)
 ***************************************************************************/
 bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
 {
-	bool	locatedNode=false;	// Return value.
+	bool	locatedNode;	    // Return value.
 	int     i=0;                // Loop counter.
 	int		nChildren=0;		// # children in current node.
 	bool	error=false; 		// Fatal error flag.
@@ -1884,7 +1873,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 ***************************************************************************/
 double Delaunay::signedArea(Node *node)
 {
-	double   area=0.0;           // Return value.
+	double   area;           // Return value.
 
 	// Check if any of the vertex is not real: P_MINUS_! or P_MINUS_2.
 	if ((node->getiChild(0) < 0) ||

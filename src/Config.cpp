@@ -37,7 +37,7 @@ using namespace std;
 #define DEFAULT_MAX_Y					5000
 #define DEFAULT_ANCHORS					1
 #define DEFAULT_NCLUSTERS				1
-#define DEFAULT_CLUSTER_RADIUS			100
+#define DEFAULT_CLUSTER_RADIUS			100.0
 
 // Fields in configuration file.
 #define N_POINTS_PARAM				"N_POINTS"
@@ -89,7 +89,7 @@ int Config::iMaxY = DEFAULT_MAX_Y;
 
 // Cluster set parameters.
 int Config::nClusters = DEFAULT_NCLUSTERS;
-int Config::clusterRadius = DEFAULT_CLUSTER_RADIUS;
+TYPE Config::clusterRadius = DEFAULT_CLUSTER_RADIUS;
 
 
 /***********************************************************************************************************************

@@ -4,20 +4,20 @@
  *  Created on: Jun 30, 2016
  *      Author: jnavas
  */
-#include <unistd.h>
-#include <time.h>
-
 #include "defines.h"
+#include "Process.h"
 #include "Statistics.h"
+#include "StoreService.h"
 #include "Tester.h"
 
-#include <string.h>
+#include <unistd.h>
+#include <ctime>
+#include <cstring>
 #include <iostream>
 
-#include "../visual/Process.h"
 using namespace std;
 
-#define STATISTICS_EXECUTION	"-stat"
+//#define STATISTICS_EXECUTION	"-stat"
 #define TEST_EXECUTION			"-test"
 #define VISUAL_EXECUTION		"-visual"
 #define PRINT_DEBUG_DATA		"-print"
@@ -30,7 +30,7 @@ using namespace std;
 int	getExecutionType(char *type);
 void printUsage(int type, char *exec);
 int executeTests(int argc, char** argv);
-int executeVisual(int argc, char** argv);
+int executeVisual(int argc, char **argv, StoreService *service);
 
 /***************************************************************************
 * Name: 	getExecutionType
@@ -49,7 +49,7 @@ int	 getExecutionType(char *type)
 	{
 		executionType = TEST;
 	}
-	// Check "visual" execution.
+	// Check "Visual" execution.
 	else if (strcmp( type, VISUAL_EXECUTION) == 0)
 	{
 		executionType = VISUAL;
@@ -78,7 +78,7 @@ void printUsage(int type, char *exec)
 		case GENERAL:
 		{
 			std::cerr << "Usage: " << exec << " type [configFile]" << std::endl;
-			std::cerr << "type(enumerated):\t\tvisual (" << VISUAL_EXECUTION <<
+			std::cerr << "type(enumerated):\t\tVisual (" << VISUAL_EXECUTION <<
 					") or test (" << TEST_EXECUTION << ")" << std::endl;
 			std::cerr << "configFile(string):\t\tconfiguration file (only " <<
 					VISUAL_EXECUTION << ")" << std::endl;
@@ -87,7 +87,7 @@ void printUsage(int type, char *exec)
 		}
 		case VISUAL:
 		{
-			std::cerr << "Usage: " << exec << " -visual configFile [";
+			std::cerr << "Usage: " << exec << " -Visual configFile [";
 			std::cerr << PRINT_DEBUG_DATA << "]." << std::endl;
 			std::cerr << std::endl << std::endl;
 			break;
@@ -118,30 +118,29 @@ void printUsage(int type, char *exec)
 ***************************************************************************/
 int executeTests(int argc, char** argv)
 {
-	int 	ret=SUCCESS;			// Return value.
-
 	Tester tester;
-	ret = tester.Execute(argc, argv);
+    int ret = tester.Execute(argc, argv);
 
 	return ret;
 }
 
-/***************************************************************************
-* Name: 	executeVisual
-* IN:		argc		input # arguments
-* 			argv		input arguments
-* OUT:		NONE
-* RETURN:	SUCCESS 	if execution finished successfully
-* 			FAILURE		i.o.c.
-* GLOBAL:	NONE
-* Description: 	executes the application in visual mode.
-***************************************************************************/
-int executeVisual(int argc, char** argv)
+
+/**
+ * @fn      executeVisual
+ * @brief   executes the application in Visual mode.
+ *
+ * @param   argc        (IN)    input # arguments
+ * @param   argv        (IN)    input arguments
+ * @param   service     (IN)    Service to access permanent data
+ * @return  true if execution was success
+ *          false otherwise
+ */
+int executeVisual(int argc, char **argv, StoreService *service)
 {
 	int 	ret=SUCCESS;			// Return value.
 	bool	printData=false;		// Print data into screen.
 
-	// Check visual arguments.
+	// Check Visual arguments.
 	switch (argc)
 	{
 		case 3:
@@ -165,7 +164,7 @@ int executeVisual(int argc, char** argv)
 		}
 		default:
 		{
-			std::cout << "Wrong number of arguments in visual mode: " << argc;
+			std::cout << "Wrong number of arguments in Visual mode: " << argc;
 			std::cout << ". Must be 3 or 4." << std::endl << std::endl;
 			ret = FAILURE;
 			break;
@@ -175,7 +174,7 @@ int executeVisual(int argc, char** argv)
 	if (ret != FAILURE)
 	{
 		// Create process.
-		Process process = Process(argc, argv, printData);
+		Process process = Process(argc, argv, printData, service);
 		process.setInstance(&process);
 
 		// Main loop.
@@ -200,8 +199,10 @@ int executeVisual(int argc, char** argv)
 ***************************************************************************/
 int main(int argc, char **argv)
 {
-	int 	ret=SUCCESS;			// Return value.
-	int		option=0;				// Input option.
+	int 	ret;			// Return value.
+	int		option=0;		// Input option.
+
+    auto *service = new StoreService();
 
 	// Check "test" execution.
 	if ((argc >= 2) && (argc <= 4))
@@ -214,7 +215,7 @@ int main(int argc, char **argv)
 			// Visual execution.
 			case VISUAL:
 			{
-				ret = executeVisual(argc, argv);
+				ret = executeVisual(argc, argv, service);
 				break;
 			}
 			// Run functional tests or statistics.
@@ -242,6 +243,9 @@ int main(int argc, char **argv)
 		printUsage(GENERAL, argv[0]);
 		ret = FAILURE;
 	}
+
+	// Free resources
+	delete service;
 
 	return(ret);
 }

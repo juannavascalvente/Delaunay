@@ -5,7 +5,7 @@
  *      Author: juan
  */
 
-#include "../visual/Status.h"
+#include "Status.h"
 
 //------------------------------------------------------------------------
 // Constructors / Destructor.

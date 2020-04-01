@@ -106,7 +106,7 @@ public:
 															double &dist);
 	bool findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q,
 														double &distance);
-	bool findPath(Line &line, Set<int> &faces);
+	bool findPath(Line &line, vector<int> &vFacesId);
 
 	// GET/SET functions.
 	inline void setDCEL(Dcel *dcel) {this->dcel = dcel;};
