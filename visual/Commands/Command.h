@@ -7,7 +7,6 @@
 ***********************************************************************************************************************/
 #include "CommandParamIn.h"
 #include "CommandResult.h"
-#include "Config.h"
 #include "DcelGenerator.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
@@ -30,6 +29,7 @@ protected:
     * Protected class members
     *******************************************************************************************************************/
     bool isSuccess;
+    CmdParamIn in;
     CommandResult *result;
 
     /*******************************************************************************************************************
@@ -45,8 +45,12 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    Command() : isSuccess(false), result(nullptr) {};
+    Command() : isSuccess(false), in(nullptr, nullptr), result(nullptr) {};
+    explicit Command(StoreService *storeServiceIn, ConfigService *configService) : isSuccess(false),
+                                                                                   in(storeServiceIn, configService),
+                                                                                   result(nullptr) {};
     virtual ~Command() { delete result; };
+
 
     /*******************************************************************************************************************
     * Getter/Setter
@@ -151,7 +155,6 @@ class CommandGenerateRandom : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    GeneratorCmdParamIn in;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -159,7 +162,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateRandom(GeneratorCmdParamIn &inParam) : in(inParam) {}
+    explicit CommandGenerateRandom(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
 
     /**
      * @fn      isRunnable
@@ -171,7 +174,7 @@ public:
     bool isRunnable() override
     {
         // Number of points higher than 0
-        return (in.getNumPoints() > 0);
+        return (in.getConfigService()->getNumPoints() > 0);
     };
 
     /**
@@ -181,7 +184,7 @@ public:
     void printRunnableMsg() override
     {
         // Check number of points
-        if (in.getNumPoints() == 0)
+        if (in.getConfigService()->getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -196,15 +199,17 @@ public:
      */
     CommandResult * runCommand() override
     {
+        size_t szNumPoints = in.getConfigService()->getNumPoints();
+
         // Reset store data
         in.getStoreService()->reset();
 
         // Run command
         Dcel *dcel = in.getStoreService()->getDcel();
-        this->isSuccess = DcelGenerator::generateRandom(in.getNumPoints(), *dcel);
+        this->isSuccess = DcelGenerator::generateRandom(szNumPoints, *dcel);
 
         // Add point display
-        for (size_t i=0; i< in.getNumPoints(); i++)
+        for (size_t i=0; i<szNumPoints ; i++)
         {
             vPoints.push_back(*dcel->getRefPoint(i));
         }
@@ -232,7 +237,6 @@ class CommandGenerateCluster : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    GeneratorClusterCmdParamIn in;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -240,7 +244,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateCluster(GeneratorClusterCmdParamIn &inParam) : in(inParam) {}
+    CommandGenerateCluster(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
 
     /**
      * @fn      isRunnable
@@ -255,7 +259,9 @@ public:
     bool isRunnable() override
     {
         // All values are higher than 0
-        return (in.getFRadius() > 0.0) && (in.getSzNumClusters() > 0) && (in.getNumPoints() > 0);
+        return (in.getConfigService()->getNumPoints() > 0.0) &&
+                (in.getConfigService()->getNumClusters() > 0) &&
+                (in.getConfigService()->getNumPoints() > 0);
     };
 
     /**
@@ -268,19 +274,19 @@ public:
         in.getStoreService()->reset();
 
         // Check radius
-        if (in.getFRadius() <= 0.0)
+        if (in.getConfigService()->getNumPoints() <= 0.0)
         {
             cout << "One of the values is not higher than 0" << endl;
         }
 
         // Check number of clusters
-        if (in.getSzNumClusters() == 0)
+        if (in.getConfigService()->getNumClusters() == 0)
         {
             cout << "Number of cluster to generate is zero" << endl;
         }
 
         // Check number of points
-        if (in.getNumPoints() == 0)
+        if (in.getConfigService()->getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -295,12 +301,16 @@ public:
      */
     CommandResult * runCommand() override
     {
+        size_t szNumPoints = in.getConfigService()->getNumPoints();
+        size_t szNumClusters = in.getConfigService()->getNumClusters();
+        TYPE radius = in.getConfigService()->getRadius();
+
         // Run command
         Dcel *dcel = in.getStoreService()->getDcel();
-        this->isSuccess = DcelGenerator::generateClusters(in.getNumPoints(), in.getSzNumClusters(), in.getFRadius(), *dcel);
+        this->isSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, *dcel);
 
         // Add point display
-        for (size_t i=0; i< in.getNumPoints(); i++)
+        for (size_t i=0; i< szNumPoints; i++)
         {
             vPoints.push_back(*dcel->getRefPoint(i));
         }
@@ -325,17 +335,12 @@ public:
 ***********************************************************************************************************************/
 class CommandStarTriangulation : public Command
 {
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    StarTriangulationParamCmdIn in;
-
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandStarTriangulation(StarTriangulationParamCmdIn &inParam) : in(inParam) {};
+    CommandStarTriangulation(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
 
     /**
      * @fn       printRunnableMsg
@@ -395,17 +400,12 @@ public:
 ***********************************************************************************************************************/
 class CommandDelaunay : public Command
 {
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    CmdParamIn  in;
-
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandDelaunay(CmdParamIn &inParam) : in(inParam) {};
+    CommandDelaunay(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
     /**
      * @fn       printRunnableMsg
@@ -490,7 +490,6 @@ class CommandConvexHull : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     Polygon *hull;
 
 public:
@@ -498,7 +497,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandConvexHull(CmdParamIn &inParam) : in(inParam), hull(nullptr) {};
+    explicit CommandConvexHull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService), hull(nullptr) {};
 
 
     /**
@@ -573,17 +572,12 @@ public:
 ***********************************************************************************************************************/
 class CommandVoronoi : public Command
 {
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    CmdParamIn  in;
-
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandVoronoi(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -654,17 +648,12 @@ public:
 ***********************************************************************************************************************/
 class CommandGabriel : public Command
 {
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    CmdParamIn  in;
-
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandGabriel(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandGabriel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -734,7 +723,6 @@ class CommandTriangulationPath : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     Line line;
     vector<Polygon> vPolygons;
 
@@ -743,7 +731,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTriangulationPath(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandTriangulationPath(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -838,7 +826,6 @@ class CommandVoronoiPath : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     Line line;
     vector<Polygon> vPolygons;
 
@@ -847,7 +834,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandVoronoiPath(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandVoronoiPath(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -962,7 +949,6 @@ class CommandClosestPoint : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -970,7 +956,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandClosestPoint(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandClosestPoint(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1068,7 +1054,6 @@ class CommandFindFace : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Point<TYPE>> vPoints;
     vector<Polygon> vPolygons;
 
@@ -1077,7 +1062,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFindFace(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandFindFace(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1177,7 +1162,6 @@ class CommandTwoClosest : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Point<TYPE>> vPoints;
 
 public:
@@ -1185,7 +1169,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTwoClosest(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandTwoClosest(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1264,18 +1248,12 @@ public:
 ***********************************************************************************************************************/
 class CommandFilterEdges : public Command
 {
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    CmdParamIn  in;
-    TYPE minLen;
-
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFilterEdges(CmdParamIn &inParam, TYPE minLenIn) : in(inParam), minLen(minLenIn) {};
+    explicit CommandFilterEdges(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1325,7 +1303,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, minLen);
+        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, in.getConfigService()->getMinLengthEdge());
     }
 };
 
@@ -1338,7 +1316,6 @@ class CommandCircumcentres : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Circle> vCircles;
 
 public:
@@ -1346,7 +1323,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandCircumcentres(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandCircumcentres(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1430,7 +1407,6 @@ class CommandEdgeCircle : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Circle> vCircles;
 
 public:
@@ -1438,7 +1414,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandEdgeCircle(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandEdgeCircle(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1478,7 +1454,7 @@ public:
 
         // Loop all faces (but external).
         Dcel *dcel = in.getStoreService()->getDcel();
-        for (size_t edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
+        for (int edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
         {
             // Skip imaginary edges.
             if (!dcel->hasNegativeVertex(edgeIndex+1))
@@ -1527,7 +1503,6 @@ class CommandDcelInfo : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Displayable*> vDisplayable;
 
     void createDcelPointsInfo(vector<Text> &info)
@@ -1621,7 +1596,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandDcelInfo(CmdParamIn &inParam) : in(inParam)
+    explicit CommandDcelInfo(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService)
     {
         dcel = in.getStoreService()->getDcel();
     };
@@ -1706,9 +1681,9 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit  CommandVoronoiInfo(CmdParamIn &inParam) : CommandDcelInfo(inParam)
+    explicit  CommandVoronoiInfo(StoreService *storeServiceIn, ConfigService *configService) : CommandDcelInfo(storeServiceIn, configService)
     {
-        dcel = inParam.getStoreService()->getVoronoi()->getRefDcel();
+        dcel = storeServiceIn->getVoronoi()->getRefDcel();
     };
 };
 
@@ -1721,14 +1696,13 @@ class CommandClear : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Displayable*> vDisplayable;
 
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandClear(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandClear(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1769,7 +1743,6 @@ class CommandReadPoints : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Point<TYPE>> vPoints;
     vector<Displayable*> vDisplayable;
 
@@ -1777,7 +1750,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadPoints(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandReadPoints(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1833,7 +1806,6 @@ class CommandReadPointsDcel : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Point<TYPE>> vPoints;
     vector<Displayable*> vDisplayable;
 
@@ -1841,7 +1813,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadPointsDcel(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandReadPointsDcel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1897,14 +1869,13 @@ class CommandReadDcel : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Displayable*> vDisplayable;
 
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadDcel(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandReadDcel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -1954,14 +1925,13 @@ class CommandReadDelaunay : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Displayable*> vDisplayable;
 
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadDelaunay(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandReadDelaunay(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -2012,14 +1982,13 @@ class CommandReadVoronoi : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Displayable*> vDisplayable;
 
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadVoronoi(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandReadVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -2071,14 +2040,13 @@ class CommandWriteFile : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    CmdParamIn  in;
     vector<Displayable*> vDisplayable;
 
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFile(CmdParamIn &inParam) : in(inParam) {};
+    explicit CommandWriteFile(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -2120,7 +2088,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileDcel(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
+    explicit CommandWriteFileDcel(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
 
     /**
      * @fn      run
@@ -2149,7 +2117,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileDelaunay(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
+    explicit CommandWriteFileDelaunay(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
 
     /**
      * @fn      run
@@ -2178,7 +2146,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileVoronoi(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
+    explicit CommandWriteFileVoronoi(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
 
     /**
      * @fn      run
@@ -2207,7 +2175,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileGabriel(CmdParamIn &inParam) : CommandWriteFile(inParam) {};
+    explicit CommandWriteFileGabriel(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
 
     /**
      * @fn      run

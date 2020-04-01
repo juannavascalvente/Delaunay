@@ -17,7 +17,7 @@ Process         *Process::instance = nullptr;
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Process::Process(int argc, char **argv, bool printData, StoreService *storeServiceIn)
+Process::Process(int argc, char **argv, bool printData, StoreService *storeServiceIn, ConfigService *configServiceIn)
 {
 	string 	fileName;			// Configuration file name.
 
@@ -28,6 +28,7 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 	// Check flag to print data to screen.
 	this->log = new Logging("log.txt", printData);
 
+    configService = configServiceIn;
     storeService = storeServiceIn;
     dispManager = new DisplayManager(argc, argv);
 
@@ -44,6 +45,7 @@ Process::~Process()
 	delete log;
 	delete dispManager;
 	delete storeService;
+	delete configService;
 }
 
 
@@ -85,11 +87,12 @@ void Process::execute()
         delete log;
         delete dispManager;
         delete storeService;
+        delete configService;
         exit(0);
     }
 
     // Create command
-    Command *cmd = CommandFactory::create(option, storeService);
+    Command *cmd = CommandFactory::create(option, storeService, configService);
 
     // Run command
     cmd->run();
