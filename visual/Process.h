@@ -47,7 +47,6 @@ class Process
      *******************************************************************************************************************/
 	void execute();
 	static void executeWrapper();
-	bool readData(int option);
 
 protected:
 	static Process *instance;

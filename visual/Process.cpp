@@ -5,11 +5,6 @@
 #include "Process.h"
 #include "Command.h"
 #include "CommandFactory.h"
-#include "DcelGenerator.h"
-#include "DcelReader.h"
-#include "DelaunayIO.h"
-#include "DisplayableFactory.h"
-#include "LineFactory.h"
 #include "MenuOption.h"
 
 #include <GL/glut.h>
@@ -67,126 +62,21 @@ void Process::setInstance(Process *process)
 }
 
 
-/***************************************************************************
-* Name: executeWrapper
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: wrapper to call "execute" function.
-***************************************************************************/
+/**
+ * @fn      executeWrapper
+ * @brief   wrapper to call "execute" function.
+ */
 void Process::executeWrapper()
 {
 	instance->execute();
 }
 
 
-/***************************************************************************
-* Name: 	readData
-* IN:		option				option selected in menu.
-* OUT:		NONE
-* RETURN:	true				if successfully read.
-* 			false				i.o.c.
-* GLOBAL:	NONE
-* Description: 	read data from file or generate data set depending on input
-* 				option. The data set can be generated:
-* 				1.- Randomly uniform
-* 				2.- Generated randomly in clusters
-* 				3.- Read from flat file.
-* 				4.- Read from DCEL.
-* 				5.- Read Delaunay (DCEL + graph file).
-* 				6.- Read voronoi data.
-***************************************************************************/
-bool Process::readData(int option)
-{
-	bool isSuccess; 		// Return value.
-
-//	// Check option to generate/read set.
-//	switch (option)
-//	{
-//		// Read set from flat file.
-//		case READ_POINTS_FLAT_FILE:
-//		case READ_POINTS_DCEL_FILE:
-//		{
-//			// Read points from flat file.
-//			if(option == READ_POINTS_FLAT_FILE)
-//			{
-//                isSuccess = DcelReader::readPoints(Config::getInFlatFilename(), true, this->dcel);
-//			}
-//			// Read points from DCEL file.
-//			else
-//			{
-//                isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, this->dcel);
-//			}
-//			status->set(false, isSuccess, false, false, false, false);
-//			break;
-//		}
-//		// Read dcel file.
-//		case READ_DCEL:
-//		{
-//			// PENDING CHECK IF A DCEL IS CONSISTENT?
-//			success = DcelReader::read(Config::getInDCELFilename(), false, this->dcel);
-//			this->delaunay.setDCEL(&this->dcel);
-//			status->set(false, true, true, false, false, false);
-//			break;
-//		}
-//		// Read Delaunay incremental algorithm files.
-//		case READ_DELAUNAY:
-//		{
-//			// PENDING CHECK IF A DCEL AND GRAPG ARE CONSISTENT?
-//			this->delaunay.setDCEL(&this->dcel);
-//			success = DelaunayIO::read(Config::getInDCELFilename(),
-//                                       Config::getInGraphFilename(), this->delaunay);
-//			status->set(false, success, success, success, false, false);
-//			this->delaunay.setAlgorithm(INCREMENTAL);
-//			break;
-//		}
-//		// Read Voronoi file.
-//		case READ_VORONOI:
-//		{
-//			// PENDING: What to allow in menu if only voronoi is read.
-//			//success = this->voronoi.read(Config::getInVoronoiFilename());
-//			//status->set(false, true, !success, !success, true, false);
-//			cout << "NOT IMPLEMENTED YET" << endl;
-//			break;
-//		}
-//		// Read Gabriel file.
-//		default:
-//		{
-//			// PENDING: What to allow in menu if only voronoi is read.
-//			success = GabrielIO::readBinary(Config::getOutGabrielFilename(), this->gabriel);
-//			status->setGabrielCreated(true);
-//			break;
-//		}
-//        default:
-//        {
-//            // PENDING: What to allow in menu if only voronoi is read.
-//            isSuccess = false;
-//            break;
-//        }
-//	}
-//
-//	// Add figure display.
-//    vector<Point<TYPE>> vPoints;
-//    for (size_t i=0; i< Config::getNPoints(); i++)
-//    {
-//        vPoints.push_back(*this->dcel.getRefPoint(i));
-//    }
-//    dispManager->add(DisplayableFactory::createPointsSet(vPoints));
-
-	return isSuccess;
-}
-
-
-/***************************************************************************
-* Name: execute
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	main loop that processes events from menu and executes the
-* 				selected option and updates menu and internal status.
-***************************************************************************/
+/**
+ * @fn      execute
+ * @brief   main loop that processes events from menu and executes the
+ *			selected option and updates menu and internal status.
+ */
 void Process::execute()
 {
     Command *cmd=nullptr;           // Command to execute
