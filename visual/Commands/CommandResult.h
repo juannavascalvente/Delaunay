@@ -74,9 +74,10 @@ public:
 
     void updateStatus() override
     {
+        StatusModel status = StatusModel(false, true, false, false, false, false);
         if (wasSuccess())
         {
-            storeService->getStatus()->set(false, true, false, false, false, false);
+            storeService->getStatus()->set(status);
         }
     };
 
@@ -107,9 +108,10 @@ public:
 
     void updateStatus() override
     {
+        StatusModel status = StatusModel(false, true, true, false, false, false);
         if (wasSuccess())
         {
-            storeService->getStatus()->set(false, true, true, false, false, false);
+            storeService->getStatus()->set(status);
         }
     };
 
@@ -131,11 +133,13 @@ class CommandResultDelaunay : public CommandResultTriangulation
 public:
     CommandResultDelaunay(bool isSuccess, StoreService *service, Dcel *dcelIn) : CommandResultTriangulation(isSuccess, service, dcelIn) {};
 
+    StatusModel status = StatusModel(false, true, true, true, false, false);
+
     void updateStatus() override
     {
         if (wasSuccess())
         {
-            storeService->getStatus()->set(false, true, true, true, false, false);
+            storeService->getStatus()->set(status);
         }
     };
 };
@@ -187,9 +191,10 @@ public:
 
     void updateStatus() override
     {
+        StatusModel status = StatusModel(false, true, true, true, true, false);
         if (wasSuccess())
         {
-            storeService->getStatus()->set(false, true, true, true, true, false);
+            storeService->getStatus()->set(status);
         }
     };
 };
@@ -245,9 +250,10 @@ public:
 
     void updateStatus() override
     {
+        StatusModel status = StatusModel(false, true, true, true, true, true);
         if (wasSuccess())
         {
-            storeService->getStatus()->set(false, true, true, true, true, true);
+            storeService->getStatus()->set(status);
         }
     };
 };
