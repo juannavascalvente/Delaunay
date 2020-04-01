@@ -22,6 +22,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
     // Check command option
     switch (szOptionCmdId)
     {
+        case DEFAULT_OPTION:
+        {
+            command = createNull();
+            break;
+        }
         case PARAMETERS:
         {
             command = createReadCfg();

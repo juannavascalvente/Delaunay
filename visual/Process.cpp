@@ -77,96 +77,40 @@ void Process::executeWrapper()
  */
 void Process::execute()
 {
-    Command *cmd=nullptr;           // Command to execute
-    CommandResult *result;
-
-	static bool firstTime=true;
-	int		option=0;			// Option to be executed.
-
 	// Get option to be executed.
-	option = menu.getMenuOption();
+    int option = menu.getMenuOption();
+	if (option == QUIT)
+    {
+        // Quit application.
+        delete log;
+        delete dispManager;
+        delete storeService;
+        exit(0);
+    }
 
-	// Execute option.
-	switch(option)
-	{
-		// Read parameters from configuration file.
-		case PARAMETERS:
-        case RANDOMLY:
-        case CLUSTER:
-		case STAR_TRIANGULATION:
-		case DELAUNAY:
-		case CONVEX_HULL:
-        case VORONOI:
-        case GABRIEL:
-        case TRIANGULATION_PATH:
-        case VORONOI_PATH:
-        case CLOSEST_POINT:
-        case FIND_FACE:
-        case TWO_CLOSEST:
-        case FILTER_EDGES:
-        case CIRCUMCENTRES:
-        case EDGE_CIRCLES:
-        case DCEL_INFO:
-        case VORONOI_INFO:
-        case CLEAR:
-        case READ_POINTS_FLAT_FILE:
-        case READ_POINTS_DCEL_FILE:
-        case READ_DCEL:
-        case READ_DELAUNAY:
-        case READ_VORONOI:
-        case READ_GABRIEL:
-        case WRITE_POINTS:
-        case WRITE_DCEL:
-        case WRITE_DELAUNAY:
-        case WRITE_VORONOI:
-        case WRITE_GABRIEL:
-		{
-            // Create command
-            cmd = CommandFactory::create(option, storeService);
+    // Create command
+    Command *cmd = CommandFactory::create(option, storeService);
 
-            // Run command
-            cmd->run();
+    // Run command
+    cmd->run();
 
-            // Process results
-            result = cmd->getResult();
-            if (result->wasSuccess())
-            {
-                // Update menu status
-                result->updateStatus();
+    // Process results
+    CommandResult *result = cmd->getResult();
+    if (result->wasSuccess())
+    {
+        // Update menu status
+        result->updateStatus();
 
-                // Get displaybale elements
-                vector<Displayable*> vDisplayable(0);
-                result->createDisplayables(vDisplayable);
-                dispManager->add(vDisplayable);
+        // Get displaybale elements
+        vector<Displayable*> vDisplayable(0);
+        result->createDisplayables(vDisplayable);
+        dispManager->add(vDisplayable);
 
-                dispManager->process();
-            }
+        dispManager->process();
 
-            // Update menu entries.
-            menu.updateMenu();
-
-			break;
-		}
-		// Quit application.
-		case QUIT:
-		{
-			// Quit application.
-            delete log;
-            delete dispManager;
-            delete storeService;
-            exit(0);
-		}
-		default:
-		{
-			if (firstTime)
-			{
-				// Clear screen.
-				firstTime = false;
-                dispManager->process();
-			}
-			break;
-		}
-	}
+        // Update menu entries.
+        menu.updateMenu();
+    }
 
 	// Delete iteration resources
     delete cmd;

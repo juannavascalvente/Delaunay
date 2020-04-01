@@ -101,12 +101,6 @@ public:
     bool isRunnable() override  { return false; };
 
     /**
-     * @fn       printRunnableMsg
-     * @brief    Prints message to explain null command has no task
-     */
-    void printRunnableMsg() override { cout << "Null command does not execute any action" << endl; };
-
-    /**
      * @fn      runCommand
      * @brief   does not execute anything. Command when there is nothing to run
      *
