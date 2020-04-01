@@ -38,7 +38,11 @@ protected:
     virtual bool isRunnable() { return true; };
     virtual void printRunnableMsg() {};
     virtual CommandResult * runCommand() { return createResult(); };
-    virtual CommandResult* createResult() { return new CommandResultNull(false); };
+    virtual CommandResult* createResult()
+    {
+        Status status;
+        return new CommandResultNull(false, status, nullptr);
+    };
 
 public:
 
@@ -112,7 +116,7 @@ public:
      */
     CommandResult * runCommand() override
     {
-        return new CommandResultNull(false);
+        return new CommandResultNull(false, *in.getStoreService()->getStatus(), in.getStoreService());
     }
 };
 
@@ -142,7 +146,7 @@ public:
         this->isSuccess = Config::readConfig();
 
         // Build result
-        return new CommandResultNull(this->isSuccess);
+        return new CommandResultNull(this->isSuccess, *in.getStoreService()->getStatus(), in.getStoreService());
     }
 };
 
@@ -224,7 +228,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultPoints(getSuccess(), in.getStoreService(), vPoints);
+        Status status = Status(false, true, false, false, false, false);
+        return new CommandResultPoints(getSuccess(), vPoints, status, in.getStoreService());
     }
 };
 
@@ -325,7 +330,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultPoints(getSuccess(), in.getStoreService(), vPoints);
+        Status status = Status(false, true, false, false, false, false);
+        return new CommandResultPoints(getSuccess(), vPoints, status, in.getStoreService());
     }
 };
 
@@ -390,7 +396,8 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel);
+        Status status = Status(false, true, true, false, false, false);
+        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, status, 0);
     }
 };
 
@@ -477,7 +484,8 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel);
+        Status status = Status(false, true, true, true, false, false);
+        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel, status);
     }
 };
 
@@ -562,7 +570,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultPolygon(getSuccess(), in.getStoreService(), hull);
+        return new CommandResultPolygon(getSuccess(), in.getStoreService(), hull, *in.getStoreService()->getStatus());
     }
 };
 
@@ -638,7 +646,8 @@ public:
     {
         Dcel *dcel = in.getStoreService()->getDcel();
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi);
+        Status status = Status(false, true, true, true, true, false);
+        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi, status);
     }
 };
 
@@ -710,7 +719,7 @@ public:
     {
         Dcel *dcel = in.getStoreService()->getDcel();
         Gabriel *gabriel = in.getStoreService()->getGabriel();
-        return new CommandResultGabriel(getSuccess(), in.getStoreService(), dcel, gabriel);
+        return new CommandResultGabriel(getSuccess(), in.getStoreService(), dcel, gabriel, *in.getStoreService()->getStatus());
     }
 };
 
@@ -813,7 +822,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons);
+        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons, *in.getStoreService()->getStatus());
     }
 };
 
@@ -935,7 +944,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getVoronoi()->getRefDcel();
-        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons);
+        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons, *in.getStoreService()->getStatus());
     }
 };
 
@@ -1041,7 +1050,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints);
+        return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints, *in.getStoreService()->getStatus());
     }
 };
 
@@ -1149,7 +1158,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultFace(getSuccess(), in.getStoreService(), dcel, vPoints, vPolygons);
+        return new CommandResultFace(getSuccess(), in.getStoreService(), dcel, vPoints, vPolygons, *in.getStoreService()->getStatus());
     }
 };
 
@@ -1238,7 +1247,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints);
+        return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints, *in.getStoreService()->getStatus());
     }
 };
 
@@ -1303,7 +1312,8 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, in.getConfigService()->getMinLengthEdge());
+        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, *in.getStoreService()->getStatus(),
+                                              in.getConfigService()->getMinLengthEdge());
     }
 };
 
@@ -1394,7 +1404,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles);
+        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles, *in.getStoreService()->getStatus());
     }
 };
 
@@ -1490,7 +1500,7 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles);
+        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles, *in.getStoreService()->getStatus());
     }
 };
 
@@ -1667,7 +1677,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, *in.getStoreService()->getStatus());
     }
 };
 
@@ -1730,7 +1740,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+        Status status = Status(true, false, false, false, false, false);
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, status);
     }
 };
 
@@ -1793,7 +1804,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+        Status status = Status(false, true, false, false, false, false);
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, status);
     }
 };
 
@@ -1856,7 +1868,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+        Status status = Status(false, true, false, false, false, false);
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, status);
     }
 };
 
@@ -1912,7 +1925,8 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel);
+        Status status = Status(false, true, true, true, false, false);
+        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel, status);
     }
 };
 
@@ -1969,7 +1983,8 @@ public:
     CommandResult *createResult() override
     {
         Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel);
+        Status status = Status(false, true, true, true, false, false);
+        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel, status);
     }
 };
 
@@ -2027,7 +2042,7 @@ public:
     {
         Dcel *dcel = in.getStoreService()->getDcel();
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi);
+        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi, *in.getStoreService()->getStatus());
     }
 };
 
@@ -2072,7 +2087,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable);
+        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, *in.getStoreService()->getStatus());
     }
 
     CmdParamIn *getInput() { return &in; }

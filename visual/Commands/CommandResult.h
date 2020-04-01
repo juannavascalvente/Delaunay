@@ -26,16 +26,25 @@ class CommandResult
 {
 protected:
     bool isSuccess;
+    Status status;
     StoreService *storeService;
 
 public:
-    CommandResult(bool isSuccessIn, StoreService *storeServiceIn) : isSuccess(isSuccessIn), storeService(storeServiceIn) {};
+    CommandResult(bool isSuccessIn, Status &statusIn, StoreService *storeServiceIn) : isSuccess(isSuccessIn),
+                                                                                    status(statusIn),
+                                                                                    storeService(storeServiceIn) {};
 
     /**
      * @fn      updateStatus
      * @brief   Updates status based on result execution
      */
-    virtual void updateStatus() {};
+    void updateStatus()
+    {
+        if (wasSuccess())
+        {
+            storeService->getStatus()->set(status);
+        }
+    };
 
     /**
      * @fn      createDisplayables
@@ -59,7 +68,7 @@ public:
 class CommandResultNull : public CommandResult
 {
 public:
-    explicit CommandResultNull(bool isSuccess) : CommandResult(isSuccess, nullptr) {};
+    explicit CommandResultNull(bool isSuccess, Status &status, StoreService *service) : CommandResult(isSuccess, status, service) {};
 };
 
 
@@ -69,17 +78,11 @@ public:
 class CommandResultPoints : public CommandResult
 {
     vector<Point<TYPE>> vPoints;
-public:
-    CommandResultPoints(bool isSuccess, StoreService *service, vector<Point<TYPE>> &vPointsIn) : CommandResult(isSuccess, service), vPoints(vPointsIn) {};
 
-    void updateStatus() override
-    {
-        Status status = Status(false, true, false, false, false, false);
-        if (wasSuccess())
-        {
-            storeService->getStatus()->set(status);
-        }
-    };
+public:
+    CommandResultPoints(bool isSuccess, vector<Point<TYPE>> &vPointsIn, Status &status, StoreService *service) :
+                                                                        CommandResult(isSuccess, status, service),
+                                                                        vPoints(vPointsIn) {};
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
@@ -101,19 +104,10 @@ class CommandResultTriangulation : public CommandResult
     Dcel *dcel;
     TYPE minLength;
 public:
-    CommandResultTriangulation(bool isSuccess, StoreService *service, Dcel *dcelIn, TYPE minLengthIn=INVALID) :
-                                                                                        CommandResult(isSuccess, service),
+    CommandResultTriangulation(bool isSuccess, StoreService *service, Dcel *dcelIn, Status &status, float minLengthIn = INVALID) :
+                                                                                        CommandResult(isSuccess, status, service),
                                                                                         dcel(dcelIn),
                                                                                         minLength(minLengthIn) {};
-
-    void updateStatus() override
-    {
-        Status status = Status(false, true, true, false, false, false);
-        if (wasSuccess())
-        {
-            storeService->getStatus()->set(status);
-        }
-    };
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
@@ -128,18 +122,22 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandResultDelaunay : public CommandResultTriangulation
+class CommandResultDelaunay : public CommandResult
 {
+    Dcel *dcel;
+    TYPE minLength;
+
 public:
-    CommandResultDelaunay(bool isSuccess, StoreService *service, Dcel *dcelIn) : CommandResultTriangulation(isSuccess, service, dcelIn) {};
+    CommandResultDelaunay(bool isSuccess, StoreService *service, Dcel *dcelIn, Status &status, float minLengthIn = INVALID) :
+            CommandResult(isSuccess, status, service),
+            dcel(dcelIn),
+            minLength(minLengthIn) {};
 
-    Status status = Status(false, true, true, true, false, false);
-
-    void updateStatus() override
+    void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
         if (wasSuccess())
         {
-            storeService->getStatus()->set(status);
+            vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel(), minLength));
         }
     };
 };
@@ -152,7 +150,8 @@ class CommandResultPolygon : public CommandResult
 {
     Polygon *polygon;
 public:
-    CommandResultPolygon(bool isSuccess, StoreService *service, Polygon *polygonIn) : CommandResult(isSuccess, service), polygon(polygonIn) {};
+    CommandResultPolygon(bool isSuccess, StoreService *service, Polygon *polygonIn, Status &status)
+            : CommandResult(isSuccess,status, service), polygon(polygonIn) {};
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
@@ -175,9 +174,10 @@ class CommandResulVoronoi : public CommandResult
     Dcel *dcel;
     Voronoi *voronoi;
 public:
-    CommandResulVoronoi(bool isSuccess, StoreService *service, Dcel *dcelIn, Voronoi *voronoiIn) :  CommandResult(isSuccess, service),
-                                                                                                    dcel(dcelIn),
-                                                                                                    voronoi(voronoiIn) {};
+    CommandResulVoronoi(bool isSuccess, StoreService *service, Dcel *dcelIn, Voronoi *voronoiIn, Status &status)
+            : CommandResult( isSuccess, status, service),
+              dcel(dcelIn),
+              voronoi(voronoiIn) {};
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
@@ -186,15 +186,6 @@ public:
             // Add delaunay and voronoi
             vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getDcel()));
             vDisplayable.push_back(DisplayableFactory::createDcel(storeService->getVoronoi()->getRefDcel()));
-        }
-    };
-
-    void updateStatus() override
-    {
-        Status status = Status(false, true, true, true, true, false);
-        if (wasSuccess())
-        {
-            storeService->getStatus()->set(status);
         }
     };
 };
@@ -208,9 +199,10 @@ class CommandResultGabriel : public CommandResult
     Dcel *dcel;
     Gabriel *gabriel;
 public:
-    CommandResultGabriel(bool isSuccess, StoreService *service, Dcel *dcelIn, Gabriel *gabrielIn) : CommandResult(isSuccess, service),
-                                                                                                    dcel(dcelIn),
-                                                                                                    gabriel(gabrielIn) {};
+    CommandResultGabriel(bool isSuccess, StoreService *service, Dcel *dcelIn, Gabriel *gabrielIn, Status &status)
+            : CommandResult(isSuccess, status, service),
+              dcel(dcelIn),
+              gabriel(gabrielIn) {};
 
     void createDisplayables(vector<Displayable*> &vDisplayable) override
     {
@@ -247,15 +239,6 @@ public:
             vDisplayable.push_back(DisplayableFactory::createPolyLine(vLines));
         }
     };
-
-    void updateStatus() override
-    {
-        Status status = Status(false, true, true, true, true, true);
-        if (wasSuccess())
-        {
-            storeService->getStatus()->set(status);
-        }
-    };
 };
 
 
@@ -269,8 +252,8 @@ class CommandResultPath : public CommandResult
     vector<Polygon> vPolygons;
 
 public:
-    CommandResultPath(bool isSuccess, StoreService *service, Dcel *dcelIn, Line &lineIn, vector<Polygon> &vPolygonsIn) :
-                                                                                        CommandResult(isSuccess, service),
+    CommandResultPath(bool isSuccess, StoreService *service, Dcel *dcelIn, Line &lineIn, vector<Polygon> &vPolygonsIn,
+                      Status &status) :CommandResult(isSuccess, status, service),
                                                                                         dcel(dcelIn),
                                                                                         line(lineIn),
                                                                                         vPolygons(vPolygonsIn) {};
@@ -305,8 +288,9 @@ class CommandResultClosestPoint : public CommandResult
     vector<Point<TYPE>> &vPoints;
 
 public:
-    CommandResultClosestPoint(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Point<TYPE>> &vPointsIn) :
-                                                                                    CommandResult(isSuccess, service),
+    CommandResultClosestPoint(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Point<TYPE>> &vPointsIn,
+                              Status &status) :
+            CommandResult(isSuccess, status, service),
                                                                                     dcel(dcelIn),
                                                                                     vPoints(vPointsIn) {};
 
@@ -337,8 +321,9 @@ class CommandResultFace : public CommandResult
     vector<Polygon> vPolygons;
 
 public:
-    CommandResultFace(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Point<TYPE>> &vPointsIn, vector<Polygon> &vPolygonsIn) :
-                                                                                CommandResult(isSuccess, service),
+    CommandResultFace(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Point<TYPE>> &vPointsIn,
+                      vector<Polygon> &vPolygonsIn, Status &status) :
+            CommandResult(isSuccess, status, service),
                                                                                 dcel(dcelIn),
                                                                                 vPoints(vPointsIn),
                                                                                 vPolygons(vPolygonsIn) {};
@@ -374,8 +359,9 @@ class CommandResultCircles : public CommandResult
     vector<Circle> vCircles;
 
 public:
-    CommandResultCircles(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Circle> &vCirclesIn) :
-                                                                                    CommandResult(isSuccess, service),
+    CommandResultCircles(bool isSuccess, StoreService *service, Dcel *dcelIn, vector<Circle> &vCirclesIn,
+                         Status &status) :
+            CommandResult(isSuccess, status, service),
                                                                                     dcel(dcelIn),
                                                                                     vCircles(vCirclesIn) {};
 
@@ -401,8 +387,8 @@ class CommandResultDisplay : public CommandResult
     vector<Displayable*> vDisplayable;
 
 public:
-    CommandResultDisplay(bool isSuccess, StoreService *service, vector<Displayable*> &vDisplayableIn) :
-                                                                                    CommandResult(isSuccess, service),
+    CommandResultDisplay(bool isSuccess, StoreService *service, vector<Displayable *> &vDisplayableIn, Status &status) :
+            CommandResult(isSuccess, status, service),
                                                                                     vDisplayable(vDisplayableIn) {};
 
     void createDisplayables(vector<Displayable*> &vDisplayableOut) override
