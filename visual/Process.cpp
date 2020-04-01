@@ -7,13 +7,11 @@
 #include "CommandFactory.h"
 #include "MenuOption.h"
 
-#include <GL/glut.h>
-
 
 /***********************************************************************************************************************
 * Static members
 ***********************************************************************************************************************/
-Process *Process::instance = nullptr;
+Process         *Process::instance = nullptr;
 
 
 /***********************************************************************************************************************
@@ -36,7 +34,7 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 	this->menu = Menu(storeServiceIn->getStatus());
 
 	// Function to execute by GLUT.
-	glutDisplayFunc(executeWrapper);
+    dispManager->setLoopFunction(executeWrapper);
 }
 
 
@@ -52,7 +50,7 @@ Process::~Process()
 void Process::start()
 {
 	// GLUT main function.
-	glutMainLoop();
+    dispManager->startLoop();
 }
 
 

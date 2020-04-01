@@ -13,19 +13,9 @@
 * Includes
 ***********************************************************************************************************************/
 #include "DisplayManager.h"
-
-#include "Menu.h"
-#include "Status.h"
-#include "Config.h"
-#include "Dcel.h"
-#include "Delaunay.h"
-#include "Gabriel.h"
 #include "Logging.h"
-#include "Queue.h"
-#include "StarTriangulation.h"
+#include "Menu.h"
 #include "StoreService.h"
-#include "Text.h"
-#include "Voronoi.h"
 
 
 /***********************************************************************************************************************
@@ -62,7 +52,7 @@ public:
      * @fn      start
      * @brief   starts infinite loop
      */
-    static void start();
+    void start();
 
     /**
      * @fn      setInstance

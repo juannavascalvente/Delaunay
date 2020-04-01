@@ -52,6 +52,15 @@ public:
     static void finish() { glEnd(); };
 
     /**
+     * @fn      startLoop
+     * @brief   Starts glu main loop
+     */
+    static void startLoop()
+    {
+        glutMainLoop();
+    }
+
+    /**
      *
      * @param size
      */
