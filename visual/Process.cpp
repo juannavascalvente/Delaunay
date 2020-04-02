@@ -78,7 +78,7 @@ void Process::executeWrapper()
 void Process::execute()
 {
 	// Get option to be executed.
-    int option = menu.getMenuOption();
+    int option = Menu::getMenuOption();
 	if (option == quit)
     {
         // Quit application.
@@ -114,7 +114,7 @@ void Process::execute()
     delete cmd;
 
     // Reset menu option.
-	menu.resetMenuOption();
+	Menu::resetMenuOption();
 }
 
 
