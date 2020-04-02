@@ -12,185 +12,32 @@
 
 
 /***********************************************************************************************************************
+* Static members
+***********************************************************************************************************************/
+map<int, pfuncCommandCreate> CommandFactory::mapFactories;
+
+
+/***********************************************************************************************************************
 * Public method definitions
 ***********************************************************************************************************************/
 Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService, ConfigService *configServiceIn)
 {
-    // Return value
+    if (CommandFactory::mapFactories.empty())
+    {
+        initialize();
+    }
+
     Command *command;
 
-    // Check command option
-    switch (szOptionCmdId)
+    // Check if option is valid
+    if (CommandFactory::mapFactories.find(szOptionCmdId) == CommandFactory::mapFactories.end())
     {
-        case DEFAULT_OPTION:
-        {
-            command = createNull();
-            break;
-        }
-        case PARAMETERS:
-        {
-            command = createReadCfg();
-            break;
-        }
-        // Generate random set of points
-        case RANDOMLY:
-        {
-            command = createRandomGenerator(storeService, configServiceIn);
-            break;
-        }
-        // Generate random set of points grouped in clusters
-        case CLUSTER:
-        {
-            command = createClusterGenerator(storeService, configServiceIn);
-            break;
-        }
-        // Create start triangulation from set of points
-        case STAR_TRIANGULATION:
-        {
-            command = createStarTriangulation(storeService, configServiceIn);
-            break;
-        }
-        // Create Delaunay triangulation
-        case DELAUNAY:
-        {
-            command = createDelaunay(storeService, configServiceIn);
-            break;
-        }
-        case CONVEX_HULL:
-        {
-            command = createConvexHull(storeService, configServiceIn);
-            break;
-        }
-        case VORONOI:
-        {
-            command = createVoronoi(storeService, configServiceIn);
-            break;
-        }
-        case GABRIEL:
-        {
-            command = createGabriel(storeService, configServiceIn);
-            break;
-        }
-        case TRIANGULATION_PATH:
-        {
-            command = createTriangulationPath(storeService, configServiceIn);
-            break;
-        }
-        case VORONOI_PATH:
-        {
-            command = createVoronoiPath(storeService, configServiceIn);
-            break;
-        }
-        case CLOSEST_POINT:
-        {
-            command = createClosestPoint(storeService, configServiceIn);
-            break;
-        }
-        case FIND_FACE:
-        {
-            command = createFindFace(storeService, configServiceIn);
-            break;
-        }
-        case TWO_CLOSEST:
-        {
-            command = createTwoClosest(storeService, configServiceIn);
-            break;
-        }
-        case FILTER_EDGES:
-        {
-            command = createFilterEdges(storeService, configServiceIn);
-            break;
-        }
-        case CIRCUMCENTRES:
-        {
-            command = createCircumcentres(storeService, configServiceIn);
-            break;
-        }
-        case EDGE_CIRCLES:
-        {
-            command = createEdgeCircle(storeService, configServiceIn);
-            break;
-        }
-        case DCEL_INFO:
-        {
-            command = createDcelInfo(storeService, configServiceIn);
-            break;
-        }
-        case VORONOI_INFO:
-        {
-            command = createVoronoiInfo(storeService, configServiceIn);
-            break;
-        }
-        case CLEAR:
-        {
-            command = createClear(storeService, configServiceIn);
-            break;
-        }
-        case READ_POINTS_FLAT_FILE:
-        {
-            command = createReadPoints(storeService, configServiceIn);
-            break;
-        }
-        case READ_POINTS_DCEL_FILE:
-        {
-            command = createReadPointsDcel(storeService, configServiceIn);
-            break;
-        }
-        case READ_DCEL:
-        {
-            command = createReadDcel(storeService, configServiceIn);
-            break;
-        }
-        case READ_DELAUNAY:
-        {
-            command = createReadDelaunay(storeService, configServiceIn);
-            break;
-        }
-        case READ_VORONOI:
-        {
-            command = CommandFactory::createNull();
-            cout << "Error creating command. Read Voronoi is not implemented " << endl;
-            //command = createReadVoronoi(storeService, configServiceIn);
-            break;
-        }
-        case READ_GABRIEL:
-        {
-            command = CommandFactory::createNull();
-            cout << "Error creating command. Read Gabriel is not implemented " << endl;
-            //command = createReadGabriel(storeService, configServiceIn);
-            break;
-        }
-        case WRITE_POINTS:
-        {
-            command = createWritePoints(storeService, configServiceIn);
-            break;
-        }
-        case WRITE_DCEL:
-        {
-            command = createWriteDcel(storeService, configServiceIn);
-            break;
-        }
-        case WRITE_DELAUNAY:
-        {
-            command = createWriteDelaunay(storeService, configServiceIn);
-            break;
-        }
-        case WRITE_VORONOI:
-        {
-            command = createWriteVoronoi(storeService, configServiceIn);
-            break;
-        }
-        case WRITE_GABRIEL:
-        {
-            command = createWriteGabriel(storeService, configServiceIn);
-            break;
-        }
-        default:
-        {
-            command = CommandFactory::createNull();
-            cout << "Error creating command. Id is not valid " << szOptionCmdId << endl;
-            break;
-        }
+        command = CommandFactory::createNull(storeService, configServiceIn);
+        cout << "Error creating command. Id is not valid " << szOptionCmdId << endl;
+    }
+    else
+    {
+        command = CommandFactory::mapFactories.at(szOptionCmdId)(storeService, configServiceIn);
     }
 
     return command;
@@ -200,17 +47,17 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
 /***********************************************************************************************************************
 * Private method definitions
 ***********************************************************************************************************************/
-Command *CommandFactory::createNull()
+Command *CommandFactory::createNull(StoreService *storeService, ConfigService *configService)
 {
     // Create command
-    return new CommandNull();
+    return new CommandNull(storeService, configService);
 }
 
 
-Command *CommandFactory::createReadCfg()
+Command *CommandFactory::createReadCfg(StoreService *storeService, ConfigService *configService)
 {
     // Create command
-    return new CommandReadConfig();
+    return new CommandReadConfig(storeService, configService);
 }
 
 
@@ -392,4 +239,40 @@ Command *CommandFactory::createWriteGabriel(StoreService *storeService, ConfigSe
 {
     // Create command
     return new CommandWriteFileGabriel(storeService, configService);
+}
+
+void CommandFactory::initialize()
+{
+    // Initialize map
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(defaultOption, CommandFactory::createNull));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(parameters, CommandFactory::createReadCfg));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(randomly, CommandFactory::createRandomGenerator));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(cluster, CommandFactory::createClusterGenerator));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(star_triangulation, CommandFactory::createStarTriangulation));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(delaunay_triangulation, CommandFactory::createDelaunay));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(convex_hull, CommandFactory::createConvexHull));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(voronoi, CommandFactory::createVoronoi));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(gabriel, CommandFactory::createGabriel));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(triangulation_path, CommandFactory::createTriangulationPath));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(voronoi_path, CommandFactory::createVoronoiPath));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(closest_point, CommandFactory::createClosestPoint));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(find_face, CommandFactory::createFindFace));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(two_closest, CommandFactory::createTwoClosest));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(filter_edges, CommandFactory::createFilterEdges));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(circumcentres, CommandFactory::createCircumcentres));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(edge_circles, CommandFactory::createEdgeCircle));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(dcel_info, CommandFactory::createDcelInfo));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(voronoi_info, CommandFactory::createVoronoiInfo));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(clear, CommandFactory::createClear));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_flat_file, CommandFactory::createReadPoints));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_dcel_file, CommandFactory::createReadPointsDcel));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_dcel, CommandFactory::createReadDcel));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_delaunay, CommandFactory::createReadDelaunay));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_voronoi, CommandFactory::createNull));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_gabriel, CommandFactory::createNull));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_points, CommandFactory::createWritePoints));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_dcel, CommandFactory::createWriteDcel));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_delaunay, CommandFactory::createWriteDelaunay));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_voronoi, CommandFactory::createWriteVoronoi));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_gabriel, CommandFactory::createWriteGabriel));
 }

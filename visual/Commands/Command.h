@@ -100,7 +100,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandNull() = default;
+    CommandNull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
 
     /**
      * @fn      isRunnable
@@ -122,7 +122,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandReadConfig() = default;
+    CommandReadConfig(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
 
     /**
      * @fn      runCommand

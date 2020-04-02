@@ -78,7 +78,7 @@ void Process::execute()
 {
 	// Get option to be executed.
     int option = menu.getMenuOption();
-	if (option == QUIT)
+	if (option == quit)
     {
         // Quit application.
         deallocateResources();
