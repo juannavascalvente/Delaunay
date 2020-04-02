@@ -26,7 +26,7 @@ using namespace std;
 #define	INPUTSET_READ_INCREMENTAL_TEXT	"Incremental files"
 #define	INPUTSET_READ_VORONOI_TEXT		"Voronoi file"
 #define INPUTSET_READ_GABRIEL_TEXT		"Gabriel file"
-#define	INPUTSET_SHAKE_DCEL_TEXT		"Shake points"
+//#define	INPUTSET_SHAKE_DCEL_TEXT		"Shake points"
 
 // Parameters menu entries text.
 #define PARAMETERS_MENU_TEXT			"Read parameters"
@@ -48,7 +48,7 @@ using namespace std;
 #define	FIGURES_TRIANGULATION_PATH_TEXT	"StarTriangulation path"
 
 // Location menu entries.
-#define LOCATION_MENU_TEXT				"Location"
+//#define LOCATION_MENU_TEXT				"Location"
 #define	LOCATION_CLOSEST_POINTS_TEXT	"Closest to a given"
 #define	LOCATION_2CLOSEST_POINTS_TEXT	"Two closest"
 #define	LOCATION_FIND_FACE_TEXT			"Locate face"
@@ -67,16 +67,12 @@ using namespace std;
 #define INFORMATION_VORONOI_TEXT		"Voronoi info"
 
 // Other menu entries text.
-#define	ZOOM_MENU_TEXT					"Zoom"
+//#define	ZOOM_MENU_TEXT					"Zoom"
 #define	CLEAR_MENU_TEXT					"Clear"
 #define	QUIT_MENU_TEXT					"Quit"
 
 
-//------------------------------------------------------------------------
-// Functions.
-//------------------------------------------------------------------------
-void menu_level_1(int menu_Id);
-
+void menu_level_1(int menuId);
 MenuOption enOption;
 
 
@@ -95,7 +91,7 @@ Menu::Menu()
 	this->subMenuRead = 0;
 	this->subMenuGenerate = 0;
     enOption = MenuOption::defaultOption;
-};
+}
 
 
 void Menu::updateMenu(Status *status)
@@ -261,7 +257,7 @@ void Menu::resetMenuOption()
     enOption = defaultOption;
 }
 
-void menu_level_1(int menu_Id)
+void menu_level_1(int menuId)
 {
-    enOption = (MenuOption) menu_Id;
+    enOption = (MenuOption) menuId;
 }

@@ -42,13 +42,13 @@ public:
      * @brief   Get last menu option
      * @return  menu option
      */
-	MenuOption getMenuOption();
+	static MenuOption getMenuOption();
 
 	/**
 	 * @fn      resetMenuOption
 	 * @brief   Reset menu option
 	 */
-	void	resetMenuOption();
+	static void	resetMenuOption();
 };
 
 
