@@ -98,9 +98,9 @@ void Process::execute()
         // Update menu status
         result->updateStatus();
 
-        // Get displaybale elements
+        // Get displayable elements
         vector<Displayable*> vDisplayable(0);
-        result->createDisplayables(vDisplayable);
+        result->getItems(vDisplayable);
         dispManager->add(vDisplayable);
 
         dispManager->process();

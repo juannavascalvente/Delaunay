@@ -41,7 +41,8 @@ protected:
     virtual CommandResult* createResult()
     {
         Status status;
-        return new CommandResultNull(false, status, nullptr);
+        vector<Displayable*> vDisplayable(0);
+        return new CommandResult(getSuccess(), *in.getStoreService()->getStatus(), in.getStoreService(), vDisplayable);
     };
 
 public:
@@ -61,6 +62,7 @@ public:
     *******************************************************************************************************************/
     bool getSuccess() const { return isSuccess; }
     CommandResult *getResult() const { return result;}
+    void setIsSuccess(bool isSuccessIn) { isSuccess = isSuccessIn; }
 
     /**
      * @fn      run
@@ -71,7 +73,7 @@ public:
      */
     void run()
     {
-        isSuccess = false;
+        setIsSuccess(false);
 
         // Check command can be executed
         if (!isRunnable())
@@ -107,17 +109,6 @@ public:
      * @return  false
      */
     bool isRunnable() override  { return false; };
-
-    /**
-     * @fn      runCommand
-     * @brief   does not execute anything. Command when there is nothing to run
-     *
-     * @return  true
-     */
-    CommandResult * runCommand() override
-    {
-        return new CommandResultNull(false, *in.getStoreService()->getStatus(), in.getStoreService());
-    }
 };
 
 
@@ -143,10 +134,11 @@ public:
     CommandResult * runCommand() override
     {
         // Run command
-        this->isSuccess = Config::readConfig();
+        bool isRunSuccess = Config::readConfig();
 
         // Build result
-        return new CommandResultNull(this->isSuccess, *in.getStoreService()->getStatus(), in.getStoreService());
+        setIsSuccess(isRunSuccess);
+        return createResult();
     }
 };
 
@@ -210,15 +202,19 @@ public:
 
         // Run command
         Dcel *dcel = in.getStoreService()->getDcel();
-        this->isSuccess = DcelGenerator::generateRandom(szNumPoints, *dcel);
+        bool isRunSuccess = DcelGenerator::generateRandom(szNumPoints, *dcel);
 
-        // Add point display
-        for (size_t i=0; i<szNumPoints ; i++)
+        if (isRunSuccess)
         {
-            vPoints.push_back(*dcel->getRefPoint(i));
+            // Create points set
+            for (size_t i=0; i<szNumPoints ; i++)
+            {
+                vPoints.push_back(*dcel->getRefPoint(i));
+            }
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -228,8 +224,17 @@ public:
      */
     CommandResult *createResult() override
     {
+        // Set status to update
         Status status = Status(false, true, false, false, false, false);
-        return new CommandResultPoints(getSuccess(), vPoints, status, in.getStoreService());
+
+        vector<Displayable*> vDisplayable(0);
+        if (getSuccess())
+        {
+            // Add figure display
+            vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -312,15 +317,19 @@ public:
 
         // Run command
         Dcel *dcel = in.getStoreService()->getDcel();
-        this->isSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, *dcel);
+        bool isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, *dcel);
 
-        // Add point display
-        for (size_t i=0; i< szNumPoints; i++)
+        if (isRunSuccess)
         {
-            vPoints.push_back(*dcel->getRefPoint(i));
+            // Add point display
+            for (size_t i=0; i< szNumPoints; i++)
+            {
+                vPoints.push_back(*dcel->getRefPoint(i));
+            }
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -330,8 +339,18 @@ public:
      */
     CommandResult *createResult() override
     {
+        // Set status to update
         Status status = Status(false, true, false, false, false, false);
-        return new CommandResultPoints(getSuccess(), vPoints, status, in.getStoreService());
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add figure display
+            vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -383,9 +402,10 @@ public:
     {
         // Run command
         StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-        this->isSuccess = triangulation->build(in.getStoreService()->getDcel());
+        bool isRunSuccess = triangulation->build(in.getStoreService()->getDcel());
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -395,9 +415,18 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
+        // Set status to update
         Status status = Status(false, true, true, false, false, false);
-        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, status, 0);
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -455,10 +484,11 @@ public:
         Status *status = in.getStoreService()->getStatus();
 
         // Build Delaunay from Star triangulation.
+        bool isRunSuccess=false;
         if (status->isTriangulation())
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            this->isSuccess = triangulation->delaunay();
+            isRunSuccess = triangulation->delaunay();
             delaunay->setAlgorithm(FROM_STAR);
         }
         else
@@ -466,7 +496,7 @@ public:
             // Build Delaunay from DCEL.
             if (!status->isDelaunay())
             {
-                this->isSuccess = delaunay->incremental();
+                isRunSuccess = delaunay->incremental();
             }
         }
 
@@ -474,6 +504,7 @@ public:
         StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -483,9 +514,18 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
+        // Set status to update
         Status status = Status(false, true, true, true, false, false);
-        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel, status);
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -545,21 +585,23 @@ public:
         // Get reference to status
         Status *status = in.getStoreService()->getStatus();
 
-        // Computing convex hull.
+        // Computing convex hull
+        bool isRunSuccess;
         if (status->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            this->isSuccess = delaunay->convexHull();
+            isRunSuccess = delaunay->convexHull();
             hull = in.getStoreService()->getDelaunay()->getConvexHull();
         }
         else
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            this->isSuccess = triangulation->convexHull();
+            isRunSuccess = triangulation->convexHull();
             hull = triangulation->getConvexHull();
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -570,7 +612,20 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultPolygon(getSuccess(), in.getStoreService(), hull, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add polygon points
+            vector<Point<TYPE>> vPoints;
+            hull->getPoints(vPoints);
+            vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -624,16 +679,17 @@ public:
         // Initialize voronoi data.
         Dcel *dcel = in.getStoreService()->getDcel();
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        this->isSuccess = voronoi->init(dcel);
+        bool isRunSuccess = voronoi->init(dcel);
 
         // Check init was success
-        if (this->isSuccess)
+        if (isRunSuccess)
         {
             // Compute Voronoi diagram.
-            this->isSuccess = voronoi->build(true);
+            isRunSuccess = voronoi->build(true);
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -644,10 +700,19 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Voronoi *voronoi = in.getStoreService()->getVoronoi();
+        // Set status
         Status status = Status(false, true, true, true, true, false);
-        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi, status);
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add delaunay and voronoi
+            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDcel()));
+            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getVoronoi()->getRefDcel()));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -657,6 +722,7 @@ public:
 ***********************************************************************************************************************/
 class CommandGabriel : public Command
 {
+    vector<Line> vLines;
 public:
 
     /*******************************************************************************************************************
@@ -704,9 +770,39 @@ public:
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
         Gabriel *gabriel = in.getStoreService()->getGabriel();
         gabriel->init(delaunay->getRefDcel(), voronoi);
-        this->isSuccess = gabriel->build();
+        bool isRunSuccess = gabriel->build();
+
+        if (isRunSuccess)
+        {
+            Point<TYPE> *vertex1;	    // First vertex.
+            Point<TYPE> *vertex2;	    // Second vertex.
+            Dcel	*dcelRef;
+
+            // Get reference to gabriel dcel.
+            Gabriel *gabriel = in.getStoreService()->getGabriel();
+            dcelRef = gabriel->getDcel();
+
+            // Draw Gabriel edges.
+            // TODO https://github.com/juannavascalvente/Delaunay/issues/60 -> Add dashed lines to highlight results
+            for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
+            {
+                // Check if current edge mamtches Gabriel restriction.s
+                if (gabriel->isSet(edgeIndex))
+                {
+                    // Get origin vertex of edge.
+                    vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
+
+                    // Get destination vertex of edge.
+                    vertex2 = dcelRef->getRefPoint(dcelRef->getOrigin(dcelRef->getTwin(edgeIndex)-1)-1);
+
+                    Line line(*vertex1, *vertex2);
+                    vLines.push_back(line);
+                }
+            }
+        }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -717,9 +813,19 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Gabriel *gabriel = in.getStoreService()->getGabriel();
-        return new CommandResultGabriel(getSuccess(), in.getStoreService(), dcel, gabriel, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add Delaunay and gabriel graph
+            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDcel()));
+            vDisplayable.push_back(DisplayableFactory::createPolyLine(vLines));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -792,9 +898,9 @@ public:
         // Compute triangles path between two points.
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         vector<int> vFacesId;
-        this->isSuccess = delaunay->findPath(line, vFacesId);
+        bool isRunSuccess = delaunay->findPath(line, vFacesId);
 
-        if (this->isSuccess)
+        if (isRunSuccess)
         {
             for (auto face : vFacesId)
             {
@@ -811,6 +917,7 @@ public:
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -821,8 +928,29 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayables;
+        if (getSuccess())
+        {
+            // Add Delaunay triangulation
+            Dcel *dcel = in.getStoreService()->getDcel();
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayables.push_back(dispDelaunay);
+
+            // Add points whose path is drawn
+            vector<Point<TYPE>> vPoints;
+            vPoints.push_back(line.getOrigin());
+            vPoints.push_back(line.getDest());
+            vDisplayables.push_back(DisplayableFactory::createPolygon(vPoints));
+
+            // Add faces
+            vDisplayables.push_back(DisplayableFactory::createPolygonSet(vPolygons));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayables);
     }
 };
 
@@ -904,7 +1032,7 @@ public:
 
         // Get extreme point faces.
         https://github.com/juannavascalvente/Delaunay/issues/62
-        this->isSuccess = false;
+        bool isRunSuccess = false;
         if (delaunay->findClosestPoint(line.getOrigin(), *voronoi, closest, initialFace, distance) &&
             delaunay->findClosestPoint(line.getDest(), *voronoi, closest, finalFace, distance))
         {
@@ -913,10 +1041,10 @@ public:
             extremeFaces.add(finalFace+1);
 
             // Find path.
-            this->isSuccess = voronoi->getRefDcel()->findPath(extremeFaces, line, vFacesId);
+            isRunSuccess = voronoi->getRefDcel()->findPath(extremeFaces, line, vFacesId);
         }
 
-        if (this->isSuccess)
+        if (isRunSuccess)
         {
             for (auto face : vFacesId)
             {
@@ -943,8 +1071,30 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getVoronoi()->getRefDcel();
-        return new CommandResultPath(getSuccess(), in.getStoreService(), dcel, line, vPolygons, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getVoronoi()->getRefDcel();
+
+            // Add Delaunay triangulation
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayable.push_back(dispDelaunay);
+
+            // Add points whose path is drawn
+            vector<Point<TYPE>> vPoints;
+            vPoints.push_back(line.getOrigin());
+            vPoints.push_back(line.getDest());
+            vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
+
+            // Add faces
+            vDisplayable.push_back(DisplayableFactory::createPolygonSet(vPolygons));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1013,6 +1163,7 @@ public:
         double distance;
 
         // Check if Delaunay triangulation computed.
+        bool isRunSuccess=false;
         Status *status = in.getStoreService()->getStatus();
         if (status->isDelaunay())
         {
@@ -1021,24 +1172,25 @@ public:
             {
                 Delaunay *delaunay = in.getStoreService()->getDelaunay();
                 Voronoi *voronoi = in.getStoreService()->getVoronoi();
-                this->isSuccess = delaunay->findClosestPoint(point, *voronoi, closest, pointIndex, distance);
+                isRunSuccess = delaunay->findClosestPoint(point, *voronoi, closest, pointIndex, distance);
             }
         }
         else
         {
             // Find closest using brute force.
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            this->isSuccess = triangulation->findClosestPoint(point, closest, distance);
+            isRunSuccess = triangulation->findClosestPoint(point, closest, distance);
         }
 
         // Add point to locate and closest point
-        if (this->isSuccess)
+        if (isRunSuccess)
         {
             vPoints.push_back(point);
             vPoints.push_back(closest);
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -1049,8 +1201,25 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add Delaunay triangulation
+            Dcel *dcel = in.getStoreService()->getDcel();
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayable.push_back(dispDelaunay);
+
+            // Add points (point to locate and closest point)
+            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
+            dispPoints->setPointSize(5.0);
+            vDisplayable.push_back(dispPoints);
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1117,11 +1286,12 @@ public:
 
         // Find face.
         Status *status = in.getStoreService()->getStatus();
+        bool isRunSuccess=false;
         bool isImaginaryFace=false;
         if (status->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            this->isSuccess = delaunay->findFace(point, faceId, isImaginaryFace);
+            isRunSuccess = delaunay->findFace(point, faceId, isImaginaryFace);
         }
 //        else
 //        {
@@ -1133,7 +1303,7 @@ public:
         vPoints.push_back(point);
 
         // Add face if it is not imaginary
-        if (this->isSuccess && !isImaginaryFace)
+        if (isRunSuccess && !isImaginaryFace)
         {
             vector<Point<TYPE>> vFacesPoints;
             DcelFigureBuilder::getFacePoints(faceId, *in.getStoreService()->getDcel(), vFacesPoints);
@@ -1147,6 +1317,7 @@ public:
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -1157,8 +1328,30 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultFace(getSuccess(), in.getStoreService(), dcel, vPoints, vPolygons, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add Delaunay triangulation
+            Dcel *dcel = in.getStoreService()->getDcel();
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayable.push_back(dispDelaunay);
+
+            // Add points (point to locate and closest point)
+            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
+            dispPoints->setPointSize(3.0);
+            vDisplayable.push_back(dispPoints);
+
+            // Add faces
+            Displayable *dispFace = DisplayableFactory::createPolygonSet(vPolygons);
+            dispFace->setPointSize(3.0);
+            vDisplayable.push_back(dispFace);
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1216,26 +1409,28 @@ public:
     CommandResult* runCommand() override
     {
         int iPointIdx1, iPointIdx2;
+        bool isRunSuccess=false;
         Status *status = in.getStoreService()->getStatus();
         if (status->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            this->isSuccess = delaunay->findTwoClosest(iPointIdx1, iPointIdx2);
+            isRunSuccess = delaunay->findTwoClosest(iPointIdx1, iPointIdx2);
         }
         else
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            this->isSuccess = triangulation->findTwoClosest(iPointIdx1, iPointIdx2);
+            isRunSuccess = triangulation->findTwoClosest(iPointIdx1, iPointIdx2);
         }
 
         // Add closest points
-        if (this->isSuccess)
+        if (isRunSuccess)
         {
             vPoints.push_back(*in.getStoreService()->getDcel()->getRefPoint(iPointIdx1));
             vPoints.push_back(*in.getStoreService()->getDcel()->getRefPoint(iPointIdx2));
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
@@ -1246,8 +1441,25 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultClosestPoint(getSuccess(), in.getStoreService(), dcel, vPoints, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add Delaunay triangulation
+            Dcel *dcel = in.getStoreService()->getDcel();
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            vDisplayable.push_back(dispDelaunay);
+
+            // Add points (point to locate and closest point)
+            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
+            dispPoints->setPointSize(5.0);
+            vDisplayable.push_back(dispPoints);
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1298,9 +1510,8 @@ public:
      */
     CommandResult* runCommand() override
     {
-        this->isSuccess = true;
-
         // Build result
+        setIsSuccess(true);
         return createResult();
     }
 
@@ -1311,9 +1522,17 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultTriangulation(getSuccess(), in.getStoreService(), dcel, *in.getStoreService()->getStatus(),
-                                              in.getConfigService()->getMinLengthEdge());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable *> vDisplayable;
+        if (getSuccess()) {
+            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDcel(),
+                                                                  in.getConfigService()->getMinLengthEdge()));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1369,7 +1588,7 @@ public:
      */
     CommandResult* runCommand() override
     {
-        this->isSuccess = true;
+        setIsSuccess(true);
 
         // Add circles
         Dcel *dcel = in.getStoreService()->getDcel();
@@ -1403,8 +1622,22 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add Delaunay triangulation
+            Dcel *dcel = in.getStoreService()->getDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+
+            // Add points to display.
+            vDisplayable.push_back(DisplayableFactory::createCircleSet(vCircles));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1460,7 +1693,7 @@ public:
      */
     CommandResult* runCommand() override
     {
-        this->isSuccess = true;
+        setIsSuccess(true);
 
         // Loop all faces (but external).
         Dcel *dcel = in.getStoreService()->getDcel();
@@ -1499,8 +1732,22 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        return new CommandResultCircles(getSuccess(), in.getStoreService(), dcel, vCircles, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            // Add Delaunay triangulation
+            Dcel *dcel = in.getStoreService()->getDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+
+            // Add points to display.
+            vDisplayable.push_back(DisplayableFactory::createCircleSet(vCircles));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1645,7 +1892,7 @@ public:
      */
     CommandResult* runCommand() override
     {
-        this->isSuccess = true;
+        setIsSuccess(true);
 
         // Add Delaunay triangulation
         Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
@@ -1677,7 +1924,10 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1724,7 +1974,7 @@ public:
      */
     CommandResult* runCommand() override
     {
-        this->isSuccess = true;
+        setIsSuccess(true);
 
         // Reset
         in.getStoreService()->getStatus()->reset();
@@ -1741,7 +1991,7 @@ public:
     CommandResult *createResult() override
     {
         Status status = Status(true, false, false, false, false, false);
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, status);
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1805,7 +2055,7 @@ public:
     CommandResult *createResult() override
     {
         Status status = Status(false, true, false, false, false, false);
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, status);
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1869,7 +2119,7 @@ public:
     CommandResult *createResult() override
     {
         Status status = Status(false, true, false, false, false, false);
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, status);
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1924,9 +2174,8 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
         Status status = Status(false, true, true, true, false, false);
-        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel, status);
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -1982,9 +2231,18 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
+        // Set status to update
         Status status = Status(false, true, true, true, false, false);
-        return new CommandResultDelaunay(getSuccess(), in.getStoreService(), dcel, status);
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -2040,9 +2298,22 @@ public:
      */
     CommandResult *createResult() override
     {
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        return new CommandResulVoronoi(getSuccess(), in.getStoreService(), dcel, voronoi, *in.getStoreService()->getStatus());
+        // Set status
+        Status status = Status(false, true, true, true, true, false);
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getDcel();
+            Voronoi *voronoi = in.getStoreService()->getVoronoi();
+
+            // Add delaunay and voronoi
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+            vDisplayable.push_back(DisplayableFactory::createDcel(voronoi->getRefDcel()));
+        }
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 };
 
@@ -2087,7 +2358,13 @@ public:
      */
     CommandResult *createResult() override
     {
-        return new CommandResultDisplay(getSuccess(), in.getStoreService(), vDisplayable, *in.getStoreService()->getStatus());
+        // Set status to update
+        Status status = *in.getStoreService()->getStatus();
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
     }
 
     CmdParamIn *getInput() { return &in; }
