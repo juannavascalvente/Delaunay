@@ -63,7 +63,7 @@ public:
      *          by the main loop process
      * @param   process   instance to be executed by main loop
      */
-	void setInstance(Process *process);
+	static void setInstance(Process *process);
 };
 
 #endif /* PROCESS_H_ */
