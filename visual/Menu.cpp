@@ -77,11 +77,12 @@ using namespace std;
 //------------------------------------------------------------------------
 void menu_level_1(int menu_Id);
 
-int menu_Option;
+MenuOption enOption;
 
-//------------------------------------------------------------------------
-// Constructors.
-//------------------------------------------------------------------------
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 Menu::Menu()
 {
 	// Initialize class attributes.
@@ -93,36 +94,14 @@ Menu::Menu()
 	this->sub_Menu_Id5 = 0;
 	this->subMenuRead = 0;
 	this->subMenuGenerate = 0;
-	this->status = nullptr;
-	menu_Option = MenuOption::defaultOption;
+    enOption = MenuOption::defaultOption;
 };
 
 
-Menu::Menu(Status *status)
-{
-	// Initialize class attributes.
-	this->menu_Id = 0;
-	this->sub_Menu_Input = 0;
-	this->sub_Menu_Id2 = 0;
-	this->sub_Menu_Id3 = 0;
-	this->sub_Menu_Id4 = 0;
-	this->sub_Menu_Id5 = 0;
-	this->subMenuRead = 0;
-	this->subMenuGenerate = 0;
-	this->status = status;
-
-	updateMenu();
-
-	menu_Option = MenuOption::defaultOption;
-};
-
-//------------------------------------------------------------------------
-// Public functions.
-//------------------------------------------------------------------------
-void Menu::updateMenu()
+void Menu::updateMenu(Status *status)
 {
 	// Check if first time menu created.
-	if (this->status->isFirstTime())
+	if (status->isFirstTime())
 	{
 		// Clear current menu.
 		if (menu_Id != 0)
@@ -156,7 +135,7 @@ void Menu::updateMenu()
 		glutAddMenuEntry(QUIT_MENU_TEXT, quit);
 		glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-		this->status->setFirstTime(false);
+		status->setFirstTime(false);
 	}
 	else
 	{
@@ -183,7 +162,7 @@ void Menu::updateMenu()
 		glutAddSubMenu(READ_MENU_TEXT, this->subMenuGenerate);
 
 		// Triangulations submenu.
-		if (this->status->isSet())
+		if (status->isSet())
 		{
 			sub_Menu_Id2 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(TRIANGULATIONS_STAR_TEXT, star_triangulation);
@@ -191,7 +170,7 @@ void Menu::updateMenu()
 		}
 
 		// Main figures submenu.
-		if (this->status->isTriangulation() || this->status->isDelaunay())
+		if (status->isTriangulation() || status->isDelaunay())
 		{
 			sub_Menu_Id3 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(FIGURES_CONVEX_TEXT, convex_hull);
@@ -204,7 +183,7 @@ void Menu::updateMenu()
 			glutAddMenuEntry(FIGURES_TRIANGULATION_PATH_TEXT, triangulation_path);
 			glutAddMenuEntry(FIGURES_FILTER_EDGES, filter_edges);
 
-			if (this->status->isVoronoi())
+			if (status->isVoronoi())
 			{
 				glutAddMenuEntry(FIGURES_GABRIEL_TEXT, gabriel);
 				glutAddMenuEntry(FIGURES_VORONOI_PATH_TEXT, voronoi_path);
@@ -212,22 +191,22 @@ void Menu::updateMenu()
 		}
 
 		// Output data submenu.
-		if (this->status->isSet())
+		if (status->isSet())
 		{
 			sub_Menu_Id4 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(EXPORT_FLAT_FILE, write_points);
-			if (this->status->isTriangulation())
+			if (status->isTriangulation())
 			{
 				glutAddMenuEntry(EXPORT_DCEL_FILE, write_dcel);
-				if (this->status->isDelaunay())
+				if (status->isDelaunay())
 				{
 					glutAddMenuEntry(EXPORT_DELAUNAY_FILE, write_delaunay);
 				}
-				if (this->status->isVoronoi())
+				if (status->isVoronoi())
 				{
 					glutAddMenuEntry(EXPORT_VORONOI_FILE, write_voronoi);
 				}
-				if (this->status->isGabriel())
+				if (status->isGabriel())
 				{
 					glutAddMenuEntry(EXPORT_GABRIEL_FILE, write_gabriel);
 				}
@@ -235,11 +214,11 @@ void Menu::updateMenu()
 		}
 
 		// Information submenu.
-		if (this->status->isSet())
+		if (status->isSet())
 		{
 			sub_Menu_Id5 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(INFORMATION_DCEL_TEXT, dcel_info);
-			if (this->status->isVoronoi())
+			if (status->isVoronoi())
 			{
 				glutAddMenuEntry(INFORMATION_VORONOI_TEXT, voronoi_info);
 			}
@@ -249,19 +228,19 @@ void Menu::updateMenu()
 		menu_Id = glutCreateMenu(menu_level_1);
 		glutAddSubMenu(INPUTSET_MENU_TEXT, sub_Menu_Input);
 		glutAddMenuEntry(PARAMETERS_MENU_TEXT, parameters);
-		if (this->status->isSet())
+		if (status->isSet())
 		{
 			glutAddSubMenu(TRIANGULATIONS_MENU_TEXT, sub_Menu_Id2);
 		}
-		if (this->status->isTriangulation() || this->status->isDelaunay())
+		if (status->isTriangulation() || status->isDelaunay())
 		{
 			glutAddSubMenu(FIGURES_MENU_TEXT, sub_Menu_Id3);
 		}
-		if (this->status->isSet())
+		if (status->isSet())
 		{
 			glutAddSubMenu(EXPORT_MENU_TEXT, sub_Menu_Id4);
 		}
-		if (this->status->isSet())
+		if (status->isSet())
 		{
 			glutAddSubMenu(INFORMATION_MENU_TEXT, sub_Menu_Id5);
 		}
@@ -271,22 +250,18 @@ void Menu::updateMenu()
 	}
 }
 
-int	Menu::getMenuOption()
+MenuOption Menu::getMenuOption()
 {
-	return(menu_Option);
+	return(enOption);
 }
 
-void Menu::setMenuOption(int value)
-{
-	menu_Option = value;
-}
 
 void Menu::resetMenuOption()
 {
-	menu_Option = defaultOption;
+    enOption = defaultOption;
 }
 
 void menu_level_1(int menu_Id)
 {
-	menu_Option = menu_Id;
+    enOption = (MenuOption) menu_Id;
 }

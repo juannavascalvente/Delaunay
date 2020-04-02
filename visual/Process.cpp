@@ -32,7 +32,8 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
     dispManager = new DisplayManager(argc, argv);
 
     // Initialize menu
-	this->menu = Menu(storeServiceIn->getStatus());
+	this->menu = Menu();
+    this->menu.updateMenu(storeServiceIn->getStatus());
 
 	// Function to execute by GLUT.
     dispManager->setLoopFunction(executeWrapper);
@@ -106,7 +107,7 @@ void Process::execute()
         dispManager->process();
 
         // Update menu entries.
-        menu.updateMenu();
+        menu.updateMenu(storeService->getStatus());
     }
 
 	// Delete iteration resources
