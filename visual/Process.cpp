@@ -17,7 +17,7 @@ Process         *Process::instance = nullptr;
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Process::Process(int argc, char **argv, bool printData, StoreService *storeServiceIn)
+Process::Process(int argc, char **argv, bool printData, StoreService *storeServiceIn, ConfigService *configServiceIn)
 {
 	string 	fileName;			// Configuration file name.
 
@@ -25,12 +25,13 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 	fileName = argv[2];
 	Config::readConfig(fileName);
 
-	// Check flag to print data to screen.
+	// Allocate resources
 	this->log = new Logging("log.txt", printData);
-
+    configService = configServiceIn;
     storeService = storeServiceIn;
     dispManager = new DisplayManager(argc, argv);
 
+    // Initialize menu
 	this->menu = Menu(storeServiceIn->getStatus());
 
 	// Function to execute by GLUT.
@@ -41,9 +42,7 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 Process::~Process()
 {
 	// Deallocate resources
-	delete log;
-	delete dispManager;
-	delete storeService;
+    deallocateResources();
 }
 
 
@@ -82,14 +81,12 @@ void Process::execute()
 	if (option == QUIT)
     {
         // Quit application.
-        delete log;
-        delete dispManager;
-        delete storeService;
+        deallocateResources();
         exit(0);
     }
 
     // Create command
-    Command *cmd = CommandFactory::create(option, storeService);
+    Command *cmd = CommandFactory::create(option, storeService, configService);
 
     // Run command
     cmd->run();
@@ -101,9 +98,9 @@ void Process::execute()
         // Update menu status
         result->updateStatus();
 
-        // Get displaybale elements
+        // Get displayable elements
         vector<Displayable*> vDisplayable(0);
-        result->createDisplayables(vDisplayable);
+        result->getItems(vDisplayable);
         dispManager->add(vDisplayable);
 
         dispManager->process();
@@ -117,4 +114,17 @@ void Process::execute()
 
     // Reset menu option.
 	menu.resetMenuOption();
+}
+
+
+/**
+ * @fn      deallocateResources
+ * @brief   Free allocated resources
+ */
+void Process::deallocateResources() const
+{
+    delete log;
+    delete dispManager;
+    delete storeService;
+    delete configService;
 }

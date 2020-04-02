@@ -10,6 +10,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "defines.h"
+#include "ConfigService.h"
 #include "StoreService.h"
 
 #include <cstddef>
@@ -20,66 +21,14 @@
 ***********************************************************************************************************************/
 class CmdParamIn
 {
+    ConfigService *cfgService;
     StoreService *storeService;
 public:
-    explicit CmdParamIn(StoreService *storeServiceIn) : storeService(storeServiceIn) {};
+    explicit CmdParamIn(StoreService *storeServiceIn, ConfigService *cfgServiceIn) : cfgService(cfgServiceIn),
+                                                                                     storeService(storeServiceIn) {};
 
+    ConfigService *getConfigService() const { return cfgService; }
     StoreService *getStoreService() const { return storeService; }
-};
-
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
-class GeneratorCmdParamIn : public CmdParamIn
-{
-    size_t szNumPoints;
-
-public:
-    GeneratorCmdParamIn(size_t szNumPointsIn, StoreService *storeService) : szNumPoints(szNumPointsIn),
-                                                                            CmdParamIn(storeService) {};
-
-    /**
-     * Getter/Setter
-     */
-    size_t getNumPoints() const { return szNumPoints;}
-};
-
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
-class GeneratorClusterCmdParamIn : public GeneratorCmdParamIn
-{
-    TYPE fRadius;
-    size_t szNumClusters;
-public:
-    GeneratorClusterCmdParamIn(size_t szNumPointsIn, size_t szNumClustersIn, TYPE fRadiusIn, StoreService *storeService) :
-                                                                        GeneratorCmdParamIn(szNumPointsIn, storeService),
-                                                                        szNumClusters(szNumClustersIn),
-                                                                        fRadius(fRadiusIn)
-                                                                        {};
-    /**
-     * Getter/Setter
-     */
-    TYPE getFRadius() const { return fRadius; }
-    size_t getSzNumClusters() const { return szNumClusters; }
-};
-
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
-class StarTriangulationParamCmdIn : public CmdParamIn
-{
-    Dcel *dcel;
-public:
-    explicit StarTriangulationParamCmdIn(Dcel *dcelIn, StoreService *storeService) : dcel(dcelIn), CmdParamIn(storeService) {};
-
-    /**
-     * Getter/Setter
-     */
-    Dcel &getDcel() { return(*dcel); }
 };
 
 #endif //DELAUNAY_COMMANDPARAMIN_H

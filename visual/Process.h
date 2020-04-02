@@ -12,6 +12,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "ConfigService.h"
 #include "DisplayManager.h"
 #include "Logging.h"
 #include "Menu.h"
@@ -27,6 +28,7 @@ class Process
     * Class members
     *******************************************************************************************************************/
     DisplayManager      *dispManager;
+    ConfigService       *configService;
     StoreService        *storeService;
 
 	Menu 			    menu;		    // Menu object.
@@ -37,6 +39,7 @@ class Process
      *******************************************************************************************************************/
 	void execute();
 	static void executeWrapper();
+    void deallocateResources() const;
 
 protected:
 	static Process *instance;
@@ -45,7 +48,7 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn);
+    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn, ConfigService *configService);
 	~Process();
 
     /**
@@ -60,7 +63,7 @@ public:
      *          by the main loop process
      * @param   process   instance to be executed by main loop
      */
-	static void setInstance(Process *process);
+	void setInstance(Process *process);
 };
 
 #endif /* PROCESS_H_ */

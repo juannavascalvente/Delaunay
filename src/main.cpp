@@ -30,7 +30,7 @@ using namespace std;
 int	getExecutionType(char *type);
 void printUsage(int type, char *exec);
 int executeTests(int argc, char** argv);
-int executeVisual(int argc, char **argv, StoreService *service);
+int executeVisual(int argc, char **argv);
 
 /***************************************************************************
 * Name: 	getExecutionType
@@ -135,7 +135,7 @@ int executeTests(int argc, char** argv)
  * @return  true if execution was success
  *          false otherwise
  */
-int executeVisual(int argc, char **argv, StoreService *service)
+int executeVisual(int argc, char **argv)
 {
 	int 	ret=SUCCESS;			// Return value.
 	bool	printData=false;		// Print data into screen.
@@ -174,7 +174,9 @@ int executeVisual(int argc, char **argv, StoreService *service)
 	if (ret != FAILURE)
 	{
 		// Create process.
-		Process process = Process(argc, argv, printData, service);
+        auto *storeService = new StoreService();
+        auto *configService = new ConfigService();
+		Process process = Process(argc, argv, printData, storeService, configService);
 		process.setInstance(&process);
 
 		// Main loop.
@@ -202,8 +204,6 @@ int main(int argc, char **argv)
 	int 	ret;			// Return value.
 	int		option=0;		// Input option.
 
-    auto *service = new StoreService();
-
 	// Check "test" execution.
 	if ((argc >= 2) && (argc <= 4))
 	{
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
 			// Visual execution.
 			case VISUAL:
 			{
-				ret = executeVisual(argc, argv, service);
+				ret = executeVisual(argc, argv);
 				break;
 			}
 			// Run functional tests or statistics.
@@ -244,8 +244,6 @@ int main(int argc, char **argv)
 		ret = FAILURE;
 	}
 
-	// Free resources
-	delete service;
 
 	return(ret);
 }

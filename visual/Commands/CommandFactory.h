@@ -22,42 +22,42 @@ class CommandFactory
     ***********************************************************************************************************************/
     static Command *createNull();
     static Command *createReadCfg();
-    static Command *createRandomGenerator(size_t szNumPoints, StoreService *storeService);
-    static Command *createClusterGenerator(size_t szNumPoints, size_t szNumClusters, TYPE radius, StoreService *storeService);
-    static Command *createStarTriangulation(StoreService *storeService);
-    static Command *createDelaunay(StoreService *storeService);
-    static Command *createConvexHull(StoreService *storeService);
-    static Command *createVoronoi(StoreService *storeService);
-    static Command *createGabriel(StoreService *storeService);
-    static Command *createTriangulationPath(StoreService *storeService);
-    static Command *createVoronoiPath(StoreService *storeService);
-    static Command *createClosestPoint(StoreService *storeService);
-    static Command *createFindFace(StoreService *storeService);
-    static Command *createTwoClosest(StoreService *storeService);
-    static Command *createFilterEdges(StoreService *storeService, TYPE minLen);
-    static Command *createCircumcentres(StoreService *storeService);
-    static Command *createEdgeCircle(StoreService *storeService);
-    static Command *createDcelInfo(StoreService *storeService);
-    static Command *createVoronoiInfo(StoreService *storeService);
-    static Command *createClear(StoreService *storeService);
-    static Command *createReadPoints(StoreService *storeService);
-    static Command *createReadPointsDcel(StoreService *storeService);
-    static Command *createReadDcel(StoreService *storeService);
-    static Command *createReadDelaunay(StoreService *storeService);
-//    static Command *createReadVoronoi(StoreService *storeService);
-//    static Command *createReadGabriel(StoreService *storeService);
-    static Command *createWritePoints(StoreService *storeService);
-    static Command *createWriteDcel(StoreService *storeService);
-    static Command *createWriteDelaunay(StoreService *storeService);
-    static Command *createWriteVoronoi(StoreService *storeService);
-    static Command *createWriteGabriel(StoreService *storeService);
+    static Command *createRandomGenerator(StoreService *storeService, ConfigService *configService);
+    static Command *createClusterGenerator(StoreService *storeService, ConfigService *configService);
+    static Command *createStarTriangulation(StoreService *storeService, ConfigService *configService);
+    static Command *createDelaunay(StoreService *storeService, ConfigService *configService);
+    static Command *createConvexHull(StoreService *storeService, ConfigService *configService);
+    static Command *createVoronoi(StoreService *storeService, ConfigService *configService);
+    static Command *createGabriel(StoreService *storeService, ConfigService *configService);
+    static Command *createTriangulationPath(StoreService *storeService, ConfigService *configService);
+    static Command *createVoronoiPath(StoreService *storeService, ConfigService *configService);
+    static Command *createClosestPoint(StoreService *storeService, ConfigService *configService);
+    static Command *createFindFace(StoreService *storeService, ConfigService *configService);
+    static Command *createTwoClosest(StoreService *storeService, ConfigService *configService);
+    static Command *createFilterEdges(StoreService *storeService, ConfigService *configService);
+    static Command *createCircumcentres(StoreService *storeService, ConfigService *configService);
+    static Command *createEdgeCircle(StoreService *storeService, ConfigService *configService);
+    static Command *createDcelInfo(StoreService *storeService, ConfigService *configService);
+    static Command *createVoronoiInfo(StoreService *storeService, ConfigService *configService);
+    static Command *createClear(StoreService *storeService, ConfigService *configService);
+    static Command *createReadPoints(StoreService *storeService, ConfigService *configService);
+    static Command *createReadPointsDcel(StoreService *storeService, ConfigService *configService);
+    static Command *createReadDcel(StoreService *storeService, ConfigService *configService);
+    static Command *createReadDelaunay(StoreService *storeService, ConfigService *configService);
+//    static Command *createReadVoronoi(StoreService *storeService, ConfigService *configService);
+//    static Command *createReadGabriel(StoreService *storeService, ConfigService *configService);
+    static Command *createWritePoints(StoreService *storeService, ConfigService *configService);
+    static Command *createWriteDcel(StoreService *storeService, ConfigService *configService);
+    static Command *createWriteDelaunay(StoreService *storeService, ConfigService *configService);
+    static Command *createWriteVoronoi(StoreService *storeService, ConfigService *configService);
+    static Command *createWriteGabriel(StoreService *storeService, ConfigService *configService);
 
 public:
 
     /***********************************************************************************************************************
     * Public method declarations
     ***********************************************************************************************************************/
-    static Command *create(size_t szOptionCmdId, StoreService *storeService);
+    static Command *create(size_t szOptionCmdId, StoreService *storeService, ConfigService *configServiceIn);
 };
 
 

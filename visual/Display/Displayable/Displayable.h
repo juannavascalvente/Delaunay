@@ -26,22 +26,22 @@ using namespace std;
 ***********************************************************************************************************************/
 class Displayable
 {
-    /***********************************************************************************************************************
+    /*******************************************************************************************************************
     * Class members
-    ***********************************************************************************************************************/
-    DisplayableConfig config;
+    *******************************************************************************************************************/
+    DisplayableConfig displayConfig;
 
-    /***********************************************************************************************************************
+    /*******************************************************************************************************************
     * Private class methods
-    ***********************************************************************************************************************/
+    *******************************************************************************************************************/
     virtual void runConfig()
     {
-        DisplayService::setColor(config.getColor());
-        DisplayService::setPointSize(config.getPointSize());
-        DisplayService::setLineSize(config.getLineSize());
+        DisplayService::setColor(displayConfig.getColor());
+        DisplayService::setPointSize(displayConfig.getPointSize());
+        DisplayService::setLineSize(displayConfig.getLineSize());
     }
 public:
-    explicit Displayable(DisplayableConfig configIn) : config(configIn) {};
+    explicit Displayable(DisplayableConfig configIn) : displayConfig(configIn) {};
     virtual ~Displayable() = default;
 
     /**
@@ -56,7 +56,7 @@ public:
      *
      * @param   fSize
      */
-    void setPointSize(float fSize) { config.setPointSize(fSize); };
+    void setPointSize(float fSize) { displayConfig.setPointSize(fSize); };
 };
 
 
