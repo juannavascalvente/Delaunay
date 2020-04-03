@@ -13,7 +13,7 @@
 #include "Delaunay.h"
 #include "Gabriel.h"
 #include "StarTriangulation.h"
-#include "StoreData.h"
+#include "StoreDataRepository.h"
 #include "Voronoi.h"
 
 
@@ -22,19 +22,38 @@
 ***********************************************************************************************************************/
 class StoreService
 {
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    StoreDataRepository *repository;
+
 public:
-    static Status *getStatus()  { return StoreData::getStatus(); };
-    static Dcel *getDcel()      { return StoreData::getDcel(); };
-    static Delaunay *getDelaunay() { return StoreData::getDelaunay(); };
-    static StarTriangulation *getStarTriang() { return StoreData::getStarTriang(); };
-    static Voronoi *getVoronoi() { return StoreData::getVoronoi(); };
-    static Gabriel *getGabriel() { return StoreData::getGabriel(); };
+    /*******************************************************************************************************************
+    * Public methods
+    *******************************************************************************************************************/
+    explicit StoreService(StoreDataRepository *repoIn) : repository(repoIn) {};
 
     /**
      * @fn      reset
      * @brief   Resets Delaunay and Voronoi
      */
-    static void reset();
+    void reset();
+
+    /**
+     * @fn      destroy
+     * @brief   Deletes repository
+     */
+    void destroy();
+
+    /*******************************************************************************************************************
+    * Getters
+    *******************************************************************************************************************/
+    Status      *getStatus()    { return repository->getData()->getStatus(); };
+    Dcel        *getDcel()      { return repository->getData()->getDcel(); };
+    Delaunay    *getDelaunay()  { return repository->getData()->getDelaunay(); };
+    Voronoi     *getVoronoi()   { return repository->getData()->getVoronoi(); };
+    Gabriel     *getGabriel()   { return repository->getData()->getGabriel(); };
+    StarTriangulation *getStarTriang() { return repository->getData()->getStarTriang(); };
 };
 
 

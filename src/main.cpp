@@ -1,13 +1,8 @@
-/*
- * main.cpp
- *
- *  Created on: Jun 30, 2016
- *      Author: jnavas
- */
 #include "defines.h"
 #include "Process.h"
 #include "Statistics.h"
 #include "StoreService.h"
+#include "StoreDataRepository.h"
 #include "Tester.h"
 
 #include <unistd.h>
@@ -31,6 +26,7 @@ int	getExecutionType(char *type);
 void printUsage(int type, char *exec);
 int executeTests(int argc, char** argv);
 int executeVisual(int argc, char **argv);
+
 
 /***************************************************************************
 * Name: 	getExecutionType
@@ -174,7 +170,7 @@ int executeVisual(int argc, char **argv)
 	if (ret != FAILURE)
 	{
 		// Create process.
-        auto *storeService = new StoreService();
+        auto *storeService = new StoreService(StoreDataRepository::getInstance());
         auto *configService = new ConfigService();
 		Process process = Process(argc, argv, printData, storeService, configService);
 		process.setInstance(&process);

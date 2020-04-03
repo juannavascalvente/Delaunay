@@ -779,15 +779,15 @@ public:
             Dcel	*dcelRef;
 
             // Get reference to gabriel dcel.
-            Gabriel *gabriel = in.getStoreService()->getGabriel();
+            Gabriel *gabrielIn = in.getStoreService()->getGabriel();
             dcelRef = gabriel->getDcel();
 
             // Draw Gabriel edges.
             // TODO https://github.com/juannavascalvente/Delaunay/issues/60 -> Add dashed lines to highlight results
-            for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
+            for (size_t edgeIndex=0; edgeIndex<gabrielIn->getSize() ;edgeIndex++)
             {
                 // Check if current edge mamtches Gabriel restriction.s
-                if (gabriel->isSet(edgeIndex))
+                if (gabrielIn->isSet(edgeIndex))
                 {
                     // Get origin vertex of edge.
                     vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
@@ -1409,7 +1409,7 @@ public:
     CommandResult* runCommand() override
     {
         int iPointIdx1, iPointIdx2;
-        bool isRunSuccess=false;
+        bool isRunSuccess;
         Status *status = in.getStoreService()->getStatus();
         if (status->isDelaunay())
         {
@@ -2185,11 +2185,6 @@ public:
 ***********************************************************************************************************************/
 class CommandReadDelaunay : public Command
 {
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    vector<Displayable*> vDisplayable;
-
 public:
     /*******************************************************************************************************************
     * Public class methods
@@ -2250,72 +2245,72 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandReadVoronoi : public Command
-{
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    vector<Displayable*> vDisplayable;
-
-public:
-    /*******************************************************************************************************************
-    * Public class methods
-    *******************************************************************************************************************/
-    explicit CommandReadVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
-
-
-    /**
-     * @fn      run
-     * @brief   Read Delaunay from file
-     *
-     * @return  true read was successfully
-     *          false otherwise
-     */
-    CommandResult* runCommand() override
-    {
-        // Reset store data
-        in.getStoreService()->reset();
-
-        // Run command
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        delaunay->setDCEL(dcel);
-        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
-
-        if (this->isSuccess)
-        {
-            delaunay->setAlgorithm(INCREMENTAL);
-        }
-
-        // Build result
-        return createResult();
-    }
-
-
-    /**
-     * @fn      createResult
-     * @brief   Creates command result
-     */
-    CommandResult *createResult() override
-    {
-        // Set status
-        Status status = Status(false, true, true, true, true, false);
-
-        // Add items to display
-        vector<Displayable*> vDisplayable;
-        if (getSuccess())
-        {
-            Dcel *dcel = in.getStoreService()->getDcel();
-            Voronoi *voronoi = in.getStoreService()->getVoronoi();
-
-            // Add delaunay and voronoi
-            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
-            vDisplayable.push_back(DisplayableFactory::createDcel(voronoi->getRefDcel()));
-        }
-
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
-    }
-};
+//class CommandReadVoronoi : public Command
+//{
+//    /*******************************************************************************************************************
+//    * Class members
+//    *******************************************************************************************************************/
+//    vector<Displayable*> vDisplayable;
+//
+//public:
+//    /*******************************************************************************************************************
+//    * Public class methods
+//    *******************************************************************************************************************/
+//    explicit CommandReadVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+//
+//
+//    /**
+//     * @fn      run
+//     * @brief   Read Delaunay from file
+//     *
+//     * @return  true read was successfully
+//     *          false otherwise
+//     */
+//    CommandResult* runCommand() override
+//    {
+//        // Reset store data
+//        in.getStoreService()->reset();
+//
+//        // Run command
+//        Dcel *dcel = in.getStoreService()->getDcel();
+//        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+//        delaunay->setDCEL(dcel);
+//        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+//
+//        if (this->isSuccess)
+//        {
+//            delaunay->setAlgorithm(INCREMENTAL);
+//        }
+//
+//        // Build result
+//        return createResult();
+//    }
+//
+//
+//    /**
+//     * @fn      createResult
+//     * @brief   Creates command result
+//     */
+//    CommandResult *createResult() override
+//    {
+//        // Set status
+//        Status status = Status(false, true, true, true, true, false);
+//
+//        // Add items to display
+//        vector<Displayable*> vDisplayableIn;
+//        if (getSuccess())
+//        {
+//            Dcel *dcel = in.getStoreService()->getDcel();
+//            Voronoi *voronoi = in.getStoreService()->getVoronoi();
+//
+//            // Add delaunay and voronoi
+//            vDisplayableIn.push_back(DisplayableFactory::createDcel(dcel));
+//            vDisplayableIn.push_back(DisplayableFactory::createDcel(voronoi->getRefDcel()));
+//        }
+//
+//        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayableIn);
+//    }
+//};
 
 
 /***********************************************************************************************************************
@@ -2323,11 +2318,6 @@ public:
 ***********************************************************************************************************************/
 class CommandWriteFile : public Command
 {
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    vector<Displayable*> vDisplayable;
-
 public:
     /*******************************************************************************************************************
     * Public class methods
@@ -2362,9 +2352,9 @@ public:
         Status status = *in.getStoreService()->getStatus();
 
         // Add items to display
-        vector<Displayable*> vDisplayable;
+        vector<Displayable*> vDisplayableIn;
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayableIn);
     }
 
     CmdParamIn *getInput() { return &in; }
