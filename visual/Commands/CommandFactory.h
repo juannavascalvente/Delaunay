@@ -11,17 +11,26 @@
 #include "Command.h"
 #include "Dcel.h"
 
+#include <map>
+
+typedef Command * (*pfuncCommandCreate)(StoreService *storeService, ConfigService *configService);
+
 
 /***********************************************************************************************************************
 * Public method definitions
 ***********************************************************************************************************************/
 class CommandFactory
 {
-    /***********************************************************************************************************************
+    /*******************************************************************************************************************
+    * Private memebers
+    *******************************************************************************************************************/
+    static map<int, pfuncCommandCreate> mapFactories;
+
+    /*******************************************************************************************************************
     * Private method declarations
-    ***********************************************************************************************************************/
-    static Command *createNull();
-    static Command *createReadCfg();
+    *******************************************************************************************************************/
+    static Command *createNull(StoreService *storeService, ConfigService *configService);
+    static Command *createReadCfg(StoreService *storeService, ConfigService *configService);
     static Command *createRandomGenerator(StoreService *storeService, ConfigService *configService);
     static Command *createClusterGenerator(StoreService *storeService, ConfigService *configService);
     static Command *createStarTriangulation(StoreService *storeService, ConfigService *configService);
@@ -51,6 +60,8 @@ class CommandFactory
     static Command *createWriteDelaunay(StoreService *storeService, ConfigService *configService);
     static Command *createWriteVoronoi(StoreService *storeService, ConfigService *configService);
     static Command *createWriteGabriel(StoreService *storeService, ConfigService *configService);
+
+    static void initialize();
 
 public:
 
