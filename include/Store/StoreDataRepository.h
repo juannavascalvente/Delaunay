@@ -16,13 +16,13 @@ class StoreDataRepository
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    StoreData *data;
+    StoreData data;
     static StoreDataRepository *instance;
 
     /*******************************************************************************************************************
      * Private methods
      ******************************************************************************************************************/
-    StoreDataRepository();
+    StoreDataRepository() = default;
 
 public:
 
@@ -43,7 +43,7 @@ public:
      *
      * @return      Pointer to data
      */
-    StoreData* getData() { return getInstance()->data; };
+    StoreData* getData() { return &getInstance()->data; };
 
     /**
       * @fn         deleteInstance

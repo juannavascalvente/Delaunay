@@ -24,12 +24,6 @@ StoreDataRepository *StoreDataRepository::getInstance()
 }
 
 
-StoreDataRepository::StoreDataRepository() : data(nullptr)
-{
-    instance = new StoreDataRepository();
-}
-
-
 void StoreDataRepository::deleteInstance()
 {
     delete instance;
