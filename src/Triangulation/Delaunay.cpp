@@ -1122,52 +1122,52 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 //}
 
 
-/***************************************************************************
-* Name: 	getInternalFace
-* IN:		edgesIndex		set of edges to check
-* OUT:		NONE
-* IN/OUT:	face			face to be updated
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	get the face that is in the convex hull that is a twin face
-* 				of the external input "face".
-***************************************************************************/
-void Delaunay::getInternalFace(Line &line, Set<int> &edgesIndex, int &face)
-{
-	int		i=0;				// Loop counter.
-	bool	found;		        // Loop control flag.
-	int		edgeIndex=0;		// Edge index.
-
-	// Initialize loop variables.
-	i=0;
-	found = false;
-
-	// Loop until all edges checked or face found.
-	while ((i < edgesIndex.getNElements()) && (!found))
-	{
-		// Get next edge.
-		edgeIndex = *edgesIndex.at(i);
-#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
-		Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
-		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-		Logging::write(true, Info);
-#endif
-
-		// Check if edge face is equal to input face.
-		if (this->dcel->getFace(edgeIndex) == face)
-		{
-			// Twin face is the internal face searched.
-			found = true;
-			face = this->dcel->getFace(this->dcel->getTwin(edgeIndex)-1);
-#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
-			Logging::buildText(__FUNCTION__, __FILE__, "Edge found and face is ");
-			Logging::buildText(__FUNCTION__, __FILE__, face);
-			Logging::write(true, Info);
-#endif
-		}
-		i++;
-	}
-}
+///***************************************************************************
+//* Name: 	getInternalFace
+//* IN:		edgesIndex		set of edges to check
+//* OUT:		NONE
+//* IN/OUT:	face			face to be updated
+//* RETURN:	NONE
+//* GLOBAL:	NONE
+//* Description: 	get the face that is in the convex hull that is a twin face
+//* 				of the external input "face".
+//***************************************************************************/
+//void Delaunay::getInternalFace(Line &line, Set<int> &edgesIndex, int &face)
+//{
+//	int		i=0;				// Loop counter.
+//	bool	found;		        // Loop control flag.
+//	int		edgeIndex=0;		// Edge index.
+//
+//	// Initialize loop variables.
+//	i=0;
+//	found = false;
+//
+//	// Loop until all edges checked or face found.
+//	while ((i < edgesIndex.getNElements()) && (!found))
+//	{
+//		// Get next edge.
+//		edgeIndex = *edgesIndex.at(i);
+//#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
+//		Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
+//		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
+//		Logging::write(true, Info);
+//#endif
+//
+//		// Check if edge face is equal to input face.
+//		if (this->dcel->getFace(edgeIndex) == face)
+//		{
+//			// Twin face is the internal face searched.
+//			found = true;
+//			face = this->dcel->getFace(this->dcel->getTwin(edgeIndex)-1);
+//#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
+//			Logging::buildText(__FUNCTION__, __FILE__, "Edge found and face is ");
+//			Logging::buildText(__FUNCTION__, __FILE__, face);
+//			Logging::write(true, Info);
+//#endif
+//		}
+//		i++;
+//	}
+//}
 
 /***************************************************************************
 * Name: 	findFace
