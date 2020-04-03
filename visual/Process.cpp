@@ -29,13 +29,10 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 	this->log = new Logging("log.txt", printData);
     configService = configServiceIn;
     storeService = storeServiceIn;
-    dispManager = new DisplayManager(argc, argv);
 
-    // Initialize menu
-	this->menu = Menu();
-    this->menu.updateMenu(storeServiceIn->getStatus());
-
-	// Function to execute by GLUT.
+    // Initialize display
+    dispManager = new DisplayManager(argc, argv, storeService);
+    dispManager->updateMenu();
     dispManager->setLoopFunction(executeWrapper);
 }
 
@@ -103,11 +100,10 @@ void Process::execute()
         vector<Displayable*> vDisplayable(0);
         result->getItems(vDisplayable);
         dispManager->add(vDisplayable);
-
         dispManager->process();
 
         // Update menu entries.
-        menu.updateMenu(storeService->getStatus());
+        dispManager->updateMenu();
     }
 
 	// Delete iteration resources

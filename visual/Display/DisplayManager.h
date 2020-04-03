@@ -10,8 +10,11 @@
 ***********************************************************************************************************************/
 #include "DisplayService.h"
 #include "Displayable.h"
+#include "Menu.h"
 
 #include <vector>
+#include <Store/StoreService.h>
+
 using namespace std;
 
 
@@ -23,7 +26,9 @@ class DisplayManager
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    vector<Displayable *> vDisplayables;
+    vector<Displayable *>   vDisplayables;
+    Menu 			        menu;		    // Menu object.
+    StoreService            *storeService;
 
     /*******************************************************************************************************************
      * Private methods declaration
@@ -51,7 +56,7 @@ public:
     /*******************************************************************************************************************
      * Public methods declaration
      *******************************************************************************************************************/
-    DisplayManager(int argc, char **argv) : vDisplayables(0)
+    DisplayManager(int argc, char **argv, StoreService *service) : vDisplayables(0), storeService(service)
     {
         // Initialize display
         DisplayService::init(argc, argv);
@@ -87,14 +92,20 @@ public:
      * @fn      startLoop
      * @brief   Starts glu main loop
      */
-    void startLoop() { DisplayService::startLoop(); }
+    static void startLoop() { DisplayService::startLoop(); }
 
 
     /**
      * @fn      setLoopFunction
      * @brief   Set function to be executed in glu main loop
      */
-    void setLoopFunction(void (* f)()) { glutDisplayFunc((*f)); }
+    static void setLoopFunction(void (* f)()) { glutDisplayFunc((*f)); }
+
+    /**
+     * @fn      updateMenu
+     * @brief   Updae menu entries
+     */
+    void updateMenu() { menu.updateMenu(storeService->getStatus()); }
 };
 
 
