@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 #ifndef DELAUNAY_STOREDATA_H
 #define DELAUNAY_STOREDATA_H
 
@@ -21,20 +17,29 @@
 ***********************************************************************************************************************/
 class StoreData
 {
-    static Status 			    status;			// Current status.
-    static Dcel			        dcel;			// Dcel data.
-    static Delaunay		        delaunay;		// Delaunay data.
-    static StarTriangulation	triangulation;	// Star triangulation data.
-    static Voronoi			    voronoi;		// Voronoi diagram data.
-    static Gabriel			    gabriel;		// Gabriel graph data.
+
+    /*******************************************************************************************************************
+    * Privae class members
+    *******************************************************************************************************************/
+    Status 			    status;			// Current status.
+    Dcel			    dcel;			// Dcel data.
+    Delaunay		    delaunay;		// Delaunay data.
+    StarTriangulation	triangulation;	// Star triangulation data.
+    Voronoi			    voronoi;		// Voronoi diagram data.
+    Gabriel			    gabriel;		// Gabriel graph data.
+
 public:
 
-    static Status *getStatus() { return &status; };
-    static Dcel *getDcel() { return &dcel; };
-    static Delaunay *getDelaunay() { return &delaunay; };
-    static StarTriangulation *getStarTriang() { return &triangulation; };
-    static Voronoi *getVoronoi() { return &voronoi; };
-    static Gabriel *getGabriel() { return &gabriel; };
+    /*******************************************************************************************************************
+    * Getters
+    *******************************************************************************************************************/
+    Status   *getStatus()   { return &status; };
+    Dcel     *getDcel()     { return &dcel; };
+    Delaunay *getDelaunay() { return &delaunay; };
+    StarTriangulation *getStarTriang() { return &triangulation; };
+    Voronoi *getVoronoi()   { return &voronoi; };
+    Gabriel *getGabriel()   { return &gabriel; };
+
 };
 
 
