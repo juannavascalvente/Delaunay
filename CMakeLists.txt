@@ -32,6 +32,25 @@ else (BUILD_RELEASE)
 endif (BUILD_DEBUG)
 
 
+########################################### Visual Source code #########################################################
+file(GLOB DELAUNAY_VISUAL_HEADER_FILES
+        ${BUILD_PATH}/statistics
+        ${BUILD_PATH}/test
+        ${BUILD_PATH}/visual
+        ${BUILD_PATH}/visual/Commands
+        ${BUILD_PATH}/visual/Display
+        ${BUILD_PATH}/visual/Display/Displayable
+        )
+
+file(GLOB DELAUNAY_VISUAL_SRC_FILES
+        ${BUILD_PATH}/statistics/*.cpp
+        ${BUILD_PATH}/test/*.cpp
+        ${BUILD_PATH}/visual/*.cpp
+        ${BUILD_PATH}/visual/Commands/*.cpp
+        ${BUILD_PATH}/visual/Display/*.cpp
+        ${BUILD_PATH}/visual/Display/Displayable/*.cpp
+        )
+
 ################################################ Source code ##########################################################
 file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include
@@ -44,12 +63,6 @@ file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include/Triangulation
         ${BUILD_PATH}/include/Visual
         ${BUILD_PATH}/include/Voronoi
-        ${BUILD_PATH}/statistics
-        ${BUILD_PATH}/test
-        ${BUILD_PATH}/visual
-        ${BUILD_PATH}/visual/Commands
-        ${BUILD_PATH}/visual/Display
-        ${BUILD_PATH}/visual/Display/Displayable
         )
 
 file(GLOB DELAUNAY_SRC_FILES
@@ -63,12 +76,6 @@ file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/src/Triangulation/*.cpp
         ${BUILD_PATH}/src/Visual/*.cpp
         ${BUILD_PATH}/src/Voronoi/*.cpp
-        ${BUILD_PATH}/statistics/*.cpp
-        ${BUILD_PATH}/test/*.cpp
-        ${BUILD_PATH}/visual/*.cpp
-        ${BUILD_PATH}/visual/Commands/*.cpp
-        ${BUILD_PATH}/visual/Display/*.cpp
-        ${BUILD_PATH}/visual/Display/Displayable/*.cpp
         )
 
 ################################################### GTest #############################################################
@@ -78,10 +85,29 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 
 ################################################ Executable ###########################################################
-add_executable(Delaunay ${DELAUNAY_SRC_FILES})
+add_executable(Delaunay ${DELAUNAY_SRC_FILES} ${DELAUNAY_VISUAL_SRC_FILES})
 target_link_libraries(Delaunay LINK_PUBLIC m pthread ${GTEST_LIBRARIES} -lglut -lGL)
 target_include_directories(Delaunay
         PUBLIC
         ${DELAUNAY_HEADER_FILES}
-
+        ${DELAUNAY_VISUAL_HEADER_FILES}
 )
+
+
+################################################ Library ###########################################################
+file(GLOB DELAUNAY_LIB_HEADER_FILES
+        ${BUILD_PATH}/lib/inc
+        )
+
+file(GLOB DELAUNAY_LIB_SRC_FILES
+        ${BUILD_PATH}/lib/src/*.cpp
+        )
+
+add_library(DelaunayLib ${DELAUNAY_SRC_FILES} ${DELAUNAY_LIB_SRC_FILES})
+
+target_include_directories(DelaunayLib
+        PUBLIC
+        ${DELAUNAY_HEADER_FILES}
+        ${DELAUNAY_LIB_HEADER_FILES}
+
+        )
