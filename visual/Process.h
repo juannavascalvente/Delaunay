@@ -15,7 +15,6 @@
 #include "ConfigService.h"
 #include "DisplayManager.h"
 #include "Logging.h"
-#include "Menu.h"
 #include "StoreService.h"
 
 
@@ -30,8 +29,6 @@ class Process
     DisplayManager      *dispManager;
     ConfigService       *configService;
     StoreService        *storeService;
-
-	Menu 			    menu;		    // Menu object.
 	Logging 		    *log;			// Log file.
 
     /*******************************************************************************************************************
