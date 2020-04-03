@@ -8,11 +8,12 @@
 #include "Delaunay.h"
 #include "Logging.h"
 #include "Point.h"
-#include "Queue.h"
 #include "Voronoi.h"
-#include <cfloat>
 #include "DcelReader.h"
 #include "DcelWriter.h"
+
+#include <queue>
+#include <cfloat>
 
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_DELAUNAY
@@ -720,7 +721,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 	int	 currentPointIndex=0;	// Current point in loop.
 	int	 currentEdgeIndex=0;	// Current edge in loop.
 	int  i=0;					// Loop counter.
-	Queue<int> queue(NPOINTS_TRIANGLE*2);
+    queue<int> queue;
 	bool *insertedPoints;		// Array of previously point checked.
 
 #ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
@@ -746,7 +747,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 			{
 				// Insert current point and set as inserted.
 				insertedPoints[pointIndex] = true;
-				queue.enqueue(pointIndex);
+				queue.push(pointIndex);
 #ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
 				Logging::buildText(__FUNCTION__, __FILE__, "Inserted initial point ");
 				Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
@@ -768,7 +769,8 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 		do
 		{
 			// Get next point.
-			pointIndex = queue.dequeue();
+			pointIndex = queue.front();
+            queue.pop();
 #ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
 			Logging::buildText(__FUNCTION__, __FILE__, "Checking point ");
 			Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
@@ -811,7 +813,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 #endif
 							// Insert current point and set as inserted.
 							insertedPoints[currentPointIndex] = true;
-							queue.enqueue(currentPointIndex);
+							queue.push(currentPointIndex);
 						}
 #ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
 						else
@@ -836,7 +838,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 					currentPointIndex = this->dcel->getOrigin(currentEdgeIndex)-1;
 				} while (currentPointIndex != firstPointIndex);
 			}
-		} while ((!found) && (queue.getNElements() > 0));
+		} while (!found && !queue.empty());
 
 		if (found)
 		{
@@ -849,58 +851,58 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 	// Deallocate memory.
 	delete[] insertedPoints;
 
-	return(found);
+	return found;
 }
 
 
 // PENDING
-bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, double &distance)
-{
-	bool 	found;		        // Return value.
-	int		pointIndex=0;		// Loop counter.
-	int		id=0;				// Point identifier.
-	Point<TYPE> currentPoint;	// Current point.
-	TYPE 	dist;	    		// New distance.
-
-	// Create seed.
-	srand48((int) time(nullptr));
-
-	// Set current distance.
-	distance = FLT_MAX;
-
-	// Select closest anchor.
-	for (pointIndex=0; pointIndex<nAnchors ;pointIndex++)
-	{
-		// Generate a random point.
-		id = rand() % this->getRefDcel()->getNVertex();
-		currentPoint = *this->getRefDcel()->getRefPoint(id);
-
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
-		Logging::buildText(__FUNCTION__, __FILE__, "Checking distance form point id ");
-		Logging::buildText(__FUNCTION__, __FILE__, id);
-		Logging::write(true, Info);
-#endif
-
-		// Compute distance to current anchor.
-		dist = p.distance(currentPoint);
-		if(dist < distance)
-		{
-			// Update output data.
-			q = currentPoint;
-			distance = dist;
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
-			Logging::buildText(__FUNCTION__, __FILE__, "Lower distance ");
-			Logging::buildText(__FUNCTION__, __FILE__, distance);
-			Logging::write(true, Info);
-#endif
-		}
-	}
-
-	// Update return value.
-	found = true;
-
-	return(found);
-}
+//bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, double &distance)
+//{
+//	bool 	found;		        // Return value.
+//	int		pointIndex=0;		// Loop counter.
+//	int		id=0;				// Point identifier.
+//	Point<TYPE> currentPoint;	// Current point.
+//	TYPE 	dist;	    		// New distance.
+//
+//	// Create seed.
+//	srand48((int) time(nullptr));
+//
+//	// Set current distance.
+//	distance = FLT_MAX;
+//
+//	// Select closest anchor.
+//	for (pointIndex=0; pointIndex<nAnchors ;pointIndex++)
+//	{
+//		// Generate a random point.
+//		id = rand() % this->getRefDcel()->getNVertex();
+//		currentPoint = *this->getRefDcel()->getRefPoint(id);
+//
+//#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
+//		Logging::buildText(__FUNCTION__, __FILE__, "Checking distance form point id ");
+//		Logging::buildText(__FUNCTION__, __FILE__, id);
+//		Logging::write(true, Info);
+//#endif
+//
+//		// Compute distance to current anchor.
+//		dist = p.distance(currentPoint);
+//		if(dist < distance)
+//		{
+//			// Update output data.
+//			q = currentPoint;
+//			distance = dist;
+//#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
+//			Logging::buildText(__FUNCTION__, __FILE__, "Lower distance ");
+//			Logging::buildText(__FUNCTION__, __FILE__, distance);
+//			Logging::write(true, Info);
+//#endif
+//		}
+//	}
+//
+//	// Update return value.
+//	found = true;
+//
+//	return(found);
+//}
 
 /***************************************************************************
 * Name: 	findPath
@@ -1028,96 +1030,96 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 	return(found);
 }
 
-/***************************************************************************
-* Name: 	getInitialFaces
-* IN:		line			line whose extreme points must be located
-* 			edgesSet		set of edges that intersect convex hull.
-* OUT:		NONE
-* IN/OUT:	initialFace		first face into the DCEL convex hull
-* 			finalFace		last face into the DCEL convex hull
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	at least one of the line extreme points is not into the
-* 				convex hull. PENDING
-***************************************************************************/
-void Delaunay::getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace)
-{
-	int			i=0;			// Loop counter.
-	Point<TYPE>	point;			// Line extreme point.
-	Set<int> 	edgesIndex;		// Set of edges index.
-
-	//PENDING REMOVE this->dcel->print(std::cout);
-	// Get real edges ID in DCEL.
-	for (i=0; i<edgesSet.getNElements() ;i++)
-	{
-		edgesIndex.add((*this->getConvexHullEdges()->at(*edgesSet.at(i))) - 1);
-#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-		Logging::buildText(__FUNCTION__, __FILE__, "Intersected edge index ");
-		Logging::buildText(__FUNCTION__, __FILE__, *edgesIndex.at(i));
-		Logging::write(true, Info);
-#endif
-	}
-
-#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-	Logging::buildText(__FUNCTION__, __FILE__, "Initial faces are ");
-	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
-	Logging::write(true, Info);
-#endif
-
-	if (this->dcel->isBottomMostFace(initialFace))
-	{
-		if (this->dcel->getFace(*edgesIndex.at(0)) == finalFace)
-		{
-			initialFace = this->dcel->getFace(*edgesIndex.at(1));
-		}
-		else
-		{
-			initialFace = this->dcel->getFace(*edgesIndex.at(0));
-		}
-	}
-	else if (this->dcel->isBottomMostFace(finalFace))
-	{
-		if (this->dcel->getFace(*edgesIndex.at(0)) == initialFace)
-		{
-			finalFace = this->dcel->getFace(*edgesIndex.at(1));
-		}
-		else
-		{
-			finalFace = this->dcel->getFace(*edgesIndex.at(0));
-		}
-	}
-#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-	Logging::buildText(__FUNCTION__, __FILE__, "Corrected faces are ");
-	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
-	Logging::write(true, Info);
-#endif
-
-	// Check if origin extreme point is internal to the convex hull.
-	point = line.getOrigin();
-	if (!this->getConvexHull()->isInternal(point))
-	{
-#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-		Logging::buildText(__FUNCTION__, __FILE__, "Origin is external to convex hull");
-		Logging::write(true, Info);
-#endif
-		this->getInternalFace(line, edgesIndex, initialFace);
-	}
-
-	// Check if origin extreme point is internal to the convex hull.
-	point = line.getDest();
-	if (!this->getConvexHull()->isInternal(point))
-	{
-#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-		Logging::buildText(__FUNCTION__, __FILE__, "Destination is external to convex hull");
-		Logging::write(true, Info);
-#endif
-		this->getInternalFace(line, edgesIndex, finalFace);
-	}
-}
+///***************************************************************************
+//* Name: 	getInitialFaces
+//* IN:		line			line whose extreme points must be located
+//* 			edgesSet		set of edges that intersect convex hull.
+//* OUT:		NONE
+//* IN/OUT:	initialFace		first face into the DCEL convex hull
+//* 			finalFace		last face into the DCEL convex hull
+//* RETURN:	NONE
+//* GLOBAL:	NONE
+//* Description: 	at least one of the line extreme points is not into the
+//* 				convex hull. PENDING
+//***************************************************************************/
+//void Delaunay::getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace)
+//{
+//	int			i=0;			// Loop counter.
+//	Point<TYPE>	point;			// Line extreme point.
+//	Set<int> 	edgesIndex;		// Set of edges index.
+//
+//	//PENDING REMOVE this->dcel->print(std::cout);
+//	// Get real edges ID in DCEL.
+//	for (i=0; i<edgesSet.getNElements() ;i++)
+//	{
+//		edgesIndex.add((*this->getConvexHullEdges()->at(*edgesSet.at(i))) - 1);
+//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+//		Logging::buildText(__FUNCTION__, __FILE__, "Intersected edge index ");
+//		Logging::buildText(__FUNCTION__, __FILE__, *edgesIndex.at(i));
+//		Logging::write(true, Info);
+//#endif
+//	}
+//
+//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+//	Logging::buildText(__FUNCTION__, __FILE__, "Initial faces are ");
+//	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
+//	Logging::buildText(__FUNCTION__, __FILE__, " and ");
+//	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
+//	Logging::write(true, Info);
+//#endif
+//
+//	if (this->dcel->isBottomMostFace(initialFace))
+//	{
+//		if (this->dcel->getFace(*edgesIndex.at(0)) == finalFace)
+//		{
+//			initialFace = this->dcel->getFace(*edgesIndex.at(1));
+//		}
+//		else
+//		{
+//			initialFace = this->dcel->getFace(*edgesIndex.at(0));
+//		}
+//	}
+//	else if (this->dcel->isBottomMostFace(finalFace))
+//	{
+//		if (this->dcel->getFace(*edgesIndex.at(0)) == initialFace)
+//		{
+//			finalFace = this->dcel->getFace(*edgesIndex.at(1));
+//		}
+//		else
+//		{
+//			finalFace = this->dcel->getFace(*edgesIndex.at(0));
+//		}
+//	}
+//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+//	Logging::buildText(__FUNCTION__, __FILE__, "Corrected faces are ");
+//	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
+//	Logging::buildText(__FUNCTION__, __FILE__, " and ");
+//	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
+//	Logging::write(true, Info);
+//#endif
+//
+//	// Check if origin extreme point is internal to the convex hull.
+//	point = line.getOrigin();
+//	if (!this->getConvexHull()->isInternal(point))
+//	{
+//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+//		Logging::buildText(__FUNCTION__, __FILE__, "Origin is external to convex hull");
+//		Logging::write(true, Info);
+//#endif
+//		this->getInternalFace(line, edgesIndex, initialFace);
+//	}
+//
+//	// Check if origin extreme point is internal to the convex hull.
+//	point = line.getDest();
+//	if (!this->getConvexHull()->isInternal(point))
+//	{
+//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
+//		Logging::buildText(__FUNCTION__, __FILE__, "Destination is external to convex hull");
+//		Logging::write(true, Info);
+//#endif
+//		this->getInternalFace(line, edgesIndex, finalFace);
+//	}
+//}
 
 
 /***************************************************************************

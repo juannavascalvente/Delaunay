@@ -1061,6 +1061,7 @@ public:
         }
 
         // Build result
+        setIsSuccess(isRunSuccess);
         return createResult();
     }
 
