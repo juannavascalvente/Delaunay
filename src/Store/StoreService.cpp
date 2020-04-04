@@ -20,8 +20,14 @@ void StoreService::destroy()
 void StoreService::reset()
 {
     // Reset Delaunay
-    getDelaunay()->reset();
+    if (getDelaunay())
+    {
+        getDelaunay()->reset();
+    }
 
     // Reset Voronoi
-    getVoronoi()->reset();
+    if (getVoronoi())
+    {
+        getVoronoi()->reset();
+    }
 }

@@ -202,6 +202,10 @@ public:
 
         // Run command
         bool isRunSuccess = DcelGenerator::generateRandom(szNumPoints, vPoints);
+        if (isRunSuccess)
+        {
+            in.getStoreService()->save(vPoints);
+        }
 
         // Build result
         setIsSuccess(isRunSuccess);
@@ -307,9 +311,9 @@ public:
 
         // Run command
         bool isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, vPoints);
-        for (auto point : vPoints)
+        if (isRunSuccess)
         {
-            cout << point << endl;
+            in.getStoreService()->save(vPoints);
         }
 
         // Build result
@@ -385,8 +389,16 @@ public:
     CommandResult * runCommand() override
     {
         // Run command
-        StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-        bool isRunSuccess = triangulation->build(in.getStoreService()->getDcel());
+        auto *triangulation = new StarTriangulation(in.getStoreService()->getPoints());
+        bool isRunSuccess = triangulation->build();
+
+        // Save result
+        if (isRunSuccess)
+        {
+            in.getStoreService()->save(*triangulation);
+        }
+
+        delete triangulation;
 
         // Build result
         setIsSuccess(isRunSuccess);
@@ -406,7 +418,7 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            Dcel *dcel = in.getStoreService()->getDcel();
+            Dcel *dcel = in.getStoreService()->getStarTriang()->getDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
         }
 

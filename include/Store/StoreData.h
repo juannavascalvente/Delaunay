@@ -51,6 +51,7 @@ public:
     * Setters
     *******************************************************************************************************************/
     void save(vector<Point<TYPE>> &vPointsIn);
+    void save(StarTriangulation &triangulation);
     void save(Delaunay &in);
 };
 

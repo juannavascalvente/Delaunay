@@ -71,60 +71,34 @@ Dcel::Dcel()
 	this->nFaces = 0;
 	this->sizeFaces = 0;
 	this->faces = nullptr;
-	this->minX = 0.0;
-	this->minY = 0.0;
-	this->maxX = 0.0;
-	this->maxY = 0.0;
 }
 
 
-Dcel::Dcel(int nPoints, int nEdges, int nFaces)
+Dcel::Dcel(vector<Point<TYPE>> &vPoints) : Dcel()
 {
-	// Initialize max and min X and Y coordinates.
-	this->minX = 0.0;
-	this->minY = 0.0;
-	this->maxX = 0.0;
-	this->maxY = 0.0;
-
     try
     {
     	this->incremental = false;
 
-		// Initialize vertex.
+		// Initialize vertex
 		this->nVertex = 0;
-		this->sizeVertex = nPoints;
+		this->sizeVertex = vPoints.size();
 		this->vertex = new Vertex[this->sizeVertex];
+		for (auto point : vPoints)
+        {
+            this->vertex[this->nVertex].setPoint(&point);
+            this->nVertex++;
+        }
 
-		// Initialize edges attributes.
+		// Initialize edges
 		this->nEdges = 0;
-		this->sizeEdges = nEdges;
-		if (this->sizeEdges == INVALID)
-		{
-			// Max number of edges is = 3xnPoints - 6.
-			// NOTE: It is 6xnPoints because there are two directions per edge.
-			this->sizeEdges = 6*(this->sizeVertex+2) - 6;
-		}
+		this->sizeEdges = 3*2*vPoints.size() - 6;
 		this->edges = new Edge[this->sizeEdges];
 
-		// Initialize faces attributes. If # vertices and # edges are known then # faces = 2 - #v + #e
+		// Initialize faces
 		this->nFaces = 0;
-		this->sizeFaces = nFaces;
-		if (nFaces == INVALID)
-		{
-			this->sizeFaces = 2 - this->sizeVertex + this->sizeEdges;
-		}
+		this->sizeFaces = 2 - this->sizeVertex + this->sizeEdges;
 		this->faces = new Face[this->sizeFaces];
-
-#ifdef DEBUG_DCEL_CONSTRUCTOR
-		Logging::buildText(__FUNCTION__, __FILE__, "Allocating ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeVertex);
-		Logging::buildText(__FUNCTION__, __FILE__, " points, ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeEdges);
-		Logging::buildText(__FUNCTION__, __FILE__, " edges and ");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeFaces);
-		Logging::buildText(__FUNCTION__, __FILE__, " faces.");
-		Logging::write(true, Info);
-#endif
 		this->created = true;
     }
     catch (exception &ex)
@@ -132,11 +106,6 @@ Dcel::Dcel(int nPoints, int nEdges, int nFaces)
     	this->invalidate();
 
     	ex.what();
-#ifdef LOGGING
-    	// PENDING RETURN ERROR IF MEMORY NOT ALLOCATED.
-    	Logging::buildText(__FUNCTION__, __FILE__, "Error allocating data.\n");
-    	Logging::write(true, Error);
-#endif
 	}
 }
 
@@ -1724,6 +1693,35 @@ bool Dcel::operator==(const Dcel& other) const
 	return(equal);
 }
 
+
+Dcel & Dcel::operator=(const Dcel &d)
+{
+    this->incremental = d.incremental;
+    this->created = d.created;
+
+    // Initialize vertex
+    this->nVertex = d.nVertex;
+    this->sizeVertex = d.sizeVertex;
+    delete[] this->vertex;
+    this->vertex = new Vertex[this->sizeVertex];
+    memcpy((void *)this->vertex, (void *)d.vertex, sizeof(Vertex)*d.nVertex);
+
+    // Initialize edges
+    this->nEdges = d.nEdges;
+    this->sizeEdges = d.sizeEdges;
+    delete[] this->edges;
+    this->edges = new Edge[this->sizeEdges];
+    memcpy((void *)this->edges, (void *)d.edges, sizeof(Edge)*d.nEdges);
+
+    // Initialize faces
+    this->nFaces = d.nFaces;
+    this->sizeFaces = d.sizeFaces;
+    delete[] this->faces;
+    this->faces = new Face[this->sizeFaces];
+    memcpy((void *)this->faces, (void *)d.faces, sizeof(Face)*d.nFaces);
+
+    return *this;
+}
 
 /***********************************************************************************************************************
 * Private methods definitions

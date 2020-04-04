@@ -48,6 +48,7 @@ public:
     /*******************************************************************************************************************
     * Getters
     *******************************************************************************************************************/
+    vector<Point<TYPE>>      &getPoints()    { return *repository->getData()->getPoints(); };
     Status      *getStatus()    { return repository->getData()->getStatus(); };
     Dcel        *getDcel()      { return repository->getData()->getDcel(); };
     Delaunay    *getDelaunay()  { return repository->getData()->getDelaunay(); };
@@ -58,7 +59,8 @@ public:
     /*******************************************************************************************************************
     * Setters
     *******************************************************************************************************************/
-    void    setPoints(vector<Point<TYPE>> &vPoints) { repository->getData()->save(vPoints); };
+    void    save(vector<Point<TYPE>> &vPoints) { repository->getData()->save(vPoints); };
+    void    save(StarTriangulation &triangulation) { repository->getData()->save(triangulation); };
 };
 
 
