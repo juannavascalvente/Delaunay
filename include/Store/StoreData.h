@@ -21,6 +21,7 @@ class StoreData
     /*******************************************************************************************************************
     * Privae class members
     *******************************************************************************************************************/
+    vector<Point<TYPE>> vPoints;        // Set of points
     Status 			    status;			// Current status.
     Dcel			    dcel;			// Dcel data.
     Delaunay		    delaunay;		// Delaunay data.
@@ -33,6 +34,7 @@ public:
     /*******************************************************************************************************************
     * Getters
     *******************************************************************************************************************/
+    vector<Point<TYPE>> *getPoints()   { return &vPoints; };
     Status   *getStatus()   { return &status; };
     Dcel     *getDcel()     { return &dcel; };
     Delaunay *getDelaunay() { return &delaunay; };
@@ -40,6 +42,10 @@ public:
     Voronoi *getVoronoi()   { return &voronoi; };
     Gabriel *getGabriel()   { return &gabriel; };
 
+    /*******************************************************************************************************************
+    * Setters
+    *******************************************************************************************************************/
+    void setPoints(vector<Point<TYPE>> &vPointsIn) { vPoints = vPointsIn; };
 };
 
 

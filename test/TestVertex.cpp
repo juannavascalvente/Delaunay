@@ -47,28 +47,6 @@ TEST (VertexUnitTest, Test_Parameter_Constructor)
     EXPECT_EQ(p, v.getPoint());
 }
 
-/**
- * DESCRIPTION: check shake
- *
- */
-TEST (VertexUnitTest, Test_Shake)
-{
-    // Check vertex edge and origin point.
-	int originEdge=7;
-	TYPE fpX=5.0;
-	TYPE fpY=3.0;
-	Point<TYPE> p(fpX, fpY);
-	Vertex v(originEdge, p);
-
-	// Check vertex build successfully.
-    EXPECT_EQ(originEdge, v.getOrigin());
-    EXPECT_EQ(p, v.getPoint());
-
-    // Shake vertex.
-    v.shake();
-    EXPECT_EQ(originEdge, v.getOrigin());
-    EXPECT_NE(p, v.getPoint());
-}
 
 /**
  * DESCRIPTION: check operators

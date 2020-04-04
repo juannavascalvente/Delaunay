@@ -54,6 +54,11 @@ public:
     Voronoi     *getVoronoi()   { return repository->getData()->getVoronoi(); };
     Gabriel     *getGabriel()   { return repository->getData()->getGabriel(); };
     StarTriangulation *getStarTriang() { return repository->getData()->getStarTriang(); };
+
+    /*******************************************************************************************************************
+    * Setters
+    *******************************************************************************************************************/
+    void    setPoints(vector<Point<TYPE>> &vPoints) { repository->getData()->setPoints(vPoints); };
 };
 
 

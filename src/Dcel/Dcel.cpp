@@ -1189,24 +1189,6 @@ bool Dcel::isValid()
 	return(true);
 }
 
-/***************************************************************************
-* Name: 	shake
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	shake all points in DCEL.
-***************************************************************************/
-void Dcel::shake()
-{
-	int	i=0;			// Loop counter.
-
-	// Points loop.
-	for (i=0;i<this->nVertex ;i++)
-	{
-		this->vertex[i].shake();
-	}
-}
 
 
 /***************************************************************************

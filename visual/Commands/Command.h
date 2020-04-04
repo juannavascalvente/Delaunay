@@ -318,15 +318,20 @@ public:
         // Run command
         Dcel *dcel = in.getStoreService()->getDcel();
         bool isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, *dcel);
-
-        if (isRunSuccess)
+        isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, vPoints);
+        for (auto point : vPoints)
         {
-            // Add point display
-            for (size_t i=0; i< szNumPoints; i++)
-            {
-                vPoints.push_back(*dcel->getRefPoint(i));
-            }
+            cout << point << endl;
         }
+
+//        if (isRunSuccess)
+//        {
+//            // Add point display
+//            for (size_t i=0; i< szNumPoints; i++)
+//            {
+//                vPoints.push_back(*dcel->getRefPoint(i));
+//            }
+//        }
 
         // Build result
         setIsSuccess(isRunSuccess);

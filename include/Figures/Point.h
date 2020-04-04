@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <random>
 using namespace std;
 #include <cmath>
 
@@ -96,7 +97,14 @@ public:
 
 	bool isInvalid() { return (this->getX() == INVALID) && (this->getY() == INVALID); }
 	void random();
-	void shake();
+
+	/**
+	 * @fn      shake
+	 * @brief   Moves point in x and y coordinates
+	 * @param   radius      (IN) Maximum distance to move coordinates
+	 */
+	void shake(TYPE radius);
+
 	inline void shift(TYPE deltaX, TYPE deltaY) {this->x += deltaX; this->y += deltaY;};
 
 	// I/O interface
@@ -236,24 +244,32 @@ template <class A_Type> void Point<A_Type>::random()
 	this->y = (A_Type) drand48()*MAX_Y_COORD;
 }
 
-/*****************************************************************************
- * Name: 		shake
- * Input: 		NONE
- * Description: Shake random x and y coordinates.
- * Output: 		NONE
- * Complexity:	O(1)
-*****************************************************************************/
-template <class A_Type> void Point<A_Type>::shake()
-{
-	A_Type delta=0.0;
 
-	// Generate random coordinates.
-	delta = (double)(rand() % 10);
-	delta = delta / 10.0;
-	this->x = this->x + (A_Type) delta;
-	delta = (double)(rand() % 10);
-	delta = delta / 10.0;
-	this->y = this->y + (A_Type) delta;
+template <class A_Type> void Point<A_Type>::shake(TYPE radius)
+{
+    // Generate random number between 0 and 3.
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> dist(0.0, 3.0);
+
+    // Move point in random direction.
+    int move = (int) dist(mt);
+    if (move == 0)
+    {
+        this->shift((TYPE) (-drand48()) * radius, (TYPE) (-drand48()) * radius);
+    }
+    else if (move == 1)
+    {
+        this->shift((TYPE) (-drand48()) * radius, (TYPE) drand48() * radius);
+    }
+    else if (move == 2)
+    {
+        this->shift((TYPE) drand48() * radius, (TYPE) (-drand48()) * radius);
+    }
+    else
+    {
+        this->shift((TYPE) drand48() * radius, (TYPE) drand48() * radius);
+    }
 }
 
 /*****************************************************************************

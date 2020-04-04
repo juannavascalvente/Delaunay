@@ -153,7 +153,6 @@ public:
 	void reset();
 	void resize(int size, bool copy);		// PENDING Return false if FAILED?
 	void invalidate();
-	void shake();
 	bool isValid();
 
 	// PENDING. Move to set? point?
