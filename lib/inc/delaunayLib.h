@@ -12,16 +12,34 @@
 /***********************************************************************************************************************
 * API function declarations
 ***********************************************************************************************************************/
-bool starTriangulation(const vector<TYPE> &vPoints, Dcel &dcel);
+/**
+ * @fn              getStarTriangulation
+ * @brief           Returns the dcel associated to a star triangulation
+ *
+ * @param vPoints   (IN) Triangulation number of points
+ * @param dcel      (OUT) Dcel associated to star triangulation
+ * @return          true if triangulation built successfully
+ *                  false otherwise
+ */
+bool getStarTriangulation(const vector<TYPE> &vPoints, Dcel &dcel);
 
 
-bool delaunay(const vector<TYPE> &vPoints, Delaunay &delaunay);
+/**
+ * @fn              getDelaunay
+ * @brief           Returns the dcel associated to a Delaunay triangulation
+ *
+ * @param vPoints   (IN) Triangulation number of points
+ * @param dcel      (OUT) Dcel associated to Delunay triangulation
+ * @return          true if triangulation built successfully
+ *                  false otherwise
+ */
+bool getDelaunay(const vector<TYPE> &vPoints, Dcel &dcel);
 
 
-bool voronoi(const vector<TYPE> &vPoints, Voronoi &voronoi);
+bool getVoronoi(const vector<TYPE> &vPoints, Dcel &dcel);
 
 
-bool convexHull(const Dcel &dcel, vector<TYPE> &vPoints);
+bool getConvexHull(const Dcel &dcel, vector<TYPE> &vPoints);
 
 
 

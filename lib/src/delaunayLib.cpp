@@ -8,7 +8,7 @@
 /***********************************************************************************************************************
 * API function definitions
 ***********************************************************************************************************************/
-bool starTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcel)
+bool getStarTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
     bool isSuccess;       // Return value
 
@@ -19,9 +19,9 @@ bool starTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcel)
         isSuccess = triangulation->build();
 
         // Update output
-        dcel = *triangulation->getDcel();
+        dcelOut = *triangulation->getDcel();
 
-        // Delete resources
+        // Free resources
         delete triangulation;
     }
     catch (std::bad_alloc& ba)
@@ -34,18 +34,23 @@ bool starTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcel)
 }
 
 
-bool delaunay(const vector<TYPE> &vPoints, Delaunay &delaunay)
+bool getDelaunay(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
     bool isSuccess;       // Return value
 
     try
     {
         // Insert points into dcel
-        Dcel *dcel = new Dcel();
-        delaunay.setDCEL(dcel);
+        auto *delaunay = new Delaunay(vPoints);
 
         // Build Delaunay from DCEL.
-        isSuccess = delaunay.incremental();
+        isSuccess = delaunay->incremental();
+
+        // Update output
+        dcelOut = *delaunay->getRefDcel();
+
+        // Free resources
+        delete delaunay;
     }
     catch (std::bad_alloc& ba)
     {
@@ -57,14 +62,14 @@ bool delaunay(const vector<TYPE> &vPoints, Delaunay &delaunay)
 }
 
 
-bool voronoi(const vector<TYPE> &vPoints, Voronoi &voronoi)
+bool getVoronoi(const vector<TYPE> &vPoints, Voronoi &voronoi)
 {
     // TODO -> pending to implement
     return false;
 }
 
 
-bool convexHull(const Dcel &dcel, vector<TYPE> &vPoints)
+bool getConvexHull(const Dcel &dcel, vector<TYPE> &vPoints)
 {
     // TODO -> pending to implement
     return false;

@@ -18,7 +18,7 @@ bool DelaunayIO::read(const string &fileName, const string &graphFileName, Delau
     bool	read;		// Return value.
 
     // Read DCEL data.
-    read = DcelReader::read(fileName, false, *delaunay.dcel);
+    read = DcelReader::read(fileName, false, delaunay.dcel);
     if (read)
     {
         // Initialize graph.
@@ -42,7 +42,7 @@ bool DelaunayIO::write(const string &strFileName, const string &strGraphFileName
     bool	success;		// Return value.
 
     // Write DCEL data.
-    success = DcelWriter::write(strFileName, false, *delaunay.dcel);
+    success = DcelWriter::write(strFileName, false, delaunay.dcel);
     if (success)
     {
         // Write graph data if graph exists.

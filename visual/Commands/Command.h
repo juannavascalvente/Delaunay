@@ -472,32 +472,19 @@ public:
     CommandResult * runCommand() override
     {
         // Get reference to current DCEL and Delaunay
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        delaunay->setDCEL(dcel);
+        Delaunay *delaunay = new Delaunay(in.getStoreService()->getPoints());
 
-        // Get reference to status
-        Status *status = in.getStoreService()->getStatus();
+        // Build Delaunay from DCEL.
+        bool isRunSuccess = delaunay->incremental();
 
-        // Build Delaunay from Star triangulation.
-        bool isRunSuccess=false;
-        if (status->isTriangulation())
+        // Save result
+        if (isRunSuccess)
         {
-            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            isRunSuccess = triangulation->delaunay();
-            delaunay->setAlgorithm(FROM_STAR);
-        }
-        else
-        {
-            // Build Delaunay from DCEL.
-            if (!status->isDelaunay())
-            {
-                isRunSuccess = delaunay->incremental();
-            }
+            in.getStoreService()->save( *delaunay);
         }
 
-        // Run command
-        StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+        // Free resources
+        delete delaunay;
 
         // Build result
         setIsSuccess(isRunSuccess);
@@ -2124,62 +2111,6 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandReadDcel : public Command
-{
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    vector<Displayable*> vDisplayable;
-
-public:
-    /*******************************************************************************************************************
-    * Public class methods
-    *******************************************************************************************************************/
-    explicit CommandReadDcel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
-
-
-    /**
-     * @fn      run
-     * @brief   Read dcel from file
-     *
-     * @return  true read was successfully
-     *          false otherwise
-     */
-    CommandResult* runCommand() override
-    {
-        // Reset store data
-        in.getStoreService()->reset();
-
-        // Run command
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), false, *dcel);
-
-        if (this->isSuccess)
-        {
-            delaunay->setDCEL(dcel);
-        }
-
-        // Build result
-        return createResult();
-    }
-
-
-    /**
-     * @fn      createResult
-     * @brief   Creates command result
-     */
-    CommandResult *createResult() override
-    {
-        Status status = Status(false, true, true, true, false, false);
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
-    }
-};
-
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
 class CommandReadDelaunay : public Command
 {
 public:
@@ -2202,9 +2133,7 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Dcel *dcel = in.getStoreService()->getDcel();
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        delaunay->setDCEL(dcel);
         this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
 
         if (this->isSuccess)
