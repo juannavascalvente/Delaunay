@@ -23,29 +23,35 @@ class StoreData
     *******************************************************************************************************************/
     vector<Point<TYPE>> vPoints;        // Set of points
     Status 			    status;			// Current status.
-    Dcel			    dcel;			// Dcel data.
-    Delaunay		    delaunay;		// Delaunay data.
-    StarTriangulation	triangulation;	// Star triangulation data.
-    Voronoi			    voronoi;		// Voronoi diagram data.
-    Gabriel			    gabriel;		// Gabriel graph data.
+    Dcel			    *dcel;			// Dcel data.
+    Delaunay		    *delaunay;		// Delaunay data.
+    StarTriangulation	*triangulation;	// Star triangulation data.
+    Voronoi			    *voronoi;		// Voronoi diagram data.
+    Gabriel			    *gabriel;		// Gabriel graph data.
 
 public:
+
+    /*******************************************************************************************************************
+    * Public methods
+    *******************************************************************************************************************/
+    StoreData() : dcel(nullptr), delaunay(nullptr), triangulation(nullptr), voronoi(nullptr), gabriel(nullptr) {};
 
     /*******************************************************************************************************************
     * Getters
     *******************************************************************************************************************/
     vector<Point<TYPE>> *getPoints()   { return &vPoints; };
     Status   *getStatus()   { return &status; };
-    Dcel     *getDcel()     { return &dcel; };
-    Delaunay *getDelaunay() { return &delaunay; };
-    StarTriangulation *getStarTriang() { return &triangulation; };
-    Voronoi *getVoronoi()   { return &voronoi; };
-    Gabriel *getGabriel()   { return &gabriel; };
+    Dcel     *getDcel()     { return dcel; };
+    Delaunay *getDelaunay() { return delaunay; };
+    StarTriangulation *getStarTriang() { return triangulation; };
+    Voronoi *getVoronoi()   { return voronoi; };
+    Gabriel *getGabriel()   { return gabriel; };
 
     /*******************************************************************************************************************
     * Setters
     *******************************************************************************************************************/
-    void setPoints(vector<Point<TYPE>> &vPointsIn) { vPoints = vPointsIn; };
+    void save(vector<Point<TYPE>> &vPointsIn);
+    void save(Delaunay &in);
 };
 
 

@@ -58,7 +58,7 @@ public:
     /*******************************************************************************************************************
     * Setters
     *******************************************************************************************************************/
-    void    setPoints(vector<Point<TYPE>> &vPoints) { repository->getData()->setPoints(vPoints); };
+    void    setPoints(vector<Point<TYPE>> &vPoints) { repository->getData()->save(vPoints); };
 };
 
 

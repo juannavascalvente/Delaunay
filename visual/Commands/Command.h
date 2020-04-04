@@ -201,17 +201,7 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Dcel *dcel = in.getStoreService()->getDcel();
-        bool isRunSuccess = DcelGenerator::generateRandom(szNumPoints, *dcel);
-
-        if (isRunSuccess)
-        {
-            // Create points set
-            for (size_t i=0; i<szNumPoints ; i++)
-            {
-                vPoints.push_back(*dcel->getRefPoint(i));
-            }
-        }
+        bool isRunSuccess = DcelGenerator::generateRandom(szNumPoints, vPoints);
 
         // Build result
         setIsSuccess(isRunSuccess);
@@ -316,22 +306,11 @@ public:
         TYPE radius = in.getConfigService()->getRadius();
 
         // Run command
-        Dcel *dcel = in.getStoreService()->getDcel();
-        bool isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, *dcel);
-        isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, vPoints);
+        bool isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, vPoints);
         for (auto point : vPoints)
         {
             cout << point << endl;
         }
-
-//        if (isRunSuccess)
-//        {
-//            // Add point display
-//            for (size_t i=0; i< szNumPoints; i++)
-//            {
-//                vPoints.push_back(*dcel->getRefPoint(i));
-//            }
-//        }
 
         // Build result
         setIsSuccess(isRunSuccess);
