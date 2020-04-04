@@ -18,8 +18,8 @@
  * @fn              getStarTriangulation
  * @brief           Returns the dcel associated to a star triangulation
  *
- * @param vPoints   (IN) Triangulation number of points
- * @param dcel      (OUT) Dcel associated to star triangulation
+ * @param vPoints   (IN) Set of points
+ * @param dcel      (OUT) Star triangulation in DCEL format
  * @return          true if triangulation built successfully
  *                  false otherwise
  */
@@ -30,15 +30,24 @@ bool getStarTriangulation(const vector<TYPE> &vPoints, Dcel &dcel);
  * @fn              getDelaunay
  * @brief           Returns the dcel associated to a Delaunay triangulation
  *
- * @param vPoints   (IN) Triangulation number of points
- * @param dcel      (OUT) Dcel associated to Delunay triangulation
+ * @param vPoints   (IN) Triangulation points
+ * @param dcel      (OUT) Delunay triangulation in DCEL format
  * @return          true if triangulation built successfully
  *                  false otherwise
  */
 bool getDelaunay(const vector<TYPE> &vPoints, Dcel &dcel);
 
 
-bool getVoronoi(const vector<Point<TYPE>> &vPoints, Voronoi &voronoiOut);
+/**
+ * @fn              getDelaunay
+ * @brief           Returns the dcel associated to a Delaunay triangulation
+ *
+ * @param vPoints   (IN) Set of points
+ * @param dcelOut   (OUT) Voronoi in DCEL format
+ * @return          true if Voronoi built successfully
+ *                  false otherwise
+ */
+bool getVoronoi(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut);
 
 
 /**

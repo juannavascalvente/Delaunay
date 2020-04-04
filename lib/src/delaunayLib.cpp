@@ -62,7 +62,7 @@ bool getDelaunay(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 }
 
 
-bool getVoronoi(const vector<Point<TYPE>> &vPoints, Voronoi &voronoiOut)
+bool getVoronoi(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
     bool isSuccess;       // Return value
 
@@ -83,7 +83,7 @@ bool getVoronoi(const vector<Point<TYPE>> &vPoints, Voronoi &voronoiOut)
             // Compute Voronoi diagram.
             isSuccess = voronoi->build(true);
 
-            //voronoiOut = voronoi;
+            dcelOut = *voronoi->getRefDcel();
             delete voronoi;
         }
 
