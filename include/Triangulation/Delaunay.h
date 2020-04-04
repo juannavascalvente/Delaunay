@@ -28,7 +28,7 @@ class Delaunay
 	//------------------------------------------------------------------------
 	// Attributes
 	//------------------------------------------------------------------------
-	Dcel 	*dcel;				// Reference to DCEL data.
+	Dcel 	dcel;				// Reference to DCEL data.
 	Graph 	*graph;				// Graph used in incremental algorithm.
 
 	bool 	graphAllocated;		// Allocated memory for graph flag.
@@ -60,25 +60,16 @@ class Delaunay
 	double signedArea(Node *node);
 
 //	void getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace);
-	void getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
+//	void getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
 
 	friend class DelaunayIO;
 public:
 	//------------------------------------------------------------------------
 	// Constructor/Destructor
 	//------------------------------------------------------------------------
-	Delaunay() : dcel(NULL), graph(NULL), graphAllocated(false), \
-					convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), \
-					hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
-	Delaunay(Dcel *inDcel) : graphAllocated(true), convexHullComputed(false), \
-						hull(DEFAUTL_CONVEXHULL_LEN), \
-						hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE) \
-
-	{
-		// PENDING REPLACE 10 BY DEFAULT LENGTH DEPENDING ON NPOINTS.
-		this->dcel = inDcel;
-		this->graph = new Graph(this->dcel->getNVertex()*10);
-	}
+	Delaunay() : graph(nullptr), graphAllocated(false),  convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), \
+            	hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
+    explicit Delaunay(const vector<Point<TYPE>> &vPoints);
 	~Delaunay();
 
 	//------------------------------------------------------------------------
@@ -108,8 +99,7 @@ public:
 	bool findPath(Line &line, vector<int> &vFacesId);
 
 	// GET/SET functions.
-	inline void setDCEL(Dcel *dcel) {this->dcel = dcel;};
-	inline Dcel *getRefDcel() {return(this->dcel); };
+	inline Dcel *getRefDcel() { return &this->dcel; };
 	inline void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
 	inline enum Algorithm getAlgorithm() {return(this->algorithm);};
 

@@ -37,6 +37,7 @@ public:
 	Polygon() = default;
 	explicit Polygon(int n) : vPoints(n) {};
 	virtual ~Polygon() = default;
+    Polygon(const Polygon &p) { vPoints = p.vPoints; }
 
     /*******************************************************************************************************************
     * Public methods

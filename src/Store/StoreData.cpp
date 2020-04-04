@@ -1,33 +1,26 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "StoreService.h"
+#include "StoreData.h"
 
 
 /***********************************************************************************************************************
-* Class declaration
+* Public methods definitions
 ***********************************************************************************************************************/
-void StoreService::destroy()
+void StoreData::save(vector<Point<TYPE>> &vPointsIn)
 {
-    repository->deleteInstance();
+    vPoints = vPointsIn;
 }
 
 
-void StoreService::reset()
+void StoreData::save(StarTriangulation &in)
 {
-    // Reset Delaunay
-    if (getDelaunay())
-    {
-        getDelaunay()->reset();
-    }
+    delete triangulation;
+    triangulation = new StarTriangulation(in);
+}
 
-    // Reset Voronoi
-    if (getVoronoi())
-    {
-        getVoronoi()->reset();
-    }
+void StoreData::save(Delaunay &in)
+{
+    delete delaunay;
+    delaunay = new Delaunay(in);
 }

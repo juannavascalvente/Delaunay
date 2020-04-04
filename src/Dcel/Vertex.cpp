@@ -29,19 +29,6 @@ void Vertex::random()
 
 
 /*****************************************************************************
- * Name: 		shake
- * Input: 		NONE
- * Description: shakes point coordinates
- * Output: 		NONE
- * Complexity:	O(1)
-*****************************************************************************/
-void Vertex::shake()
-{
-	// Read point coordinates.
-	this->point.shake();
-}
-
-/*****************************************************************************
  * Name: 		read
  * Input: 		ifs		input file stream.
  * Description: reads x and y coordinates and set edge as INVALID.

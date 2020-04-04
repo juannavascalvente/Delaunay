@@ -187,11 +187,6 @@ Command *CommandFactory::createReadPointsDcel(StoreService *storeService, Config
     return new CommandReadPointsDcel(storeService, configService);
 }
 
-Command *CommandFactory::createReadDcel(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandReadDcel(storeService, configService);
-}
 
 Command *CommandFactory::createReadDelaunay(StoreService *storeService, ConfigService *configService)
 {
@@ -266,7 +261,6 @@ void CommandFactory::initialize()
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(clear, CommandFactory::createClear));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_flat_file, CommandFactory::createReadPoints));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_dcel_file, CommandFactory::createReadPointsDcel));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_dcel, CommandFactory::createReadDcel));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_delaunay, CommandFactory::createReadDelaunay));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_voronoi, CommandFactory::createNull));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_gabriel, CommandFactory::createNull));

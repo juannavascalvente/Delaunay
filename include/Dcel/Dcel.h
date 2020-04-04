@@ -52,21 +52,11 @@ class Dcel
 	int		sizeFaces;
 	Face	*faces;
 
-	// Max and min X and Y coordinates for all points in the DCEL set.
-	TYPE	minX;
-	TYPE	minY;
-	TYPE	maxX;
-	TYPE	maxY;
-
 	//------------------------------------------------------------------------
 	//  Private functions.
 	//------------------------------------------------------------------------
 	void quicksort(Vertex *origin, Vertex *list, int first, int last);
 	int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
-
-	void drawPointsInfo();
-	void drawEdgesInfo();
-	void drawFacesInfo();
 
     friend class DcelReader;
     friend class DcelWriter;
@@ -76,7 +66,8 @@ public:
 	  Constructor/Destructor.
 	------------------------------------------------------------------------*/
 	Dcel();
-	Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
+    explicit Dcel(const vector<Point<TYPE>> &vPoints);
+//	Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
 	~Dcel();
 
 	/*------------------------------------------------------------------------
@@ -153,7 +144,6 @@ public:
 	void reset();
 	void resize(int size, bool copy);		// PENDING Return false if FAILED?
 	void invalidate();
-	void shake();
 	bool isValid();
 
 	// PENDING. Move to set? point?
@@ -168,6 +158,7 @@ public:
 	bool 	findPath(Set<int> &extremeFaces, Line &line, vector<int> &vFacesId);
 
 	bool operator==(const Dcel& other) const;
+	Dcel & operator=(const Dcel &d);
 };
 
 #endif /* DCEL_H_ */

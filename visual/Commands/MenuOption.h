@@ -15,7 +15,6 @@ enum MenuOption
     cluster = 3,
     read_points_flat_file = 4,
     read_points_dcel_file = 5,
-    read_dcel = 6,
     read_delaunay = 7,
     read_voronoi = 8,
     read_gabriel = 9,

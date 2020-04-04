@@ -50,7 +50,6 @@ public:
 	inline Point<TYPE> *getRefPoint() {return(&this->point);};
 
 	void random();
-	void shake();
 
 	// I/O functions.
 	int		read(ifstream ifs);

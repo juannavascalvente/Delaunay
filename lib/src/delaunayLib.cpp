@@ -2,30 +2,27 @@
 * Includes
 ***********************************************************************************************************************/
 #include "delaunayLib.h"
+#include "StarTriangulation.h"
 
 
 /***********************************************************************************************************************
 * API function definitions
 ***********************************************************************************************************************/
-bool starTriangulation(const vector<TYPE> &vPoints, Dcel &dcel)
-{
-    // TODO -> pending to implement
-    return false;
-}
-
-
-bool delaunay(const vector<TYPE> &vPoints, Delaunay &delaunay)
+bool getStarTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
     bool isSuccess;       // Return value
 
     try
     {
-        // Insert points into dcel
-        Dcel *dcel = new Dcel();
-        delaunay.setDCEL(dcel);
+        // Run command
+        auto *triangulation = new StarTriangulation(vPoints);
+        isSuccess = triangulation->build();
 
-        // Build Delaunay from DCEL.
-        isSuccess = delaunay.incremental();
+        // Update output
+        dcelOut = *triangulation->getDcel();
+
+        // Free resources
+        delete triangulation;
     }
     catch (std::bad_alloc& ba)
     {
@@ -37,15 +34,104 @@ bool delaunay(const vector<TYPE> &vPoints, Delaunay &delaunay)
 }
 
 
-bool voronoi(const vector<TYPE> &vPoints, Voronoi &voronoi)
+bool getDelaunay(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
-    // TODO -> pending to implement
-    return false;
+    bool isSuccess;       // Return value
+
+    try
+    {
+        // Insert points into delaunay
+        auto *delaunay = new Delaunay(vPoints);
+
+        // Build Delaunay using incremental algorithm
+        isSuccess = delaunay->incremental();
+
+        // Update output
+        dcelOut = *delaunay->getRefDcel();
+
+        // Free resources
+        delete delaunay;
+    }
+    catch (std::bad_alloc& ba)
+    {
+        std::cerr << "bad_alloc caught: " << ba.what() << '\n';
+        isSuccess = false;
+    }
+
+    return isSuccess;
 }
 
 
-bool convexHull(const Dcel &dcel, vector<TYPE> &vPoints)
+bool getVoronoi(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
-    // TODO -> pending to implement
-    return false;
+    bool isSuccess;       // Return value
+
+    try
+    {
+        // Create Delaunay
+        auto *delaunay = new Delaunay(vPoints);
+
+        // Build Delaunay using incremental algorithm
+        isSuccess = delaunay->incremental();
+
+        // Check init was success
+        if (isSuccess)
+        {
+            // Create Voronoi
+            auto *voronoi = new Voronoi(delaunay->getRefDcel());
+
+            // Compute Voronoi diagram.
+            isSuccess = voronoi->build(true);
+
+            dcelOut = *voronoi->getRefDcel();
+            delete voronoi;
+        }
+
+        // Free resources
+        delete delaunay;
+    }
+    catch (std::bad_alloc& ba)
+    {
+        std::cerr << "bad_alloc caught: " << ba.what() << '\n';
+        isSuccess = false;
+    }
+
+    return isSuccess;
+}
+
+
+bool getConvexHull(const vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut)
+{
+    bool isSuccess;       // Return value
+
+    try
+    {
+        // Create Delaunay
+        auto *delaunay = new Delaunay(vPointsIn);
+
+        // Build Delaunay using incremental algorithm
+        isSuccess = delaunay->incremental();
+
+        // Check init was success
+        if (isSuccess)
+        {
+            // Compute convex hull
+            isSuccess = delaunay->convexHull();
+
+            // Update output
+            Polygon *hull = delaunay->getConvexHull();
+            vPointsOut.clear();
+            hull->getPoints(vPointsOut);
+        }
+
+        // Free resources
+        delete delaunay;
+    }
+    catch (std::bad_alloc& ba)
+    {
+        std::cerr << "bad_alloc caught: " << ba.what() << '\n';
+        isSuccess = false;
+    }
+
+    return isSuccess;
 }

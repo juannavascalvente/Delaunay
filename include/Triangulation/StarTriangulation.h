@@ -1,10 +1,3 @@
-/*
- * StarTriangulation.h
- *
- *  Created on: Jul 22, 2016
- *      Author: jnavas
- */
-
 #ifndef TRIANGULATION_H_
 #define TRIANGULATION_H_
 
@@ -23,12 +16,16 @@ struct ConvexPoint
 ****************************************************************************/
 class StarTriangulation
 {
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    Dcel 	dcel;					// DCEL data
+
 	//------------------------------------------------------------------------
 	//  Attributes
 	//------------------------------------------------------------------------
-	Dcel 	*dcel;					// Reference to DCEL data.
+
 	Polygon *hull;					// Convex hull polygon.
-	bool	*edgeChecked;			// Edges checked flag array.
 	int		nPending;				// # pending edges.
 	bool	convexHullComputed;		// Convex hull computed flag.
 #ifdef STATISTICS_STAR_TRIANGULATION
@@ -39,20 +36,31 @@ class StarTriangulation
 	//------------------------------------------------------------------------
 	//  Private functions.
 	//------------------------------------------------------------------------
-	bool setNotChecked(int index);
+    bool setNotChecked(int index, bool *isEdgeChecked);
 
 public:
-	//------------------------------------------------------------------------
-	// Constructor/Destructor.
-	//------------------------------------------------------------------------
-	StarTriangulation();
+    /*******************************************************************************************************************
+    * Public methods
+    *******************************************************************************************************************/
+    explicit StarTriangulation(const vector<Point<TYPE>> &vPoints);
 	~StarTriangulation();
+
+    StarTriangulation(const StarTriangulation &t);
+
+    /**
+     * @fn          build
+     * @brief       Computes star triangulation for a given set of points
+     *
+     * @return      true if star triangulation computed
+     *              false otherwise
+     */
+    bool build();
 
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
 	void reset();
-	bool build(Dcel *dcel);
+
 	bool delaunay();
 
 	//------------------------------------------------------------------------
@@ -60,14 +68,14 @@ public:
 	//------------------------------------------------------------------------
 	bool convexHull();
 	bool findTwoClosest(int &first, int &second);
-	bool findFace(Point<TYPE> &point, int &faceId);
+//	bool findFace(Point<TYPE> &point, int &faceId);
 	bool findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &distance);
 
 	//------------------------------------------------------------------------
 	// Get/Set functions.
 	//------------------------------------------------------------------------
 	bool isConvexHullComputed() const {return convexHullComputed;}
-	Dcel* getDcel() const {return dcel;}
+	Dcel* getDcel() {return &dcel;}
 	Polygon* getConvexHull() const {return hull;}
 #ifdef STATISTICS_STAR_TRIANGULATION
 	int getCollinear() const {return nCollinear;}
