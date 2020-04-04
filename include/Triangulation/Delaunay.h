@@ -69,7 +69,7 @@ public:
 	//------------------------------------------------------------------------
 	Delaunay() : graph(nullptr), graphAllocated(false),  convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), \
             	hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
-    explicit Delaunay(const vector<Point<TYPE>> &vPoints);
+    explicit Delaunay(vector<Point<TYPE>> &vPoints);
 	~Delaunay();
 
 	//------------------------------------------------------------------------

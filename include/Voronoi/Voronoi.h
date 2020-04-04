@@ -27,13 +27,11 @@ class Voronoi
 	//------------------------------------------------------------------------
 	//  Private functions.
 	//------------------------------------------------------------------------
-	inline void setValid(bool valid) { this->valid = valid; };
 	void computeCircumcentres(bool isIncremental);
 	void buildArea(int pointIndex);
 	Point<TYPE> computeExtremeVoronoi(int edgeIndex, Point<TYPE> &centre);
 	bool edgeExists(Edge &edge);
 	bool isBottomMostFace(int faceId);
-	static void setBorderPoints(int minX, int minY, int maxX, int maxY, Line *borders);
 
 	friend class VoronoiIO;
 public:
@@ -49,21 +47,15 @@ public:
 	// Public functions.
 	//------------------------------------------------------------------------
 	bool 	init(Dcel *dcel);
-	void 	resize(int size, bool copy);
 	void 	reset();
 
 	// GET/SET functions.
-	inline bool  isValid() { return(valid); };
 	inline Dcel* getRefDcel() { return(&this->voronoi); };
-	inline void  setDCEL(Dcel *dcel) {this->triangulation = dcel;};
 	bool 		 getCentre(int areaId, Point<TYPE> &centre);
 
 	// Figures functions.
 	bool 	build(bool isIncremental);
-	bool	findArea(Point<TYPE> &p);
-	bool 	findPath(Line &line, Set<int> &faces);
 	bool 	isInnerToArea(const Point<TYPE> &p, int areaId);
-	void 	correctBorderPoints(int minX, int minY, int maxX, int maxY);
 };
 
 #endif /* INCLUDE_VORONOI_H_ */

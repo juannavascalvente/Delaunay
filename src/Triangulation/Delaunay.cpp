@@ -39,7 +39,7 @@
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-Delaunay::Delaunay(const vector<Point<TYPE>> &vPoints) : Delaunay()
+Delaunay::Delaunay(vector<Point<TYPE>> &vPoints) : Delaunay()
 {
     dcel = Dcel(vPoints);
 }

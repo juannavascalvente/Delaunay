@@ -11,7 +11,7 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-void DcelFigureBuilder::getEdgePoints(size_t szEdgeIdx, const Dcel &dcel, vector<Point<TYPE>> &vPoints)
+void DcelFigureBuilder::getEdgePoints(size_t szEdgeIdx, Dcel &dcel, vector<Point<TYPE>> &vPoints)
 {
     // TODO Add check to control access out of bounds -> https://github.com/juannavascalvente/Delaunay/issues/56
 //    if (szEdgIdx >= dcel.getNEdges())
@@ -27,7 +27,7 @@ void DcelFigureBuilder::getEdgePoints(size_t szEdgeIdx, const Dcel &dcel, vector
 }
 
 
-void DcelFigureBuilder::getFacePoints(size_t szFaceIdx, const Dcel &dcel, vector<Point<TYPE>> &vPoints)
+void DcelFigureBuilder::getFacePoints(size_t szFaceIdx, Dcel &dcel, vector<Point<TYPE>> &vPoints)
 {
     // Get first and current face edges
     size_t szFirstEdgeIdx = dcel.getFaceEdge(szFaceIdx) - 1;        // First face edge

@@ -23,7 +23,7 @@
  * @return          true if triangulation built successfully
  *                  false otherwise
  */
-bool getStarTriangulation(const vector<TYPE> &vPoints, Dcel &dcel);
+bool getStarTriangulation(vector<TYPE> &vPoints, Dcel &dcel);
 
 
 /**
@@ -35,7 +35,7 @@ bool getStarTriangulation(const vector<TYPE> &vPoints, Dcel &dcel);
  * @return          true if triangulation built successfully
  *                  false otherwise
  */
-bool getDelaunay(const vector<TYPE> &vPoints, Dcel &dcel);
+bool getDelaunay(vector<TYPE> &vPoints, Dcel &dcel);
 
 
 /**
@@ -47,7 +47,7 @@ bool getDelaunay(const vector<TYPE> &vPoints, Dcel &dcel);
  * @return          true if Voronoi built successfully
  *                  false otherwise
  */
-bool getVoronoi(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut);
+bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut);
 
 
 /**
@@ -59,7 +59,7 @@ bool getVoronoi(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut);
  * @return              true if convex hull built successfully
  *                      false otherwise
  */
-bool getConvexHull(const vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
+bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
 
 
 #endif //DELAUNAY_DELAUNAYLIB_H

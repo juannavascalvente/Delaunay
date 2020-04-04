@@ -52,9 +52,6 @@ Voronoi::Voronoi(Dcel *triangulation)
 	// Allocate voronoi data.
 	if (this->triangulation != nullptr)
 	{
-		// Allocate data.
-		this->voronoi.resize(this->triangulation->getNFaces(), false);
-
 		// PENDING Add check Voronoi is valid data.
 		this->valid = true;
 	}
@@ -101,7 +98,6 @@ bool Voronoi::init(Dcel *dcel)
 		this->triangulation = dcel;
 
 		// Allocate data.
-		this->voronoi.resize(this->triangulation->getNFaces(), false);
 		this->valid = true;
 #ifdef DEBUG_VORONOI_INIT
 		Logging::buildText(__FUNCTION__, __FILE__, "Allocating voronoi data.\n\t# Points ");
@@ -123,24 +119,6 @@ bool Voronoi::init(Dcel *dcel)
 	return(initialized);
 }
 
-/***************************************************************************
-* Name: 	resize
-* IN:		size			new size
-* 			copy			flag to copy data to new allocation
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	this->voronoi		resize to new size.
-* Description: 	resizes the "voronoi" DCEL attribute.
-***************************************************************************/
-void Voronoi::resize(int size, bool copy)
-{
-	// Reset Voronoi DCEL data.
-	if (this->valid)
-	{
-		// PENDING: how many edges and faces? Maybe depends on DUAL Delaunay.
-		this->voronoi.resize(size, copy);
-	}
-}
 
 /***************************************************************************
 * Name: 	reset
@@ -238,24 +216,6 @@ bool Voronoi::build(bool isIncremental)
 	this->voronoi.print(std::cout);
 #endif
 	return(built);
-}
-
-
-/***************************************************************************
-* Name: 	findArea
-* IN:		p				point to check.
-* 			areaid			area id where point is checked.
-* OUT:		NONE
-* RETURN:	true 			if area found
-* 			false			i.o.c.
-* GLOBAL:	NONE
-* Description: 	Finds the voronoi area that surrounds input point p.
-***************************************************************************/
-bool Voronoi::findArea(Point<TYPE> &p)
-{
-	bool	found=false;		// Return value.
-
-	return(found);
 }
 
 
@@ -902,161 +862,3 @@ bool Voronoi::isBottomMostFace(int faceId)
 
 	return(nImaginaryPoints == 2);
 }
-
-/***************************************************************************
-* Name: 	correctBorderPoints
-* IN:		minX			min X coordinate
-* 			minY			min Y coordinate
-* 			maxX			max X coordinate
-* 			maxY			max Y coordinate
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	Correct border points to window size.
-***************************************************************************/
-void Voronoi::correctBorderPoints(int minX, int minY, int maxX, int maxY)
-{
-	int		edgeIndex=0;		// Loop counter.
-	Line	edgeLine;			// Edge line.
-	Point<TYPE> origin, dest;	// Edge extreme points.
-	Point<TYPE> intersection;	// Point intersection.
-	int		i=0;				// Loop counter.
-	bool	found;				// Loop control flag.
-	int		pointIndex=0;		// Point index.
-	Line	borders[4];			// Border lines.
-
-	// Set window borders.
-	this->setBorderPoints(minX, minY, maxX, maxY, borders);
-
-	// Fix any vertex.
-	for (edgeIndex=0; edgeIndex<this->voronoi.getNEdges(); edgeIndex++)
-	{
-#ifdef DEBUG_VORONOI_CORRECTBORDER
-		Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
-		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-		Logging::write(true, Info);
-#endif
-		// Skip edge higher than its twin (already corrected.
-		if ((edgeIndex+1) < this->voronoi.getTwin(edgeIndex))
-		{
-			// Get edge line.
-			this->voronoi.getEdgePoints(edgeIndex, origin, dest);
-			edgeLine = Line(origin, dest);
-#ifdef DEBUG_VORONOI_CORRECTBORDER
-			Logging::buildText(__FUNCTION__, __FILE__, "Origin ");
-			Logging::buildText(__FUNCTION__, __FILE__, &origin);
-			Logging::buildText(__FUNCTION__, __FILE__, ".Destination ");
-			Logging::buildText(__FUNCTION__, __FILE__, &dest);
-			Logging::write(true, Info);
-#endif
-
-			// Loop until all borders checked or point point out of bounds.
-			i = 0;
-			found = false;
-			while (!found && (i<4))
-			{
-				// Check if edge intersects.
-				if (edgeLine.intersect(borders[i]))
-				{
-#ifdef DEBUG_VORONOI_CORRECTBORDER
-					Logging::buildText(__FUNCTION__, __FILE__, "Intersection with border ");
-					Logging::buildText(__FUNCTION__, __FILE__, i+1);
-					Logging::write(true, Info);
-#endif
-					// Get intersection.
-					edgeLine.getIntersection(borders[i], intersection);
-					found = true;
-
-					// Check if origin out of bounds.
-					if ((origin.getX() < (float) minX) || (origin.getX() > (float) maxX) ||
-						(origin.getY() < (float) minY) || (origin.getY() > (float) maxY))
-					{
-#ifdef DEBUG_VORONOI_CORRECTBORDER
-						Logging::buildText(__FUNCTION__, __FILE__, "Correcting origin point ");
-						Logging::buildText(__FUNCTION__, __FILE__, &origin);
-						Logging::buildText(__FUNCTION__, __FILE__, " to ");
-						Logging::buildText(__FUNCTION__, __FILE__, &intersection);
-						Logging::write(true, Info);
-#endif
-						// Update origin.
-						pointIndex = this->voronoi.getOrigin(edgeIndex)-1;
-						this->voronoi.getRefPoint(pointIndex)->setX(intersection.getX());
-						this->voronoi.getRefPoint(pointIndex)->setY(intersection.getY());
-					}
-					// Destination out of bounds.
-					else
-					{
-#ifdef DEBUG_VORONOI_CORRECTBORDER
-						Logging::buildText(__FUNCTION__, __FILE__, "Correcting destination point ");
-						Logging::buildText(__FUNCTION__, __FILE__, &dest);
-						Logging::buildText(__FUNCTION__, __FILE__, " to ");
-						Logging::buildText(__FUNCTION__, __FILE__, &intersection);
-						Logging::write(true, Info);
-#endif
-						// Update destination.
-						pointIndex = this->voronoi.getOrigin(this->voronoi.getTwin(edgeIndex)-1)-1;
-						this->voronoi.getRefPoint(pointIndex)->setX(intersection.getX());
-						this->voronoi.getRefPoint(pointIndex)->setY(intersection.getY());
-					}
-				}
-				i++;
-			}
-		}
-#ifdef DEBUG_VORONOI_CORRECTBORDER
-		else
-		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Skipping edge ");
-			Logging::buildText(__FUNCTION__, __FILE__, (edgeIndex+1));
-			Logging::buildText(__FUNCTION__, __FILE__, " because it is higher than ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->voronoi.getTwin(edgeIndex));
-			Logging::write(true, Info);
-		}
-#endif
-	}
-}
-
-/***************************************************************************
-* Name: 	setBorderPoints
-* IN:		minX			min X coordinate
-* 			minY			min Y coordinate
-* 			maxX			max X coordinate
-* 			maxY			max Y coordinate
-* OUT:		borders			border lines.
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description:	updates the "borders" input parameter with the lines that
-* 				are the window where figures are drawn.
-***************************************************************************/
-void Voronoi::setBorderPoints(int minX, int minY, int maxX, int maxY, Line *borders)
-{
-	Point<TYPE> origin, dest;	// Edge extreme points.
-
-	// Left most border.
-	origin.setX(minX);
-	origin.setY(minY);
-	dest.setX(minX);
-	dest.setY(maxY);
-	borders[0] = Line(origin, dest);
-
-	// Top most border.
-	origin.setX(minX);
-	origin.setY(maxY);
-	dest.setX(maxX);
-	dest.setY(maxY);
-	borders[1] = Line(origin, dest);
-
-	// Right most border.
-	origin.setX(maxX);
-	origin.setY(maxY);
-	dest.setX(maxX);
-	dest.setY(minY);
-	borders[2] = Line(origin, dest);
-
-	// Bottom most border.
-	origin.setX(maxX);
-	origin.setY(minY);
-	dest.setX(minX);
-	dest.setY(minY);
-	borders[3] = Line(origin, dest);
-}
-
