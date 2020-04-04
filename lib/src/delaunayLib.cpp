@@ -2,15 +2,35 @@
 * Includes
 ***********************************************************************************************************************/
 #include "delaunayLib.h"
+#include "StarTriangulation.h"
 
 
 /***********************************************************************************************************************
 * API function definitions
 ***********************************************************************************************************************/
-bool starTriangulation(const vector<TYPE> &vPoints, Dcel &dcel)
+bool starTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcel)
 {
-    // TODO -> pending to implement
-    return false;
+    bool isSuccess;       // Return value
+
+    try
+    {
+        // Run command
+        auto *triangulation = new StarTriangulation(vPoints);
+        isSuccess = triangulation->build();
+
+        // Update output
+        dcel = *triangulation->getDcel();
+
+        // Delete resources
+        delete triangulation;
+    }
+    catch (std::bad_alloc& ba)
+    {
+        std::cerr << "bad_alloc caught: " << ba.what() << '\n';
+        isSuccess = false;
+    }
+
+    return isSuccess;
 }
 
 

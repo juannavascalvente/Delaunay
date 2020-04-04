@@ -42,7 +42,7 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    explicit StarTriangulation(vector<Point<TYPE>> &vPoints);
+    explicit StarTriangulation(const vector<Point<TYPE>> &vPoints);
 	~StarTriangulation();
 
     StarTriangulation(const StarTriangulation &t);

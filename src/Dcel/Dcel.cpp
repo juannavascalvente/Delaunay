@@ -74,7 +74,7 @@ Dcel::Dcel()
 }
 
 
-Dcel::Dcel(vector<Point<TYPE>> &vPoints) : Dcel()
+Dcel::Dcel(const vector<Point<TYPE>> &vPoints) : Dcel()
 {
     try
     {

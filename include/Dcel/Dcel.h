@@ -66,7 +66,7 @@ public:
 	  Constructor/Destructor.
 	------------------------------------------------------------------------*/
 	Dcel();
-    explicit Dcel(vector<Point<TYPE>> &vPoints);
+    explicit Dcel(const vector<Point<TYPE>> &vPoints);
 //	Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
 	~Dcel();
 
