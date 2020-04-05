@@ -252,9 +252,9 @@ void StatisticsStarTriangulationRegister::deallocate()
 void StatisticsTriangulationData::analyzeTriangulation(StarTriangulation &triangulation)
 {
 	// Get # points, edges and faces.
-	this->setPoints(triangulation.getDcel()->getNVertex());
-	this->setEdges(triangulation.getDcel()->getNEdges());
-	this->setFaces(triangulation.getDcel()->getNFaces());
+	this->setPoints(triangulation.getDcel()->getNumVertex());
+	this->setEdges(triangulation.getDcel()->getNumEdges());
+	this->setFaces(triangulation.getDcel()->getNumFaces());
 
 	// Compute # edges the convex hull.
 	if (!triangulation.isConvexHullComputed())
@@ -483,10 +483,10 @@ void StatisticsDelaunayRegister::deallocate()
 void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 {
 	// Get # points.
-	this->setPoints(delaunay.getRefDcel()->getNVertex());
+	this->setPoints(delaunay.getRefDcel()->getNumVertex());
 
 	// Analyze edges.
-	for (size_t i=0; i<delaunay.getRefDcel()->getNEdges() ;i++)
+	for (size_t i=0; i< delaunay.getRefDcel()->getNumEdges() ; i++)
 	{
 		if (delaunay.getRefDcel()->hasNegativeVertex(i+1))
 		{
@@ -515,7 +515,7 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 	}
 
 	// Analyze faces.
-	for (size_t i=0; i<delaunay.getRefDcel()->getNFaces() ;i++)
+	for (size_t i=0; i< delaunay.getRefDcel()->getNumFaces() ; i++)
 	{
 		if (delaunay.getRefDcel()->imaginaryFace(i))
 		{

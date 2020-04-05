@@ -253,7 +253,7 @@ public:
         Displayable::display();
 
         // Draw all edges.
-        for (size_t edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
+        for (size_t edgeIndex=0; edgeIndex< dcel->getNumEdges() ; edgeIndex++)
         {
             // Skip triangle if any vertex is P_MINUS_1 or P_MINUS_2.
             if (!dcel->hasNegativeVertex((int) edgeIndex+1))

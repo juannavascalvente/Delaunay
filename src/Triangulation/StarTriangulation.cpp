@@ -126,13 +126,13 @@ bool StarTriangulation::findTwoClosest(int &first, int &second)
 	auto	lowestDistance=DBL_MAX;	// Current distance.
 
 	// Loop all vertex.
-	for (i=0; i<this->dcel.getNVertex(); i++)
+	for (i=0; i< this->dcel.getNumVertex(); i++)
 	{
 		// Get origin point.
 		origin = this->dcel.getRefPoint(i);
 
 		// Compute distance to remaining points.
-		for (j=(i+1); j<this->dcel.getNVertex(); j++)
+		for (j=(i+1); j< this->dcel.getNumVertex(); j++)
 		{
 			// Get destination point.
 			dest = this->dcel.getRefPoint(j);
@@ -211,7 +211,7 @@ bool StarTriangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double 
 
 	// Initialize loop.
 	distance = FLT_MAX;
-	upperBound = this->dcel.getNVertex();
+	upperBound = this->dcel.getNumVertex();
 	for (pointIndex=0; pointIndex<upperBound ;pointIndex++)
 	{
 		// Get current point.
@@ -321,7 +321,7 @@ bool StarTriangulation::build()
 	edgeId = 4;
 
 	// Parse rest of points.
-	for (i=3; i<this->dcel.getNVertex() ;i++)
+	for (i=3; i< this->dcel.getNumVertex() ; i++)
 	{
 #ifdef DEBUG_TRIANGULATION_DEBUG
 		Logging::buildText(__FUNCTION__, __FILE__, "-----------------------------------------------------");
@@ -536,7 +536,7 @@ bool StarTriangulation::delaunay()
 
 	// Initialize variables.
 	edgeIndex=0;									// First edge index.
-	this->nPending = this->dcel.getNEdges();		// # edges to check.
+	this->nPending = this->dcel.getNumEdges();		// # edges to check.
 	bool *edgeChecked = new bool[this->nPending];	// Already checked edges array.
 	memset(edgeChecked, false, sizeof(bool)*this->nPending);
 
@@ -705,7 +705,7 @@ bool StarTriangulation::delaunay()
 #endif
 		// Next edge.
 		edgeIndex++;
-		edgeIndex = edgeIndex % this->dcel.getNEdges();
+		edgeIndex = edgeIndex % this->dcel.getNumEdges();
 	}
 
 	// Deallocate checked boolean flag array.
@@ -730,7 +730,7 @@ bool StarTriangulation::setNotChecked(int index, bool *isEdgeChecked)
 	bool updated=false;		// Return value.
 
 	// Check if index out of bounds.
-	if (index < this->dcel.getNEdges())
+	if (index < this->dcel.getNumEdges())
 	{
 		// If edge or its twin is in external face then do not update.
 		if (!this->dcel.isExternalEdge(index))
@@ -748,7 +748,7 @@ bool StarTriangulation::setNotChecked(int index, bool *isEdgeChecked)
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Index out of bounds when trying to update checked edge ");
 		Logging::buildText(__FUNCTION__, __FILE__, index+1);
-		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->dcel.getNEdges());
+		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->dcel.getNumEdges());
 		Logging::write(true, Error);
 		updated = false;
 	}

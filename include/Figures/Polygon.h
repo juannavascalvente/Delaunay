@@ -1,10 +1,3 @@
-/*
- * Polygon.h
- *
- *  Created on: Jul 19, 2016
- *      Author: jnavas
- */
-
 #ifndef INCLUDE_POLYGON_H_
 #define INCLUDE_POLYGON_H_
 

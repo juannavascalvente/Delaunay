@@ -1586,7 +1586,7 @@ public:
 
         // Add circles
         Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        for (int faceID=1; faceID<dcel->getNFaces() ;faceID++)
+        for (int faceID=1; faceID< dcel->getNumFaces() ; faceID++)
         {
             // Skip imaginary faces.
             if (!dcel->imaginaryFace(faceID))
@@ -1691,7 +1691,7 @@ public:
 
         // Loop all faces (but external).
         Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        for (int edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
+        for (int edgeIndex=0; edgeIndex< dcel->getNumEdges() ; edgeIndex++)
         {
             // Skip imaginary edges.
             if (!dcel->hasNegativeVertex(edgeIndex+1))
@@ -1759,7 +1759,7 @@ class CommandDcelInfo : public Command
     void createDcelPointsInfo(vector<Text> &info)
     {
         // Draw all points of the set.
-        for (size_t i=0; i < dcel->getNVertex() ; i++)
+        for (size_t i=0; i < dcel->getNumVertex() ; i++)
         {
             // Get and draw i-point.
             Point<TYPE> *point = dcel->getRefPoint(i);
@@ -1774,7 +1774,7 @@ class CommandDcelInfo : public Command
     void createDcelEdgeInfo(vector<Text> &info)
     {
         // Loop all edges.
-        for (size_t edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
+        for (size_t edgeIndex=0; edgeIndex< dcel->getNumEdges() ; edgeIndex++)
         {
             // Check if twin edge already visited.
             if ((edgeIndex+1) < dcel->getTwin(edgeIndex))
@@ -1804,7 +1804,7 @@ class CommandDcelInfo : public Command
     void createDcelFacesInfo(vector<Text> &info)
     {
         // Loop all faces (skip external face).
-        for (size_t faceId=0; faceId<dcel->getNFaces() ;faceId++)
+        for (size_t faceId=0; faceId< dcel->getNumFaces() ; faceId++)
         {
             // If any vertex is imaginary then face is not drawn.
             if (!dcel->imaginaryFace(faceId))
@@ -2027,7 +2027,7 @@ public:
         if (this->isSuccess)
         {
             // Add point display
-            for (size_t i=0; i< dcel->getNVertex() ; i++)
+            for (size_t i=0; i< dcel->getNumVertex() ; i++)
             {
                 vPoints.push_back(*dcel->getRefPoint(i));
             }
@@ -2091,7 +2091,7 @@ public:
         if (this->isSuccess)
         {
             // Add point display
-            for (size_t i=0; i< dcel->getNVertex() ; i++)
+            for (size_t i=0; i< dcel->getNumVertex() ; i++)
             {
                 vPoints.push_back(*dcel->getRefPoint(i));
             }

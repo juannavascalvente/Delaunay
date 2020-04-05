@@ -139,7 +139,7 @@ bool Delaunay::incremental()
 
     // Loop all other points.
     pointIndex=1;
-    nPoints = this->dcel.getNVertex();
+    nPoints = this->dcel.getNumVertex();
     inserted = built;
     while ((pointIndex<nPoints) && (inserted))
     {
@@ -589,7 +589,7 @@ bool Delaunay::findTwoClosest(int &first, int &second)
 	int lastPointIndex=0;			// Last point must no be checked.
 
 	// Check all vertex.
-	lastPointIndex = this->dcel.getNVertex()-1;
+	lastPointIndex = this->dcel.getNumVertex() - 1;
 	for (pointIndex=0; pointIndex<lastPointIndex; pointIndex++)
 	{
 #ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
@@ -712,8 +712,8 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 
 	// Initialize variables.
 	pointIndex = 0;
-	insertedPoints = new bool[this->dcel.getNVertex()];
-	memset(insertedPoints, 0, sizeof(bool)*this->dcel.getNVertex());
+	insertedPoints = new bool[this->dcel.getNumVertex()];
+	memset(insertedPoints, 0, sizeof(bool)* this->dcel.getNumVertex());
 
 	// Get node index of the face that surrounds point.
 	found = this->locateNode(p, nodeIndex);
@@ -1494,8 +1494,8 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 	double	area[3];
 
     // Get identifiers of next edge and face to be created.
-	new_Edge_ID = this->dcel.getNEdges() + 1;
-	new_Face_ID = this->dcel.getNFaces();
+	new_Edge_ID = this->dcel.getNumEdges() + 1;
+	new_Face_ID = this->dcel.getNumFaces();
 
     // Update edge departing from new point.
 	this->dcel.updateVertex(new_Edge_ID, pointIndex);
