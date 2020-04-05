@@ -46,82 +46,28 @@ using namespace std;
 //#define DEBUG_READBINARY_DCEL
 //#define DEBUG_WRITEBINARY_DCEL
 //#define DEBUG_DCEL_EDGE_INTERSECTION
-#define DEBUG_DCEL_EQUAL
+//#define DEBUG_DCEL_EQUAL
 #endif
 
 
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Dcel::Dcel(vector<Point<TYPE>> &v) : Dcel()
-{
-    for (auto point : v)
-    {
-        Vertex vertex(INVALID, point);
-        vVertex.push_back(vertex);
-    }
-}
-
-
-/***************************************************************************
-* Name: 	imaginaryFace
-* IN:		edgeIndex			input edge index.
-* OUT:		origin				origin point of the edge.
-* 			dest				destination point of the edge.
-* IN/OUT:	NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	gets the origin and destination points of the input edge
-* 				index "edgeIndex".
-***************************************************************************/
-// PENDING WHY IS OUT OF BOUNDS WHEN PRINTIN DCEL INFO?
-void Dcel::getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest)
-{
-#ifdef DEBUG_OUTOFBOUNDS_EXCEPTION
-	if (edgeIndex >= this->getNEdges())
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Edge index out of bounds");
-		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex);
-		Logging::write(true, Info);
-	}
-#endif
-
-	// Get origin and destination points of the edge.
-	origin = *this->getRefPoint(this->getOrigin(edgeIndex)-1);
-	dest   = *this->getRefPoint(this->getOrigin(this->getTwin(edgeIndex)-1)-1);
-#ifdef DEBUG_DCEL_GET_EDGE_POINTS
-	Logging::buildText(__FUNCTION__, __FILE__, "Edge extreme points are ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getOrigin(edgeIndex));
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getOrigin(this->getTwin(edgeIndex)-1));
-	Logging::write(true, Info);
-#endif
-}
-
-/***************************************************************************
-* Name: 	imaginaryFace
-* IN:		faceId			face identifier to check
-* OUT:		NONE
-* RETURN:	true if any of the vertex of the face is negative.
-* GLOBAL:	NONE
-* Description: 	checks if any of the vertex of the face is imaginary (only
-* 				in incremental Delaunay triangulations).
-***************************************************************************/
 bool Dcel::imaginaryFace(int faceId)
 {
-	bool	imaginary=false;		// Return value.
-	int		edgeIndex=0;			// Edge index.
+    bool	imaginary=false;		// Return value.
+    int		edgeIndex=0;			// Edge index.
 
-	// Get index edge from face.
-	edgeIndex = this->getFaceEdge(faceId) - 1;
+    // Get index edge from face.
+    edgeIndex = this->getFaceEdge(faceId) - 1;
 
-	if ((faceId == EXTERNAL_FACE) ||
-		(this->getOrigin(edgeIndex) < 0) ||
-		(this->getOrigin(this->getNext(edgeIndex)-1) < 0) ||
-		(this->getOrigin(this->getPrevious(edgeIndex)-1) < 0))
-	{
+    if ((faceId == EXTERNAL_FACE) ||
+        (this->getOrigin(edgeIndex) < 0) ||
+        (this->getOrigin(this->getNext(edgeIndex)-1) < 0) ||
+        (this->getOrigin(this->getPrevious(edgeIndex)-1) < 0))
+    {
 #ifdef DEBUG_DCELIMAGINARYFACE
-		Logging::buildText(__FUNCTION__, __FILE__, "Face ");
+        Logging::buildText(__FUNCTION__, __FILE__, "Face ");
 		Logging::buildText(__FUNCTION__, __FILE__, faceId);
 		Logging::buildText(__FUNCTION__, __FILE__, " is imaginary. Vertices: (");
 		Logging::buildText(__FUNCTION__, __FILE__, this->getOrigin(edgeIndex));
@@ -132,312 +78,12 @@ bool Dcel::imaginaryFace(int faceId)
 		Logging::buildText(__FUNCTION__, __FILE__, ")");
 		Logging::write(true, Info);
 #endif
-		imaginary = true;
-	}
+        imaginary = true;
+    }
 
-	return imaginary;
+    return imaginary;
 }
 
-
-/***************************************************************************
-* Name: 	getFaceVertices
-* IN:		faceIndex			face identifier to check
-* OUT:		*ids				array of indexes
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	returns the face identifiers of the "faceIndex" face.
-***************************************************************************/
-void Dcel::getFaceVertices(int faceIndex, int *ids)
-{
-	int		edgeIndex=0;			// Edge index.
-
-	// Get index edge from face.
-	edgeIndex = this->getFaceEdge(faceIndex) - 1;
-
-	// Get face vertices.
-	ids[0] = this->getOrigin(edgeIndex);
-	ids[1] = this->getOrigin(this->getNext(edgeIndex)-1);
-	ids[2] = this->getOrigin(this->getPrevious(edgeIndex)-1);
-}
-
-/***************************************************************************
-* Name: 	getFacePoints
-* IN:		faceIndex			face identifier to check
-* OUT:		p					1st face vertex point.
-* 			q					2nd face vertex point
-* 			r					3rd face vertex point
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	returns the face vertices of the "faceIndex" face.
-***************************************************************************/
-void Dcel::getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Point<TYPE> &r)
-{
-	int		edgeIndex=0;			// Edge index.
-
-	// Get index edge from face.
-	edgeIndex = this->getFaceEdge(faceIndex) - 1;
-
-#ifdef DEBUG_POINTS_GET_FACE_POINTS
-	Logging::buildText(__FUNCTION__, __FILE__, "Face ");
-	Logging::buildText(__FUNCTION__, __FILE__, faceIndex);
-	Logging::buildText(__FUNCTION__, __FILE__, " points id are ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getOrigin(edgeIndex));
-	Logging::buildText(__FUNCTION__, __FILE__, ",");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getNext(edgeIndex));
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getPrevious(edgeIndex));
-	Logging::write(true, Info);
-#endif
-
-	// Get face vertices.
-	p = *this->getRefPoint(this->getOrigin(edgeIndex)-1);
-	q = *this->getRefPoint(this->getOrigin(this->getNext(edgeIndex)-1)-1);
-	r = *this->getRefPoint(this->getOrigin(this->getPrevious(edgeIndex)-1)-1);
-}
-
-/***************************************************************************
-* Name: 	reset
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	set the # elements in DCEL to zero.
-***************************************************************************/
-void Dcel::reset()
-{
-	// Reset counters.
-    this->vVertex.clear();
-	this->vEdges.clear();
-	this->vFaces.clear();
-}
-
-
-/***************************************************************************
-* Name: 	addVertex
-* IN:		p			new point coordinates
-* 			edge		new edge identifier.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	adds a new point to the vertex array.
-***************************************************************************/
-void Dcel::addVertex(const Point<TYPE> *p, const int edge)
-{
-    Vertex v(edge, *p);
-    vVertex.push_back(v);
-}
-
-
-/***************************************************************************
-* Name: 	updateVertex
-* IN:		edgeID			new edge to set for point
-* 			index			point index to update
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	sets the edgeId as the edge departing from point at "index"
-* 				position.
-***************************************************************************/
-void Dcel::updateVertex(int edge_ID, int index)
-{
-	// Check if index is out of bounds.
-	if (index < this->vVertex.size())
-	{
-		// Update vertex edge.
-		this->vVertex.at(index).setOrigin(edge_ID);
-#ifdef DEBUG_UPDATE_VERTEX_EDGE_AT
-		Logging::buildText(__FUNCTION__, __FILE__, "Update vertex ");
-		Logging::buildText(__FUNCTION__, __FILE__, index+1);
-		Logging::buildText(__FUNCTION__, __FILE__, " origin edge to ");
-		Logging::buildText(__FUNCTION__, __FILE__, edge_ID);
-		Logging::write(true, Info);
-#endif
-	}
-	else
-	{
-		// PENDING: RESIZE? EXCEPTION?
-		Logging::buildText(__FUNCTION__, __FILE__, "Index ");
-		Logging::buildText(__FUNCTION__, __FILE__, index);
-		Logging::buildText(__FUNCTION__, __FILE__, " out of bounds: ");
-		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->vVertex.size());
-		Logging::write(true, Error);
-	}
-}
-
-/***************************************************************************
-* Name: 	updateVertex
-* IN:		p			reference to point to copy.
-* 			index		point index to update
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	sets the edgeId as the edge departing from point at "index"
-* 				position.
-***************************************************************************/
-void Dcel::updateVertex(Point<TYPE> *p, int index)
-{
-	// Check if index is out of bounds.
-	if (index < this->vVertex.size())
-	{
-		// Update vertex edge.
-		this->vVertex.at(index).setPoint(p);
-#ifdef DEBUG_UPDATE_VERTEX_EDGE_AT
-		Logging::buildText(__FUNCTION__, __FILE__, "Vertex ");
-		Logging::buildText(__FUNCTION__, __FILE__, index+1);
-		Logging::buildText(__FUNCTION__, __FILE__, " updated point to ");
-		Logging::buildText(__FUNCTION__, __FILE__, p);
-		Logging::write(true, Info);
-#endif
-	}
-	else
-	{
-		// PENDING: RESIZE? EXCEPTION?
-		Logging::buildText(__FUNCTION__, __FILE__, "Index ");
-		Logging::buildText(__FUNCTION__, __FILE__, index);
-		Logging::buildText(__FUNCTION__, __FILE__, " out of bounds: ");
-		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->vVertex.size());
-		Logging::write(true, Error);
-	}
-}
-
-
-/***************************************************************************
-* Name: 	addEdge
-* IN:		origin		edge origin point
-* 			twin		twin edge
-* 			previous	previous edge
-* 			next		next edge
-* 			face		edge face
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	adds a new edge to the edges array.
-***************************************************************************/
-void Dcel::addEdge(int origin, int twin, int previous, int next, int face)
-{
-    Edge e(origin, twin, previous, next, face);
-    this->vEdges.push_back(e);
-}
-
-
-/***************************************************************************
-* Name: 	updateEdge
-* IN:		origin		edge origin point
-* 			twin		twin edge
-* 			previous	previous edge
-* 			next		next edge
-* 			face		edge face
-* 			index		edge index to update
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	updates the edge fields. If any input value is "NO_UPDATE"
-* 				then that value is not updated.
-***************************************************************************/
-void Dcel::updateEdge(int origin, int twin, int previous, int next, int face, int index)
-{
-	// Check if faces vector is full.
-	if (index < this->vEdges.size())
-	{
-#ifdef DEBUG_UPDATE_EDGE
-		Logging::buildText(__FUNCTION__, __FILE__, "Updating edge ");
-		Logging::buildText(__FUNCTION__, __FILE__, index+1);
-		Logging::buildText(__FUNCTION__, __FILE__, "/");
-		Logging::buildText(__FUNCTION__, __FILE__, this->sizeEdges);
-		Logging::buildText(__FUNCTION__, __FILE__, ". Fields updated are:");
-		Logging::write(true, Info);
-		Logging::buildText(__FUNCTION__, __FILE__, "Origin ");
-		Logging::buildText(__FUNCTION__, __FILE__, origin);
-		Logging::buildText(__FUNCTION__, __FILE__, ".Twin ");
-		Logging::buildText(__FUNCTION__, __FILE__, twin);
-		Logging::buildText(__FUNCTION__, __FILE__, ".Previous ");
-		Logging::buildText(__FUNCTION__, __FILE__, previous);
-		Logging::buildText(__FUNCTION__, __FILE__, ".Next ");
-		Logging::buildText(__FUNCTION__, __FILE__, next);
-		Logging::buildText(__FUNCTION__, __FILE__, ".Face ");
-		Logging::buildText(__FUNCTION__, __FILE__, face);
-		Logging::write(true, Info);
-#endif
-		// Check if origin point field must be updated.
-		if (origin != NO_UPDATE)
-		{
-			this->vEdges.at(index).setOrigin(origin);
-		}
-
-		// Check if twin edge field must be updated.
-		if (twin != NO_UPDATE)
-		{
-			this->vEdges.at(index).setTwin(twin);
-		}
-
-		// Check if previous edge field must be updated.
-		if (previous != NO_UPDATE)
-		{
-			this->vEdges.at(index).setPrevious(previous);
-		}
-
-		// Check if next edge field must be updated.
-		if (next != NO_UPDATE)
-		{
-			this->vEdges.at(index).setNext(next);
-		}
-
-		// Check if face field must be updated.
-		if (face != NO_UPDATE)
-		{
-			this->vEdges.at(index).setFace(face);
-		}
-	}
-	else
-	{
-		// PENDING: EXCEPTION?
-		Logging::buildText(__FUNCTION__, __FILE__, "Updating edge with index ");
-		Logging::buildText(__FUNCTION__, __FILE__, index);
-		Logging::buildText(__FUNCTION__, __FILE__, " out of bounds.");
-		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->vEdges.size());
-		Logging::write(true, Error);
-	}
-}
-
-
-/***************************************************************************
-* Name: 	addFace
-* IN:		face		edge in face
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	adds a new face to the faces array.
-***************************************************************************/
-void Dcel::addFace(const int edge)
-{
-    // Add face
-    Face face(edge);
-    this->vFaces.push_back(face);
-}
-
-
-/***************************************************************************
-* Name: 	updateFace
-* IN:		face		edge in face
-*			imaginary	imaginary face identifier
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	update face at position "index" in the face array.
-***************************************************************************/
-void Dcel::updateFace(int edge_ID, int index)
-{
-	// JNC PENDING ALL INDEX ACCESSES TO THROW EXCEPTION.
-	try
-	{
-		// Update edge id of face at index-th position.
-		this->vFaces.at(index).setEdge(edge_ID);
-	}
-	catch (exception &ex)
-	{
-		ex.what();
-	}
-}
 
 /***************************************************************************
 * Name: 		isExternalEdge
@@ -453,7 +99,7 @@ bool Dcel::isExternalEdge(int edgeIndex)
 	bool isExternal=false;			// Return value.
 
 	// Check index is not out of bounds.
-	if (edgeIndex < this->vEdges.size())
+	if (edgeIndex < this->getNumEdges())
 	{
 		// Check if this edge or its twin belong face #0.
 		if ((this->vEdges.at(edgeIndex).getFace() == EXTERNAL_FACE) ||
@@ -468,7 +114,7 @@ bool Dcel::isExternalEdge(int edgeIndex)
     	Logging::buildText(__FUNCTION__, __FILE__,
     					"Trying to check an edge out of bounds. Edge index is ");
     	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex);
-    	Logging::buildRange(__FUNCTION__, __FILE__, 0, this->vEdges.size());
+    	Logging::buildRange(__FUNCTION__, __FILE__, 0, this->getNumEdges());
     	Logging::write(true, Error);
 		isExternal = false;
 	}
@@ -491,7 +137,7 @@ bool Dcel::hasNegativeVertex(int edgeID)
     bool hasNegative=false;      // Return value.
 
 	// Check face is not out of bounds.
-	if (edgeID <= this->vEdges.size())
+	if (edgeID <= this->getNumEdges())
 	{
 		// Check if any of the vertex of the triangle is negative.
 		if ((this->vEdges.at(edgeID - 1).getOrigin() < 0) ||
@@ -513,7 +159,7 @@ bool Dcel::hasNegativeVertex(int edgeID)
     	Logging::buildText(__FUNCTION__, __FILE__,
     					"Trying to check an edge out of bounds. Edge ID is ");
     	Logging::buildText(__FUNCTION__, __FILE__, edgeID);
-    	Logging::buildRange(__FUNCTION__, __FILE__, 0, this->vEdges.size());
+    	Logging::buildRange(__FUNCTION__, __FILE__, 0, this->getNumEdges());
     	Logging::write(true, Error);
 #endif
     	hasNegative = false;
@@ -632,7 +278,7 @@ int	Dcel::getCollinear(int pointIndex, int edgeID)
 void Dcel::sort()
 {
 	// Call quicksort with DCEL set of points.
-	quicksort(&this->vVertex.at(0), &this->vVertex.at(1), 0, this->getNVertex() - 2);
+	quicksort(&this->vVertex.at(0), &this->vVertex.at(1), 0, this->getNumVertex() - 2);
 }
 
 
@@ -646,7 +292,7 @@ int Dcel::getIndexLowest(bool (*f)(Point<TYPE> *, Point<TYPE> *))
     index = 0;
 
     // Find index of highest point.
-    for (i=1; i<this->vVertex.size() ;i++)
+    for (i=1; i< this->getNumVertex() ; i++)
     {
     	if ((*f) (this->vVertex.at(i).getRefPoint(), this->vVertex.at(index).getRefPoint()))
         {
@@ -678,7 +324,7 @@ int Dcel::getIndexHighest(bool (*f)(const Point<TYPE> *, const Point<TYPE> *))
     int     index=0;    // Index of highest point.
 
     // Find index of highest point.
-    for (size_t i=1; i<this->vVertex.size() ;i++)
+    for (size_t i=1; i< this->getNumVertex() ; i++)
     {
     	if ((*f) (this->vVertex.at(i).getRefPoint(), this->vVertex.at(index).getRefPoint()))
         {
@@ -719,7 +365,6 @@ enum Turn_T Dcel::returnTurn(const Point<TYPE> *p, int sourcePoint, int destPoin
         if (destPoint > 0)
         {
             // If turn right then point is not in triangle.
-			//turn = check_Turn(&this->vertex[sourcePoint-1].point, &this->vertex[destPoint-1].point, p);
 			turn = this->vVertex.at(sourcePoint-1).getRefPoint()->check_Turn(*this->vVertex.at(destPoint-1).getRefPoint(), *p);
         }
         // Destination point is P-2.
@@ -1044,28 +689,6 @@ bool Dcel::findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesI
 }
 
 
-/***************************************************************************
-* Name: 	readPoints
-* IN:		fileName	file name to write data into.
-* OUT:		NONE
-* RETURN:	true 		if file read.
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	writes the set of points in DCEL separated by spaces to
-* 				"fileName"
-***************************************************************************/
-bool Dcel::operator==(const Dcel& other) const
-{
-    bool isEqual;	    // Return value.
-
-    isEqual =  ((this->vVertex == other.vVertex) &&
-                (this->vEdges == other.vEdges) &&
-                (this->vFaces == other.vFaces));
-
-	return(isEqual);
-}
-
-
 /***********************************************************************************************************************
 * Private methods definitions
 ***********************************************************************************************************************/
@@ -1142,33 +765,4 @@ int	 Dcel::movePivot(Vertex *origin, Vertex *list, int first, int last)
     list[pivotIndex] = temp;
 
 	return(pivotIndex);
-}
-
-/***************************************************************************
-* Name: 	swapVertex
-* IN:		N/A
-* OUT:		N/A
-* IN/OUT:	N/A
-* RETURN:	N/A
-* Description: swaps vertex positions in array.
-***************************************************************************/
-void Dcel::swapVertex(int index1, int index2)
-{
-	Vertex vertex;	// Temporary variable.
-
-	if ((index1 < this->getNVertex()) || (index2 < this->getNVertex()))
-	{
-		// Swap vertices.
-		vertex = this->vVertex.at(index1);
-		this->vVertex.at(index1) = this->vVertex.at(index2);
-		this->vVertex.at(index2) = vertex;
-	}
-	else
-	{
-    	Logging::buildText(__FUNCTION__, __FILE__, "Error swapping vertex between positions ");
-    	Logging::buildText(__FUNCTION__, __FILE__, index1);
-    	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-    	Logging::buildText(__FUNCTION__, __FILE__, index2);
-    	Logging::write(true, Error);
-	}
 }

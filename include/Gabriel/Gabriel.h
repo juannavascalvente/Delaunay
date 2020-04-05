@@ -43,7 +43,7 @@ public:
     /*******************************************************************************************************************
      * Public methods declaration
      *******************************************************************************************************************/
-	Gabriel(Dcel &dcelIn, Voronoi &voronoiIn) : dcel(dcelIn), voronoi(voronoiIn), vValidEdges(dcelIn.getNEdges()) {};
+	Gabriel(Dcel &dcelIn, Voronoi &voronoiIn) : dcel(dcelIn), voronoi(voronoiIn), vValidEdges(dcelIn.getNumEdges()) {};
 	~Gabriel() = default;
 
     Gabriel(const Gabriel &d)

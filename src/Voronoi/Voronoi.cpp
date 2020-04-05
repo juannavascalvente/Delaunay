@@ -67,7 +67,7 @@ bool Voronoi::build(bool isIncremental)
     this->computeCircumcentres(isIncremental);
 
     // Compute Voronoi area for every point in Delaunay triangulation.
-    for (pointIndex=0; pointIndex<this->triangulation.getNVertex() ;pointIndex++)
+    for (pointIndex=0; pointIndex< this->triangulation.getNumVertex() ; pointIndex++)
     {
         this->buildArea(pointIndex);
     }
@@ -179,7 +179,7 @@ void Voronoi::computeCircumcentres(bool isIncremental)
 #endif
 
 	// Loop all faces from 1 because zero face has no circumcentre.
-	for (faceId=1; faceId<this->triangulation.getNFaces() ;faceId++)
+	for (faceId=1; faceId< this->triangulation.getNumFaces() ; faceId++)
 	{
 		// Skip imaginary faces.
 		if (!this->triangulation.imaginaryFace(faceId))
@@ -339,7 +339,7 @@ void Voronoi::buildArea(int pointIndex)
 
 	// Initialize variables.
 	previousEdge = INVALID;
-	newEdgeId = this->dcel.getNEdges() + 1;
+	newEdgeId = this->dcel.getNumEdges() + 1;
 
 	// Get edge departing from point.
 	currentEdge = this->triangulation.getPointEdge(pointIndex);
@@ -398,7 +398,7 @@ void Voronoi::buildArea(int pointIndex)
 #endif
 
 	// Get current face id.
-	newVoronoiFaceId = this->dcel.getNFaces();
+	newVoronoiFaceId = this->dcel.getNumFaces();
 
 	// Loop until all faces with "pointIndex" as vertex have been checked.
 	do
