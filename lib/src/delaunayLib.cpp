@@ -44,7 +44,7 @@ bool getDelaunay(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
         auto *delaunay = new Delaunay(vPoints);
 
         // Build Delaunay using incremental algorithm
-        isSuccess = delaunay->incremental();
+        isSuccess = delaunay->build();
 
         // Update output
         dcelOut = *delaunay->getRefDcel();
@@ -72,7 +72,7 @@ bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
         auto *delaunay = new Delaunay(vPoints);
 
         // Build Delaunay using incremental algorithm
-        isSuccess = delaunay->incremental();
+        isSuccess = delaunay->build();
 
         // Check init was success
         if (isSuccess)
@@ -110,7 +110,7 @@ bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsO
         auto *delaunay = new Delaunay(vPointsIn);
 
         // Build Delaunay using incremental algorithm
-        isSuccess = delaunay->incremental();
+        isSuccess = delaunay->build();
 
         // Check init was success
         if (isSuccess)

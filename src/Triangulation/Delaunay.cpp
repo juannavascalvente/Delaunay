@@ -57,14 +57,7 @@ void Delaunay::freeStatistics()
 }
 #endif
 
-/***************************************************************************
-* Name: 	reset
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description:
-***************************************************************************/
+
 void Delaunay::reset()
 {
 	// Reset data flags.
@@ -74,18 +67,8 @@ void Delaunay::reset()
 	this->vHullEdges.clear();
 }
 
-/***************************************************************************
-* Name: 	incremental
-* IN:		node		node whose area must be computed
-* OUT:		NONE
-* RETURN:	true		if triangulation built
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	computes the Delaunay triangulation using the incremental
-* 				algorithm.
-***************************************************************************/
-//#define DELAUNAY_STATISTICS
-bool Delaunay::incremental()
+
+bool Delaunay::build()
 {
 	bool 	built=true;		        // Return value.
 	bool	inserted;	            // Point inserted flag.
@@ -447,15 +430,7 @@ void Delaunay::flipEdges(int edge_ID)
 	this->checkEdge(twin->getNext());
 }
 
-/***************************************************************************
-* Name: 	convexHull
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	true if the convex hull has been computed.
-* 			false otherwise.
-* GLOBAL:	the convex hull is stored in the "convexHull" attribute.
-* Description: 	computes the convex hull of the DCEL set of points.
-***************************************************************************/
+
 bool Delaunay::convexHull()
 {
 	bool finished;      		// Loop control flag.
@@ -967,7 +942,6 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 			if (this->getConvexHull()->getIntersections(line, intersectEdges))
 			{
 				computePath = true;
-				//this->getInitialFaces(line, intersectEdges, initialFace, finalFace);
 				nFacesToAdd = intersectEdges.size();
 				for (i=0; i<nFacesToAdd ;i++)
 				{

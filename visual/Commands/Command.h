@@ -475,7 +475,7 @@ public:
         auto *delaunay = new Delaunay(in.getStoreService()->getPoints());
 
         // Build Delaunay from DCEL.
-        bool isRunSuccess = delaunay->incremental();
+        bool isRunSuccess = delaunay->build();
 
         // Save result
         if (isRunSuccess)

@@ -77,26 +77,21 @@ public:
         this->graph = d.graph;
     }
 
+    /**
+     * @fn      reset
+     * @build   Resets triangulation state
+     *
+     */
 	void reset();
-	bool incremental();
 
 	// Get/Set functions.
 	bool isConvexHullComputed() {return(this->convexHullComputed);};
 	void setConvexHullComputed(bool v) {this->convexHullComputed = v;};
 	Graph* getGraph() {return &graph;}
 
-	// Figures functions.
-	bool convexHull();
 	//bool internalToConvexHull(Point<TYPE> &p);
 	Polygon* getConvexHull() {return(&this->hull);};
 	vector<int> *getConvexHullEdges() {return &this->vHullEdges; };
-	bool findTwoClosest(int &first, int &second);
-	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
-	bool findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
-															int	&poinIndex,
-															double &dist);
-    //bool findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, double &distance);
-	bool findPath(Line &line, vector<int> &vFacesId);
 
     /*******************************************************************************************************************
     * Getter/Setters
@@ -104,6 +99,16 @@ public:
 	Dcel *getRefDcel() { return &this->dcel; };
 	void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
 	enum Algorithm getAlgorithm() {return(this->algorithm);};
+
+    /*******************************************************************************************************************
+    * Triangulation interface functions implementation
+    *******************************************************************************************************************/
+    bool build();
+    bool convexHull();
+    bool findTwoClosest(int &first, int &second);
+    bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
+    bool findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q, int	&poinIndex, double &dist);
+    bool findPath(Line &line, vector<int> &vFacesId);
 
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}
