@@ -77,10 +77,6 @@ public:
         this->graph = d.graph;
     }
 
-
-    //------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
 	void reset();
 	bool incremental();
 
@@ -102,7 +98,9 @@ public:
     //bool findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, double &distance);
 	bool findPath(Line &line, vector<int> &vFacesId);
 
-	// GET/SET functions.
+    /*******************************************************************************************************************
+    * Getter/Setters
+    *******************************************************************************************************************/
 	Dcel *getRefDcel() { return &this->dcel; };
 	void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
 	enum Algorithm getAlgorithm() {return(this->algorithm);};

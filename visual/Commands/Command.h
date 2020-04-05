@@ -659,17 +659,22 @@ public:
      */
     CommandResult * runCommand() override
     {
-        // Initialize voronoi data.
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        bool isRunSuccess = voronoi->init(dcel);
+        // Initialize voronoi data
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        Dcel *dcel = delaunay->getRefDcel();
+        auto *voronoi = new Voronoi(*dcel);
 
-        // Check init was success
+        // Compute Voronoi diagram
+        bool isRunSuccess = voronoi->build(true);
+
+        // Save result
         if (isRunSuccess)
         {
-            // Compute Voronoi diagram.
-            isRunSuccess = voronoi->build(true);
+            in.getStoreService()->save( *voronoi);
         }
+
+        // Free resources
+        delete voronoi;
 
         // Build result
         setIsSuccess(isRunSuccess);
@@ -691,7 +696,7 @@ public:
         if (getSuccess())
         {
             // Add delaunay and voronoi
-            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDcel()));
+            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDelaunay()->getRefDcel()));
             vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getVoronoi()->getRefDcel()));
         }
 
@@ -877,7 +882,7 @@ public:
             line = vLines.at(1);
         }
 
-        // https://github.com/juannavascalvente/Delaunay/issues/61
+        // TODO https://github.com/juannavascalvente/Delaunay/issues/61
         // Compute triangles path between two points.
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         vector<int> vFacesId;
@@ -888,7 +893,7 @@ public:
             for (auto face : vFacesId)
             {
                 vector<Point<TYPE>> vFacesPoints;
-                DcelFigureBuilder::getFacePoints(face, *in.getStoreService()->getDcel(), vFacesPoints);
+                DcelFigureBuilder::getFacePoints(face, *delaunay->getRefDcel(), vFacesPoints);
 
                 Polygon polygon;
                 for (auto point : vFacesPoints)
@@ -919,7 +924,8 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Dcel *dcel = in.getStoreService()->getDcel();
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            Dcel *dcel = delaunay->getRefDcel();
             Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayables.push_back(dispDelaunay);
 
@@ -1011,7 +1017,6 @@ public:
         int	 finalFace=0;			// Final face in the path.
         Point<TYPE> closest;		// Closest point.
         double distance=0.0;		// Distance between points.
-        Set<int> extremeFaces(2);	// First and last faces in the path.
 
         // Get extreme point faces.
         https://github.com/juannavascalvente/Delaunay/issues/62
@@ -1020,11 +1025,12 @@ public:
             delaunay->findClosestPoint(line.getDest(), *voronoi, closest, finalFace, distance))
         {
             // Add faces to set.
-            extremeFaces.add(initialFace+1);
-            extremeFaces.add(finalFace+1);
+            vector<int> vFaces;
+            vFaces.push_back(initialFace+1);
+            vFaces.push_back(finalFace+1);
 
             // Find path.
-            isRunSuccess = voronoi->getRefDcel()->findPath(extremeFaces, line, vFacesId);
+            isRunSuccess = voronoi->getRefDcel()->findPath(vFaces, line, vFacesId);
         }
 
         if (isRunSuccess)
@@ -1068,14 +1074,14 @@ public:
             Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayable.push_back(dispDelaunay);
 
+            // Add faces path
+            vDisplayable.push_back(DisplayableFactory::createPolygonSet(vPolygons));
+
             // Add points whose path is drawn
             vector<Point<TYPE>> vPoints;
             vPoints.push_back(line.getOrigin());
             vPoints.push_back(line.getDest());
             vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
-
-            // Add faces
-            vDisplayable.push_back(DisplayableFactory::createPolygonSet(vPolygons));
         }
 
         return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
@@ -1193,8 +1199,8 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Dcel *dcel = in.getStoreService()->getDcel();
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(delaunay->getRefDcel());
             vDisplayable.push_back(dispDelaunay);
 
             // Add points (point to locate and closest point)
@@ -1272,9 +1278,9 @@ public:
         Status *status = in.getStoreService()->getStatus();
         bool isRunSuccess=false;
         bool isImaginaryFace=false;
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
         if (status->isDelaunay())
         {
-            Delaunay *delaunay = in.getStoreService()->getDelaunay();
             isRunSuccess = delaunay->findFace(point, faceId, isImaginaryFace);
         }
 //        else
@@ -1290,7 +1296,7 @@ public:
         if (isRunSuccess && !isImaginaryFace)
         {
             vector<Point<TYPE>> vFacesPoints;
-            DcelFigureBuilder::getFacePoints(faceId, *in.getStoreService()->getDcel(), vFacesPoints);
+            DcelFigureBuilder::getFacePoints(faceId, *delaunay->getRefDcel(), vFacesPoints);
 
             Polygon polygon;
             for (auto item : vFacesPoints)
@@ -1320,8 +1326,8 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Dcel *dcel = in.getStoreService()->getDcel();
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(delaunay->getRefDcel());
             vDisplayable.push_back(dispDelaunay);
 
             // Add points (point to locate and closest point)
@@ -1409,8 +1415,9 @@ public:
         // Add closest points
         if (isRunSuccess)
         {
-            vPoints.push_back(*in.getStoreService()->getDcel()->getRefPoint(iPointIdx1));
-            vPoints.push_back(*in.getStoreService()->getDcel()->getRefPoint(iPointIdx2));
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            vPoints.push_back(*delaunay->getRefDcel()->getRefPoint(iPointIdx1));
+            vPoints.push_back(*delaunay->getRefDcel()->getRefPoint(iPointIdx2));
         }
 
         // Build result
@@ -1433,8 +1440,8 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Dcel *dcel = in.getStoreService()->getDcel();
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(delaunay->getRefDcel());
             vDisplayable.push_back(dispDelaunay);
 
             // Add points (point to locate and closest point)
@@ -1511,9 +1518,10 @@ public:
 
         // Add items to display
         vector<Displayable *> vDisplayable;
-        if (getSuccess()) {
-            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDcel(),
-                                                                  in.getConfigService()->getMinLengthEdge()));
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getConfigService()->getMinLengthEdge()));
         }
 
         return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
@@ -1575,7 +1583,7 @@ public:
         setIsSuccess(true);
 
         // Add circles
-        Dcel *dcel = in.getStoreService()->getDcel();
+        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
         for (int faceID=1; faceID<dcel->getNFaces() ;faceID++)
         {
             // Skip imaginary faces.
@@ -1614,7 +1622,7 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Dcel *dcel = in.getStoreService()->getDcel();
+            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
 
             // Add points to display.
@@ -1680,7 +1688,7 @@ public:
         setIsSuccess(true);
 
         // Loop all faces (but external).
-        Dcel *dcel = in.getStoreService()->getDcel();
+        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
         for (int edgeIndex=0; edgeIndex<dcel->getNEdges() ;edgeIndex++)
         {
             // Skip imaginary edges.
@@ -1724,7 +1732,7 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Dcel *dcel = in.getStoreService()->getDcel();
+            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
 
             // Add points to display.
@@ -1839,7 +1847,7 @@ public:
     *******************************************************************************************************************/
     explicit CommandDcelInfo(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService)
     {
-        dcel = in.getStoreService()->getDcel();
+        dcel = in.getStoreService()->getDelaunay()->getRefDcel();
     };
 
 
@@ -2011,7 +2019,7 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Dcel *dcel = in.getStoreService()->getDcel();
+        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
         this->isSuccess = DcelReader::readPoints(Config::getInFlatFilename(), true, *dcel);
 
         if (this->isSuccess)
@@ -2075,7 +2083,7 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Dcel *dcel = in.getStoreService()->getDcel();
+        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
         this->isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, *dcel);
 
         if (this->isSuccess)
@@ -2159,7 +2167,7 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            Dcel *dcel = in.getStoreService()->getDcel();
+            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
         }
 
@@ -2261,7 +2269,8 @@ public:
     CommandResult* runCommand() override
     {
         // Write points to file
-        this->isSuccess = DcelWriter::writePoints(Config::getOutFlatFilename(), INVALID, *in.getStoreService()->getDcel());
+        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        this->isSuccess = DcelWriter::writePoints(Config::getOutFlatFilename(), INVALID, *dcel);
 
         // Build result
         return createResult();
@@ -2308,7 +2317,8 @@ public:
     CommandResult* runCommand() override
     {
         // Write dcel to file
-        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), false, *getInput()->getStoreService()->getDcel());
+        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), false, *dcel);
 
         // Build result
         return createResult();

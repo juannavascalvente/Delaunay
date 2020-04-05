@@ -7,20 +7,28 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-void StoreData::save(vector<Point<TYPE>> &vPointsIn)
+void StoreData::save(vector<Point<TYPE>> &v)
 {
-    vPoints = vPointsIn;
+    vPoints = v;
 }
 
 
-void StoreData::save(StarTriangulation &in)
+void StoreData::save(StarTriangulation &t)
 {
     delete triangulation;
-    triangulation = new StarTriangulation(in);
+    triangulation = new StarTriangulation(t);
 }
 
-void StoreData::save(Delaunay &in)
+
+void StoreData::save(Delaunay &d)
 {
     delete delaunay;
-    delaunay = new Delaunay(in);
+    delaunay = new Delaunay(d);
+}
+
+
+void StoreData::save(Voronoi &v)
+{
+    delete voronoi;
+    voronoi = new Voronoi(v);
 }

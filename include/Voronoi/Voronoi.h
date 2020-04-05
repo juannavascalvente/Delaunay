@@ -1,32 +1,27 @@
-/*
- * Voronoi.h
- *
- *  Created on: Aug 3, 2016
- *      Author: jnavas
- */
-
 #ifndef INCLUDE_VORONOI_H_
 #define INCLUDE_VORONOI_H_
 
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Dcel.h"
 #include "Line.h"
 
 
-/****************************************************************************
-// 						VORONOI CLASS DEFITNION
-****************************************************************************/
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class Voronoi
 {
-	//------------------------------------------------------------------------
-	//  Attributes
-	//------------------------------------------------------------------------
-	bool 	valid;
-	Dcel 	*triangulation;			// Reference to triangulation DCEL data.
-	Dcel 	voronoi;				// Reference to Voronoi DCEL data.
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+	Dcel 	triangulation;		// Reference to triangulation DCEL data.
+	Dcel 	dcel;				// Reference to Voronoi DCEL data.
 
-	//------------------------------------------------------------------------
-	//  Private functions.
-	//------------------------------------------------------------------------
+    /*******************************************************************************************************************
+    * Private methods declarations
+    *******************************************************************************************************************/
 	void computeCircumcentres(bool isIncremental);
 	void buildArea(int pointIndex);
 	Point<TYPE> computeExtremeVoronoi(int edgeIndex, Point<TYPE> &centre);
@@ -34,28 +29,59 @@ class Voronoi
 	bool isBottomMostFace(int faceId);
 
 	friend class VoronoiIO;
-public:
-	//------------------------------------------------------------------------
-	// Constructor/Destructor.
-	//------------------------------------------------------------------------
-	// PENDING IMPLICIT CONSTRUCTORS.
-	Voronoi();
-	explicit Voronoi(Dcel *dcel);
-	~Voronoi();
 
-	//------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
-	bool 	init(Dcel *dcel);
+public:
+    /*******************************************************************************************************************
+    * Public methods declarations
+    *******************************************************************************************************************/
+	Voronoi() = default;
+	explicit Voronoi(Dcel &t);
+	~Voronoi() = default;
+
+    Voronoi(const Voronoi &d)
+    {
+        this->dcel = d.dcel;
+        this->triangulation = d.triangulation;
+    }
+
+	/**
+	 * @fn  reset
+	 * @brief   Resets voronoi dcel (but keeps triangulation dcel)
+	 */
 	void 	reset();
 
-	// GET/SET functions.
-	inline Dcel* getRefDcel() { return(&this->voronoi); };
-	bool 		 getCentre(int areaId, Point<TYPE> &centre);
-
-	// Figures functions.
+	/**
+	 * @fn                      build
+	 * @brief                   Builds Voronoi diagram associated to triangulation
+	 * @param isIncremental     Flags if triangulation was built using Incremental algorithm
+	 * @return                  true if build successfully
+	 *                          false otherwise
+	 */
 	bool 	build(bool isIncremental);
+
+	/**
+	 * @fn              isInnerToArea
+	 * @brief           checks if the input point is inner to areaId Voronoi area.
+	 *
+	 * @param p         (IN) Point to check
+	 * @param areaId    (IN) Face id to check
+	 * @return          true if point is interior to face
+	 *                  false otherwise
+	 */
 	bool 	isInnerToArea(const Point<TYPE> &p, int areaId);
+
+    /*******************************************************************************************************************
+    * Getters
+    *******************************************************************************************************************/
+    inline Dcel* getRefDcel() { return(&this->dcel); };
+
+    /**
+     * @fn              getCentre
+     * @brief           Returns the centre of the input area id.
+     * @param areaId    (IN) Area whose center point is returned
+     * @param centre    (OUT) Area center
+     */
+    void 		 getCentre(int areaId, Point<TYPE> &centre) { centre = *this->dcel.getRefPoint(areaId); };
 };
 
 #endif /* INCLUDE_VORONOI_H_ */

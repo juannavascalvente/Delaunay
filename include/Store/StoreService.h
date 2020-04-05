@@ -62,6 +62,7 @@ public:
     void    save(vector<Point<TYPE>> &vPoints) { repository->getData()->save(vPoints); };
     void    save(StarTriangulation &triangulation) { repository->getData()->save(triangulation); };
     void    save(Delaunay &delaunay) { repository->getData()->save(delaunay); };
+    void    save(Voronoi &voronoi) { repository->getData()->save(voronoi); };
 };
 
 
