@@ -42,11 +42,11 @@ public:
      * @return  true if success
      *          false otherwise
      */
-    virtual bool convexHull(Polygon &hull) = 0;
-    virtual bool findClosestPoint(Point<TYPE> &p, size_t, vector<Point<TYPE>> &v) = 0;
+    virtual bool convexHull() = 0;
+    virtual bool findClosestPoint(Point<TYPE> &in, Point<TYPE> &out) = 0;
     virtual bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) = 0;
+    virtual bool findFace(Point<TYPE> &origin, vector<Point<TYPE>> &vPoints) = 0;
     virtual bool path(Point<TYPE> &origin, Point<TYPE> &dest, vector<Polygon> &path) = 0;
-    virtual bool findFace(Point<TYPE> &origin, Polygon &face) = 0;
 };
 
 

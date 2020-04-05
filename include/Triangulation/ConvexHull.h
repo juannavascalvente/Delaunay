@@ -36,7 +36,7 @@ public:
      *
      * @return
      */
-    bool isEmpty() { return (hull.getNElements() != 0); }
+    bool isEmpty() { return (hull.getNElements() == 0); }
 
      /**
      * @fn      getConvexHull

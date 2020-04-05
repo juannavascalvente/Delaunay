@@ -30,9 +30,7 @@ class Delaunay
     *******************************************************************************************************************/
 	Dcel 	dcel;				// Reference to DCEL data.
 	Graph 	graph;				// Graph used in incremental algorithm.
-
-	// Convex hull data.
-    ConvexHull hull;
+    ConvexHull hull;            // Convex hull data.
 
 	// Type of algorithm executed to compute the Delaunay algorithm.
 	enum Algorithm algorithm;
@@ -104,10 +102,10 @@ public:
     *******************************************************************************************************************/
     bool build();
     bool convexHull();
-    bool findTwoClosest(int &first, int &second);
-    bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
-    bool findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q, int	&poinIndex, double &dist);
-    bool findPath(Line &line, vector<int> &vFacesId);
+    bool findClosestPoint(Point<TYPE> &in, Point<TYPE> &out, Voronoi *voronoi);
+    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q);
+    bool findFace(Point<TYPE> &origin, int &faceId);
+    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId);
 
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}
