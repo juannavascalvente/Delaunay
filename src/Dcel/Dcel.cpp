@@ -965,7 +965,7 @@ bool Dcel::getEdgeInserection(Line &line, int face, int &edgeId)
 * GLOBAL:	NONE
 * Description: 	finds the list of faces where input line lays.
 ***************************************************************************/
-bool Dcel::findPath(Set<int> &extremeFaces, Line &line, vector<int> &vFacesId)
+bool Dcel::findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesId)
 {
 	bool found=true;		// Return value.
 	int	edgeId=INVALID;		// Edge id.
@@ -973,8 +973,8 @@ bool Dcel::findPath(Set<int> &extremeFaces, Line &line, vector<int> &vFacesId)
 	int lastFace=0;			// First face in path.
 
 	// Get origin and destination faces of the path.
-	firstFace = *extremeFaces.at(0);
-	lastFace = *extremeFaces.at(1);
+	firstFace = vExtremeFaces.at(0);
+	lastFace = vExtremeFaces.at(1);
 #ifdef DEBUG_DELAUNAY_FIND_PATH
 	Logging::buildText(__FUNCTION__, __FILE__, "Searching path between faces ");
 	Logging::buildText(__FUNCTION__, __FILE__, firstFace);

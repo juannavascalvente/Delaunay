@@ -904,7 +904,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 	int	 edgeIndex=0;				// Edge index.
 	vector<int> intersectEdges;		// Set of edges that intersect convex hull.
 	Point<TYPE> origin, dest;		// Line extreme points.
-	Set<int> extremeFaces(2);	// First and last faces in the path.
+	vector<int> vFaces;
 
 	// Get origin and destination points.
 	origin = line.getOrigin();
@@ -926,7 +926,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 		// Add non external faces to set.
 		if (!isImaginaryFace1)
 		{
-			extremeFaces.add(originFace);
+            vFaces.push_back(originFace);
 			computePath = true;
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 			Logging::buildText(__FUNCTION__, __FILE__, "Initial face is real.");
@@ -935,7 +935,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 		}
 		if (!isImaginaryFace2)
 		{
-			extremeFaces.add(destinationFace);
+            vFaces.push_back(destinationFace);
 			computePath = true;
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 			Logging::buildText(__FUNCTION__, __FILE__, "Final face is real.");
@@ -944,7 +944,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 		}
 
 		// Check if any of the faces is external to convex hull.
-		if (extremeFaces.getNElements() != 2)
+		if (vFaces.size() != 2)
 		{
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 			Logging::buildText(__FUNCTION__, __FILE__, "At least one of the faces is imaginary. Faces ids are ");
@@ -973,7 +973,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 				{
 					edgeIndex = this->getConvexHullEdges()->at(intersectEdges.at(i))-1;
                     originFace = this->dcel.getFace(this->dcel.getTwin(edgeIndex) - 1);
-					extremeFaces.add(originFace);
+                    vFaces.push_back(originFace);
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 					Logging::buildText(__FUNCTION__, __FILE__, "Changing external face to ");
 					Logging::buildText(__FUNCTION__, __FILE__, faceId);
@@ -989,7 +989,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 		if (computePath)
 		{
 			// Find path.
-			found = this->getRefDcel()->findPath(extremeFaces, line, vFacesId);
+			found = this->getRefDcel()->findPath(vFaces, line, vFacesId);
 		}
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
 		else

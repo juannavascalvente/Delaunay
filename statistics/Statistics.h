@@ -1,19 +1,13 @@
-/*
- * statistics.h
- *
- *  Created on: Nov 17, 2016
- *      Author: juan
- */
-
 #include "Delaunay.h"
 #include "Logging.h"
+#include "Set.h"
 #include "StarTriangulation.h"
 
 #include <iostream>
 #include <fstream>
 using namespace std;
-#include <sys/time.h>
-#include <stdio.h>
+#include <ctime>
+#include <cstdio>
 
 #ifndef INCLUDE_STATISTICS_H_
 #define INCLUDE_STATISTICS_H_

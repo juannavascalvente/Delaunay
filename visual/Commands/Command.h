@@ -659,17 +659,22 @@ public:
      */
     CommandResult * runCommand() override
     {
-        // Initialize voronoi data.
-        Dcel *dcel = in.getStoreService()->getDcel();
-        Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        bool isRunSuccess = voronoi->init(dcel);
+        // Initialize voronoi data
+        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        Dcel *dcel = delaunay->getRefDcel();
+        auto *voronoi = new Voronoi(*dcel);
 
-        // Check init was success
+        // Compute Voronoi diagram
+        bool isRunSuccess = voronoi->build(true);
+
+        // Save result
         if (isRunSuccess)
         {
-            // Compute Voronoi diagram.
-            isRunSuccess = voronoi->build(true);
+            in.getStoreService()->save( *voronoi);
         }
+
+        // Free resources
+        delete voronoi;
 
         // Build result
         setIsSuccess(isRunSuccess);
@@ -691,7 +696,7 @@ public:
         if (getSuccess())
         {
             // Add delaunay and voronoi
-            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDcel()));
+            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDelaunay()->getRefDcel()));
             vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getVoronoi()->getRefDcel()));
         }
 
@@ -1011,7 +1016,6 @@ public:
         int	 finalFace=0;			// Final face in the path.
         Point<TYPE> closest;		// Closest point.
         double distance=0.0;		// Distance between points.
-        Set<int> extremeFaces(2);	// First and last faces in the path.
 
         // Get extreme point faces.
         https://github.com/juannavascalvente/Delaunay/issues/62
@@ -1020,11 +1024,12 @@ public:
             delaunay->findClosestPoint(line.getDest(), *voronoi, closest, finalFace, distance))
         {
             // Add faces to set.
-            extremeFaces.add(initialFace+1);
-            extremeFaces.add(finalFace+1);
+            vector<int> vFaces;
+            vFaces.push_back(initialFace+1);
+            vFaces.push_back(finalFace+1);
 
             // Find path.
-            isRunSuccess = voronoi->getRefDcel()->findPath(extremeFaces, line, vFacesId);
+            isRunSuccess = voronoi->getRefDcel()->findPath(vFaces, line, vFacesId);
         }
 
         if (isRunSuccess)
@@ -1068,14 +1073,14 @@ public:
             Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayable.push_back(dispDelaunay);
 
+            // Add faces path
+            vDisplayable.push_back(DisplayableFactory::createPolygonSet(vPolygons));
+
             // Add points whose path is drawn
             vector<Point<TYPE>> vPoints;
             vPoints.push_back(line.getOrigin());
             vPoints.push_back(line.getDest());
             vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
-
-            // Add faces
-            vDisplayable.push_back(DisplayableFactory::createPolygonSet(vPolygons));
         }
 
         return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);

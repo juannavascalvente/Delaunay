@@ -16,7 +16,6 @@
 #include "Edge.h"
 #include "Face.h"
 #include "Line.h"
-#include "Set.h"
 #include "Vertex.h"
 
 
@@ -124,7 +123,7 @@ public:
 
 	// Figures? PENDING. Move to another module?
 	bool 	getEdgeInserection(Line &line, int face, int &edgeId);
-	bool 	findPath(Set<int> &extremeFaces, Line &line, vector<int> &vFacesId);
+	bool 	findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesId);
 
 	bool operator==(const Dcel& other) const;
 	Dcel & operator=(const Dcel &d) = default;
