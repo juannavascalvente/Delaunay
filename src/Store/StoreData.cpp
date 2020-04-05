@@ -32,3 +32,10 @@ void StoreData::save(Voronoi &v)
     delete voronoi;
     voronoi = new Voronoi(v);
 }
+
+
+void StoreData::save(Gabriel &g)
+{
+    delete gabriel;
+    gabriel = new Gabriel(g);
+}

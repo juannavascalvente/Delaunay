@@ -1,65 +1,66 @@
-/*
- * Gabriel.h
- *
- *  Created on: Nov 11, 2016
- *      Author: juan
- */
-
 #ifndef INCLUDE_GABRIEL_H_
 #define INCLUDE_GABRIEL_H_
 
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Dcel.h"
 #include "Voronoi.h"
 
 #include <iostream>
 using namespace std;
 
-/****************************************************************************
-//	 						GABRIEL CLASS DEFITNION
-****************************************************************************/
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class Gabriel
 {
-	//------------------------------------------------------------------------
-	//  Attributes
-	//------------------------------------------------------------------------
-	bool 	valid;				// Valid data flag.
-	int	 	size;				// Size of the bool array.
-	bool 	*validEdge;			// Valid edge array.
-	Dcel 	*dcel;				// DCELto check.
-	Voronoi *voronoi;			// Voronoi graph associated to DCEL.
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    vector<bool> vValidEdges;	// Valid edge array.
+	Dcel 	dcel;				// DCELto check.
+	Voronoi voronoi;			// Voronoi graph associated to DCEL.
 
-	//------------------------------------------------------------------------
-	// Private functions.
-	//------------------------------------------------------------------------
-	void validateEdges( int edgeIndex);
-	bool resize( int size, bool copy);
+
+    /*******************************************************************************************************************
+    * Private methods
+    *******************************************************************************************************************/
+	void validateEdges(int edgeIndex);
+
+protected:
+
+    /*******************************************************************************************************************
+    * Protected methods
+    *******************************************************************************************************************/
+    void set(int index) { this->vValidEdges.at(index) = true; };
+    bool at(int index) const { return this->vValidEdges.at(index); };
 
 	friend class GabrielIO;
 public:
 
-	//------------------------------------------------------------------------
-	// Constructor/Destructor
-	//------------------------------------------------------------------------
-	Gabriel();
-	Gabriel( Dcel *dcel, Voronoi *voronoi);
-	~Gabriel();
+    /*******************************************************************************************************************
+     * Public methods declaration
+     *******************************************************************************************************************/
+	Gabriel(Dcel &dcelIn, Voronoi &voronoiIn) : dcel(dcelIn), voronoi(voronoiIn), vValidEdges(dcelIn.getNEdges()) {};
+	~Gabriel() = default;
 
-	//------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
-	void init( Dcel *dcel, Voronoi *voronoi);
+    Gabriel(const Gabriel &d)
+    {
+        this->dcel = d.dcel;
+        this->voronoi = d.voronoi;
+        this->vValidEdges = d.vValidEdges;
+    }
 
-	inline bool isSet( int index) { return(this->validEdge[index]); };
-	inline void set( int index) { this->validEdge[index] = true; };
-	inline void unset( int index) { this->validEdge[index] = false; };
-	inline bool at( int index) const { return(this->validEdge[index]); };
+	bool isSet(int index) { return(this->vValidEdges.at(index)); };
+    bool build();
 
-	// Get/Set functions.
-	inline bool isValid() {return(this->valid); };
-	inline int  getSize() const {return(this->size); };
-	inline Dcel *getDcel() {return(this->dcel); };
-
-	bool build();
+    /*******************************************************************************************************************
+    * Getters/Setters
+    *******************************************************************************************************************/
+	int  getSize() const { return this->vValidEdges.size(); };
+	Dcel *getDcel() {return &this->dcel; };
 };
 
 #endif /* INCLUDE_GABRIEL_H_ */

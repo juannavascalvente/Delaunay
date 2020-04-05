@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 25/3/20.
-//
-
 #ifndef DELAUNAY_DISPLAYMANAGER_H
 #define DELAUNAY_DISPLAYMANAGER_H
 

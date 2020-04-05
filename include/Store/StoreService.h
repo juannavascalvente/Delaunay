@@ -50,7 +50,6 @@ public:
     *******************************************************************************************************************/
     vector<Point<TYPE>>      &getPoints()    { return *repository->getData()->getPoints(); };
     Status      *getStatus()    { return repository->getData()->getStatus(); };
-    Dcel        *getDcel()      { return repository->getData()->getDcel(); };
     Delaunay    *getDelaunay()  { return repository->getData()->getDelaunay(); };
     Voronoi     *getVoronoi()   { return repository->getData()->getVoronoi(); };
     Gabriel     *getGabriel()   { return repository->getData()->getGabriel(); };
@@ -63,7 +62,7 @@ public:
     void    save(StarTriangulation &triangulation) { repository->getData()->save(triangulation); };
     void    save(Delaunay &delaunay) { repository->getData()->save(delaunay); };
     void    save(Voronoi &voronoi) { repository->getData()->save(voronoi); };
+    void    save(Gabriel &gabriel) { repository->getData()->save(gabriel); };
 };
-
 
 #endif //DELAUNAY_STORESERVICE_H

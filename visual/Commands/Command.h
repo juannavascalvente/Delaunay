@@ -756,8 +756,7 @@ public:
         // Build Gabriel graph.
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
-        Gabriel *gabriel = in.getStoreService()->getGabriel();
-        gabriel->init(delaunay->getRefDcel(), voronoi);
+        auto *gabriel = new Gabriel(*delaunay->getRefDcel(), *voronoi);
         bool isRunSuccess = gabriel->build();
 
         if (isRunSuccess)
@@ -767,15 +766,14 @@ public:
             Dcel	*dcelRef;
 
             // Get reference to gabriel dcel.
-            Gabriel *gabrielIn = in.getStoreService()->getGabriel();
             dcelRef = gabriel->getDcel();
 
             // Draw Gabriel edges.
             // TODO https://github.com/juannavascalvente/Delaunay/issues/60 -> Add dashed lines to highlight results
-            for (size_t edgeIndex=0; edgeIndex<gabrielIn->getSize() ;edgeIndex++)
+            for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
             {
                 // Check if current edge mamtches Gabriel restriction.s
-                if (gabrielIn->isSet(edgeIndex))
+                if (gabriel->isSet(edgeIndex))
                 {
                     // Get origin vertex of edge.
                     vertex1 = dcelRef->getRefPoint(dcelRef->getOrigin(edgeIndex)-1);
@@ -787,6 +785,9 @@ public:
                     vLines.push_back(line);
                 }
             }
+
+            // Save result
+            in.getStoreService()->save(*gabriel);
         }
 
         // Build result
@@ -809,7 +810,8 @@ public:
         if (getSuccess())
         {
             // Add Delaunay and gabriel graph
-            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDcel()));
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            vDisplayable.push_back(DisplayableFactory::createDcel(delaunay->getRefDcel()));
             vDisplayable.push_back(DisplayableFactory::createPolyLine(vLines));
         }
 
