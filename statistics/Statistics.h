@@ -1,6 +1,5 @@
 #include "Delaunay.h"
 #include "Logging.h"
-#include "Set.h"
 #include "StarTriangulation.h"
 
 #include <iostream>
@@ -249,14 +248,14 @@ public:
 ****************************************************************************/
 class StatisticsConvexHullRegister : public StatisticsRegister
 {
-	Set<ConexHullStatisticsData *>	data;	// Test statistics array.
+	vector<ConexHullStatisticsData *> data;
 public:
 	StatisticsConvexHullRegister(string outFile, int nSteps, int nTestsStep):\
 							StatisticsRegister(outFile, nSteps, nTestsStep), \
 							data(DEFAULT_N_STATISTICS) {};
 	~StatisticsConvexHullRegister(){this->deallocate();};
 
-    void add(ConexHullStatisticsData *data) {this->data.add(data);};
+    void add(ConexHullStatisticsData *data) {this->data.push_back(data);};
     bool writeResults();
     void deallocate();
 };
@@ -266,14 +265,14 @@ public:
 ****************************************************************************/
 class StatisticsStarTriangulationRegister : public StatisticsRegister
 {
-	Set<StatisticsTriangulationData *>	data;	// Test statistics array.
+    vector<StatisticsTriangulationData *> data;
 public:
 	StatisticsStarTriangulationRegister(string outFile, int nSteps, int nTestsStep): \
 							StatisticsRegister(outFile, nSteps, nTestsStep),\
 							data(DEFAULT_N_STATISTICS) {};
 	~StatisticsStarTriangulationRegister(){this->deallocate();};
 
-    void add(StatisticsTriangulationData *data) {this->data.add(data);};
+    void add(StatisticsTriangulationData *data) {this->data.push_back(data);};
     bool writeResults();
     void deallocate();
 };
@@ -283,14 +282,14 @@ public:
 ****************************************************************************/
 class StatisticsDelaunayRegister : public StatisticsRegister
 {
-	Set<StatisticsDelaunayData *>	data;	// Test statistics array.
+    vector<StatisticsDelaunayData *> data;
 public:
 	StatisticsDelaunayRegister(string outFile, int nSteps, int nTestsStep): \
 							StatisticsRegister(outFile, nSteps, nTestsStep),\
 							data(DEFAULT_N_STATISTICS) {};
 	~StatisticsDelaunayRegister(){this->deallocate();};
 
-    void add(StatisticsDelaunayData *data) {this->data.add(data);};
+    void add(StatisticsDelaunayData *data) {this->data.push_back(data);};
     bool writeResults();
     void deallocate();
 };

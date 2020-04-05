@@ -70,35 +70,35 @@ bool StatisticsConvexHullRegister::writeResults()
 	// Check file is opened.
 	if (this->ofs.is_open())
 	{
-		if (this->data.getNElements() > 0)
+		if (this->data.size() > 0)
 		{
 			// Write # points in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nPoints <- c(" << current->getPoints();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getPoints();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # edges in convex hull.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nEdges <- c(" << current->getLength();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getLength();
 			}
 			this->ofs << ")" << endl;
 
 			// Write execution times.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "times <- c(" << current->getExecTime();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
 				// Write # points in test data.
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getExecTime();
 			}
 			this->ofs << ")" << endl;
@@ -128,9 +128,9 @@ void StatisticsConvexHullRegister::deallocate()
 	int	 i=0;				// Loop counter.
 
 	// Delete statistics registers.
-	for (i=0; i<this->data.getNElements() ;i++)
+	for (i=0; i<this->data.size() ;i++)
 	{
-		delete *this->data.at(i);
+		delete this->data.at(i);
 	}
 }
 
@@ -152,65 +152,65 @@ bool StatisticsStarTriangulationRegister::writeResults()
 	// Check file is opened.
 	if (this->ofs.is_open())
 	{
-		if (this->data.getNElements() > 0)
+		if (this->data.size() > 0)
 		{
 			// Write # points in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nPoints <- c(" << current->getPoints();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getPoints();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # edges in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nEdges <- c(" << current->getEdges();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getEdges();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # faces in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nFaces <- c(" << current->getFaces();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getFaces();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # convex hull edges in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nConvexEdges <- c(" << current->getConvexhullEdges();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getConvexhullEdges();
 			}
 			this->ofs << ")" << endl;
 
 #ifdef STATISTICS_STAR_TRIANGULATION
 			// Write # flipped edges in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nFlipped <- c(" << current->getFlips();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getFlips();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # collinear points in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nCollinearPoints <- c(" << current->getCollinear();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getCollinear();
 			}
 			this->ofs << ")" << endl;
@@ -234,9 +234,9 @@ void StatisticsStarTriangulationRegister::deallocate()
 	int	 i=0;				// Loop counter.
 
 	// Delete statistics registers.
-	for (i=0; i<this->data.getNElements() ;i++)
+	for (i=0; i<this->data.size() ;i++)
 	{
-		delete *this->data.at(i);
+		delete this->data.at(i);
 	}
 }
 
@@ -292,123 +292,123 @@ bool StatisticsDelaunayRegister::writeResults()
 	// Check file is opened.
 	if (this->ofs.is_open())
 	{
-		if (this->data.getNElements() > 0)
+		if (this->data.size() > 0)
 		{
 			// Write # points in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nPoints <- c(" << current->getPoints();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getPoints();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # edges in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nEdges <- c(" << current->getEdges();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getEdges();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # imaginary edges in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nImagEdges <- c(" << current->getImaginaryEdges();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getImaginaryEdges();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # convex hull edges in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nConvexEdges <- c(" << current->getConvexhullEdges();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getConvexhullEdges();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # faces in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nFaces <- c(" << current->getFaces();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getFaces();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # imaginary faces in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nImagFaces <- c(" << current->getImaginaryFaces();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getImaginaryFaces();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # nodes in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nNodes <- c(" << current->getNodes();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getNodes();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # nodes with 3 children in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "n3childrenNodes <- c(" << current->getN3childrenNodes();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getN3childrenNodes();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # nodes with 2 children in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "n2childrenNodes <- c(" << current->getN2childrenNodes();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getN2childrenNodes();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # flipped edges in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nFlipped <- c(" << current->getFlips();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getFlips();
 			}
 			this->ofs << ")" << endl;
 
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 			// Write # collinear points in test data.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nCollinearPoints <- c(" << current->getCollinear();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getCollinear();
 			}
 			this->ofs << ")" << endl;
 
 			// Write # nodes checked for each point insertion.
-			for (i=0; i<this->data.getNElements() ;i++)
+			for (i=0; i<this->data.size() ;i++)
 			{
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "nInsertions" << (i+1) << " <- c(1";
 				intVector = current->getNodesChecked();
 				for (j=1; j<current->getPoints() ;j++)
@@ -419,23 +419,23 @@ bool StatisticsDelaunayRegister::writeResults()
 			}
 #endif
 			// Write # leaves in graph.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "nLeaves <- c(" << current->getLeaves();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
 				// Write # points in test data.
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getLeaves();
 			}
 			this->ofs << ")" << endl;
 
 			// Write execution times.
-			current = *this->data.at(0);
+			current = this->data.at(0);
 			this->ofs << "times <- c(" << current->getExecTime();
-			for (i=1; i<this->data.getNElements() ;i++)
+			for (i=1; i<this->data.size() ;i++)
 			{
 				// Write # points in test data.
-				current = *this->data.at(i);
+				current = this->data.at(i);
 				this->ofs << "," << current->getExecTime();
 			}
 			this->ofs << ")" << endl;
@@ -465,9 +465,9 @@ void StatisticsDelaunayRegister::deallocate()
 	int	 i=0;				// Loop counter.
 
 	// Delete statistics registers.
-	for (i=0; i<this->data.getNElements() ;i++)
+	for (i=0; i<this->data.size() ;i++)
 	{
-		delete *this->data.at(i);
+		delete this->data.at(i);
 	}
 }
 
