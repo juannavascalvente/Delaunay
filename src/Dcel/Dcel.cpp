@@ -223,7 +223,8 @@ void Dcel::reset()
 ***************************************************************************/
 void Dcel::addVertex(const Point<TYPE> *p, const int edge)
 {
-    vVertex.emplace_back(edge, *p);
+    Vertex v(edge, *p);
+    vVertex.push_back(v);
 }
 
 
@@ -314,8 +315,10 @@ void Dcel::updateVertex(Point<TYPE> *p, int index)
 ***************************************************************************/
 void Dcel::addEdge(int origin, int twin, int previous, int next, int face)
 {
-    this->vEdges.emplace_back(origin, twin, previous, next, face);
+    Edge e(origin, twin, previous, next, face);
+    this->vEdges.push_back(e);
 }
+
 
 /***************************************************************************
 * Name: 	updateEdge
@@ -408,7 +411,8 @@ void Dcel::updateEdge(int origin, int twin, int previous, int next, int face, in
 void Dcel::addFace(const int edge)
 {
     // Add face
-    this->vFaces.emplace_back(Face(edge));
+    Face face(edge);
+    this->vFaces.push_back(face);
 }
 
 

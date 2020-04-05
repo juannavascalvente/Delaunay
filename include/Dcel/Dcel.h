@@ -85,7 +85,7 @@ public:
 	Edge *getRefEdge(int index) { return &this->vEdges.at(index); };
 	Face *getRefFace(int index) { return &this->vFaces.at(index); };
 
-	size_t getNVertex() const { return vEdges.size(); };
+	size_t getNVertex() const { return vVertex.size(); };
 	size_t getNEdges()  const { return vEdges.size(); };
 	size_t getNFaces()  const { return vFaces.size(); };
 

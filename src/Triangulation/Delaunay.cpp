@@ -1558,7 +1558,6 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 	int		flipCandidates[2];		// Edges that must be cheked due to split operation.
 	int		oldNode1=0;				// Old nodes id.
 	int		oldNode2=0;				// Old nodes id.
-    Face 	*ptrFace;				// Pointer to current face.
 	Node 	*ptrNode;				// Pointer to current node.
 	Node 	newNode[3];
 	double	area[3];
@@ -1574,18 +1573,18 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 	ptrNode = this->graph->getRefNode(nodeIndex);
 
     // Get data of the face of the triangle to be splitted.
-	ptrFace = this->dcel.getRefFace(ptrNode->getFace());
+	int faceEdge = this->dcel.getRefFace(ptrNode->getFace())->getEdge();
 
     // Check number of new triangles to create.
     if (nTriangles == 3)
     {
         // Save previous and next edges ID.
-    	prev_Edge_ID = this->dcel.getPrevious(ptrFace->getEdge()-1);
-    	next_Edge_ID = this->dcel.getNext(ptrFace->getEdge()-1);
+    	prev_Edge_ID = this->dcel.getPrevious(faceEdge-1);
+    	next_Edge_ID = this->dcel.getNext(faceEdge-1);
 
         // Insert two new edges: new_Edge_ID and new_Edge_ID+1.
-        this->dcel.addEdge(pointIndex+1, new_Edge_ID+5, new_Edge_ID+1, ptrFace->getEdge(), ptrNode->getFace());
-        this->dcel.addEdge(this->dcel.getOrigin(next_Edge_ID-1), new_Edge_ID+2, ptrFace->getEdge(), new_Edge_ID, ptrNode->getFace());
+        this->dcel.addEdge(pointIndex+1, new_Edge_ID+5, new_Edge_ID+1, faceEdge, ptrNode->getFace());
+        this->dcel.addEdge(this->dcel.getOrigin(next_Edge_ID-1), new_Edge_ID+2, faceEdge, new_Edge_ID, ptrNode->getFace());
 
         // Insert two new edges: new_Edge_ID+2 and new_Edge_ID+3.
         this->dcel.addEdge(pointIndex+1, new_Edge_ID+1, new_Edge_ID+3, next_Edge_ID, new_Face_ID);
@@ -1593,10 +1592,10 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 
         // Insert two new edges: new_Edge_ID+4 and new_Edge_ID+5.
         this->dcel.addEdge(pointIndex+1, new_Edge_ID+3, new_Edge_ID+5, prev_Edge_ID, new_Face_ID+1);
-        this->dcel.addEdge(this->dcel.getOrigin(ptrFace->getEdge()-1), new_Edge_ID, prev_Edge_ID, new_Edge_ID+4, new_Face_ID+1);
+        this->dcel.addEdge(this->dcel.getOrigin(faceEdge-1), new_Edge_ID, prev_Edge_ID, new_Edge_ID+4, new_Face_ID+1);
 
         // Update existing edges.
-        this->dcel.updateEdge(NO_UPDATE, NO_UPDATE, new_Edge_ID, new_Edge_ID+1, NO_UPDATE, ptrFace->getEdge()-1);
+        this->dcel.updateEdge(NO_UPDATE, NO_UPDATE, new_Edge_ID, new_Edge_ID+1, NO_UPDATE, faceEdge-1);
         this->dcel.updateEdge(NO_UPDATE, NO_UPDATE, new_Edge_ID+2, new_Edge_ID+3, new_Face_ID, next_Edge_ID-1);
         this->dcel.updateEdge(NO_UPDATE, NO_UPDATE, new_Edge_ID+4, new_Edge_ID+5, new_Face_ID+1, prev_Edge_ID-1);
 
@@ -1612,7 +1611,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 		// Insert three new nodes.
         newNode[0] = Node(	this->dcel.getOrigin(new_Edge_ID),
         					this->dcel.getOrigin(new_Edge_ID - 1),
-							this->dcel.getOrigin(ptrFace->getEdge() - 1),
+							this->dcel.getOrigin(faceEdge - 1),
 							ptrNode->getFace());
         area[0] = this->signedArea(&newNode[0]);
         newNode[1] = Node(	this->dcel.getOrigin(new_Edge_ID + 2),
@@ -1677,7 +1676,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
             }
         }
 		// Check if edges must be flipped.
-        this->checkEdge(ptrFace->getEdge());
+        this->checkEdge(faceEdge);
 		this->checkEdge(prev_Edge_ID);
 		this->checkEdge(next_Edge_ID);
     }
@@ -1687,7 +1686,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 		this->nCollinear++;
 #endif
         // Get edge identifier where new point is collinear.
-    	collinear_Edge_ID = this->dcel.getCollinear(pointIndex, ptrFace->getEdge());
+    	collinear_Edge_ID = this->dcel.getCollinear(pointIndex, faceEdge);
 
 #ifdef DEBUG_SPLIT_NODE
 		Logging::buildText(__FUNCTION__, __FILE__, "Point ");
@@ -1850,7 +1849,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			Logging::buildText(__FUNCTION__, __FILE__, "Collinear edge is negative. Point index ");
 			Logging::buildText(__FUNCTION__, __FILE__, pointIndex);
 			Logging::buildText(__FUNCTION__, __FILE__, " and face edge ");
-			Logging::buildText(__FUNCTION__, __FILE__, ptrFace->getEdge());
+			Logging::buildText(__FUNCTION__, __FILE__, faceEdge);
 			Logging::write(true, Info);
 		}
 #endif
