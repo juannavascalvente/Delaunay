@@ -66,7 +66,8 @@ public:
     *******************************************************************************************************************/
 	bool isConvexHullComputed() const {return convexHullComputed;}
 	Dcel* getDcel() {return &dcel;}
-	Polygon* getConvexHull() const {return hull;}
+	void getConvexHull(Polygon &polygon) { polygon = *hull; }
+    size_t getConvexHullLen() { return hull->getNElements(); }
 #ifdef STATISTICS_STAR_TRIANGULATION
 	int getCollinear() const {return nCollinear;}
 	int getFlips() const {return nFlips;}

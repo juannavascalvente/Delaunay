@@ -22,6 +22,8 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
+    ConvexHull() = default;
+    ~ConvexHull() = default;
     ConvexHull(const ConvexHull &d)
     {
         this->hull = d.hull;
@@ -70,6 +72,14 @@ public:
      * @param edgeId
      */
     void add(Point<TYPE> &p, int edgeId=INVALID);
+
+    /**
+     * @fn      size
+     * @brief   Get convex hull number of edges
+     *
+     * @return  Convex hull number of edges
+     */
+    size_t size() { return vEdges.size(); };
 };
 
 #endif //DELAUNAY_CONVEXHULL_H

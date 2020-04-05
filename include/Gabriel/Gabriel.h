@@ -48,9 +48,12 @@ public:
 
     Gabriel(const Gabriel &d)
     {
-        this->dcel = d.dcel;
-        this->voronoi = d.voronoi;
-        this->vValidEdges = d.vValidEdges;
+        if(this != &d)
+        {
+            this->dcel = d.dcel;
+            this->voronoi = d.voronoi;
+            this->vValidEdges = d.vValidEdges;
+        }
     }
 
 	bool isSet(int index) { return(this->vValidEdges.at(index)); };

@@ -1,22 +1,21 @@
-/*
- * Delaunay.h
- *
- *  Created on: Jul 11, 2016
- *      Author: jnavas
- */
-
 #ifndef INCLUDE_DELAUNAY_H_
 #define INCLUDE_DELAUNAY_H_
 
+
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
+#include "ConvexHull.h"
 #include "Dcel.h"
 #include "defines.h"
 #include "Graph.h"
 #include "Polygon.h"
 #include "Voronoi.h"
 
-//****************************************************************************
-//                           ENUM DEFINITION
-//****************************************************************************
+
+/***********************************************************************************************************************
+* Public declarations
+***********************************************************************************************************************/
 // Algorithm used to compute the Delaunay triangulation.
 enum Algorithm { NONE, INCREMENTAL, FROM_STAR};
 
@@ -33,9 +32,7 @@ class Delaunay
 	Graph 	graph;				// Graph used in incremental algorithm.
 
 	// Convex hull data.
-	bool 	convexHullComputed;
-	Polygon hull;
-	vector<int> vHullEdges;
+    ConvexHull hull;
 
 	// Type of algorithm executed to compute the Delaunay algorithm.
 	enum Algorithm algorithm;
@@ -63,18 +60,20 @@ public:
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Delaunay() : convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
+	Delaunay() : algorithm(NONE)  {}
     explicit Delaunay(vector<Point<TYPE>> &vPoints);
 	~Delaunay() = default;
 
     Delaunay(const Delaunay &d)
     {
-        this->dcel = d.dcel;
-        this->convexHullComputed = d.convexHullComputed;
-        this->hull = d.hull;
-        this->vHullEdges = d.vHullEdges;
-        this->algorithm = d.algorithm;
-        this->graph = d.graph;
+        if(this != &d)
+        {
+            this->dcel = d.dcel;
+            this->hull = d.hull;
+            this->hull = d.hull;
+            this->algorithm = d.algorithm;
+            this->graph = d.graph;
+        }
     }
 
     /**
@@ -85,13 +84,13 @@ public:
 	void reset();
 
 	// Get/Set functions.
-	bool isConvexHullComputed() {return(this->convexHullComputed);};
-	void setConvexHullComputed(bool v) {this->convexHullComputed = v;};
+	bool isConvexHullComputed() { return !hull.isEmpty(); };
 	Graph* getGraph() {return &graph;}
 
 	//bool internalToConvexHull(Point<TYPE> &p);
-	Polygon* getConvexHull() {return(&this->hull);};
-	vector<int> *getConvexHullEdges() {return &this->vHullEdges; };
+	bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); };
+	bool getConvexHullEdges(vector<int> &vEdges) { return hull.getConvexHullEdges(vEdges);  };
+	size_t getConvexHullLen() { return hull.size(); }
 
     /*******************************************************************************************************************
     * Getter/Setters

@@ -521,14 +521,14 @@ class CommandConvexHull : public Command
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    Polygon *hull;
+    Polygon hull;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandConvexHull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService), hull(nullptr) {};
+    explicit CommandConvexHull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
 
 
     /**
@@ -574,13 +574,13 @@ public:
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             isRunSuccess = delaunay->convexHull();
-            hull = in.getStoreService()->getDelaunay()->getConvexHull();
+            in.getStoreService()->getDelaunay()->getConvexHull(hull);
         }
         else
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
             isRunSuccess = triangulation->convexHull();
-            hull = triangulation->getConvexHull();
+            triangulation->getConvexHull(hull);
         }
 
         // Build result
@@ -604,7 +604,7 @@ public:
         {
             // Add polygon points
             vector<Point<TYPE>> vPoints;
-            hull->getPoints(vPoints);
+            hull.getPoints(vPoints);
             vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
         }
 

@@ -62,9 +62,7 @@ void Delaunay::reset()
 {
 	// Reset data flags.
 	this->algorithm = NONE;
-	this->setConvexHullComputed(false);
 	this->hull.reset();
-	this->vHullEdges.clear();
 }
 
 
@@ -116,9 +114,7 @@ bool Delaunay::build()
 			Logging::write(true, Info);
 #endif
     // Reset convex hull flag.
-    this->setConvexHullComputed(false);
     this->hull.reset();
-    this->vHullEdges.clear();
 
     // Loop all other points.
     pointIndex=1;
@@ -440,7 +436,7 @@ bool Delaunay::convexHull()
 	try
 	{
 		// Initialize return value.
-		this->setConvexHullComputed(false);
+		this->hull.reset();
 #ifdef DEBUG_GET_CONVEX_HULL
 		Logging::buildText(__FUNCTION__, __FILE__, "Inserting point ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getOrigin(0));
@@ -495,7 +491,6 @@ bool Delaunay::convexHull()
 		{
 			// Insert next point.
 			this->hull.add(*this->dcel.getRefPoint(this->dcel.getOrigin(edgeIndex)-1));
-			this->vHullEdges.push_back(edgeIndex+1);
 #ifdef DEBUG_GET_CONVEX_HULL
 			Logging::buildText(__FUNCTION__, __FILE__, "Added point ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getOrigin(edgeIndex));
@@ -520,7 +515,6 @@ bool Delaunay::convexHull()
 			if (edgeIndex == firstIndex)
 			{
 				finished = true;
-				this->setConvexHullComputed(true);
 #ifdef DEBUG_GET_CONVEX_HULL
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull computed.");
 				Logging::write(true, Info);
@@ -939,23 +933,30 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 			}
 
 			// Line intersects convex hull.
-			if (this->getConvexHull()->getIntersections(line, intersectEdges))
+            Polygon polygon;
+            getConvexHull(polygon);
+			if (polygon.getIntersections(line, intersectEdges))
 			{
-				computePath = true;
 				nFacesToAdd = intersectEdges.size();
-				for (i=0; i<nFacesToAdd ;i++)
-				{
-					edgeIndex = this->getConvexHullEdges()->at(intersectEdges.at(i))-1;
-                    originFace = this->dcel.getFace(this->dcel.getTwin(edgeIndex) - 1);
-                    vFaces.push_back(originFace);
+				vector<int> vEdges;
+                this->getConvexHullEdges(vEdges);
+                if (!vEdges.empty())
+                {
+                    computePath = true;
+                    for (i=0; i<nFacesToAdd ;i++)
+                    {
+                        edgeIndex = vEdges.at(intersectEdges.at(i))-1;
+                        originFace = this->dcel.getFace(this->dcel.getTwin(edgeIndex) - 1);
+                        vFaces.push_back(originFace);
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-					Logging::buildText(__FUNCTION__, __FILE__, "Changing external face to ");
+                        Logging::buildText(__FUNCTION__, __FILE__, "Changing external face to ");
 					Logging::buildText(__FUNCTION__, __FILE__, faceId);
 					Logging::buildText(__FUNCTION__, __FILE__, " using edge ");
 					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
 					Logging::write(true, Info);
 #endif
-				}
+                    }
+                }
 			}
 		}
 
@@ -981,7 +982,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 	}
 #endif
 
-	return(found);
+	return found;
 }
 
 ///***************************************************************************

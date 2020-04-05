@@ -119,9 +119,10 @@ bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsO
             isSuccess = delaunay->convexHull();
 
             // Update output
-            Polygon *hull = delaunay->getConvexHull();
+            Polygon hull;
+            delaunay->getConvexHull(hull);
             vPointsOut.clear();
-            hull->getPoints(vPointsOut);
+            hull.getPoints(vPointsOut);
         }
 
         // Free resources
