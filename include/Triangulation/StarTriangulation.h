@@ -65,10 +65,6 @@ public:
 	void reset() { this->hull.reset(); };
 	bool delaunay();
 
-	bool convexHull();
-	bool findTwoClosest(int &first, int &second);
-	bool findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &distance);
-
     /*******************************************************************************************************************
     * Getters/Setters
     *******************************************************************************************************************/
@@ -79,12 +75,16 @@ public:
     *******************************************************************************************************************/
     bool isConvexHullComputed() { return !hull.isEmpty(); };
     bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); };
-//    bool getConvexHullEdges(vector<int> &vEdges) { return hull.getConvexHullEdges(vEdges);  };
     size_t getConvexHullLen() { return hull.size(); }
-#ifdef STATISTICS_STAR_TRIANGULATION
-	int getCollinear() const {return nCollinear;}
-	int getFlips() const {return nFlips;}
-#endif
+
+    /*******************************************************************************************************************
+    * Triangulation interface functions implementation
+    *******************************************************************************************************************/
+    bool convexHull();
+    bool findClosestPoint(Point<TYPE> &p, Point<TYPE> &q);
+    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q);
+    bool findFace(Point<TYPE> &origin, vector<Point<TYPE>> &vPoints) { return false; };
+    bool path(Point<TYPE> &origin, Point<TYPE> &dest, vector<Polygon> &path) { return false; };
 };
 
 #endif /* TRIANGULATION_H_ */

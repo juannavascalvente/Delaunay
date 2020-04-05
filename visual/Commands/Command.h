@@ -1172,7 +1172,7 @@ public:
         {
             // Find closest using brute force.
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            isRunSuccess = triangulation->findClosestPoint(point, closest, distance);
+            isRunSuccess = triangulation->findClosestPoint(point, closest);
         }
 
         // Add point to locate and closest point
@@ -1403,18 +1403,17 @@ public:
     {
         Point<TYPE> p;
         Point<TYPE> q;
-        bool isRunSuccess=true;
+        bool isRunSuccess;
         Status *status = in.getStoreService()->getStatus();
         if (status->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            //Point<TYPE> &p, Point<TYPE> &q
             isRunSuccess = delaunay->findTwoClosest(p, q);
         }
         else
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-//            isRunSuccess = triangulation->findTwoClosest(iPointIdx1, iPointIdx2);
+            isRunSuccess = triangulation->findTwoClosest(p, q);
         }
 
         // Add closest points
