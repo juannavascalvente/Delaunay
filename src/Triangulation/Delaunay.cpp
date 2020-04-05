@@ -1,10 +1,6 @@
-/*
- * Delaunay.cpp
- *
- *  Created on: Jul 11, 2016
- *      Author: jnavas
- */
-
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include "Delaunay.h"
 #include "Point.h"
 #include "Voronoi.h"
@@ -36,25 +32,16 @@
 //#define DEBUG_DELAUNAY_FIND_TRIANG_PATH
 #endif
 
-//------------------------------------------------------------------------
-// Constructors / Destructor.
-//------------------------------------------------------------------------
+
+/***********************************************************************************************************************
+* Public methods definitions
+***********************************************************************************************************************/
 Delaunay::Delaunay(vector<Point<TYPE>> &vPoints) : Delaunay()
 {
     dcel = Dcel(vPoints);
 }
 
 
-Delaunay::~Delaunay()
-{
-    delete this->graph;
-	this->setGraphAllocated(false);
-	this->setConvexHullComputed(false);
-}
-
-//------------------------------------------------------------------------
-// Public functions.
-//------------------------------------------------------------------------
 /***************************************************************************
 * Name: 	freeStatistics
 * IN:		NONE
@@ -84,7 +71,7 @@ void Delaunay::reset()
 	this->algorithm = NONE;
 	this->setConvexHullComputed(false);
 	this->hull.reset();
-	this->hullEdges.reset();
+	this->vHullEdges.clear();
 }
 
 /***************************************************************************
@@ -116,62 +103,61 @@ bool Delaunay::incremental()
 	this->setAlgorithm(INCREMENTAL);
 
     // If no graph allocated then create a new graph.
-    if (this->initializeGraph())
-    {
-        // Set highest point at first position of the DCEL vertex array.
-        highestPointIndex = this->dcel.getIndexHighest(&Point<TYPE>::lexicographicHigher);
-        this->dcel.swapVertex(0, highestPointIndex);
+    this->initGraph();
 
-        // Insert root node.
-        Node node(1, P_MINUS_2, P_MINUS_1, 1);
-        this->graph->insert(node);
+    // Set highest point at first position of the DCEL vertex array.
+    highestPointIndex = this->dcel.getIndexHighest(&Point<TYPE>::lexicographicHigher);
+    this->dcel.swapVertex(0, highestPointIndex);
 
-        // Update edge from new point.
-        this->dcel.updateVertex(1, 0);
+    // Insert root node.
+    Node node(1, P_MINUS_2, P_MINUS_1, 1);
+    this->graph.insert(node);
 
-        // Insert first 6 edges due to first point.
-        this->dcel.addEdge(1, 4, 3, 2, 1);
-        this->dcel.addEdge(P_MINUS_2, 6, 1, 3, 1);
-        this->dcel.addEdge(P_MINUS_1, 5, 2, 1, 1);
-        this->dcel.addEdge(P_MINUS_2, 1, 6, 5, 0);
-        this->dcel.addEdge(1, 3, 4, 6, 0);
-        this->dcel.addEdge(P_MINUS_1, 2, 5, 4, 0);
+    // Update edge from new point.
+    this->dcel.updateVertex(1, 0);
 
-        // Insert first internal face and external face.
-        this->dcel.addFace(4);
-        this->dcel.addFace(1);
+    // Insert first 6 edges due to first point.
+    this->dcel.addEdge(1, 4, 3, 2, 1);
+    this->dcel.addEdge(P_MINUS_2, 6, 1, 3, 1);
+    this->dcel.addEdge(P_MINUS_1, 5, 2, 1, 1);
+    this->dcel.addEdge(P_MINUS_2, 1, 6, 5, 0);
+    this->dcel.addEdge(1, 3, 4, 6, 0);
+    this->dcel.addEdge(P_MINUS_1, 2, 5, 4, 0);
+
+    // Insert first internal face and external face.
+    this->dcel.addFace(4);
+    this->dcel.addFace(1);
 #ifdef DEBUG_DELAUNAY_INCREMENTAL
-        Logging::buildText(__FUNCTION__, __FILE__, "Starting triangulation. Set length is: ");
+    Logging::buildText(__FUNCTION__, __FILE__, "Starting triangulation. Set length is: ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getNVertex());
 			Logging::write(true, Info);
 #endif
-        // Reset convex hull flag.
-        this->setConvexHullComputed(false);
-        this->hull.reset();
-        this->hullEdges.reset();
+    // Reset convex hull flag.
+    this->setConvexHullComputed(false);
+    this->hull.reset();
+    this->vHullEdges.clear();
 
-        // Loop all other points.
-        pointIndex=1;
-        nPoints = this->dcel.getNVertex();
-        inserted = built;
-        while ((pointIndex<nPoints) && (inserted))
-        {
+    // Loop all other points.
+    pointIndex=1;
+    nPoints = this->dcel.getNVertex();
+    inserted = built;
+    while ((pointIndex<nPoints) && (inserted))
+    {
 #ifdef DEBUG_DELAUNAY_INCREMENTAL
-            Logging::buildText(__FUNCTION__, __FILE__, "Inserting point ");
+        Logging::buildText(__FUNCTION__, __FILE__, "Inserting point ");
 				Logging::buildText(__FUNCTION__, __FILE__, pointIndex);
 				Logging::write(true, Info);
 #endif
-            // Insert new point into triangle where it is located.
-            inserted = this->addPointToDelaunay(pointIndex);
-            built = inserted;
-            pointIndex++;
-        }
+        // Insert new point into triangle where it is located.
+        inserted = this->addPointToDelaunay(pointIndex);
+        built = inserted;
+        pointIndex++;
+    }
 
 #ifdef DEBUG_DELAUNAY_INCREMENTAL
-        Logging::buildText(__FUNCTION__, __FILE__, "Delaunay triangulation computed");
+    Logging::buildText(__FUNCTION__, __FILE__, "Delaunay triangulation computed");
 			Logging::write(true, Info);
 #endif
-    }
 
    	return built;
 }
@@ -362,8 +348,8 @@ void Delaunay::flipEdges(int edge_ID)
 #endif
 
 	// Store nodes ID that are going to be updated to internal nodes.
-	old_Node_ID1 = this->graph->getNodeAssigned(edge->getFace());
-	old_Node_ID2 = this->graph->getNodeAssigned(twin->getFace());
+	old_Node_ID1 = this->graph.getNodeAssigned(edge->getFace());
+	old_Node_ID2 = this->graph.getNodeAssigned(twin->getFace());
 
 #ifdef DEBUG_FLIP_EDGES
 	Logging::buildText(__FUNCTION__, __FILE__, "Faces where edges are located: ");
@@ -376,18 +362,18 @@ void Delaunay::flipEdges(int edge_ID)
 	Logging::buildText(__FUNCTION__, __FILE__, " and ");
 	Logging::buildText(__FUNCTION__, __FILE__, old_Node_ID2);
 	Logging::buildText(__FUNCTION__, __FILE__, "\nNodes data\n");
-	Logging::buildText(__FUNCTION__, __FILE__, this->graph->getRefNode(old_Node_ID1)->toStr());
-	Logging::buildText(__FUNCTION__, __FILE__, this->graph->getRefNode(old_Node_ID2)->toStr());
+	Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(old_Node_ID1)->toStr());
+	Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(old_Node_ID2)->toStr());
 	Logging::write(true, Info);
 
-	if ((old_Node_ID1 <= 0) || (old_Node_ID1 > this->graph->getNElements()) ||
-		(old_Node_ID2 <= 0) || (old_Node_ID2 > this->graph->getNElements()))
+	if ((old_Node_ID1 <= 0) || (old_Node_ID1 > this->graph.getNElements()) ||
+		(old_Node_ID2 <= 0) || (old_Node_ID2 > this->graph.getNElements()))
 	{
 		Logging::buildText(__FUNCTION__, __FILE__, "Node where edges are flipped out of range: ");
 		Logging::buildText(__FUNCTION__, __FILE__, old_Node_ID1);
 		Logging::buildText(__FUNCTION__, __FILE__, " or ");
 		Logging::buildText(__FUNCTION__, __FILE__, old_Node_ID2);
-		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->graph->getNElements());
+		Logging::buildRange(__FUNCTION__, __FILE__, 0, this->graph.getNElements());
 		Logging::write(true, Info);
 		exit(0);
 	}
@@ -434,27 +420,27 @@ void Delaunay::flipEdges(int edge_ID)
 	this->dcel.setFaceEdge(twin->getFace(), edge->getTwin());
 
 	// Get node of current edge and update it.
-	node = this->graph->getRefNode(old_Node_ID1);
-	node->setChildren(this->graph->getNElements(), this->graph->getNElements()+1);
-	this->graph->update(old_Node_ID1, 2, node);
+	node = this->graph.getRefNode(old_Node_ID1);
+	node->setChildren(this->graph.getSize(), this->graph.getSize() + 1);
+    this->graph.update(old_Node_ID1, node);
 
 	// Get node of twin edge and update it.
-	node = this->graph->getRefNode(old_Node_ID2);
-	node->setChildren(this->graph->getNElements(), this->graph->getNElements()+1);
-    this->graph->update(old_Node_ID2, 2, node);
+	node = this->graph.getRefNode(old_Node_ID2);
+	node->setChildren(this->graph.getSize(), this->graph.getSize() + 1);
+    this->graph.update(old_Node_ID2, node);
 
     // Insert two new nodes.
     newNode = Node(this->dcel.getOrigin(edge->getPrevious()-1),
     				this->dcel.getOrigin(edge_Index),
 					this->dcel.getOrigin(edge->getNext()-1),
 					edge->getFace());
-    this->graph->insert(newNode);
+    this->graph.insert(newNode);
 
     newNode = Node(this->dcel.getOrigin(twin->getPrevious()-1),
     				this->dcel.getOrigin(edge->getTwin()-1),
 					this->dcel.getOrigin(twin->getNext()-1),
 					twin->getFace());
-    this->graph->insert(newNode);
+    this->graph.insert(newNode);
 
 	// Check recursively edges that could be illegal.
 	this->checkEdge(edge->getPrevious());
@@ -534,7 +520,7 @@ bool Delaunay::convexHull()
 		{
 			// Insert next point.
 			this->hull.add(*this->dcel.getRefPoint(this->dcel.getOrigin(edgeIndex)-1));
-			this->hullEdges.add(edgeIndex+1);
+			this->vHullEdges.push_back(edgeIndex+1);
 #ifdef DEBUG_GET_CONVEX_HULL
 			Logging::buildText(__FUNCTION__, __FILE__, "Added point ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getOrigin(edgeIndex));
@@ -736,7 +722,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 		// Insert points from node.
 		for (i=0; i<NPOINTS_TRIANGLE ;i++)
 		{
-			pointIndex = this->graph->getRefNode(nodeIndex)->getiPoint(i)-1;
+			pointIndex = this->graph.getRefNode(nodeIndex)->getiPoint(i)-1;
 			if (pointIndex >= 0)
 			{
 				// Insert current point and set as inserted.
@@ -985,7 +971,7 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 				nFacesToAdd = intersectEdges.size();
 				for (i=0; i<nFacesToAdd ;i++)
 				{
-					edgeIndex = (*this->getConvexHullEdges()->at(intersectEdges.at(i)))-1;
+					edgeIndex = this->getConvexHullEdges()->at(intersectEdges.at(i))-1;
                     originFace = this->dcel.getFace(this->dcel.getTwin(edgeIndex) - 1);
 					extremeFaces.add(originFace);
 #ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
@@ -1184,7 +1170,7 @@ bool Delaunay::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 	if (found)
 	{
 		// Get face in node.
-		faceId = this->graph->getRefNode(nodeIndex)->getFace();
+		faceId = this->graph.getRefNode(nodeIndex)->getFace();
 		if (this->dcel.imaginaryFace(faceId))
 		{
 #ifdef DEBUG_DELAUNAY_FINDFACE
@@ -1209,74 +1195,19 @@ bool Delaunay::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
 	return(found);
 }
 
-//------------------------------------------------------------------------
-// Private functions.
-//------------------------------------------------------------------------
-/***************************************************************************
-* Name: 	initializeGraph
-* IN:		node		node whose area must be computed
-* OUT:		NONE
-* RETURN:	true		if graph allocated.
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	allocates the graph to be used in incremental Delaunay.
-***************************************************************************/
-bool Delaunay::initializeGraph()
+
+/***********************************************************************************************************************
+* Private methods definitions
+***********************************************************************************************************************/
+/**
+ * @fn      initGraph
+ * @brief   Resets graph data
+ */
+ void Delaunay::initGraph()
 {
-	int nNodes=0;		// # nodes to create.
-
-	// PENDING. How many nodes to allocate. Depends on faces? points? generation type?
-	nNodes = MAX(this->dcel.getNFaces(), this->dcel.getNVertex());
-
-	// Check if graph already allocated.
-	if (!this->isGraphAllocated())
-	{
-		// Allocate graph.
-		try
-		{
-			this->graph = new Graph(nNodes);
-			this->setGraphAllocated(true);
-#ifdef DEBUG_GRAPH_INITIALIZEGRAPH
-			Logging::buildText(__FUNCTION__, __FILE__, "Graph first allocated with # nodes=");
-			Logging::buildText(__FUNCTION__, __FILE__, nNodes);
-			Logging::write(true, Info);
-#endif
-		}
-		catch (std::bad_alloc& ba)
-		{
-			std::cerr << "bad_alloc caught: " << ba.what() << endl;
-		}
-	}
-	else
-	{
-		// Check if new graph size is higher than current.
-		if (this->graph->getSize() < nNodes)
-		{
-#ifdef DEBUG_GRAPH_INITIALIZEGRAPH
-			Logging::buildText(__FUNCTION__, __FILE__, "New size is higher.");
-			Logging::write(true, Info);
-#endif
-			if (!this->graph->resize(nNodes*2, false))
-			{
-#ifdef DEBUG_GRAPH_INITIALIZEGRAPH
-				Logging::buildText(__FUNCTION__, __FILE__, "Error resizing graph.");
-				Logging::write(true, Info);
-#endif
-				this->setGraphAllocated(false);
-			}
-		}
-		else
-		{
-#ifdef DEBUG_GRAPH_INITIALIZEGRAPH
-			Logging::buildText(__FUNCTION__, __FILE__, "Reseting graph.");
-			Logging::write(true, Info);
-#endif
-			this->graph->reset();
-		}
-	}
-
-	return(this->isGraphAllocated());
+    this->graph.reset();
 }
+
 
 /***************************************************************************
 * Name: 	addPointToDelaunay
@@ -1366,7 +1297,7 @@ bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
 
     // Loop until triangle found or error in process.
 	nodeIndex = 0;
-    while ((!this->graph->isLeaf(nodeIndex)) && (!error))
+    while ((!this->graph.isLeaf(nodeIndex)) && (!error))
     {
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
     	this->nNodesChecked[this->nNodesCheckedIndex]++;
@@ -1375,7 +1306,7 @@ bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
         // Search triangle in children nodes.
         i = 0;
         locatedNode = false;
-        nChildren = this->graph->getNChildren(nodeIndex);
+        nChildren = this->graph.getNChildren(nodeIndex);
         while ((!locatedNode) && (i < nChildren))
         {
 #ifdef DEBUG_DELAUNAY_LOCATENODE
@@ -1384,17 +1315,17 @@ bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
 			Logging::buildText(__FUNCTION__, __FILE__, "-child from node ");
 			Logging::buildText(__FUNCTION__, __FILE__, nodeIndex);
 			Logging::buildText(__FUNCTION__, __FILE__, " that is node ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->graph->getiChild(nodeIndex, i));
+			Logging::buildText(__FUNCTION__, __FILE__, this->graph.getiChild(nodeIndex, i));
 			Logging::buildText(__FUNCTION__, __FILE__, ". ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->graph->getRefNode(this->graph->getiChild(nodeIndex, i))->toStr());
+			Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(this->graph.getiChild(nodeIndex, i))->toStr());
 			Logging::write(true, Info);
 #endif
 
             // Check if point is interior to i-child node.
-            if (this->isInteriorToNode(point, this->graph->getiChild(nodeIndex, i)))
+            if (this->isInteriorToNode(point, this->graph.getiChild(nodeIndex, i)))
             {
                	// Search in next children node.
-                nodeIndex = this->graph->getiChild(nodeIndex, i);
+                nodeIndex = this->graph.getiChild(nodeIndex, i);
 
                 // End loop.
                 locatedNode = true;
@@ -1402,7 +1333,7 @@ bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
 				Logging::buildText(__FUNCTION__, __FILE__, "Point is inside node ");
 				Logging::buildText(__FUNCTION__, __FILE__, nodeIndex);
 				Logging::buildText(__FUNCTION__, __FILE__, ". ");
-				Logging::buildText(__FUNCTION__, __FILE__, this->graph->getRefNode(nodeIndex)->toStr());
+				Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(nodeIndex)->toStr());
 				Logging::write(true, Info);
 #endif
             }
@@ -1428,7 +1359,7 @@ bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
         }
     }
 
-    return(this->graph->isLeaf(nodeIndex) && !error);
+    return(this->graph.isLeaf(nodeIndex) && !error);
 }
 
 
@@ -1450,7 +1381,7 @@ bool Delaunay::isInteriorToNode(const Point<TYPE> &point, int nodeIndex)
 	int		id1=0, id2=0, id3=0;	// IDs of vertex points.
 
 	// Get an edge of the face associated to the node.
-	this->graph->getVertices(nodeIndex, id1, id2, id3);
+	this->graph.getVertices(nodeIndex, id1, id2, id3);
 
 #ifdef DEBUG_IS_INTERIOR_TO_NODE
 	Logging::buildText(__FUNCTION__, __FILE__, "Vertices are ");
@@ -1493,7 +1424,7 @@ bool Delaunay::isStrictlyInteriorToNode(Point<TYPE> &point, int nodeIndex)
 	int	 id1=0, id2=0, id3=0;			// IDs of vertex points.
 
 	// Get an edge of the face associated to the node.
-	this->graph->getVertices(nodeIndex, id1, id2, id3);
+	this->graph.getVertices(nodeIndex, id1, id2, id3);
 
 #ifdef DEBUG_IS_STRICTLY_INTERIOR_TO_NODE
 	Logging::buildText(__FUNCTION__, __FILE__, "Checking if node ");
@@ -1570,7 +1501,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 	this->dcel.updateVertex(new_Edge_ID, pointIndex);
 
     // Get information of node where the new triangles are created.
-	ptrNode = this->graph->getRefNode(nodeIndex);
+	ptrNode = this->graph.getRefNode(nodeIndex);
 
     // Get data of the face of the triangle to be splitted.
 	int faceEdge = this->dcel.getRefFace(ptrNode->getFace())->getEdge();
@@ -1604,9 +1535,9 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
         this->dcel.addFace(new_Edge_ID + 4);
 
         // Update leaf node.
-        newNodeID = this->graph->getNElements();
-        this->graph->getRefNode(nodeIndex)->setChildren(newNodeID, newNodeID+1, newNodeID+2);
-        this->graph->update(nodeIndex, 3, ptrNode);
+        newNodeID = this->graph.getSize();
+        this->graph.getRefNode(nodeIndex)->setChildren(newNodeID, newNodeID+1, newNodeID+2);
+        this->graph.update(nodeIndex, ptrNode);
 
 		// Insert three new nodes.
         newNode[0] = Node(	this->dcel.getOrigin(new_Edge_ID),
@@ -1629,25 +1560,25 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
             // 2nd, 0th, 1st.
             if (area[2] > area[0])
             {
-                this->graph->insert(newNode[2]);
-                this->graph->insert(newNode[0]);
-                this->graph->insert(newNode[1]);
+                this->graph.insert(newNode[2]);
+                this->graph.insert(newNode[0]);
+                this->graph.insert(newNode[1]);
             }
             // 0th, 2nd, 1st.
             else
             {
-            	this->graph->insert(newNode[0]);
+            	this->graph.insert(newNode[0]);
                 //insert_Node(graph, &new_Node[0]);
                 if (area[2] > area[1])
                 {
-                	this->graph->insert(newNode[2]);
-                	this->graph->insert(newNode[1]);
+                	this->graph.insert(newNode[2]);
+                	this->graph.insert(newNode[1]);
                 }
                 // 0th, 1st, 2nd.
                 else
                 {
-                	this->graph->insert(newNode[1]);
-                	this->graph->insert(newNode[2]);
+                	this->graph.insert(newNode[1]);
+                	this->graph.insert(newNode[2]);
                 }
             }
         }
@@ -1656,22 +1587,22 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
             // 2nd, 1st, 0th.
             if (area[2] > area[1])
             {
-            	this->graph->insert(newNode[2]);
-            	this->graph->insert(newNode[1]);
-            	this->graph->insert(newNode[0]);
+            	this->graph.insert(newNode[2]);
+            	this->graph.insert(newNode[1]);
+            	this->graph.insert(newNode[0]);
             }
             else
             {
-            	this->graph->insert(newNode[1]);
+            	this->graph.insert(newNode[1]);
                 if (area[2] > area[0])
                 {
-                	this->graph->insert(newNode[2]);
-                	this->graph->insert(newNode[0]);
+                	this->graph.insert(newNode[2]);
+                	this->graph.insert(newNode[0]);
                 }
                 else
                 {
-                	this->graph->insert(newNode[0]);
-                	this->graph->insert(newNode[2]);
+                	this->graph.insert(newNode[0]);
+                	this->graph.insert(newNode[2]);
                 }
             }
         }
@@ -1720,9 +1651,9 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			flipCandidates[1] = prev_Edge_ID;
 
 			// Store nodes ID that are going to be updated.
-			oldNode1 = this->graph->getNodeAssigned(this->dcel.getRefEdge(collinear_Index)->getFace());
+			oldNode1 = this->graph.getNodeAssigned(this->dcel.getRefEdge(collinear_Index)->getFace());
 			index = this->dcel.getRefEdge(collinear_Index)->getTwin() - 1;
-			oldNode2 = this->graph->getNodeAssigned(this->dcel.getRefEdge(index)->getFace());
+			oldNode2 = this->graph.getNodeAssigned(this->dcel.getRefEdge(index)->getFace());
 
 #ifdef DEBUG_SPLIT_NODE
 			Logging::buildText(__FUNCTION__, __FILE__, "Nodes that share edge are ");
@@ -1730,8 +1661,8 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			Logging::buildText(__FUNCTION__, __FILE__, " and ");
 			Logging::buildText(__FUNCTION__, __FILE__, oldNode2);
 			Logging::write(true, Info);
-			Logging::buildText(__FUNCTION__, __FILE__, this->graph->getRefNode(oldNode1)->toStr());
-			Logging::buildText(__FUNCTION__, __FILE__, this->graph->getRefNode(oldNode2)->toStr());
+			Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(oldNode1)->toStr());
+			Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(oldNode2)->toStr());
 			Logging::write(true, Info);
 #endif
 
@@ -1751,16 +1682,16 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			this->dcel.updateEdge(NO_UPDATE, NO_UPDATE, new_Edge_ID+1, new_Edge_ID+2, new_Face_ID, prev_Edge_ID-1);
 
 			// Get node of current edge and update it.
-			ptrNode = this->graph->getRefNode(oldNode1);
-			ptrNode->setChildren(this->graph->getNElements(), this->graph->getNElements()+1, INVALID);
-			this->graph->update(oldNode1, 2, ptrNode);
+			ptrNode = this->graph.getRefNode(oldNode1);
+			ptrNode->setChildren(this->graph.getSize(), this->graph.getSize() + 1, INVALID);
+            this->graph.update(oldNode1, ptrNode);
 
 			// Insert two new nodes in first node splitted.
 	        newNode[0] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
 	        					this->dcel.getOrigin(collinear_Index),
 								this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1),
 								this->dcel.getFace(collinear_Index));
-			this->graph->insert(newNode[0]);
+			this->graph.insert(newNode[0]);
 #ifdef DEBUG_SPLIT_NODE
 			Logging::buildText(__FUNCTION__, __FILE__, "Splitting 1st triangle ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getRefFace(newNode[0].getFace())->toStr());
@@ -1772,7 +1703,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 	        					this->dcel.getOrigin(this->dcel.getPrevious(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1)-1),
 								this->dcel.getOrigin(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1),
 								new_Face_ID);
-			this->graph->insert(newNode[1]);
+			this->graph.insert(newNode[1]);
 
 			// Insert new face.
 			this->dcel.addFace(new_Edge_ID + 2);
@@ -1803,16 +1734,16 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			this->dcel.updateEdge(NO_UPDATE, NO_UPDATE, new_Edge_ID+5, NO_UPDATE, NO_UPDATE, prev_Edge_ID-1);
 
 			// Get node of twin edge and update it.
-			ptrNode = this->graph->getRefNode(oldNode2);
-			ptrNode->setChildren(this->graph->getNElements(), this->graph->getNElements()+1, INVALID);
-			this->graph->update(oldNode2, 2, ptrNode);
+			ptrNode = this->graph.getRefNode(oldNode2);
+			ptrNode->setChildren(this->graph.getSize(), this->graph.getSize() + 1, INVALID);
+            this->graph.update(oldNode2, ptrNode);
 
 			// Insert two new nodes in first node splitted.
 	        newNode[0] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
 	        					this->dcel.getOrigin(collinear_Index),
 								this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1),
 								this->dcel.getFace(collinear_Index));
-			this->graph->insert(newNode[0]);
+			this->graph.insert(newNode[0]);
 
 			// Update face.
 			this->dcel.updateFace(collinear_Edge_ID, newNode[0].getFace());
@@ -1825,7 +1756,7 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 	        					this->dcel.getOrigin(next_Edge_ID-1),
 								this->dcel.getOrigin(this->dcel.getNext(next_Edge_ID-1)-1),
 								this->dcel.getFace(next_Edge_ID-1));
-			this->graph->insert(newNode[1]);
+			this->graph.insert(newNode[1]);
 
 			// Insert new face.
 			this->dcel.addFace(new_Edge_ID + 4);

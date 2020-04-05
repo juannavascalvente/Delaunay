@@ -20,23 +20,22 @@
 // Algorithm used to compute the Delaunay triangulation.
 enum Algorithm { NONE, INCREMENTAL, FROM_STAR};
 
-//****************************************************************************
-//                           	DELAUNAY CLASS
-//****************************************************************************
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class Delaunay
 {
-	//------------------------------------------------------------------------
-	// Attributes
-	//------------------------------------------------------------------------
+    /*******************************************************************************************************************
+    * Private class members
+    *******************************************************************************************************************/
 	Dcel 	dcel;				// Reference to DCEL data.
-	Graph 	*graph;				// Graph used in incremental algorithm.
-
-	bool 	graphAllocated;		// Allocated memory for graph flag.
+	Graph 	graph;				// Graph used in incremental algorithm.
 
 	// Convex hull data.
 	bool 	convexHullComputed;
 	Polygon hull;
-	Set<int> hullEdges;
+	vector<int> vHullEdges;
 
 	// Type of algorithm executed to compute the Delaunay algorithm.
 	enum Algorithm algorithm;
@@ -46,10 +45,10 @@ class Delaunay
 	int *nNodesChecked;
 	int nNodesCheckedIndex;
 #endif
-	//------------------------------------------------------------------------
-	// Private functions.
-	//------------------------------------------------------------------------
-	bool initializeGraph();
+    /*******************************************************************************************************************
+    * Private methods declarations
+    *******************************************************************************************************************/
+    void initGraph();
 	void checkEdge(int edge_ID);
 	void flipEdges(int edge_ID);
 	bool addPointToDelaunay(int index);
@@ -59,37 +58,42 @@ class Delaunay
 	void splitNode(int pointIndex, int nodeIndex, int nTriangles);
 	double signedArea(Node *node);
 
-//	void getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace);
-//	void getInternalFace(Line &line, Set<int> &edgesIndex, int &initialFace);
-
 	friend class DelaunayIO;
 public:
-	//------------------------------------------------------------------------
-	// Constructor/Destructor
-	//------------------------------------------------------------------------
-	Delaunay() : graph(nullptr), graphAllocated(false),  convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), \
-            	hullEdges(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
+    /*******************************************************************************************************************
+    * Public methods declarations
+    *******************************************************************************************************************/
+	Delaunay() : convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
     explicit Delaunay(vector<Point<TYPE>> &vPoints);
-	~Delaunay();
+	~Delaunay() = default;
 
-	//------------------------------------------------------------------------
+    Delaunay(const Delaunay &d)
+    {
+        this->dcel = d.dcel;
+        this->convexHullComputed = d.convexHullComputed;
+        this->hull = d.hull;
+        this->vHullEdges = d.vHullEdges;
+        this->algorithm = d.algorithm;
+        this->graph = d.graph;
+    }
+
+
+    //------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
 	void reset();
 	bool incremental();
 
 	// Get/Set functions.
-	inline bool isGraphAllocated() {return(this->graphAllocated);};
-	inline bool isConvexHullComputed() {return(this->convexHullComputed);};
-	inline void setGraphAllocated(bool v) {this->graphAllocated = v;};
-	inline void setConvexHullComputed(bool v) {this->convexHullComputed = v;};
-	Graph* getGraph() {return graph;}
+	bool isConvexHullComputed() {return(this->convexHullComputed);};
+	void setConvexHullComputed(bool v) {this->convexHullComputed = v;};
+	Graph* getGraph() {return &graph;}
 
 	// Figures functions.
 	bool convexHull();
 	//bool internalToConvexHull(Point<TYPE> &p);
-	inline Polygon* getConvexHull() {return(&this->hull);};
-	inline Set<int>* getConvexHullEdges() {return(&this->hullEdges);};
+	Polygon* getConvexHull() {return(&this->hull);};
+	vector<int> *getConvexHullEdges() {return &this->vHullEdges; };
 	bool findTwoClosest(int &first, int &second);
 	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
 	bool findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
@@ -99,9 +103,9 @@ public:
 	bool findPath(Line &line, vector<int> &vFacesId);
 
 	// GET/SET functions.
-	inline Dcel *getRefDcel() { return &this->dcel; };
-	inline void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
-	inline enum Algorithm getAlgorithm() {return(this->algorithm);};
+	Dcel *getRefDcel() { return &this->dcel; };
+	void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
+	enum Algorithm getAlgorithm() {return(this->algorithm);};
 
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}

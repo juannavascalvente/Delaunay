@@ -1,6 +1,3 @@
-//
-// Created by delaunay on 23/3/20.
-//
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
@@ -22,13 +19,12 @@ bool DelaunayIO::read(const string &fileName, const string &graphFileName, Delau
     if (read)
     {
         // Initialize graph.
-        delaunay.initializeGraph();
+        delaunay.initGraph();
 
         // Read graph data.
-        read = delaunay.graph->read(graphFileName);
+        read = delaunay.graph.read(graphFileName);
         if (read)
         {
-            delaunay.setGraphAllocated(true);
             delaunay.setConvexHullComputed(false);
         }
     }
@@ -37,7 +33,7 @@ bool DelaunayIO::read(const string &fileName, const string &graphFileName, Delau
 }
 
 
-bool DelaunayIO::write(const string &strFileName, const string &strGraphFileName, const Delaunay &delaunay)
+bool DelaunayIO::write(const string &strFileName, const string &strGraphFileName, Delaunay &delaunay)
 {
     bool	success;		// Return value.
 
@@ -46,9 +42,9 @@ bool DelaunayIO::write(const string &strFileName, const string &strGraphFileName
     if (success)
     {
         // Write graph data if graph exists.
-        if (delaunay.graph->getNElements() > 0)
+        if (delaunay.graph.getSize() > 0)
         {
-            success = delaunay.graph->write(strGraphFileName);
+            success = delaunay.graph.write(strGraphFileName);
         }
     }
 
