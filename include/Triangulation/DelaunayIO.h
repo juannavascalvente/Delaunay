@@ -40,7 +40,7 @@ public:
     * Description: 	writes the DCEL and the graph data to two files, first
     * 				named "fileName" and the graph to the "filaNameGraph.txt".
     ***************************************************************************/
-    static bool write(const string &strFileName, const string &strGraphFileName, const Delaunay &delaunay);
+    static bool write(const string &strFileName, const string &strGraphFileName, Delaunay &delaunay);
 };
 
 

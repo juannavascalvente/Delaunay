@@ -11,6 +11,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include <utility>
 #include <vector>
 #include "Edge.h"
 #include "Face.h"
@@ -31,30 +32,18 @@
 ***********************************************************************************************************************/
 class Dcel
 {
-	//------------------------------------------------------------------------
-	//  Attributes
-	//------------------------------------------------------------------------
+	/*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
 	bool	created;
 	bool	incremental;
+	vector<Vertex>	vVertex;
+	vector<Edge> 	vEdges;
+	vector<Face> 	vFaces;
 
-	// Vertex data.
-	int 	nVertex;
-	int		sizeVertex;
-	Vertex	*vertex;
-
-	// Edges data.
-	int 	nEdges;
-	int		sizeEdges;
-	Edge	*edges;
-
-	// Faces data.
-	int 	nFaces;
-	int		sizeFaces;
-	Face	*faces;
-
-	//------------------------------------------------------------------------
-	//  Private functions.
-	//------------------------------------------------------------------------
+	/*******************************************************************************************************************
+	* Private methods
+	*******************************************************************************************************************/
 	void quicksort(Vertex *origin, Vertex *list, int first, int last);
 	int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
 
@@ -62,89 +51,69 @@ class Dcel
     friend class DcelWriter;
 
 public:
-	/*------------------------------------------------------------------------
-	  Constructor/Destructor.
-	------------------------------------------------------------------------*/
-	Dcel();
-    explicit Dcel(const vector<Point<TYPE>> &vPoints);
-//	Dcel(int nPoints, int nEdges=INVALID, int nFaces=INVALID);
-	~Dcel();
+	/*******************************************************************************************************************
+    * Public methods
+    *******************************************************************************************************************/
+	Dcel() : created(false), incremental(false) {};
+    explicit Dcel(vector<Point<TYPE>> &v);
+	~Dcel() = default;
 
 	/*------------------------------------------------------------------------
 	  Public functions.
 	------------------------------------------------------------------------*/
 	// Add / Delete functions.
 	void addVertex(const Point<TYPE> *p, int edge);
-	void addVertex(const Vertex *vertex);
 	void updateVertex(int edge_ID, int index);
 	void updateVertex(Point<TYPE> *p, int index);
 	void swapVertex(int index1, int index2);
 
-	void addEdge(const Edge *edge);
 	void addEdge(int origin, int	twin, int previou, int next, int face);
 	void updateEdge(int origin, int twin, int previous, int next, int face, int index);
 
-	void addFace(const Face *face);
 	void addFace(int face);
 	void updateFace(int edge_ID, int index);
 
 	// Check functions.
-	bool isExternalEdge(int edgeIndex) const;
-	bool hasNegativeVertex(int edgeID) const;
-	void getEdgeVertices(int edgeID, int &index1, int &index2) const;
+	bool isExternalEdge(int edgeIndex);
+	bool hasNegativeVertex(int edgeID);
 	int	 getCollinear(int pointIndex, int edgeID);
 
 	//------------------------------------------------------------------------
 	// Get/set functions.
 	//------------------------------------------------------------------------
-	inline Point<TYPE> *getRefPoint(int index) const {return(this->vertex[index].getRefPoint());};
-	inline Edge *getRefEdge(int index) {return(&this->edges[index]);};
-	inline Face *getRefFace(int index) {return(&this->faces[index]);};
-	inline int getNVertex() const {return(this->nVertex);};
-	inline int getNEdges() const{return(this->nEdges);};
-	inline int getNFaces()  const{return(this->nFaces);};
-	inline int getSizeVertex() const{return(this->sizeVertex);};
+	Point<TYPE> *getRefPoint(int index) { return this->vVertex.at(index).getRefPoint(); };
+	Edge *getRefEdge(int index) { return &this->vEdges.at(index); };
+	Face *getRefFace(int index) { return &this->vFaces.at(index); };
 
-	inline int getSizeEdges() const {return(this->sizeEdges);};
-    inline void setSizeEdges(int size) { this->sizeEdges = size; };
-
-	inline int getSizeFaces() const {return(this->sizeFaces);};
-    inline void setSizeFaces(int size) { this->sizeFaces = size; };
+	size_t getNVertex() const { return vVertex.size(); };
+	size_t getNEdges()  const { return vEdges.size(); };
+	size_t getNFaces()  const { return vFaces.size(); };
 
 	// Access to POINTS fields.
-	inline int getPointEdge(int pointIndex) {return(this->vertex[pointIndex].getOrigin());};
-	//void getNeighbors(int pointIndex, bool &checked, Queue<int> &queue);
+	int getPointEdge(int pointIndex) {return(this->vVertex.at(pointIndex).getOrigin());};
 
 	// Access to EDGES fields.
-	inline int getOrigin(int edgeIndex) const {return(this->edges[edgeIndex].getOrigin());};
-	inline int getTwin(int edgeIndex) const {return(this->edges[edgeIndex].getTwin());};
-	inline int getPrevious(int edgeIndex) const {return(this->edges[edgeIndex].getPrevious());};
-	inline int getNext(int edgeIndex) const {return(this->edges[edgeIndex].getNext());};
-	inline int getFace(int edgeIndex) const {return(this->edges[edgeIndex].getFace());};
-	inline int getNextNeighbor(int edgeIndex) const {return(this->edges[this->edges[edgeIndex].getPrevious()-1].getTwin());};
-	inline void setOrigin(int edgeIndex, int v) {this->edges[edgeIndex].setOrigin(v);};
-	inline void setTwin(int edgeIndex, int v) {this->edges[edgeIndex].setTwin(v);};
-	inline void setPrevious(int edgeIndex, int v) {this->edges[edgeIndex].setPrevious(v);};
-	inline void setNext(int edgeIndex, int v) {this->edges[edgeIndex].setNext(v);};
-	inline void setFace(int edgeIndex, int v) {this->edges[edgeIndex].setFace(v);};
-	void getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest) const;
+	int getOrigin(int edgeIndex) {return(this->vEdges.at(edgeIndex).getOrigin());};
+	int getTwin(int edgeIndex) {return(this->vEdges.at(edgeIndex).getTwin());};
+	int getPrevious(int edgeIndex) {return(this->vEdges.at(edgeIndex).getPrevious());};
+	int getNext(int edgeIndex) {return(this->vEdges.at(edgeIndex).getNext());};
+	int getFace(int edgeIndex) {return(this->vEdges.at(edgeIndex).getFace());};
+	void setOrigin(int edgeIndex, int v) {this->vEdges.at(edgeIndex).setOrigin(v);};
+	void setTwin(int edgeIndex, int v) {this->vEdges.at(edgeIndex).setTwin(v);};
+	void setPrevious(int edgeIndex, int v) {this->vEdges.at(edgeIndex).setPrevious(v);};
+	void setNext(int edgeIndex, int v) {this->vEdges.at(edgeIndex).setNext(v);};
+	void setFace(int edgeIndex, int v) {this->vEdges.at(edgeIndex).setFace(v);};
+	void getEdgePoints(int edgeIndex, Point<TYPE> &origin, Point<TYPE> &dest);
 
 	// Access to FACES fields.
-	inline int  getFaceEdge(int faceId) const {return(this->faces[faceId].getEdge());};
-	inline void setFaceEdge(int faceIndex, int v) {this->faces[faceIndex].setEdge(v);};
-	bool imaginaryFace(int faceIndex) const;
-	bool isBottomMostFace(int faceIndex) const;
-	void getBottomMostFaceNeighborFaces(int faceId, Set<int> &faces) const;
-	inline bool isExternalFace(int faceIndex) const {return(faceIndex == EXTERNAL_FACE);};
-	void getFaceVertices(int faceIndex, int *ids) const;
+	int  getFaceEdge(int faceId) { return vFaces.at(faceId).getEdge();};
+	void setFaceEdge(int faceIndex, int v) { vFaces.at(faceIndex).setEdge(v);};
+	bool imaginaryFace(int faceIndex);
+	void getFaceVertices(int faceIndex, int *ids);
 	void getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Point<TYPE> &r);
 
 	// Set functions.
-	void clean();
 	void reset();
-	void resize(int size, bool copy);		// PENDING Return false if FAILED?
-	void invalidate();
-	bool isValid();
 
 	// PENDING. Move to set? point?
 	void sort();
@@ -158,7 +127,7 @@ public:
 	bool 	findPath(Set<int> &extremeFaces, Line &line, vector<int> &vFacesId);
 
 	bool operator==(const Dcel& other) const;
-	Dcel & operator=(const Dcel &d);
+	Dcel & operator=(const Dcel &d) = default;
 };
 
 #endif /* DCEL_H_ */

@@ -5,7 +5,6 @@
  *      Author: juan
  */
 #include "Statistics.h"
-#include <sys/time.h>
 
 //------------------------------------------------------------------------
 // Public functions.
@@ -66,7 +65,7 @@ bool StatisticsConvexHullRegister::writeResults()
 {
 	bool written=false;		// Return value.
 	int	 i=0;				// Loop counter.
-	ConexHullStatisticsData *current=NULL;
+	ConexHullStatisticsData *current=nullptr;
 
 	// Check file is opened.
 	if (this->ofs.is_open())
@@ -148,7 +147,7 @@ bool StatisticsStarTriangulationRegister::writeResults()
 {
 	bool written=false;						// Return value.
 	int	 i=0;								// Loop counter.
-	StatisticsTriangulationData *current=NULL;	// Pointer to test statistics.
+	StatisticsTriangulationData *current=nullptr;	// Pointer to test statistics.
 
 	// Check file is opened.
 	if (this->ofs.is_open())
@@ -286,9 +285,9 @@ bool StatisticsDelaunayRegister::writeResults()
 	int	 i=0;								// Loop counter.
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int	 j=0;								// Loop counter.
-	int	 *intVector=NULL;					// Pointer to integers vector.
+	int	 *intVector=nullptr;					// Pointer to integers vector.
 #endif
-	StatisticsDelaunayData *current=NULL;	// Pointer to test statistics.
+	StatisticsDelaunayData *current=nullptr;	// Pointer to test statistics.
 
 	// Check file is opened.
 	if (this->ofs.is_open())
@@ -483,13 +482,11 @@ void StatisticsDelaunayRegister::deallocate()
 ***************************************************************************/
 void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 {
-	int		i=0;			// Loop counter.
-
 	// Get # points.
 	this->setPoints(delaunay.getRefDcel()->getNVertex());
 
 	// Analyze edges.
-	for (i=0; i<delaunay.getRefDcel()->getNEdges() ;i++)
+	for (size_t i=0; i<delaunay.getRefDcel()->getNEdges() ;i++)
 	{
 		if (delaunay.getRefDcel()->hasNegativeVertex(i+1))
 		{
@@ -510,7 +507,7 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 	// Compute # edges the convex hull.
 	if (delaunay.convexHull())
 	{
-		this->nConvexhullEdges = delaunay.getConvexHullEdges()->getNElements();
+		this->nConvexhullEdges = delaunay.getConvexHullEdges()->size();
 	}
 	else
 	{
@@ -518,7 +515,7 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 	}
 
 	// Analyze faces.
-	for (i=0; i<delaunay.getRefDcel()->getNFaces() ;i++)
+	for (size_t i=0; i<delaunay.getRefDcel()->getNFaces() ;i++)
 	{
 		if (delaunay.getRefDcel()->imaginaryFace(i))
 		{
@@ -552,10 +549,10 @@ void StatisticsDelaunayData::analyzeGraph(Graph &graph)
 	int i=0;		// Loop counter.
 
 	// Get # nodes.
-	this->nNodes = graph.getNElements();
+	this->nNodes = graph.getSize();
 
 	// Check all nodes.
-	for (i=0; i<graph.getNElements() ;i++)
+	for (i=0; i< graph.getSize() ; i++)
 	{
 		// Check # children in current node.
 		if (graph.getNChildren(i) == 3)

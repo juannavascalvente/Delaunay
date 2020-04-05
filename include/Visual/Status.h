@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 1/4/20.
-//
-
 #ifndef DELAUNAY_STATUSMODEL_H
 #define DELAUNAY_STATUSMODEL_H
 

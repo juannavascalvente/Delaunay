@@ -15,7 +15,7 @@
 /*------------------------------------------------------------------------
   Constructor/Destructor.
 ------------------------------------------------------------------------*/
-StarTriangulation::StarTriangulation(const vector<Point<TYPE>> &vPoints) : dcel(vPoints)
+StarTriangulation::StarTriangulation(vector<Point<TYPE>> &vPoints) : dcel(vPoints)
 {
 	// Initialize fields.
 	this->hull = new Polygon(DEFAUTL_CONVEXHULL_LEN);

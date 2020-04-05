@@ -8,7 +8,7 @@
 /***********************************************************************************************************************
 * API function definitions
 ***********************************************************************************************************************/
-bool getStarTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
+bool getStarTriangulation(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
     bool isSuccess;       // Return value
 
@@ -34,7 +34,7 @@ bool getStarTriangulation(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 }
 
 
-bool getDelaunay(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
+bool getDelaunay(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
     bool isSuccess;       // Return value
 
@@ -62,7 +62,7 @@ bool getDelaunay(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 }
 
 
-bool getVoronoi(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
+bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 {
     bool isSuccess;       // Return value
 
@@ -100,7 +100,7 @@ bool getVoronoi(const vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 }
 
 
-bool getConvexHull(const vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut)
+bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut)
 {
     bool isSuccess;       // Return value
 

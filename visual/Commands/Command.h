@@ -472,7 +472,7 @@ public:
     CommandResult * runCommand() override
     {
         // Get reference to current DCEL and Delaunay
-        Delaunay *delaunay = new Delaunay(in.getStoreService()->getPoints());
+        auto *delaunay = new Delaunay(in.getStoreService()->getPoints());
 
         // Build Delaunay from DCEL.
         bool isRunSuccess = delaunay->incremental();
@@ -504,7 +504,7 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            Dcel *dcel = in.getStoreService()->getDcel();
+            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
         }
 

@@ -40,7 +40,7 @@ public:
      * @param   dcel        (IN)    Dcel where edge is stored
      * @param   vPoints     (OUT)   Edge points vector
      */
-    static void getEdgePoints(size_t szEdgeIdx, const Dcel &dcel, vector<Point<TYPE>> &vPoints);
+    static void getEdgePoints(size_t szEdgeIdx, Dcel &dcel, vector<Point<TYPE>> &vPoints);
 
     /**
      * @fn      getFacePoints
@@ -50,7 +50,7 @@ public:
      * @param   dcel        (IN)    Dcel where face is stored
      * @param   vPoints     (OUT)   Face points vector
      */
-    static void getFacePoints(size_t szFaceIdx, const Dcel &dcel, vector<Point<TYPE>> &vPoints);
+    static void getFacePoints(size_t szFaceIdx, Dcel &dcel, vector<Point<TYPE>> &vPoints);
 };
 
 
