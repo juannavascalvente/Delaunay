@@ -882,7 +882,7 @@ public:
             line = vLines.at(1);
         }
 
-        // https://github.com/juannavascalvente/Delaunay/issues/61
+        // TODO https://github.com/juannavascalvente/Delaunay/issues/61
         // Compute triangles path between two points.
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         vector<int> vFacesId;
@@ -893,7 +893,7 @@ public:
             for (auto face : vFacesId)
             {
                 vector<Point<TYPE>> vFacesPoints;
-                DcelFigureBuilder::getFacePoints(face, *in.getStoreService()->getDcel(), vFacesPoints);
+                DcelFigureBuilder::getFacePoints(face, *delaunay->getRefDcel(), vFacesPoints);
 
                 Polygon polygon;
                 for (auto point : vFacesPoints)
@@ -924,7 +924,8 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Dcel *dcel = in.getStoreService()->getDcel();
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            Dcel *dcel = delaunay->getRefDcel();
             Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayables.push_back(dispDelaunay);
 
