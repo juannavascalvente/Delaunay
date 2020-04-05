@@ -1132,9 +1132,7 @@ public:
     {
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isTriangulation() &&
-        ((status->isDelaunay() && status->isVoronoi()) || (delaunay->getAlgorithm() != INCREMENTAL));
+        return (status->isDelaunay() && status->isVoronoi()) || status->isTriangulation();
     }
 
 
@@ -1156,17 +1154,13 @@ public:
         double distance;
 
         // Check if Delaunay triangulation computed.
-        bool isRunSuccess=false;
+        bool isRunSuccess;
         Status *status = in.getStoreService()->getStatus();
-        if (status->isDelaunay())
+        if (status->isDelaunay() && status->isVoronoi())
         {
-            // Find node that surrounds input point p.
-            if (status->isVoronoi())
-            {
-                Delaunay *delaunay = in.getStoreService()->getDelaunay();
-                Voronoi *voronoi = in.getStoreService()->getVoronoi();
-                isRunSuccess = delaunay->findClosestPoint(point, closest, voronoi);
-            }
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            Voronoi *voronoi = in.getStoreService()->getVoronoi();
+            isRunSuccess = delaunay->findClosestPoint(point, closest, voronoi);
         }
         else
         {
@@ -1201,10 +1195,19 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            // Add Delaunay triangulation
-            Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(delaunay->getRefDcel());
-            vDisplayable.push_back(dispDelaunay);
+            // Add triangulation
+            Displayable *dcel;
+            if (status.isDelaunay() && status.isVoronoi())
+            {
+                Delaunay *delaunay = in.getStoreService()->getDelaunay();
+                dcel = DisplayableFactory::createDcel(delaunay->getRefDcel());
+            }
+            else
+            {
+                StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+                dcel = DisplayableFactory::createDcel(triangulation->getDcel());
+            }
+            vDisplayable.push_back(dcel);
 
             // Add points (point to locate and closest point)
             Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
@@ -1443,10 +1446,19 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            // Add Delaunay triangulation
-            Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(delaunay->getRefDcel());
-            vDisplayable.push_back(dispDelaunay);
+            // Add triangulation
+            Displayable *dcel;
+            if (status.isDelaunay())
+            {
+                Delaunay *delaunay = in.getStoreService()->getDelaunay();
+                dcel = DisplayableFactory::createDcel(delaunay->getRefDcel());
+            }
+            else
+            {
+                StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+                dcel = DisplayableFactory::createDcel(triangulation->getDcel());
+            }
+            vDisplayable.push_back(dcel);
 
             // Add points (point to locate and closest point)
             Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
@@ -1524,7 +1536,16 @@ public:
         vector<Displayable *> vDisplayable;
         if (getSuccess())
         {
-            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+            Dcel *dcel;
+            if (status.isDelaunay())
+            {
+                dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+            }
+            else
+            {
+                dcel = in.getStoreService()->getStarTriang()->getDcel();
+            }
+
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getConfigService()->getMinLengthEdge()));
         }
 
