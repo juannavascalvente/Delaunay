@@ -4,9 +4,9 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "ConvexHull.h"
 #include "Dcel.h"
 #include "Polygon.h"
-#include "Stack.h"
 
 struct ConvexPoint
 {
@@ -23,9 +23,8 @@ class StarTriangulation
     * Class members
     *******************************************************************************************************************/
     Dcel 	dcel;					// DCEL data
-	Polygon *hull;					// Convex hull polygon.
 	int		nPending;				// # pending edges.
-	bool	convexHullComputed;		// Convex hull computed flag.
+	ConvexHull hull;
 
 #ifdef STATISTICS_STAR_TRIANGULATION
 	int 	nCollinear;				// # collinear points.
@@ -41,10 +40,14 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    explicit StarTriangulation(vector<Point<TYPE>> &vPoints);
-	~StarTriangulation();
-
-    StarTriangulation(const StarTriangulation &t);
+    explicit StarTriangulation(vector<Point<TYPE>> &vPoints) : dcel(vPoints), nPending(0) {};
+	~StarTriangulation() = default;
+    StarTriangulation(const StarTriangulation &t)
+    {
+        nPending = t.nPending;
+        this->dcel = t.dcel;
+        hull = t.hull;
+    }
 
     /**
      * @fn          build
@@ -54,7 +57,12 @@ public:
      *              false otherwise
      */
     bool build();
-	void reset();
+
+    /**
+     * @fn      reset
+     * @brief   Resets data
+     */
+	void reset() { this->hull.reset(); };
 	bool delaunay();
 
 	bool convexHull();
@@ -64,10 +72,15 @@ public:
     /*******************************************************************************************************************
     * Getters/Setters
     *******************************************************************************************************************/
-	bool isConvexHullComputed() const {return convexHullComputed;}
-	Dcel* getDcel() {return &dcel;}
-	void getConvexHull(Polygon &polygon) { polygon = *hull; }
-    size_t getConvexHullLen() { return hull->getNElements(); }
+    Dcel* getDcel() {return &dcel;}
+
+    /*******************************************************************************************************************
+    * Convex hull functions
+    *******************************************************************************************************************/
+    bool isConvexHullComputed() { return !hull.isEmpty(); };
+    bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); };
+//    bool getConvexHullEdges(vector<int> &vEdges) { return hull.getConvexHullEdges(vEdges);  };
+    size_t getConvexHullLen() { return hull.size(); }
 #ifdef STATISTICS_STAR_TRIANGULATION
 	int getCollinear() const {return nCollinear;}
 	int getFlips() const {return nFlips;}

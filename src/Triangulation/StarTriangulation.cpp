@@ -1,10 +1,18 @@
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include <cfloat>
 
 #include "Circle.h"
 #include "defines.h"
 #include "Logging.h"
+#include "Stack.h"
 #include "StarTriangulation.h"
 
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_TRIANGULATION_DEBUG
 //#define DEBUG_TRIANGULATION_CONVEX_HULL
@@ -12,36 +20,10 @@
 //#define DEBUG_TRIANGULATION_FINDTWOCLOSEST
 #endif
 
-/*------------------------------------------------------------------------
-  Constructor/Destructor.
-------------------------------------------------------------------------*/
-StarTriangulation::StarTriangulation(vector<Point<TYPE>> &vPoints) : dcel(vPoints)
-{
-	// Initialize fields.
-	this->hull = new Polygon(DEFAUTL_CONVEXHULL_LEN);
-	this->convexHullComputed = false;
-	this->nPending = 0;
-}
 
-
-StarTriangulation::~StarTriangulation()
-{
-	// Dereference fields.
-	this->convexHullComputed = false;
-	this->nPending = 0;
-	delete this->hull;
-}
-
-
-StarTriangulation::StarTriangulation(const StarTriangulation &t)
-{
-	nPending = t.nPending;
-	convexHullComputed = t.convexHullComputed;
-	this->dcel = t.dcel;
-	hull = new Polygon(*t.hull);
-}
-
-
+/***********************************************************************************************************************
+* Public methods definitions
+***********************************************************************************************************************/
 /***************************************************************************
 * Name: 	convexHull
 * IN:		NONE
@@ -53,6 +35,7 @@ StarTriangulation::StarTriangulation(const StarTriangulation &t)
 ***************************************************************************/
 bool StarTriangulation::convexHull()
 {
+    bool    isBuilt=false;
 	int	 	index=0;			// Array index.
 	int	 	first_Index=0;		// Index of first edge.
 	Point<TYPE> *point;			// Current vertex.
@@ -69,8 +52,8 @@ bool StarTriangulation::convexHull()
 		first_Index = index;
 
 		// Loop convex hull points.
-		this->convexHullComputed = false;
-		while (!this->convexHullComputed)
+		this->hull.reset();
+		while (!isBuilt)
 		{
 			// Get edge info.
 			currentEdge = this->dcel.getRefEdge(index);
@@ -84,13 +67,13 @@ bool StarTriangulation::convexHull()
 #endif
 
 			// Insert next point.
-			this->hull->add(*point);
+			this->hull.add(*point);
 
 			// Get next edge.
 			index = currentEdge->getNext()-1;
 			if (index == first_Index)
 			{
-				this->convexHullComputed = true;
+                isBuilt = true;
 #ifdef DEBUG_TRIANGULATION_CONVEX_HULL
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull computed.");
 				Logging::write(true);
@@ -103,7 +86,7 @@ bool StarTriangulation::convexHull()
 		ex.what();
 	}
 
-	return(this->convexHullComputed);
+	return isBuilt;
 }
 
 /***************************************************************************
@@ -229,21 +212,6 @@ bool StarTriangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double 
 	}
 
 	return(found);
-}
-
-/***************************************************************************
-* Name: 	reset
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	resets triangulation data.
-***************************************************************************/
-void StarTriangulation::reset()
-{
-	// Reset data.
-	this->hull->reset();
-	this->convexHullComputed = false;
 }
 
 

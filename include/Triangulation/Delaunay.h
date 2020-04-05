@@ -83,11 +83,10 @@ public:
      */
 	void reset();
 
-	// Get/Set functions.
+    /*******************************************************************************************************************
+    * Convex hull functions
+    *******************************************************************************************************************/
 	bool isConvexHullComputed() { return !hull.isEmpty(); };
-	Graph* getGraph() {return &graph;}
-
-	//bool internalToConvexHull(Point<TYPE> &p);
 	bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); };
 	bool getConvexHullEdges(vector<int> &vEdges) { return hull.getConvexHullEdges(vEdges);  };
 	size_t getConvexHullLen() { return hull.size(); }
@@ -95,6 +94,7 @@ public:
     /*******************************************************************************************************************
     * Getter/Setters
     *******************************************************************************************************************/
+    Graph* getGraph() {return &graph;}
 	Dcel *getRefDcel() { return &this->dcel; };
 	void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
 	enum Algorithm getAlgorithm() {return(this->algorithm);};
