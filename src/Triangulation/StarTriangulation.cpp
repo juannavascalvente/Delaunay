@@ -128,13 +128,13 @@ bool StarTriangulation::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 }
 
 
-bool StarTriangulation::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out)
+bool StarTriangulation::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex)
 {
 	bool found=false;				// Return value.
 
 	// Initialize loop.
 	TYPE shortestDistance = FLT_MAX;
-    int	pointIndex=0;				// Loop counter.
+    pointIndex=0;				// Loop counter.
 	for (pointIndex=0; pointIndex<this->dcel.getNumVertex() ;pointIndex++)
 	{
 		// Get current point.

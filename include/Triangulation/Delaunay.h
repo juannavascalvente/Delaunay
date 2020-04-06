@@ -78,7 +78,7 @@ public:
     bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
     bool findFace(Point<TYPE> &origin, int &faceId) override ;
 
-    bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out) override ;
+    bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex) override ;
     bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override ;
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}
