@@ -7,24 +7,18 @@
 #include "ConvexHull.h"
 #include "Dcel.h"
 #include "Polygon.h"
+#include "Triangulation.h"
 
-struct ConvexPoint
-{
-	int		vertexIndex;
-	int		edgeID;
-};
 
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class StarTriangulation
+class StarTriangulation : public Triangulation
 {
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    Dcel 	dcel;					// DCEL data
 	int		nPending;				// # pending edges.
-	ConvexHull hull;
 
 #ifdef STATISTICS_STAR_TRIANGULATION
 	int 	nCollinear;				// # collinear points.
@@ -40,13 +34,14 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    explicit StarTriangulation(vector<Point<TYPE>> &vPoints) : dcel(vPoints), nPending(0) {};
+    explicit StarTriangulation(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints), nPending(0) {};
 	~StarTriangulation() = default;
-    StarTriangulation(const StarTriangulation &t)
+    StarTriangulation(const StarTriangulation &t) : Triangulation(t)
     {
-        nPending = t.nPending;
-        this->dcel = t.dcel;
-        hull = t.hull;
+        if (this != &t)
+        {
+            nPending = t.nPending;
+        }
     }
 
     /**
@@ -56,13 +51,8 @@ public:
      * @return      true if star triangulation computed
      *              false otherwise
      */
-    bool build();
+    bool build() override ;
 
-    /**
-     * @fn      reset
-     * @brief   Resets data
-     */
-	void reset() { this->hull.reset(); };
 	bool delaunay();
 
     /*******************************************************************************************************************
@@ -80,11 +70,12 @@ public:
     /*******************************************************************************************************************
     * Triangulation interface functions implementation
     *******************************************************************************************************************/
-    bool convexHull();
-    bool findClosestPoint(Point<TYPE> &p, Point<TYPE> &q);
-    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q);
-    bool findFace(Point<TYPE> &origin, vector<Point<TYPE>> &vPoints) { return false; };
-    bool path(Point<TYPE> &origin, Point<TYPE> &dest, vector<Polygon> &path) { return false; };
+    bool convexHull() override ;
+    bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out) override ;
+    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
+    // TODO https://github.com/juannavascalvente/Delaunay/issues/63
+    bool findFace(Point<TYPE> &origin, int &faceId) override { return false; };
+    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override { return false; };
 };
 
 #endif /* TRIANGULATION_H_ */

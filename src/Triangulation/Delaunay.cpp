@@ -37,36 +37,6 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Delaunay::Delaunay(vector<Point<TYPE>> &vPoints) : Delaunay()
-{
-    dcel = Dcel(vPoints);
-}
-
-
-/***************************************************************************
-* Name: 	freeStatistics
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description:	delete resources allocated during statistics recording.
-***************************************************************************/
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-void Delaunay::freeStatistics()
-{
-	delete[] this->nNodesChecked;
-}
-#endif
-
-
-void Delaunay::reset()
-{
-	// Reset data flags.
-	this->algorithm = NONE;
-	this->hull.reset();
-}
-
-
 bool Delaunay::build()
 {
 	bool 	built=true;		        // Return value.
@@ -80,9 +50,6 @@ bool Delaunay::build()
 	this->nNodesChecked = new int[this->dcel.getNVertex()];
 	this->nNodesChecked[0] = 1;
 #endif
-
-	// Set type of algorithm.
-	this->setAlgorithm(INCREMENTAL);
 
     // If no graph allocated then create a new graph.
     this->initGraph();
@@ -544,7 +511,6 @@ bool Delaunay::convexHull()
 * 				to check the neighbors of every point because there are no
 * 				closer points to a given point than its neighbors.
 ***************************************************************************/
-//bool Delaunay::findTwoClosest(int &first, int &second)
 bool Delaunay::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 {
 	bool found=false;				// Return value.
@@ -619,7 +585,7 @@ bool Delaunay::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 * Description: 	finds the closest point q to input point p. To do so it first
 * 				locates the face that surrounds p and then
 ***************************************************************************/
-bool Delaunay::findClosestPoint(Point<TYPE> &in, Point<TYPE> &out, Voronoi *voronoi)
+bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out)
 {
 	int	 nodeIndex=0;			// Node index.
     bool *insertedPoints = new bool[this->dcel.getNumVertex()];

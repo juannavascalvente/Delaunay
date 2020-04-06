@@ -40,7 +40,6 @@ protected:
     virtual CommandResult * runCommand() { return createResult(); };
     virtual CommandResult* createResult()
     {
-        Status status;
         vector<Displayable*> vDisplayable(0);
         return new CommandResult(getSuccess(), *in.getStoreService()->getStatus(), in.getStoreService(), vDisplayable);
     };
@@ -104,11 +103,42 @@ public:
 
     /**
      * @fn      isRunnable
-     * @brief   Null command cannnot execute
+     * @brief   Null command can be executed but does nothing
+     *
+     * @return  false
+     */
+    bool isRunnable() override  { return true; };
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandFail : public Command
+{
+public:
+
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    CommandFail(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+
+    /**
+     * @fn      isRunnable
+     * @brief   Null command cannot execute
      *
      * @return  false
      */
     bool isRunnable() override  { return false; };
+
+    /**
+     * @fn      printRunnableMsg
+     * @brief   Fail command cannot be executed
+     */
+    void printRunnableMsg()
+    {
+        cout << "Wrong command has been created and cannot be executed" << endl;
+    };
 };
 
 
@@ -845,7 +875,7 @@ public:
      */
     void printRunnableMsg() override
     {
-        cout << "Triangulation is not Delaunay or it was not computed using incremenal algorithm" << endl;
+        cout << "Triangulation must be incremental Delaunay to be able to run find path" << endl;
     }
 
 
@@ -861,7 +891,7 @@ public:
         // Delaunay and Voronoi must exist
         Status *status = in.getStoreService()->getStatus();
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isDelaunay() && (delaunay->getAlgorithm() == INCREMENTAL);
+        return status->isDelaunay();
     }
 
 
@@ -973,7 +1003,7 @@ public:
      */
     void printRunnableMsg() override
     {
-        cout << "Triangulation is not Delaunay or it was not computed using incremenal algorithm" << endl;
+        cout << "Voronoi diagram has not been computed" << endl;
     }
 
 
@@ -989,8 +1019,7 @@ public:
         // Delaunay and Voronoi must exist
         // TODO https://github.com/juannavascalvente/Delaunay/issues/10
         Status *status = in.getStoreService()->getStatus();
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isVoronoi() && (delaunay->getAlgorithm() == INCREMENTAL);
+        return status->isVoronoi();
     }
 
 
@@ -1160,13 +1189,13 @@ public:
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             Voronoi *voronoi = in.getStoreService()->getVoronoi();
-            isRunSuccess = delaunay->findClosestPoint(point, closest, voronoi);
+            isRunSuccess = delaunay->findClosestPoint(point, voronoi, closest);
         }
         else
         {
             // Find closest using brute force.
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            isRunSuccess = triangulation->findClosestPoint(point, closest);
+            isRunSuccess = triangulation->findClosestPoint(point, nullptr, closest);
         }
 
         // Add point to locate and closest point
@@ -1251,7 +1280,7 @@ public:
 
     /**
      * @fn      isRunnable
-     * @brief   Checks a triangulation exist
+     * @brief   Find path can only be executed if Delaunay incremental has been computed
      *
      * @return  true if command can be ran
      *          false otherwise
@@ -1261,7 +1290,7 @@ public:
         // Triangulation must exist
         Status *status = in.getStoreService()->getStatus();
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isDelaunay() && (delaunay->getAlgorithm() == INCREMENTAL);
+        return status->isDelaunay();
     }
 
 
@@ -1283,23 +1312,22 @@ public:
         // Find face.
         Status *status = in.getStoreService()->getStatus();
         bool isRunSuccess=false;
-        bool isImaginaryFace=false;
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         if (status->isDelaunay())
         {
             isRunSuccess = delaunay->findFace(point, faceId);
         }
-//        else
-//        {
-//            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-//            this->isSuccess = triangulation->findFace(point, faceId);
-//        }
+        else
+        {
+            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+            this->isSuccess = triangulation->findFace(point, faceId);
+        }
 
         // Add point to locate
         vPoints.push_back(point);
 
         // Add face if it is not imaginary
-        if (isRunSuccess && !isImaginaryFace)
+        if (isRunSuccess && (faceId != EXTERNAL_FACE))
         {
             vector<Point<TYPE>> vFacesPoints;
             DcelFigureBuilder::getFacePoints(faceId, *delaunay->getRefDcel(), vFacesPoints);
@@ -2168,11 +2196,6 @@ public:
         // Run command
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
-
-        if (this->isSuccess)
-        {
-            delaunay->setAlgorithm(INCREMENTAL);
-        }
 
         // Build result
         return createResult();

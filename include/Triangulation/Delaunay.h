@@ -10,6 +10,7 @@
 #include "defines.h"
 #include "Graph.h"
 #include "Polygon.h"
+#include "Triangulation.h"
 #include "Voronoi.h"
 
 
@@ -23,23 +24,13 @@ enum Algorithm { NONE, INCREMENTAL, FROM_STAR};
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class Delaunay
+class Delaunay: public Triangulation
 {
     /*******************************************************************************************************************
     * Private class members
     *******************************************************************************************************************/
-	Dcel 	dcel;				// Reference to DCEL data.
 	Graph 	graph;				// Graph used in incremental algorithm.
-    ConvexHull hull;            // Convex hull data.
 
-	// Type of algorithm executed to compute the Delaunay algorithm.
-	enum Algorithm algorithm;
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-	int nFlips;
-	int nCollinear;
-	int *nNodesChecked;
-	int nNodesCheckedIndex;
-#endif
     /*******************************************************************************************************************
     * Private methods declarations
     *******************************************************************************************************************/
@@ -58,28 +49,17 @@ public:
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Delaunay() : algorithm(NONE)  {}
-    explicit Delaunay(vector<Point<TYPE>> &vPoints);
+	Delaunay() = default;
+    explicit Delaunay(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints) {};
 	~Delaunay() = default;
 
-    Delaunay(const Delaunay &d)
+    Delaunay(const Delaunay &d) : Triangulation(d)
     {
         if(this != &d)
         {
-            this->dcel = d.dcel;
-            this->hull = d.hull;
-            this->hull = d.hull;
-            this->algorithm = d.algorithm;
             this->graph = d.graph;
         }
     }
-
-    /**
-     * @fn      reset
-     * @build   Resets triangulation state
-     *
-     */
-	void reset();
 
     /*******************************************************************************************************************
     * Convex hull functions
@@ -94,19 +74,17 @@ public:
     *******************************************************************************************************************/
     Graph* getGraph() {return &graph;}
 	Dcel *getRefDcel() { return &this->dcel; };
-	void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
-	enum Algorithm getAlgorithm() {return(this->algorithm);};
 
     /*******************************************************************************************************************
     * Triangulation interface functions implementation
     *******************************************************************************************************************/
-    bool build();
-    bool convexHull();
-    bool findClosestPoint(Point<TYPE> &in, Point<TYPE> &out, Voronoi *voronoi);
-    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q);
-    bool findFace(Point<TYPE> &origin, int &faceId);
-    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId);
+    bool build() override ;
+    bool convexHull() override ;
+    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
+    bool findFace(Point<TYPE> &origin, int &faceId) override ;
 
+    bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out) override ;
+    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override ;
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}
 	int getFlips() const {return nFlips;}

@@ -32,8 +32,7 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
     // Check if option is valid
     if (CommandFactory::mapFactories.find(szOptionCmdId) == CommandFactory::mapFactories.end())
     {
-        command = CommandFactory::createNull(storeService, configServiceIn);
-        cout << "Error creating command. Id is not valid " << szOptionCmdId << endl;
+        command = CommandFactory::createFail(storeService, configServiceIn);
     }
     else
     {
@@ -51,6 +50,12 @@ Command *CommandFactory::createNull(StoreService *storeService, ConfigService *c
 {
     // Create command
     return new CommandNull(storeService, configService);
+}
+
+Command *CommandFactory::createFail(StoreService *storeService, ConfigService *configService)
+{
+    // Create command
+    return new CommandFail(storeService, configService);
 }
 
 

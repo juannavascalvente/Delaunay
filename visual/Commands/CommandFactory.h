@@ -30,6 +30,7 @@ class CommandFactory
     * Private method declarations
     *******************************************************************************************************************/
     static Command *createNull(StoreService *storeService, ConfigService *configService);
+    static Command *createFail(StoreService *storeService, ConfigService *configService);
     static Command *createReadCfg(StoreService *storeService, ConfigService *configService);
     static Command *createRandomGenerator(StoreService *storeService, ConfigService *configService);
     static Command *createClusterGenerator(StoreService *storeService, ConfigService *configService);

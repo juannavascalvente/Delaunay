@@ -22,17 +22,19 @@
 
 
 /***********************************************************************************************************************
+* Private definition
+***********************************************************************************************************************/
+struct ConvexPoint
+{
+    int		vertexIndex;
+    int		edgeID;
+};
+
+
+
+/***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-/***************************************************************************
-* Name: 	convexHull
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	true if the convex hull has been computed.
-* 			false otherwise.
-* GLOBAL:	the convex hull is stored in the "convexHull" attribute.
-* Description: 	computes the convex hull of the DCEL set of points.
-***************************************************************************/
 bool StarTriangulation::convexHull()
 {
     bool    isBuilt=false;
@@ -125,17 +127,8 @@ bool StarTriangulation::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 	return found;
 }
 
-//bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
-//{
-//	bool 	found=false;		// Return value.
-//
-//	// TODO https://github.com/juannavascalvente/Delaunay/issues/63
-//
-//	return(found);
-//}
 
-
-bool StarTriangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q)
+bool StarTriangulation::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out)
 {
 	bool found=false;				// Return value.
 
@@ -148,11 +141,11 @@ bool StarTriangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q)
         Point<TYPE> *currentPoint = this->dcel.getRefPoint(pointIndex);
 
 		// Check if new distance is lowest.
-        TYPE dist = currentPoint->distance(p);
+        TYPE dist = currentPoint->distance(in);
 		if (dist < shortestDistance)
 		{
 			// Update output data.
-			q = *currentPoint;
+            out = *currentPoint;
             shortestDistance = dist;
 			found = true;
 		}
