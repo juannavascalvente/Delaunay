@@ -1015,20 +1015,22 @@ public:
 
         // Compute triangles path between two points.
         vector<int> vFacesId;
-        int	 initialFace=0;			// Initial face in the path.
-        int	 finalFace=0;			// Final face in the path.
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
 
         // Get extreme point faces.
         https://github.com/juannavascalvente/Delaunay/issues/62
         bool isRunSuccess = false;
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        if (delaunay->findFace(p, initialFace) && delaunay->findFace(q, initialFace))
+        int pointFace1;
+        int pointFace2;
+        Point<TYPE> closest;
+        if (delaunay->findClosestPoint(p, voronoi, closest, pointFace1) &&
+            delaunay->findClosestPoint(q, voronoi, closest, pointFace2))
         {
             // Add faces to set.
             vector<int> vFaces;
-            vFaces.push_back(initialFace+1);
-            vFaces.push_back(finalFace+1);
+            vFaces.push_back(pointFace1 + 1);
+            vFaces.push_back(pointFace2 + 1);
 
             // Find path.
             isRunSuccess = voronoi->getRefDcel()->findPath(vFaces, line, vFacesId);
@@ -1153,13 +1155,13 @@ public:
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             Voronoi *voronoi = in.getStoreService()->getVoronoi();
-            isRunSuccess = delaunay->findClosestPoint(point, voronoi, closest);
+            isRunSuccess = delaunay->findClosestPoint(point, voronoi, closest, pointIndex);
         }
         else
         {
             // Find closest using brute force.
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            isRunSuccess = triangulation->findClosestPoint(point, nullptr, closest);
+            isRunSuccess = triangulation->findClosestPoint(point, nullptr, closest, pointIndex);
         }
 
         // Add point to locate and closest point

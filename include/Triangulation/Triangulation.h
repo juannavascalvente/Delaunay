@@ -70,13 +70,14 @@ public:
      * @fn      findClosestPoint
      * @build   Find closest point to a given point
      *
-     * @param in        (IN) Point whose closes point is returned
-     * @param voronoi   (IN) Voronoi diagram
-     * @param out       (OUT) Closest point
+     * @param in            (IN) Point whose closes point is returned
+     * @param voronoi       (IN) Voronoi diagram
+     * @param out           (OUT) Closest point
+     * @param pointIndex    (OUT) Dcel point index
      * @return  true if point located
      *          false otherwise
      */
-    virtual bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out) = 0;
+    virtual bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex) = 0;
 
     /**
      * @fn      findTwoClosest

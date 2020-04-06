@@ -558,7 +558,7 @@ bool Delaunay::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 * Description: 	finds the closest point q to input point p. To do so it first
 * 				locates the face that surrounds p and then
 ***************************************************************************/
-bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out)
+bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex)
 {
 	int	 nodeIndex=0;			// Node index.
     bool *insertedPoints = new bool[this->dcel.getNumVertex()];
@@ -568,7 +568,7 @@ bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &
     bool found = this->locateNode(in, nodeIndex);
 	if (found)
 	{
-        int pointIndex = 0;
+        pointIndex = 0;
         queue<int> queue;
 
 		// Insert points from node.
