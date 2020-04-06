@@ -37,7 +37,7 @@ struct ConvexPoint
 ***********************************************************************************************************************/
 bool StarTriangulation::convexHull()
 {
-    bool    isBuilt=false;
+    bool    isHullBuilt=false;
 	int	 	index=0;			// Array index.
 	int	 	first_Index=0;		// Index of first edge.
 	Point<TYPE> *point;			// Current vertex.
@@ -55,7 +55,7 @@ bool StarTriangulation::convexHull()
 
 		// Loop convex hull points.
 		this->hull.reset();
-		while (!isBuilt)
+		while (!isHullBuilt)
 		{
 			// Get edge info.
 			currentEdge = this->dcel.getRefEdge(index);
@@ -75,7 +75,7 @@ bool StarTriangulation::convexHull()
 			index = currentEdge->getNext()-1;
 			if (index == first_Index)
 			{
-                isBuilt = true;
+                isHullBuilt = true;
 #ifdef DEBUG_TRIANGULATION_CONVEX_HULL
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull computed.");
 				Logging::write(true);
@@ -88,7 +88,7 @@ bool StarTriangulation::convexHull()
 		ex.what();
 	}
 
-	return isBuilt;
+	return isHullBuilt;
 }
 
 
@@ -160,8 +160,6 @@ bool StarTriangulation::build()
 	int		i=0;						// Loop counter.
 	int		len=0;						// Loop length.
 	struct ConvexPoint	convexPoint={};	// Point to insert in convex hull.
-	struct ConvexPoint	convexEdge;		// Point to insert in convex hull.
-	struct ConvexPoint	peakEdge;		// Last edge in convex hull.
 	int	   convex_Peak[2];				// Last two points in convex hull.
 	int		edgeId=0, faceId=0;			// Edge and face Id counters.
 	int		savedEdge=0;
@@ -246,11 +244,11 @@ bool StarTriangulation::build()
 		finished = false;
 		savedEdge = INVALID;
 		nextConvexEdge = edgeId+2;
-		peakEdge = stack.peak();
+        struct ConvexPoint peakEdge = stack.peak();
 		while (!finished)
 		{
 			// Get last two vertex from convex hull.
-			convexEdge = stack.peak();
+            struct ConvexPoint convexEdge = stack.peak();
 			convex_Peak[0] = convexEdge.vertexIndex;
 			convexEdge = stack.elementAt(2);
 			convex_Peak[1] = convexEdge.vertexIndex;
@@ -377,11 +375,11 @@ bool StarTriangulation::build()
 	}
 
 	// Save index of first edge from convex hull.
-	convexEdge = stack.peak();
+    struct ConvexPoint convexEdge = stack.peak();
 	savedEdge = convexEdge.edgeID;
 
 	stack.pop();
-	peakEdge = stack.peak();
+    struct ConvexPoint peakEdge = stack.peak();
 
 	// Insert first edge from convex hull.
 	this->dcel.setTwin(peakEdge.edgeID - 1, edgeId);
@@ -613,7 +611,7 @@ bool StarTriangulation::delaunay()
 #endif
 		// Next edge.
 		edgeIndex++;
-		edgeIndex = edgeIndex % this->dcel.getNumEdges();
+		edgeIndex = edgeIndex % (int) this->dcel.getNumEdges();
 	}
 
 	// Deallocate checked boolean flag array.
