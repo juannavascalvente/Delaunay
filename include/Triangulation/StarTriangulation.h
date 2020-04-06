@@ -1,51 +1,48 @@
 #ifndef TRIANGULATION_H_
 #define TRIANGULATION_H_
 
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
+#include "ConvexHull.h"
 #include "Dcel.h"
 #include "Polygon.h"
-#include "Stack.h"
+#include "Triangulation.h"
 
-struct ConvexPoint
-{
-	int		vertexIndex;
-	int		edgeID;
-};
 
-/****************************************************************************
-// 						TRIANGULATION CLASS DEFITNION
-****************************************************************************/
-class StarTriangulation
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class StarTriangulation : public Triangulation
 {
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-    Dcel 	dcel;					// DCEL data
-
-	//------------------------------------------------------------------------
-	//  Attributes
-	//------------------------------------------------------------------------
-
-	Polygon *hull;					// Convex hull polygon.
 	int		nPending;				// # pending edges.
-	bool	convexHullComputed;		// Convex hull computed flag.
+
 #ifdef STATISTICS_STAR_TRIANGULATION
 	int 	nCollinear;				// # collinear points.
 	int		nFlips;					// # flipped edges.
 #endif
 
-	//------------------------------------------------------------------------
-	//  Private functions.
-	//------------------------------------------------------------------------
+    /*******************************************************************************************************************
+    * Private methods
+    *******************************************************************************************************************/
     bool setNotChecked(int index, bool *isEdgeChecked);
 
 public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    explicit StarTriangulation(vector<Point<TYPE>> &vPoints);
-	~StarTriangulation();
-
-    StarTriangulation(const StarTriangulation &t);
+    explicit StarTriangulation(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints), nPending(0) {};
+	~StarTriangulation() = default;
+    StarTriangulation(const StarTriangulation &t) : Triangulation(t)
+    {
+        if (this != &t)
+        {
+            nPending = t.nPending;
+        }
+    }
 
     /**
      * @fn          build
@@ -54,33 +51,31 @@ public:
      * @return      true if star triangulation computed
      *              false otherwise
      */
-    bool build();
-
-	//------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
-	void reset();
+    bool build() override ;
 
 	bool delaunay();
 
-	//------------------------------------------------------------------------
-	// Figures functions.
-	//------------------------------------------------------------------------
-	bool convexHull();
-	bool findTwoClosest(int &first, int &second);
-//	bool findFace(Point<TYPE> &point, int &faceId);
-	bool findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &distance);
+    /*******************************************************************************************************************
+    * Getters/Setters
+    *******************************************************************************************************************/
+    Dcel* getDcel() {return &dcel;}
 
-	//------------------------------------------------------------------------
-	// Get/Set functions.
-	//------------------------------------------------------------------------
-	bool isConvexHullComputed() const {return convexHullComputed;}
-	Dcel* getDcel() {return &dcel;}
-	Polygon* getConvexHull() const {return hull;}
-#ifdef STATISTICS_STAR_TRIANGULATION
-	int getCollinear() const {return nCollinear;}
-	int getFlips() const {return nFlips;}
-#endif
+    /*******************************************************************************************************************
+    * Convex hull functions
+    *******************************************************************************************************************/
+    bool isConvexHullComputed() { return !hull.isEmpty(); };
+    bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); };
+    size_t getConvexHullLen() { return hull.size(); }
+
+    /*******************************************************************************************************************
+    * Triangulation interface functions implementation
+    *******************************************************************************************************************/
+    bool convexHull() override ;
+    bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out) override ;
+    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
+    // TODO https://github.com/juannavascalvente/Delaunay/issues/63
+    bool findFace(Point<TYPE> &origin, int &faceId) override { return false; };
+    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override { return false; };
 };
 
 #endif /* TRIANGULATION_H_ */

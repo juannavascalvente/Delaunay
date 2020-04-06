@@ -1,10 +1,18 @@
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
 #include <cfloat>
 
 #include "Circle.h"
 #include "defines.h"
 #include "Logging.h"
+#include "Stack.h"
 #include "StarTriangulation.h"
 
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_TRIANGULATION_DEBUG
 //#define DEBUG_TRIANGULATION_CONVEX_HULL
@@ -12,47 +20,24 @@
 //#define DEBUG_TRIANGULATION_FINDTWOCLOSEST
 #endif
 
-/*------------------------------------------------------------------------
-  Constructor/Destructor.
-------------------------------------------------------------------------*/
-StarTriangulation::StarTriangulation(vector<Point<TYPE>> &vPoints) : dcel(vPoints)
+
+/***********************************************************************************************************************
+* Private definition
+***********************************************************************************************************************/
+struct ConvexPoint
 {
-	// Initialize fields.
-	this->hull = new Polygon(DEFAUTL_CONVEXHULL_LEN);
-	this->convexHullComputed = false;
-	this->nPending = 0;
-}
+    int		vertexIndex;
+    int		edgeID;
+};
 
 
-StarTriangulation::~StarTriangulation()
-{
-	// Dereference fields.
-	this->convexHullComputed = false;
-	this->nPending = 0;
-	delete this->hull;
-}
 
-
-StarTriangulation::StarTriangulation(const StarTriangulation &t)
-{
-	nPending = t.nPending;
-	convexHullComputed = t.convexHullComputed;
-	this->dcel = t.dcel;
-	hull = new Polygon(*t.hull);
-}
-
-
-/***************************************************************************
-* Name: 	convexHull
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	true if the convex hull has been computed.
-* 			false otherwise.
-* GLOBAL:	the convex hull is stored in the "convexHull" attribute.
-* Description: 	computes the convex hull of the DCEL set of points.
-***************************************************************************/
+/***********************************************************************************************************************
+* Public methods definitions
+***********************************************************************************************************************/
 bool StarTriangulation::convexHull()
 {
+    bool    isBuilt=false;
 	int	 	index=0;			// Array index.
 	int	 	first_Index=0;		// Index of first edge.
 	Point<TYPE> *point;			// Current vertex.
@@ -69,8 +54,8 @@ bool StarTriangulation::convexHull()
 		first_Index = index;
 
 		// Loop convex hull points.
-		this->convexHullComputed = false;
-		while (!this->convexHullComputed)
+		this->hull.reset();
+		while (!isBuilt)
 		{
 			// Get edge info.
 			currentEdge = this->dcel.getRefEdge(index);
@@ -84,13 +69,13 @@ bool StarTriangulation::convexHull()
 #endif
 
 			// Insert next point.
-			this->hull->add(*point);
+			this->hull.add(*point);
 
 			// Get next edge.
 			index = currentEdge->getNext()-1;
 			if (index == first_Index)
 			{
-				this->convexHullComputed = true;
+                isBuilt = true;
 #ifdef DEBUG_TRIANGULATION_CONVEX_HULL
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull computed.");
 				Logging::write(true);
@@ -103,147 +88,70 @@ bool StarTriangulation::convexHull()
 		ex.what();
 	}
 
-	return(this->convexHullComputed);
+	return isBuilt;
 }
 
-/***************************************************************************
-* Name: 	findTwoClosest
-* IN:		NONE
-* OUT:		first		index of one of the closest points.
-* 			second		index of the other of the closest points.
-* RETURN:	true		if two closest points found.
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	Finds the two closest point in the DCEL.
-***************************************************************************/
-bool StarTriangulation::findTwoClosest(int &first, int &second)
+
+bool StarTriangulation::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 {
 	bool found=false;				// Return value.
-	int	 i=0, j=0;					// Loop counters.
-	Point<TYPE>	*origin;			// First point.
-	Point<TYPE>	*dest;				// Second point.
-	double	distance;	    		// Current distance.
-	auto	lowestDistance=DBL_MAX;	// Current distance.
+	auto  lowestDistance=DBL_MAX;	// Current distance.
 
 	// Loop all vertex.
-	for (i=0; i< this->dcel.getNumVertex(); i++)
+	for (size_t i=0; i< this->dcel.getNumVertex(); i++)
 	{
 		// Get origin point.
-		origin = this->dcel.getRefPoint(i);
+        Point<TYPE> *origin = this->dcel.getRefPoint(i);
 
 		// Compute distance to remaining points.
-		for (j=(i+1); j< this->dcel.getNumVertex(); j++)
+		for (size_t j=(i+1); j< this->dcel.getNumVertex(); j++)
 		{
 			// Get destination point.
-			dest = this->dcel.getRefPoint(j);
-#ifdef DEBUG_TRIANGULATION_FINDTWOCLOSEST
-			Logging::buildText(__FUNCTION__, __FILE__, "Computing distance between ");
-			Logging::buildText(__FUNCTION__, __FILE__, i);
-			Logging::buildText(__FUNCTION__, __FILE__, " and ");
-			Logging::buildText(__FUNCTION__, __FILE__, j);
-			Logging::write(true, Info);
-#endif
+            Point<TYPE>	*dest = this->dcel.getRefPoint(j);
 
 			// Compute distance.
-			distance = origin->distance(*dest);
-#ifdef DEBUG_TRIANGULATION_FINDTWOCLOSEST
-			Logging::buildText(__FUNCTION__, __FILE__, "New distance is ");
-			Logging::buildText(__FUNCTION__, __FILE__, distance);
-			Logging::write(true, Info);
-#endif
+            TYPE distance = origin->distance(*dest);
 
 			// Compare to current.
 			if (distance < lowestDistance)
 			{
-#ifdef DEBUG_TRIANGULATION_FINDTWOCLOSEST
-				Logging::buildText(__FUNCTION__, __FILE__, "New distance is lower than ");
-				Logging::buildText(__FUNCTION__, __FILE__, lowestDistance);
-				Logging::write(true, Info);
-#endif
 				// Update lowest distance and output indexes.
 				lowestDistance = distance;
-				first = i;
-				second = j;
+				p = *dcel.getRefPoint(i);
+                q = *dcel.getRefPoint(j);
 				found = true;
 			}
 		}
 	}
 
-#ifdef DEBUG_TRIANGULATION_FINDTWOCLOSEST
-	Logging::buildText(__FUNCTION__, __FILE__, "Closest points are ");
-	Logging::buildText(__FUNCTION__, __FILE__, first);
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, second);
-	Logging::write(true, Info);
-#endif
-
-	return(found);
+	return found;
 }
 
-//bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
-//{
-//	bool 	found=false;		// Return value.
-//
-//	// TODO https://github.com/juannavascalvente/Delaunay/issues/63
-//
-//	return(found);
-//}
 
-/***************************************************************************
-* Name: 	findClosestPoint
-* IN:		p			input point whose closest is going to be located.
-* OUT:		q			closest point to p
-* 			distance 	p-q distance.
-* RETURN:	true		if closes point found.
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	finds the closest point q to input point p and then computes
-* 				the distance between both points. To find the closest point
-* 				it compares the input point to all existing points.
-***************************************************************************/
-bool StarTriangulation::findClosestPoint(Point<TYPE> &p, Point<TYPE> &q, double &distance)
+bool StarTriangulation::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out)
 {
 	bool found=false;				// Return value.
-	int	pointIndex=0;				// Loop counter.
-	int	upperBound=0;				// Loop max # iterations.
-	Point<TYPE> *currentPoint=nullptr;	// Current point.
-	TYPE 	dist;					// New distance.
 
 	// Initialize loop.
-	distance = FLT_MAX;
-	upperBound = this->dcel.getNumVertex();
-	for (pointIndex=0; pointIndex<upperBound ;pointIndex++)
+	TYPE shortestDistance = FLT_MAX;
+    int	pointIndex=0;				// Loop counter.
+	for (pointIndex=0; pointIndex<this->dcel.getNumVertex() ;pointIndex++)
 	{
 		// Get current point.
-		currentPoint = this->dcel.getRefPoint(pointIndex);
+        Point<TYPE> *currentPoint = this->dcel.getRefPoint(pointIndex);
 
 		// Check if new distance is lowest.
-		dist = currentPoint->distance(p);
-		if (dist < distance)
+        TYPE dist = currentPoint->distance(in);
+		if (dist < shortestDistance)
 		{
 			// Update output data.
-			q = *currentPoint;
-			distance = dist;
+            out = *currentPoint;
+            shortestDistance = dist;
 			found = true;
 		}
 	}
 
-	return(found);
-}
-
-/***************************************************************************
-* Name: 	reset
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	resets triangulation data.
-***************************************************************************/
-void StarTriangulation::reset()
-{
-	// Reset data.
-	this->hull->reset();
-	this->convexHullComputed = false;
+	return found;
 }
 
 

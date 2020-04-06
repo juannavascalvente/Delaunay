@@ -6,6 +6,7 @@
 #include "Voronoi.h"
 #include "DcelReader.h"
 #include "DcelWriter.h"
+#include "DcelFigureBuilder.h"
 
 #include <queue>
 #include <cfloat>
@@ -36,56 +37,7 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Delaunay::Delaunay(vector<Point<TYPE>> &vPoints) : Delaunay()
-{
-    dcel = Dcel(vPoints);
-}
-
-
-/***************************************************************************
-* Name: 	freeStatistics
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description:	delete resources allocated during statistics recording.
-***************************************************************************/
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-void Delaunay::freeStatistics()
-{
-	delete[] this->nNodesChecked;
-}
-#endif
-
-/***************************************************************************
-* Name: 	reset
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description:
-***************************************************************************/
-void Delaunay::reset()
-{
-	// Reset data flags.
-	this->algorithm = NONE;
-	this->setConvexHullComputed(false);
-	this->hull.reset();
-	this->vHullEdges.clear();
-}
-
-/***************************************************************************
-* Name: 	incremental
-* IN:		node		node whose area must be computed
-* OUT:		NONE
-* RETURN:	true		if triangulation built
-* 			false		i.o.c.
-* GLOBAL:	NONE
-* Description: 	computes the Delaunay triangulation using the incremental
-* 				algorithm.
-***************************************************************************/
-//#define DELAUNAY_STATISTICS
-bool Delaunay::incremental()
+bool Delaunay::build()
 {
 	bool 	built=true;		        // Return value.
 	bool	inserted;	            // Point inserted flag.
@@ -98,9 +50,6 @@ bool Delaunay::incremental()
 	this->nNodesChecked = new int[this->dcel.getNVertex()];
 	this->nNodesChecked[0] = 1;
 #endif
-
-	// Set type of algorithm.
-	this->setAlgorithm(INCREMENTAL);
 
     // If no graph allocated then create a new graph.
     this->initGraph();
@@ -133,9 +82,7 @@ bool Delaunay::incremental()
 			Logging::write(true, Info);
 #endif
     // Reset convex hull flag.
-    this->setConvexHullComputed(false);
     this->hull.reset();
-    this->vHullEdges.clear();
 
     // Loop all other points.
     pointIndex=1;
@@ -447,15 +394,7 @@ void Delaunay::flipEdges(int edge_ID)
 	this->checkEdge(twin->getNext());
 }
 
-/***************************************************************************
-* Name: 	convexHull
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	true if the convex hull has been computed.
-* 			false otherwise.
-* GLOBAL:	the convex hull is stored in the "convexHull" attribute.
-* Description: 	computes the convex hull of the DCEL set of points.
-***************************************************************************/
+
 bool Delaunay::convexHull()
 {
 	bool finished;      		// Loop control flag.
@@ -465,7 +404,7 @@ bool Delaunay::convexHull()
 	try
 	{
 		// Initialize return value.
-		this->setConvexHullComputed(false);
+		this->hull.reset();
 #ifdef DEBUG_GET_CONVEX_HULL
 		Logging::buildText(__FUNCTION__, __FILE__, "Inserting point ");
 		Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getOrigin(0));
@@ -519,8 +458,7 @@ bool Delaunay::convexHull()
 		while (!finished)
 		{
 			// Insert next point.
-			this->hull.add(*this->dcel.getRefPoint(this->dcel.getOrigin(edgeIndex)-1));
-			this->vHullEdges.push_back(edgeIndex+1);
+			this->hull.add(*this->dcel.getRefPoint(this->dcel.getOrigin(edgeIndex)-1), edgeIndex+1);
 #ifdef DEBUG_GET_CONVEX_HULL
 			Logging::buildText(__FUNCTION__, __FILE__, "Added point ");
 			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getOrigin(edgeIndex));
@@ -545,7 +483,6 @@ bool Delaunay::convexHull()
 			if (edgeIndex == firstIndex)
 			{
 				finished = true;
-				this->setConvexHullComputed(true);
 #ifdef DEBUG_GET_CONVEX_HULL
 				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull computed.");
 				Logging::write(true, Info);
@@ -558,7 +495,7 @@ bool Delaunay::convexHull()
 		ex.what();
 	}
 
-	return(this->isConvexHullComputed());
+	return this->isConvexHullComputed();
 }
 
 
@@ -574,7 +511,7 @@ bool Delaunay::convexHull()
 * 				to check the neighbors of every point because there are no
 * 				closer points to a given point than its neighbors.
 ***************************************************************************/
-bool Delaunay::findTwoClosest(int &first, int &second)
+bool Delaunay::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 {
 	bool found=false;				// Return value.
 	int	 pointIndex=0;				// Loop counter.
@@ -592,11 +529,6 @@ bool Delaunay::findTwoClosest(int &first, int &second)
 	lastPointIndex = this->dcel.getNumVertex() - 1;
 	for (pointIndex=0; pointIndex<lastPointIndex; pointIndex++)
 	{
-#ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
-		Logging::buildText(__FUNCTION__, __FILE__, "Checking point ");
-		Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
-		Logging::write(true, Info);
-#endif
 		// Get edge departing from current point.
 		currentEdgeId = this->dcel.getPointEdge(pointIndex);
 		firstEdgeId = currentEdgeId;
@@ -607,11 +539,6 @@ bool Delaunay::findTwoClosest(int &first, int &second)
 
 		do
 		{
-#ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
-			Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
-			Logging::buildText(__FUNCTION__, __FILE__, currentEdgeId);
-			Logging::write(true, Info);
-#endif
 			// Skip no-real edges.
 			if (!this->dcel.hasNegativeVertex(currentEdgeId))
 			{
@@ -620,53 +547,21 @@ bool Delaunay::findTwoClosest(int &first, int &second)
 				dest = this->dcel.getRefPoint(destination-1);
 				if ((pointIndex+1) < destination)
 				{
-#ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
-					Logging::buildText(__FUNCTION__, __FILE__, "Computing distance between ");
-					Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
-					Logging::buildText(__FUNCTION__, __FILE__, " and ");
-					Logging::buildText(__FUNCTION__, __FILE__, destination);
-					Logging::write(true, Info);
-#endif
 					// Compute distance.
 					distance = origin->distance(*dest);
-#ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
-					Logging::buildText(__FUNCTION__, __FILE__, "New distance is ");
-					Logging::buildText(__FUNCTION__, __FILE__, distance);
-					Logging::write(true, Info);
-#endif
+
 					// Compare to current.
 					if (distance < lowestDistance)
 					{
-#ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
-						Logging::buildText(__FUNCTION__, __FILE__, "New distance is lower than ");
-						Logging::buildText(__FUNCTION__, __FILE__, lowestDistance);
-						Logging::write(true, Info);
-#endif
 						// Update lowest distance and output indexes.
 						lowestDistance = distance;
-						first = pointIndex;
-						second = destination-1;
+						p = *dcel.getRefPoint(pointIndex);
+                        q = *dcel.getRefPoint(destination-1);
 						found = true;
 					}
 				}
-#ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
-				else
-				{
-					Logging::buildText(__FUNCTION__, __FILE__, "Edge already checked. Destination ");
-					Logging::buildText(__FUNCTION__, __FILE__, destination);
-					Logging::buildText(__FUNCTION__, __FILE__, " is lower than ");
-					Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
-					Logging::write(true, Info);
-				}
-#endif
 			}
-#ifdef DEBUG_DELAUNAY_FINDTWOCLOSEST
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Edge is not real");
-				Logging::write(true, Info);
-			}
-#endif
+
 			// Get next edge departing from edge.
 			currentEdgeId = this->dcel.getTwin(this->dcel.getPrevious(currentEdgeIndex)-1);
 			currentEdgeIndex = currentEdgeId - 1;
@@ -690,37 +585,21 @@ bool Delaunay::findTwoClosest(int &first, int &second)
 * Description: 	finds the closest point q to input point p. To do so it first
 * 				locates the face that surrounds p and then
 ***************************************************************************/
-bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
-															Point<TYPE> &q,
-															int	&pointIndex,
-															double &dist)
+bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out)
 {
-	bool found;     			// Return value.
 	int	 nodeIndex=0;			// Node index.
-	int	 firstPointIndex=0;		// First point in loop.
-	int	 currentPointIndex=0;	// Current point in loop.
-	int	 currentEdgeIndex=0;	// Current edge in loop.
-	int  i=0;					// Loop counter.
-    queue<int> queue;
-	bool *insertedPoints;		// Array of previously point checked.
-
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-	Logging::buildText(__FUNCTION__, __FILE__, "Searching point ");
-	Logging::buildText(__FUNCTION__, __FILE__, &p);
-	Logging::write(true, Info);
-#endif
-
-	// Initialize variables.
-	pointIndex = 0;
-	insertedPoints = new bool[this->dcel.getNumVertex()];
+    bool *insertedPoints = new bool[this->dcel.getNumVertex()];
 	memset(insertedPoints, 0, sizeof(bool)* this->dcel.getNumVertex());
 
 	// Get node index of the face that surrounds point.
-	found = this->locateNode(p, nodeIndex);
+    bool found = this->locateNode(in, nodeIndex);
 	if (found)
 	{
+        int pointIndex = 0;
+        queue<int> queue;
+
 		// Insert points from node.
-		for (i=0; i<NPOINTS_TRIANGLE ;i++)
+		for (size_t i=0; i<NPOINTS_TRIANGLE ;i++)
 		{
 			pointIndex = this->graph.getRefNode(nodeIndex)->getiPoint(i)-1;
 			if (pointIndex >= 0)
@@ -728,17 +607,6 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 				// Insert current point and set as inserted.
 				insertedPoints[pointIndex] = true;
 				queue.push(pointIndex);
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-				Logging::buildText(__FUNCTION__, __FILE__, "Inserted initial point ");
-				Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
-				Logging::write(true, Info);
-			}
-			else
-			{
-				Logging::buildText(__FUNCTION__, __FILE__, "Skipped initial point ");
-				Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
-				Logging::write(true, Info);
-#endif
 			}
 		}
 
@@ -751,33 +619,21 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 			// Get next point.
 			pointIndex = queue.front();
             queue.pop();
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-			Logging::buildText(__FUNCTION__, __FILE__, "Checking point ");
-			Logging::buildText(__FUNCTION__, __FILE__, pointIndex+1);
-			Logging::write(true, Info);
-#endif
+
 			// Check if point inner to current Voronoi area.
-			if (voronoi.isInnerToArea(p, pointIndex+1))
+			if (voronoi->isInnerToArea(in, pointIndex+1))
 			{
 				found = true;
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-				Logging::buildText(__FUNCTION__, __FILE__, "Is interior.");
-				Logging::write(true, Info);
-#endif
 			}
 			else
 			{
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-				Logging::buildText(__FUNCTION__, __FILE__, "Is exterior.");
-				Logging::write(true, Info);
-#endif
 				// Get edge departing from current point.
-				currentEdgeIndex = this->dcel.getPointEdge(pointIndex)-1;
+                int currentEdgeIndex = this->dcel.getPointEdge(pointIndex)-1;
 				currentEdgeIndex = this->dcel.getPrevious(currentEdgeIndex)-1;
-				currentPointIndex = this->dcel.getOrigin(currentEdgeIndex)-1;
+                int currentPointIndex = this->dcel.getOrigin(currentEdgeIndex)-1;
 
 				// Set end of loop condition.
-				firstPointIndex = currentPointIndex;
+                int firstPointIndex = currentPointIndex;
 
 				do
 				{
@@ -786,32 +642,12 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 					{
 						if (!insertedPoints[currentPointIndex])
 						{
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-							Logging::buildText(__FUNCTION__, __FILE__, "Inserting point ");
-							Logging::buildText(__FUNCTION__, __FILE__, currentPointIndex+1);
-							Logging::write(true, Info);
-#endif
 							// Insert current point and set as inserted.
 							insertedPoints[currentPointIndex] = true;
 							queue.push(currentPointIndex);
 						}
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-						else
-						{
-							Logging::buildText(__FUNCTION__, __FILE__, "Already checked point ");
-							Logging::buildText(__FUNCTION__, __FILE__, currentPointIndex+1);
-							Logging::write(true, Info);
-						}
-#endif
 					}
-#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT
-					else
-					{
-						Logging::buildText(__FUNCTION__, __FILE__, "Current point is not real ");
-						Logging::buildText(__FUNCTION__, __FILE__, currentPointIndex+1);
-						Logging::write(true, Info);
-					}
-#endif
+
 					// Get next edge.
 					currentEdgeIndex = this->dcel.getTwin(currentEdgeIndex)-1;
 					currentEdgeIndex = this->dcel.getPrevious(currentEdgeIndex)-1;
@@ -823,8 +659,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 		if (found)
 		{
 			// Update output data.
-			q = *this->dcel.getRefPoint(pointIndex);
-			dist = q.distance(p);
+			out = *this->dcel.getRefPoint(pointIndex);
 		}
 	}
 
@@ -835,55 +670,6 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 }
 
 
-// PENDING
-//bool Delaunay::findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, double &distance)
-//{
-//	bool 	found;		        // Return value.
-//	int		pointIndex=0;		// Loop counter.
-//	int		id=0;				// Point identifier.
-//	Point<TYPE> currentPoint;	// Current point.
-//	TYPE 	dist;	    		// New distance.
-//
-//	// Create seed.
-//	srand48((int) time(nullptr));
-//
-//	// Set current distance.
-//	distance = FLT_MAX;
-//
-//	// Select closest anchor.
-//	for (pointIndex=0; pointIndex<nAnchors ;pointIndex++)
-//	{
-//		// Generate a random point.
-//		id = rand() % this->getRefDcel()->getNVertex();
-//		currentPoint = *this->getRefDcel()->getRefPoint(id);
-//
-//#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
-//		Logging::buildText(__FUNCTION__, __FILE__, "Checking distance form point id ");
-//		Logging::buildText(__FUNCTION__, __FILE__, id);
-//		Logging::write(true, Info);
-//#endif
-//
-//		// Compute distance to current anchor.
-//		dist = p.distance(currentPoint);
-//		if(dist < distance)
-//		{
-//			// Update output data.
-//			q = currentPoint;
-//			distance = dist;
-//#ifdef DEBUG_DELAUNAY_FIND_CLOSESTPOINT_ANCHORS
-//			Logging::buildText(__FUNCTION__, __FILE__, "Lower distance ");
-//			Logging::buildText(__FUNCTION__, __FILE__, distance);
-//			Logging::write(true, Info);
-//#endif
-//		}
-//	}
-//
-//	// Update return value.
-//	found = true;
-//
-//	return(found);
-//}
-
 /***************************************************************************
 * Name: 	findPath
 * IN:		line		line that determines the path.
@@ -893,7 +679,7 @@ bool Delaunay::findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi,
 * GLOBAL:	NONE
 * Description: 	determines the set of faces where the input line lays on.
 ***************************************************************************/
-bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
+bool Delaunay::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
 {
 	bool found=false;				// Return value.
 	bool computePath=false;			// Both points in external face.
@@ -903,85 +689,52 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 	int	 nFacesToAdd=0;				// Loop upper bound.
 	int	 edgeIndex=0;				// Edge index.
 	vector<int> intersectEdges;		// Set of edges that intersect convex hull.
-	Point<TYPE> origin, dest;		// Line extreme points.
 	vector<int> vFaces;
-
-	// Get origin and destination points.
-	origin = line.getOrigin();
-	dest = line.getDest();
+    Line line(origin, dest);
 
 	// Get extreme point faces.
-	bool isImaginaryFace1=false;
-    bool isImaginaryFace2=false;
-	if (this->findFace(origin, originFace, isImaginaryFace1) &&
-        this->findFace(dest, destinationFace, isImaginaryFace2))
+	if (this->findFace(origin, originFace) && this->findFace(dest, destinationFace))
 	{
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-		Logging::buildText(__FUNCTION__, __FILE__, "Faces are ");
-		Logging::buildText(__FUNCTION__, __FILE__, faceId);
-		Logging::buildText(__FUNCTION__, __FILE__, " and ");
-		Logging::buildText(__FUNCTION__, __FILE__, finalFace);
-		Logging::write(true, Info);
-#endif
 		// Add non external faces to set.
-		if (!isImaginaryFace1)
+		if (originFace != EXTERNAL_FACE)
 		{
             vFaces.push_back(originFace);
 			computePath = true;
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-			Logging::buildText(__FUNCTION__, __FILE__, "Initial face is real.");
-			Logging::write(true, Info);
-#endif
 		}
-		if (!isImaginaryFace2)
+
+        if (destinationFace != EXTERNAL_FACE)
 		{
             vFaces.push_back(destinationFace);
 			computePath = true;
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-			Logging::buildText(__FUNCTION__, __FILE__, "Final face is real.");
-			Logging::write(true, Info);
-#endif
 		}
 
 		// Check if any of the faces is external to convex hull.
 		if (vFaces.size() != 2)
 		{
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-			Logging::buildText(__FUNCTION__, __FILE__, "At least one of the faces is imaginary. Faces ids are ");
-			Logging::buildText(__FUNCTION__, __FILE__, faceId);
-			Logging::buildText(__FUNCTION__, __FILE__, " and ");
-			Logging::buildText(__FUNCTION__, __FILE__, finalFace);
-			Logging::write(true, Info);
-#endif
 			// Check if convex hull has not been computed.
 			if (!this->isConvexHullComputed())
 			{
 				this->convexHull();
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Computing convex hull.");
-				Logging::write(true, Info);
-#endif
 			}
 
 			// Line intersects convex hull.
-			if (this->getConvexHull()->getIntersections(line, intersectEdges))
+            Polygon polygon;
+            getConvexHull(polygon);
+			if (polygon.getIntersections(line, intersectEdges))
 			{
-				computePath = true;
-				//this->getInitialFaces(line, intersectEdges, initialFace, finalFace);
 				nFacesToAdd = intersectEdges.size();
-				for (i=0; i<nFacesToAdd ;i++)
-				{
-					edgeIndex = this->getConvexHullEdges()->at(intersectEdges.at(i))-1;
-                    originFace = this->dcel.getFace(this->dcel.getTwin(edgeIndex) - 1);
-                    vFaces.push_back(originFace);
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-					Logging::buildText(__FUNCTION__, __FILE__, "Changing external face to ");
-					Logging::buildText(__FUNCTION__, __FILE__, faceId);
-					Logging::buildText(__FUNCTION__, __FILE__, " using edge ");
-					Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-					Logging::write(true, Info);
-#endif
-				}
+				vector<int> vEdges;
+                this->getConvexHullEdges(vEdges);
+                if (!vEdges.empty())
+                {
+                    computePath = true;
+                    for (i=0; i<nFacesToAdd ;i++)
+                    {
+                        edgeIndex = vEdges.at(intersectEdges.at(i))-1;
+                        originFace = this->dcel.getFace(this->dcel.getTwin(edgeIndex) - 1);
+                        vFaces.push_back(originFace);
+                    }
+                }
 			}
 		}
 
@@ -991,23 +744,9 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 			// Find path.
 			found = this->getRefDcel()->findPath(vFaces, line, vFacesId);
 		}
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-		else
-		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Both points are external.");
-			Logging::write(true, Info);
-		}
-#endif
 	}
-#ifdef DEBUG_DELAUNAY_FIND_TRIANG_PATH
-	else
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Points faces not found.");
-		Logging::write(true, Error);
-	}
-#endif
 
-	return(found);
+	return found;
 }
 
 ///***************************************************************************
@@ -1158,41 +897,23 @@ bool Delaunay::findPath(Line &line, vector<int> &vFacesId)
 * GLOBAL:	NONE
 * Description: 	allocates the graph to be used in incremental Delaunay.
 ***************************************************************************/
-bool Delaunay::findFace(Point<TYPE> &point, int &faceId, bool &isImaginary)
+bool Delaunay::findFace(Point<TYPE> &origin, int &faceId)
 {
 	int		nodeIndex=0;		// Index of the node assigned to face.
 
-	// Initialize output value
-    isImaginary = false;
-
 	// Locate node.
-	bool found = this->locateNode(point, nodeIndex);
+	bool found = this->locateNode(origin, nodeIndex);
 	if (found)
 	{
 		// Get face in node.
-		faceId = this->graph.getRefNode(nodeIndex)->getFace();
+        faceId = this->graph.getRefNode(nodeIndex)->getFace();
 		if (this->dcel.imaginaryFace(faceId))
 		{
-#ifdef DEBUG_DELAUNAY_FINDFACE
-			Logging::buildText(__FUNCTION__, __FILE__, "Face found is ");
-			Logging::buildText(__FUNCTION__, __FILE__, faceId);
-			Logging::buildText(__FUNCTION__, __FILE__, " that is imaginary. Return 0.");
-			Logging::write(true, Info);
-#endif
-			faceId = EXTERNAL_FACE;
-            isImaginary = true;
+            faceId = EXTERNAL_FACE;
 		}
-#ifdef DEBUG_DELAUNAY_FINDFACE
-		else
-		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Face found is ");
-			Logging::buildText(__FUNCTION__, __FILE__, faceId);
-			Logging::write(true, Info);
-		}
-#endif
 	}
 
-	return(found);
+	return found;
 }
 
 

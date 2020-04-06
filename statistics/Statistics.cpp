@@ -261,7 +261,7 @@ void StatisticsTriangulationData::analyzeTriangulation(StarTriangulation &triang
 	{
 		triangulation.convexHull();
 	}
-	this->nConvexhullEdges = triangulation.getConvexHull()->getNElements();
+	this->nConvexhullEdges = triangulation.getConvexHullLen();
 
 #ifdef STATISTICS_STAR_TRIANGULATION
 	// Get # collinear points and flipped edges.
@@ -507,7 +507,7 @@ void StatisticsDelaunayData::analyzeDelaunay(Delaunay &delaunay)
 	// Compute # edges the convex hull.
 	if (delaunay.convexHull())
 	{
-		this->nConvexhullEdges = delaunay.getConvexHullEdges()->size();
+		this->nConvexhullEdges = delaunay.getConvexHullLen();
 	}
 	else
 	{

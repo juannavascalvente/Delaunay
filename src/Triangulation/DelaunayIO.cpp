@@ -14,6 +14,9 @@ bool DelaunayIO::read(const string &fileName, const string &graphFileName, Delau
 {
     bool	read;		// Return value.
 
+    // Initialize output
+    delaunay.reset();
+
     // Read DCEL data.
     read = DcelReader::read(fileName, false, delaunay.dcel);
     if (read)
@@ -23,10 +26,6 @@ bool DelaunayIO::read(const string &fileName, const string &graphFileName, Delau
 
         // Read graph data.
         read = delaunay.graph.read(graphFileName);
-        if (read)
-        {
-            delaunay.setConvexHullComputed(false);
-        }
     }
 
     return read;

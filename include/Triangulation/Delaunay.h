@@ -1,22 +1,22 @@
-/*
- * Delaunay.h
- *
- *  Created on: Jul 11, 2016
- *      Author: jnavas
- */
-
 #ifndef INCLUDE_DELAUNAY_H_
 #define INCLUDE_DELAUNAY_H_
 
+
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
+#include "ConvexHull.h"
 #include "Dcel.h"
 #include "defines.h"
 #include "Graph.h"
 #include "Polygon.h"
+#include "Triangulation.h"
 #include "Voronoi.h"
 
-//****************************************************************************
-//                           ENUM DEFINITION
-//****************************************************************************
+
+/***********************************************************************************************************************
+* Public declarations
+***********************************************************************************************************************/
 // Algorithm used to compute the Delaunay triangulation.
 enum Algorithm { NONE, INCREMENTAL, FROM_STAR};
 
@@ -24,27 +24,13 @@ enum Algorithm { NONE, INCREMENTAL, FROM_STAR};
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class Delaunay
+class Delaunay: public Triangulation
 {
     /*******************************************************************************************************************
     * Private class members
     *******************************************************************************************************************/
-	Dcel 	dcel;				// Reference to DCEL data.
 	Graph 	graph;				// Graph used in incremental algorithm.
 
-	// Convex hull data.
-	bool 	convexHullComputed;
-	Polygon hull;
-	vector<int> vHullEdges;
-
-	// Type of algorithm executed to compute the Delaunay algorithm.
-	enum Algorithm algorithm;
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-	int nFlips;
-	int nCollinear;
-	int *nNodesChecked;
-	int nNodesCheckedIndex;
-#endif
     /*******************************************************************************************************************
     * Private methods declarations
     *******************************************************************************************************************/
@@ -63,48 +49,42 @@ public:
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Delaunay() : convexHullComputed(false), hull(DEFAUTL_CONVEXHULL_LEN), algorithm(NONE)  {}
-    explicit Delaunay(vector<Point<TYPE>> &vPoints);
+	Delaunay() = default;
+    explicit Delaunay(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints) {};
 	~Delaunay() = default;
 
-    Delaunay(const Delaunay &d)
+    Delaunay(const Delaunay &d) : Triangulation(d)
     {
-        this->dcel = d.dcel;
-        this->convexHullComputed = d.convexHullComputed;
-        this->hull = d.hull;
-        this->vHullEdges = d.vHullEdges;
-        this->algorithm = d.algorithm;
-        this->graph = d.graph;
+        if(this != &d)
+        {
+            this->graph = d.graph;
+        }
     }
 
-	void reset();
-	bool incremental();
-
-	// Get/Set functions.
-	bool isConvexHullComputed() {return(this->convexHullComputed);};
-	void setConvexHullComputed(bool v) {this->convexHullComputed = v;};
-	Graph* getGraph() {return &graph;}
-
-	// Figures functions.
-	bool convexHull();
-	//bool internalToConvexHull(Point<TYPE> &p);
-	Polygon* getConvexHull() {return(&this->hull);};
-	vector<int> *getConvexHullEdges() {return &this->vHullEdges; };
-	bool findTwoClosest(int &first, int &second);
-	bool findFace(Point<TYPE> &point, int &faceId, bool &isImaginary);
-	bool findClosestPoint(const Point<TYPE> &p, Voronoi &voronoi, Point<TYPE> &q,
-															int	&poinIndex,
-															double &dist);
-    //bool findClosestPoint(Point<TYPE> &p, int nAnchors, Point<TYPE> &q, double &distance);
-	bool findPath(Line &line, vector<int> &vFacesId);
+    /*******************************************************************************************************************
+    * Convex hull functions
+    *******************************************************************************************************************/
+	bool isConvexHullComputed() { return !hull.isEmpty(); };
+	bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); };
+	bool getConvexHullEdges(vector<int> &vEdges) { return hull.getConvexHullEdges(vEdges);  };
+	size_t getConvexHullLen() { return hull.size(); }
 
     /*******************************************************************************************************************
     * Getter/Setters
     *******************************************************************************************************************/
+    Graph* getGraph() {return &graph;}
 	Dcel *getRefDcel() { return &this->dcel; };
-	void setAlgorithm(enum Algorithm type) {this->algorithm = type;};
-	enum Algorithm getAlgorithm() {return(this->algorithm);};
 
+    /*******************************************************************************************************************
+    * Triangulation interface functions implementation
+    *******************************************************************************************************************/
+    bool build() override ;
+    bool convexHull() override ;
+    bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
+    bool findFace(Point<TYPE> &origin, int &faceId) override ;
+
+    bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out) override ;
+    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override ;
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS
 	int getCollinear() const {return nCollinear;}
 	int getFlips() const {return nFlips;}
