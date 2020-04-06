@@ -41,7 +41,7 @@ protected:
     virtual CommandResult* createResult()
     {
         vector<Displayable*> vDisplayable(0);
-        return new CommandResult(getSuccess(), *in.getStoreService()->getStatus(), in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     };
 
 public:
@@ -248,9 +248,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = Status(false, true, false, false, false, false);
-
         vector<Displayable*> vDisplayable(0);
         if (getSuccess())
         {
@@ -258,7 +255,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -357,9 +354,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = Status(false, true, false, false, false, false);
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -368,7 +362,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createPointsSet(vPoints));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -405,8 +399,8 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay have not been already created
-        return (!in.getStoreService()->getStatus()->isTriangulation() &&
-                !in.getStoreService()->getStatus()->isDelaunay());
+        return (!in.getStoreService()->isTriangulation() &&
+                !in.getStoreService()->isDelaunay());
     };
 
     /**
@@ -441,9 +435,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = Status(false, true, true, false, false, false);
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -452,7 +443,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -489,7 +480,7 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay have not been already created
-        return !in.getStoreService()->getStatus()->isDelaunay();
+        return !in.getStoreService()->isDelaunay();
     };
 
     /**
@@ -527,9 +518,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = Status(false, true, true, true, false, false);
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -538,7 +526,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -581,8 +569,8 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay or have been already created
-        return (in.getStoreService()->getStatus()->isTriangulation() ||
-                in.getStoreService()->getStatus()->isDelaunay());
+        return (in.getStoreService()->isTriangulation() ||
+                in.getStoreService()->isDelaunay());
     };
 
 
@@ -595,12 +583,9 @@ public:
      */
     CommandResult * runCommand() override
     {
-        // Get reference to status
-        Status *status = in.getStoreService()->getStatus();
-
         // Computing convex hull
         bool isRunSuccess;
-        if (status->isDelaunay())
+        if (in.getStoreService()->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             isRunSuccess = delaunay->convexHull();
@@ -625,9 +610,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -638,7 +620,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -676,7 +658,7 @@ public:
     bool isRunnable() override
     {
         // Delaunay must be created to create Voronoi diagram
-        return in.getStoreService()->getStatus()->isDelaunay();
+        return in.getStoreService()->isDelaunay();
     };
 
 
@@ -718,9 +700,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status
-        Status status = Status(false, true, true, true, true, false);
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -730,7 +709,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getVoronoi()->getRefDcel()));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -769,8 +748,7 @@ public:
     bool isRunnable() override
     {
         // Delaunay and Voronoi must exist
-        Status *status = in.getStoreService()->getStatus();
-        return status->isDelaunay() && status->isVoronoi();
+        return in.getStoreService()->isDelaunay() && in.getStoreService()->isVoronoi();
     }
 
 
@@ -832,9 +810,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -845,7 +820,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createPolyLine(vLines));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -889,9 +864,7 @@ public:
     bool isRunnable() override
     {
         // Delaunay and Voronoi must exist
-        Status *status = in.getStoreService()->getStatus();
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isDelaunay();
+        return in.getStoreService()->isDelaunay();
     }
 
 
@@ -950,9 +923,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayables;
         if (getSuccess())
@@ -973,7 +943,7 @@ public:
             vDisplayables.push_back(DisplayableFactory::createPolygonSet(vPolygons));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayables);
+        return new CommandResult(getSuccess(), vDisplayables);
     }
 };
 
@@ -1018,8 +988,7 @@ public:
     {
         // Delaunay and Voronoi must exist
         // TODO https://github.com/juannavascalvente/Delaunay/issues/10
-        Status *status = in.getStoreService()->getStatus();
-        return status->isVoronoi();
+        return in.getStoreService()->isVoronoi();
     }
 
 
@@ -1093,9 +1062,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -1116,7 +1082,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createPolygon(vPoints));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -1160,8 +1126,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        Status *status = in.getStoreService()->getStatus();
-        return (status->isDelaunay() && status->isVoronoi()) || status->isTriangulation();
+        return (in.getStoreService()->isDelaunay() && in.getStoreService()->isVoronoi()) || in.getStoreService()->isTriangulation();
     }
 
 
@@ -1184,8 +1149,7 @@ public:
 
         // Check if Delaunay triangulation computed.
         bool isRunSuccess;
-        Status *status = in.getStoreService()->getStatus();
-        if (status->isDelaunay() && status->isVoronoi())
+        if (in.getStoreService()->isDelaunay() && in.getStoreService()->isVoronoi())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             Voronoi *voronoi = in.getStoreService()->getVoronoi();
@@ -1217,16 +1181,13 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
             // Add triangulation
             Displayable *dcel;
-            if (status.isDelaunay() && status.isVoronoi())
+            if (in.getStoreService()->isDelaunay() && in.getStoreService()->isVoronoi())
             {
                 Delaunay *delaunay = in.getStoreService()->getDelaunay();
                 dcel = DisplayableFactory::createDcel(delaunay->getRefDcel());
@@ -1244,7 +1205,7 @@ public:
             vDisplayable.push_back(dispPoints);
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -1288,9 +1249,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        Status *status = in.getStoreService()->getStatus();
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        return status->isDelaunay();
+        return in.getStoreService()->isDelaunay();
     }
 
 
@@ -1310,10 +1269,9 @@ public:
         PointFactory::readFromConfig(point);
 
         // Find face.
-        Status *status = in.getStoreService()->getStatus();
         bool isRunSuccess=false;
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        if (status->isDelaunay())
+        if (in.getStoreService()->isDelaunay())
         {
             isRunSuccess = delaunay->findFace(point, faceId);
         }
@@ -1352,9 +1310,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -1375,7 +1330,7 @@ public:
             vDisplayable.push_back(dispFace);
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -1418,8 +1373,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulation();
+        return in.getStoreService()->isTriangulation() || in.getStoreService()->isDelaunay();
     }
 
 
@@ -1435,8 +1389,7 @@ public:
         Point<TYPE> p;
         Point<TYPE> q;
         bool isRunSuccess;
-        Status *status = in.getStoreService()->getStatus();
-        if (status->isDelaunay())
+        if (in.getStoreService()->isDelaunay())
         {
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             isRunSuccess = delaunay->findTwoClosest(p, q);
@@ -1467,16 +1420,13 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
             // Add triangulation
             Displayable *dcel;
-            if (status.isDelaunay())
+            if (in.getStoreService()->isDelaunay())
             {
                 Delaunay *delaunay = in.getStoreService()->getDelaunay();
                 dcel = DisplayableFactory::createDcel(delaunay->getRefDcel());
@@ -1494,7 +1444,7 @@ public:
             vDisplayable.push_back(dispPoints);
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -1532,8 +1482,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulation();
+        return in.getStoreService()->isTriangulation() || in.getStoreService()->isDelaunay();
     }
 
     /**
@@ -1557,15 +1506,12 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable *> vDisplayable;
         if (getSuccess())
         {
             Dcel *dcel;
-            if (status.isDelaunay())
+            if (in.getStoreService()->isDelaunay())
             {
                 dcel = in.getStoreService()->getDelaunay()->getRefDcel();
             }
@@ -1577,7 +1523,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getConfigService()->getMinLengthEdge()));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -1620,8 +1566,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulation();
+        return in.getStoreService()->isTriangulation() || in.getStoreService()->isDelaunay();
     }
 
     /**
@@ -1667,9 +1612,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -1682,7 +1624,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createCircleSet(vCircles));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -1725,8 +1667,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulation();
+        return in.getStoreService()->isTriangulation() || in.getStoreService()->isDelaunay();
     }
 
     /**
@@ -1777,9 +1718,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -1792,7 +1730,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createCircleSet(vCircles));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -1924,8 +1862,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        Status *status = in.getStoreService()->getStatus();
-        return status->isTriangulation();
+        return in.getStoreService()->isTriangulation();
     }
 
     /**
@@ -1969,10 +1906,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -2022,7 +1956,7 @@ public:
         setIsSuccess(true);
 
         // Reset
-        in.getStoreService()->getStatus()->reset();
+        in.getStoreService()->reset();
 
         // Build result
         return createResult();
@@ -2035,8 +1969,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        Status status = Status(true, false, false, false, false, false);
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -2099,8 +2032,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        Status status = Status(false, true, false, false, false, false);
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -2163,8 +2095,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        Status status = Status(false, true, false, false, false, false);
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -2208,8 +2139,7 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = Status(false, true, true, true, false, false);
+        // Set in.getStoreService() to update
 
         // Add items to display
         vector<Displayable*> vDisplayable;
@@ -2219,7 +2149,7 @@ public:
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
         }
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayable);
+        return new CommandResult(getSuccess(), vDisplayable);
     }
 };
 
@@ -2275,9 +2205,6 @@ public:
 //     */
 //    CommandResult *createResult() override
 //    {
-//        // Set status
-//        Status status = Status(false, true, true, true, true, false);
-//
 //        // Add items to display
 //        vector<Displayable*> vDisplayableIn;
 //        if (getSuccess())
@@ -2290,7 +2217,7 @@ public:
 //            vDisplayableIn.push_back(DisplayableFactory::createDcel(voronoi->getRefDcel()));
 //        }
 //
-//        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayableIn);
+//        return new CommandResult(getSuccess(), vDisplayableIn);
 //    }
 //};
 
@@ -2331,13 +2258,10 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set status to update
-        Status status = *in.getStoreService()->getStatus();
-
         // Add items to display
         vector<Displayable*> vDisplayableIn;
 
-        return new CommandResult(getSuccess(), status, in.getStoreService(), vDisplayableIn);
+        return new CommandResult(getSuccess(), vDisplayableIn);
     }
 
     CmdParamIn *getInput() { return &in; }

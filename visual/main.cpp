@@ -5,8 +5,6 @@
 #include "StoreDataRepository.h"
 #include "Tester.h"
 
-#include <unistd.h>
-#include <ctime>
 #include <cstring>
 #include <iostream>
 

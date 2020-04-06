@@ -13,7 +13,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "ConfigService.h"
-#include "DisplayManager.h"
+#include "Visual/Display/DisplayManager.h"
 #include "Logging.h"
 #include "StoreService.h"
 
@@ -45,7 +45,8 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn, ConfigService *configService);
+    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn,
+            ConfigService *configServiceIn);
 	~Process();
 
     /**

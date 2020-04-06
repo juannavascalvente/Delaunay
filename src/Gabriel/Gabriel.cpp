@@ -126,7 +126,8 @@ bool Gabriel::build()
 #endif
     }
 
-    return true;
+    isBuilt = true;
+    return isBuilt;
 }
 
 
@@ -140,13 +141,15 @@ bool Gabriel::build()
 ***************************************************************************/
 void Gabriel::validateEdges(int edgeIndex)
 {
-#ifdef DEBUG_GABRIEL_VALIDATE_EDGES
-	Logging::buildText(__FUNCTION__, __FILE__, "Setting edge ");
-	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-	Logging::buildText(__FUNCTION__, __FILE__, " and its twin ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getTwin(edgeIndex)-1);
-	Logging::write(true, Info);
-#endif
 	this->set(edgeIndex);
 	this->set(this->dcel.getTwin(edgeIndex)-1);
+}
+
+
+void Gabriel::reset()
+{
+    dcel.reset();
+    voronoi.reset();
+    vValidEdges.clear();
+    isBuilt = false;
 }

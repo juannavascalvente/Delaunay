@@ -46,10 +46,18 @@ public:
     void destroy();
 
     /*******************************************************************************************************************
+    * Checkers
+    *******************************************************************************************************************/
+    bool isSetCreated() { return !getPoints().empty(); };
+    bool isTriangulation() { return getStarTriang() && getStarTriang()->isValid(); };
+    bool isDelaunay() { return getDelaunay() && getDelaunay()->isValid(); };
+    bool isVoronoi() { return getVoronoi() && getVoronoi()->isValid(); };
+    bool isGabriel() { return getGabriel() && getGabriel()->isValid(); };
+
+    /*******************************************************************************************************************
     * Getters
     *******************************************************************************************************************/
     vector<Point<TYPE>>      &getPoints()    { return *repository->getData()->getPoints(); };
-    Status      *getStatus()    { return repository->getData()->getStatus(); };
     Delaunay    *getDelaunay()  { return repository->getData()->getDelaunay(); };
     Voronoi     *getVoronoi()   { return repository->getData()->getVoronoi(); };
     Gabriel     *getGabriel()   { return repository->getData()->getGabriel(); };

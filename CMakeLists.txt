@@ -38,8 +38,9 @@ file(GLOB DELAUNAY_VISUAL_HEADER_FILES
         ${BUILD_PATH}/test
         ${BUILD_PATH}/visual
         ${BUILD_PATH}/visual/Commands
-        ${BUILD_PATH}/visual/Display
-        ${BUILD_PATH}/visual/Display/Displayable
+        ${BUILD_PATH}/include/Visual
+        ${BUILD_PATH}/include/Visual/Display
+        ${BUILD_PATH}/include/visual/Display/Displayable
         )
 
 file(GLOB DELAUNAY_VISUAL_SRC_FILES
@@ -47,8 +48,9 @@ file(GLOB DELAUNAY_VISUAL_SRC_FILES
         ${BUILD_PATH}/test/*.cpp
         ${BUILD_PATH}/visual/*.cpp
         ${BUILD_PATH}/visual/Commands/*.cpp
-        ${BUILD_PATH}/visual/Display/*.cpp
-        ${BUILD_PATH}/visual/Display/Displayable/*.cpp
+        ${BUILD_PATH}/src/Visual/*.cpp
+        ${BUILD_PATH}/src/Visual/Display/*.cpp
+        ${BUILD_PATH}/src/Visual/Display/Displayable/*.cpp
         )
 
 ################################################ Source code ##########################################################
@@ -61,7 +63,6 @@ file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include/Gabriel
         ${BUILD_PATH}/include/Store
         ${BUILD_PATH}/include/Triangulation
-        ${BUILD_PATH}/include/Visual
         ${BUILD_PATH}/include/Voronoi
         )
 
@@ -74,7 +75,6 @@ file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/src/Gabriel/*.cpp
         ${BUILD_PATH}/src/Store/*.cpp
         ${BUILD_PATH}/src/Triangulation/*.cpp
-        ${BUILD_PATH}/src/Visual/*.cpp
         ${BUILD_PATH}/src/Voronoi/*.cpp
         )
 

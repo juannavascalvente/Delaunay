@@ -15,13 +15,6 @@
 
 
 /***********************************************************************************************************************
-* Public declarations
-***********************************************************************************************************************/
-// Algorithm used to compute the Delaunay triangulation.
-enum Algorithm { NONE, INCREMENTAL, FROM_STAR};
-
-
-/***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
 class Delaunay: public Triangulation
@@ -30,6 +23,7 @@ class Delaunay: public Triangulation
     * Private class members
     *******************************************************************************************************************/
 	Graph 	graph;				// Graph used in incremental algorithm.
+    bool    isBuilt;
 
     /*******************************************************************************************************************
     * Private methods declarations
@@ -49,15 +43,15 @@ public:
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Delaunay() = default;
-    explicit Delaunay(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints) {};
+	Delaunay() : isBuilt(false) {};
+    explicit Delaunay(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints), isBuilt(false)  {};
 	~Delaunay() = default;
-
     Delaunay(const Delaunay &d) : Triangulation(d)
     {
         if(this != &d)
         {
             this->graph = d.graph;
+            this->isBuilt = d.isBuilt;
         }
     }
 
@@ -74,6 +68,7 @@ public:
     *******************************************************************************************************************/
     Graph* getGraph() {return &graph;}
 	Dcel *getRefDcel() { return &this->dcel; };
+    bool isValid() const { return isBuilt; };
 
     /*******************************************************************************************************************
     * Triangulation interface functions implementation
