@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 #ifndef DELAUNAY_STORESERVICE_H
 #define DELAUNAY_STORESERVICE_H
 
@@ -9,6 +5,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "Config.h"
 #include "Dcel.h"
 #include "Delaunay.h"
 #include "Gabriel.h"
@@ -44,6 +41,15 @@ public:
      * @brief   Deletes repository
      */
     void destroy();
+
+    /*******************************************************************************************************************
+    * Config
+    *******************************************************************************************************************/
+    size_t getNumPoints() { return Config::getNPoints(); };
+    size_t getNumClusters() { return Config::getNClusters(); };
+    size_t getRadius() { return Config::getRadius(); };
+    size_t getMinLengthEdge() { return Config::getMinLengthEdge(); };
+
 
     /*******************************************************************************************************************
     * Checkers

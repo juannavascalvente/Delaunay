@@ -5,7 +5,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "DisplayService.h"
-#include "Visual/Display/Displayable/Displayable.h"
+#include "Displayable/Displayable.h"
 #include "Menu.h"
 
 #include <vector>

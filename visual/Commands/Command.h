@@ -49,10 +49,8 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    Command() : isSuccess(false), in(nullptr, nullptr), result(nullptr) {};
-    explicit Command(StoreService *storeServiceIn, ConfigService *configService) : isSuccess(false),
-                                                                                   in(storeServiceIn, configService),
-                                                                                   result(nullptr) {};
+    Command() : isSuccess(false), in(nullptr), result(nullptr) {};
+    explicit Command(StoreService *storeServiceIn) : isSuccess(false), in(storeServiceIn), result(nullptr) {};
     virtual ~Command() { delete result; };
 
 
@@ -99,7 +97,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandNull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandNull(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -121,7 +119,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandFail(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandFail(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -135,7 +133,7 @@ public:
      * @fn      printRunnableMsg
      * @brief   Fail command cannot be executed
      */
-    void printRunnableMsg()
+    void printRunnableMsg() override
     {
         cout << "Wrong command has been created and cannot be executed" << endl;
     };
@@ -152,7 +150,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandReadConfig(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandReadConfig(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      runCommand
@@ -188,7 +186,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandGenerateRandom(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandGenerateRandom(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -200,7 +198,7 @@ public:
     bool isRunnable() override
     {
         // Number of points higher than 0
-        return (in.getConfigService()->getNumPoints() > 0);
+        return (in.getStoreService()->getNumPoints() > 0);
     };
 
     /**
@@ -210,7 +208,7 @@ public:
     void printRunnableMsg() override
     {
         // Check number of points
-        if (in.getConfigService()->getNumPoints() == 0)
+        if (in.getStoreService()->getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -225,7 +223,7 @@ public:
      */
     CommandResult * runCommand() override
     {
-        size_t szNumPoints = in.getConfigService()->getNumPoints();
+        size_t szNumPoints = in.getStoreService()->getNumPoints();
 
         // Reset store data
         in.getStoreService()->reset();
@@ -275,7 +273,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateCluster(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandGenerateCluster(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -290,9 +288,9 @@ public:
     bool isRunnable() override
     {
         // All values are higher than 0
-        return (in.getConfigService()->getNumPoints() > 0.0) &&
-                (in.getConfigService()->getNumClusters() > 0) &&
-                (in.getConfigService()->getNumPoints() > 0);
+        return (in.getStoreService()->getNumPoints() > 0.0) &&
+                (in.getStoreService()->getNumClusters() > 0) &&
+                (in.getStoreService()->getNumPoints() > 0);
     };
 
     /**
@@ -305,19 +303,19 @@ public:
         in.getStoreService()->reset();
 
         // Check radius
-        if (in.getConfigService()->getNumPoints() <= 0.0)
+        if (in.getStoreService()->getNumPoints() <= 0.0)
         {
             cout << "One of the values is not higher than 0" << endl;
         }
 
         // Check number of clusters
-        if (in.getConfigService()->getNumClusters() == 0)
+        if (in.getStoreService()->getNumClusters() == 0)
         {
             cout << "Number of cluster to generate is zero" << endl;
         }
 
         // Check number of points
-        if (in.getConfigService()->getNumPoints() == 0)
+        if (in.getStoreService()->getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -332,9 +330,9 @@ public:
      */
     CommandResult * runCommand() override
     {
-        size_t szNumPoints = in.getConfigService()->getNumPoints();
-        size_t szNumClusters = in.getConfigService()->getNumClusters();
-        TYPE radius = in.getConfigService()->getRadius();
+        size_t szNumPoints = in.getStoreService()->getNumPoints();
+        size_t szNumClusters = in.getStoreService()->getNumClusters();
+        TYPE radius = in.getStoreService()->getRadius();
 
         // Run command
         bool isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, vPoints);
@@ -377,7 +375,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandStarTriangulation(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandStarTriangulation(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn       printRunnableMsg
@@ -458,7 +456,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandDelaunay(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandDelaunay(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
     /**
      * @fn       printRunnableMsg
@@ -546,7 +544,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandConvexHull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandConvexHull(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -635,7 +633,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandVoronoi(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -725,7 +723,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandGabriel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandGabriel(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -841,7 +839,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTriangulationPath(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandTriangulationPath(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -964,7 +962,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandVoronoiPath(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandVoronoiPath(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1105,7 +1103,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandClosestPoint(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandClosestPoint(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1228,7 +1226,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFindFace(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandFindFace(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1352,7 +1350,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTwoClosest(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandTwoClosest(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1461,7 +1459,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFilterEdges(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandFilterEdges(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1522,7 +1520,7 @@ public:
                 dcel = in.getStoreService()->getStarTriang()->getDcel();
             }
 
-            vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getConfigService()->getMinLengthEdge()));
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getStoreService()->getMinLengthEdge()));
         }
 
         return new CommandResult(getSuccess(), vDisplayable);
@@ -1545,7 +1543,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandCircumcentres(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandCircumcentres(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1646,7 +1644,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandEdgeCircle(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandEdgeCircle(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1838,7 +1836,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandDcelInfo(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService)
+    explicit CommandDcelInfo(StoreService *storeServiceIn) : Command(storeServiceIn)
     {
         dcel = in.getStoreService()->getDelaunay()->getRefDcel();
     };
@@ -1922,7 +1920,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit  CommandVoronoiInfo(StoreService *storeServiceIn, ConfigService *configService) : CommandDcelInfo(storeServiceIn, configService)
+    explicit  CommandVoronoiInfo(StoreService *storeServiceIn) : CommandDcelInfo(storeServiceIn)
     {
         dcel = storeServiceIn->getVoronoi()->getRefDcel();
     };
@@ -1943,7 +1941,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandClear(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandClear(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1991,7 +1989,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadPoints(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandReadPoints(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -2054,7 +2052,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadPointsDcel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandReadPointsDcel(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -2111,7 +2109,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadDelaunay(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandReadDelaunay(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -2170,7 +2168,7 @@ public:
 //    /*******************************************************************************************************************
 //    * Public class methods
 //    *******************************************************************************************************************/
-//    explicit CommandReadVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+//    explicit CommandReadVoronoi(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 //
 //
 //    /**
@@ -2233,7 +2231,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFile(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandWriteFile(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -2279,7 +2277,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileDcel(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandWriteFileDcel(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run
@@ -2309,7 +2307,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileDelaunay(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandWriteFileDelaunay(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run
@@ -2338,7 +2336,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileVoronoi(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandWriteFileVoronoi(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run
@@ -2367,7 +2365,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileGabriel(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandWriteFileGabriel(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run

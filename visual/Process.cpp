@@ -17,7 +17,7 @@ Process         *Process::instance = nullptr;
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Process::Process(int argc, char **argv, bool printData, StoreService *storeServiceIn, ConfigService *configServiceIn)
+Process::Process(int argc, char **argv, bool printData, StoreService *storeServiceIn)
 {
 	string 	fileName;			// Configuration file name.
 
@@ -27,7 +27,6 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
 
 	// Allocate resources
 	this->log = new Logging("log.txt", printData);
-    configService = configServiceIn;
     storeService = storeServiceIn;
 
     // Initialize display
@@ -84,7 +83,7 @@ void Process::execute()
     }
 
     // Create command
-    Command *cmd = CommandFactory::create(option, storeService, configService);
+    Command *cmd = CommandFactory::create(option, storeService);
 
     // Run command
     cmd->run();
@@ -120,5 +119,4 @@ void Process::deallocateResources() const
     delete log;
     delete dispManager;
     delete storeService;
-    delete configService;
 }

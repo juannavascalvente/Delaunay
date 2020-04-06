@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 #ifndef DELAUNAY_COMMANDPARAMIN_H
 #define DELAUNAY_COMMANDPARAMIN_H
 
@@ -10,7 +6,6 @@
 * Includes
 ***********************************************************************************************************************/
 #include "defines.h"
-#include "ConfigService.h"
 #include "StoreService.h"
 
 #include <cstddef>
@@ -21,13 +16,21 @@
 ***********************************************************************************************************************/
 class CmdParamIn
 {
-    ConfigService *cfgService;
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
     StoreService *storeService;
-public:
-    explicit CmdParamIn(StoreService *storeServiceIn, ConfigService *cfgServiceIn) : cfgService(cfgServiceIn),
-                                                                                     storeService(storeServiceIn) {};
 
-    ConfigService *getConfigService() const { return cfgService; }
+public:
+
+    /*******************************************************************************************************************
+    * Public methods
+    *******************************************************************************************************************/
+    explicit CmdParamIn(StoreService *storeServiceIn) : storeService(storeServiceIn) {};
+
+    /*******************************************************************************************************************
+    * Getters
+    *******************************************************************************************************************/
     StoreService *getStoreService() const { return storeService; }
 };
 
