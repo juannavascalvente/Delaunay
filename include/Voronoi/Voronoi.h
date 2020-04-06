@@ -18,6 +18,7 @@ class Voronoi
     *******************************************************************************************************************/
 	Dcel 	triangulation;		// Reference to triangulation DCEL data.
 	Dcel 	dcel;				// Reference to Voronoi DCEL data.
+	bool    isBuilt;
 
     /*******************************************************************************************************************
     * Private methods declarations
@@ -34,12 +35,13 @@ public:
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Voronoi() = default;
-	explicit Voronoi(Dcel &t);
+	Voronoi() : isBuilt(false) {};
+	explicit Voronoi(Dcel &t) : triangulation(t), isBuilt(false) {};
 	~Voronoi() = default;
 
     Voronoi(const Voronoi &d)
     {
+        this->isBuilt = d.isBuilt;
         this->dcel = d.dcel;
         this->triangulation = d.triangulation;
     }
@@ -73,6 +75,7 @@ public:
     /*******************************************************************************************************************
     * Getters
     *******************************************************************************************************************/
+    bool isValid() const { return isBuilt; };
     inline Dcel* getRefDcel() { return(&this->dcel); };
 
     /**

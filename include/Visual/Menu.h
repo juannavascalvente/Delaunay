@@ -2,8 +2,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "MenuOption.h"
-#include "Status.h"
-
+#include "StoreService.h"
 
 /***********************************************************************************************************************
 * Class declaration
@@ -22,20 +21,23 @@ class Menu
 	int	subMenuRead;
 	int	subMenuGenerate;
 
+    StoreService service;
+
+    int createGenerateMenu();
+    int createReadMenu();
+
 public:
 
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Menu();
+	explicit Menu(StoreService &s);
 
     /**
      * @fn      updateMenu
      * @brief   Updates menu entries and updates status
-     *
-     * @param   status  (IN/OUT)    Status data
      */
-    void updateMenu(Status *status);
+    void updateMenu();
 
     /**
      * @fn      getMenuOption

@@ -19,6 +19,15 @@ void StoreService::destroy()
 
 void StoreService::reset()
 {
+    // Reset points set
+    getPoints().clear();
+
+    // Reset Star triangulation
+    if (getStarTriang())
+    {
+        getStarTriang()->reset();
+    }
+
     // Reset Delaunay
     if (getDelaunay())
     {
@@ -29,5 +38,11 @@ void StoreService::reset()
     if (getVoronoi())
     {
         getVoronoi()->reset();
+    }
+
+    // Reset Gabriel
+    if (getGabriel())
+    {
+        getGabriel()->reset();
     }
 }

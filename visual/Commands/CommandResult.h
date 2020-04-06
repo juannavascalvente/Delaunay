@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "Dcel.h"
 #include "defines.h"
-#include "DisplayableFactory.h"
+#include "Visual/Display/Displayable/DisplayableFactory.h"
 #include "Point.h"
 #include "StoreService.h"
 
@@ -22,28 +22,10 @@ class CommandResult
 {
 protected:
     bool isSuccess;
-    Status status;
-    StoreService *storeService;
     vector<Displayable*> vDisplayable;
 
 public:
-    CommandResult(bool isSuccessIn, Status &statusIn, StoreService *storeServiceIn, vector<Displayable*> &vDisplayableIn) :
-                                                                                        isSuccess(isSuccessIn),
-                                                                                        status(statusIn),
-                                                                                        storeService(storeServiceIn),
-                                                                                        vDisplayable(vDisplayableIn) {};
-
-    /**
-     * @fn      updateStatus
-     * @brief   Updates status based on result execution
-     */
-    void updateStatus()
-    {
-        if (wasSuccess())
-        {
-            storeService->getStatus()->set(status);
-        }
-    };
+    CommandResult(bool isSuccessIn, vector<Displayable*> &vDisplayableIn) : isSuccess(isSuccessIn), vDisplayable(vDisplayableIn) {};
 
     /**
      * @fn      getItems

@@ -39,23 +39,11 @@
 ***********************************************************************************************************************/
 bool Delaunay::build()
 {
-	bool 	built=true;		        // Return value.
-	bool	inserted;	            // Point inserted flag.
-	int  	pointIndex=0;	        // Points loop counter.
-	int	 	nPoints=0;		        // Loop upper bound.
-	int  	highestPointIndex=0;	// Index of the highest point.
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-	this->nFlips = 0;
-	this->nCollinear = 0;
-	this->nNodesChecked = new int[this->dcel.getNVertex()];
-	this->nNodesChecked[0] = 1;
-#endif
-
     // If no graph allocated then create a new graph.
     this->initGraph();
 
     // Set highest point at first position of the DCEL vertex array.
-    highestPointIndex = this->dcel.getIndexHighest(&Point<TYPE>::lexicographicHigher);
+    int highestPointIndex = this->dcel.getIndexHighest(&Point<TYPE>::lexicographicHigher);
     this->dcel.swapVertex(0, highestPointIndex);
 
     // Insert root node.
@@ -76,37 +64,22 @@ bool Delaunay::build()
     // Insert first internal face and external face.
     this->dcel.addFace(4);
     this->dcel.addFace(1);
-#ifdef DEBUG_DELAUNAY_INCREMENTAL
-    Logging::buildText(__FUNCTION__, __FILE__, "Starting triangulation. Set length is: ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getNVertex());
-			Logging::write(true, Info);
-#endif
+
     // Reset convex hull flag.
     this->hull.reset();
 
     // Loop all other points.
-    pointIndex=1;
-    nPoints = this->dcel.getNumVertex();
-    inserted = built;
-    while ((pointIndex<nPoints) && (inserted))
+    int pointIndex=1;
+    int nPoints = this->dcel.getNumVertex();
+    isBuilt = true;
+    while ((pointIndex < nPoints) && isBuilt)
     {
-#ifdef DEBUG_DELAUNAY_INCREMENTAL
-        Logging::buildText(__FUNCTION__, __FILE__, "Inserting point ");
-				Logging::buildText(__FUNCTION__, __FILE__, pointIndex);
-				Logging::write(true, Info);
-#endif
         // Insert new point into triangle where it is located.
-        inserted = this->addPointToDelaunay(pointIndex);
-        built = inserted;
+        isBuilt = this->addPointToDelaunay(pointIndex);
         pointIndex++;
     }
 
-#ifdef DEBUG_DELAUNAY_INCREMENTAL
-    Logging::buildText(__FUNCTION__, __FILE__, "Delaunay triangulation computed");
-			Logging::write(true, Info);
-#endif
-
-   	return built;
+   	return isBuilt;
 }
 
 

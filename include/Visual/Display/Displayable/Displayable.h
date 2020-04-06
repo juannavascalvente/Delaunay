@@ -12,7 +12,7 @@
 #include "Dcel.h"
 #include "DisplayableConfig.h"
 #include "DisplayableConfigGenerator.h"
-#include "DisplayService.h"
+#include "Visual/Display/DisplayService.h"
 #include "Point.h"
 #include "Polygon.h"
 #include "Text.h"

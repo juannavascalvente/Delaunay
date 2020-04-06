@@ -19,7 +19,7 @@ class StarTriangulation : public Triangulation
     * Class members
     *******************************************************************************************************************/
 	int		nPending;				// # pending edges.
-
+    bool    isBuilt;
 #ifdef STATISTICS_STAR_TRIANGULATION
 	int 	nCollinear;				// # collinear points.
 	int		nFlips;					// # flipped edges.
@@ -34,13 +34,14 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    explicit StarTriangulation(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints), nPending(0) {};
+    explicit StarTriangulation(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints), nPending(0), isBuilt(false) {};
 	~StarTriangulation() = default;
     StarTriangulation(const StarTriangulation &t) : Triangulation(t)
     {
         if (this != &t)
         {
             nPending = t.nPending;
+            isBuilt = t.isBuilt;
         }
     }
 
@@ -59,6 +60,7 @@ public:
     * Getters/Setters
     *******************************************************************************************************************/
     Dcel* getDcel() {return &dcel;}
+    bool isValid() const { return isBuilt; };
 
     /*******************************************************************************************************************
     * Convex hull functions

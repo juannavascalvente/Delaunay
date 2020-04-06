@@ -29,16 +29,10 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Voronoi::Voronoi(Dcel &t)
-{
-	// Initialize attributes.
-	this->triangulation = t;
-}
-
-
 void Voronoi::reset()
 {
-    this->dcel.reset();
+    dcel.reset();
+	isBuilt = false;
 }
 
 
@@ -54,15 +48,10 @@ void Voronoi::reset()
 ***************************************************************************/
 bool Voronoi::build(bool isIncremental)
 {
-	bool built=true;		// Return value.
 	int	 pointIndex=0;		// Loop counter.
 
     this->dcel.addFace(INVALID);
 
-#ifdef DEBUG_VORONOI_BUILD
-    Logging::buildText(__FUNCTION__, __FILE__, "Start computing Voronoi diagram");
-		Logging::write(true, Info);
-#endif
     // Compute Voronoi circumcentres for every non-imaginary face.
     this->computeCircumcentres(isIncremental);
 
@@ -72,12 +61,8 @@ bool Voronoi::build(bool isIncremental)
         this->buildArea(pointIndex);
     }
 
-#ifdef DEBUG_VORONOI_BUILD
-    Logging::buildText(__FUNCTION__, __FILE__, "Voronoi diagram computed");
-		Logging::write(true, Info);
-#endif
-
-	return built;
+	isBuilt = true;
+	return isBuilt;
 }
 
 

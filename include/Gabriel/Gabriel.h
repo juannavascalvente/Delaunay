@@ -22,7 +22,7 @@ class Gabriel
     vector<bool> vValidEdges;	// Valid edge array.
 	Dcel 	dcel;				// DCELto check.
 	Voronoi voronoi;			// Voronoi graph associated to DCEL.
-
+    bool    isBuilt;
 
     /*******************************************************************************************************************
     * Private methods
@@ -43,7 +43,7 @@ public:
     /*******************************************************************************************************************
      * Public methods declaration
      *******************************************************************************************************************/
-	Gabriel(Dcel &dcelIn, Voronoi &voronoiIn) : dcel(dcelIn), voronoi(voronoiIn), vValidEdges(dcelIn.getNumEdges()) {};
+	Gabriel(Dcel &dcelIn, Voronoi &voronoiIn) : dcel(dcelIn), voronoi(voronoiIn), vValidEdges(dcelIn.getNumEdges()), isBuilt(false) {};
 	~Gabriel() = default;
 
     Gabriel(const Gabriel &d)
@@ -53,15 +53,24 @@ public:
             this->dcel = d.dcel;
             this->voronoi = d.voronoi;
             this->vValidEdges = d.vValidEdges;
+            this->isBuilt = d.isBuilt;
         }
     }
 
 	bool isSet(int index) { return(this->vValidEdges.at(index)); };
     bool build();
 
+    /**
+     * @fn      reset
+     * @brief   Resets data
+     */
+    void reset();
+
+
     /*******************************************************************************************************************
     * Getters/Setters
     *******************************************************************************************************************/
+    bool isValid() const { return isBuilt; };
 	int  getSize() const { return this->vValidEdges.size(); };
 	Dcel *getDcel() {return &this->dcel; };
 };

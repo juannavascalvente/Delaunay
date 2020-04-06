@@ -7,7 +7,6 @@
 #include "Delaunay.h"
 #include "Gabriel.h"
 #include "StarTriangulation.h"
-#include "Status.h"
 #include "Voronoi.h"
 
 
@@ -21,7 +20,6 @@ class StoreData
     * Privae class members
     *******************************************************************************************************************/
     vector<Point<TYPE>> vPoints;        // Set of points
-    Status 			    status;			// Current status.
     Delaunay		    *delaunay;		// Delaunay data.
     StarTriangulation	*triangulation;	// Star triangulation data.
     Voronoi			    *voronoi;		// Voronoi diagram data.
@@ -38,7 +36,6 @@ public:
     * Getters
     *******************************************************************************************************************/
     vector<Point<TYPE>> *getPoints()   { return &vPoints; };
-    Status   *getStatus()   { return &status; };
     Delaunay *getDelaunay() { return delaunay; };
     StarTriangulation *getStarTriang() { return triangulation; };
     Voronoi *getVoronoi()   { return voronoi; };

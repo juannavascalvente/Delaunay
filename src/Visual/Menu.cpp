@@ -78,7 +78,7 @@ MenuOption enOption;
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-Menu::Menu()
+Menu::Menu(StoreService &s) : service(s)
 {
 	// Initialize class attributes.
 	this->menu_Id = 0;
@@ -93,10 +93,10 @@ Menu::Menu()
 }
 
 
-void Menu::updateMenu(Status *status)
+void Menu::updateMenu()
 {
-	// Check if first time menu created.
-	if (status->isFirstTime())
+	// Check if there is not even a set of points.
+	if (!service.isSetCreated())
 	{
 		// Clear current menu.
 		if (menu_Id != 0)
@@ -105,17 +105,10 @@ void Menu::updateMenu(Status *status)
 		}
 
 		// Add generate sub menu entries.
-		this->subMenuRead = glutCreateMenu(menu_level_1);
-		glutAddMenuEntry(INPUTSET_RANDOM_TEXT, randomly);
-		glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, cluster);
+		this->subMenuRead = createGenerateMenu();
 
 		// Add read sub menu entries.
-		this->subMenuGenerate = glutCreateMenu(menu_level_1);
-		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, read_points_flat_file);
-		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, read_points_dcel_file);
-		glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, read_delaunay);
-		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, read_voronoi);
-		glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, read_gabriel);
+		this->subMenuGenerate = createReadMenu();
 
 		// Input points sub-menu.
 		sub_Menu_Input = glutCreateMenu(menu_level_1);
@@ -128,8 +121,6 @@ void Menu::updateMenu(Status *status)
 		glutAddMenuEntry(PARAMETERS_MENU_TEXT, parameters);
 		glutAddMenuEntry(QUIT_MENU_TEXT, quit);
 		glutAttachMenu(GLUT_RIGHT_BUTTON);
-
-		status->setFirstTime(false);
 	}
 	else
 	{
@@ -137,25 +128,18 @@ void Menu::updateMenu(Status *status)
 		glutDestroyMenu(menu_Id);
 
 		// Add generate sub menu entries.
-		this->subMenuRead = glutCreateMenu(menu_level_1);
-		glutAddMenuEntry(INPUTSET_RANDOM_TEXT, randomly);
-		glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, cluster);
+		subMenuRead = createGenerateMenu();
 
 		// Add read sub menu entries.
-		this->subMenuGenerate = glutCreateMenu(menu_level_1);
-		glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, read_points_flat_file);
-		glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, read_points_dcel_file);
-		glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, read_delaunay);
-		glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, read_voronoi);
-		glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, read_gabriel);
+        subMenuGenerate = createReadMenu();
 
 		// Input points sub-menu.
 		sub_Menu_Input = glutCreateMenu(menu_level_1);
-		glutAddSubMenu(GENERATE_MENU_TEXT, this->subMenuRead);
-		glutAddSubMenu(READ_MENU_TEXT, this->subMenuGenerate);
+		glutAddSubMenu(GENERATE_MENU_TEXT, subMenuRead);
+		glutAddSubMenu(READ_MENU_TEXT, subMenuGenerate);
 
 		// Triangulations submenu.
-		if (status->isSet())
+		if (service.isSetCreated())
 		{
 			sub_Menu_Id2 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(TRIANGULATIONS_STAR_TEXT, star_triangulation);
@@ -163,7 +147,7 @@ void Menu::updateMenu(Status *status)
 		}
 
 		// Main figures submenu.
-		if (status->isTriangulation() || status->isDelaunay())
+		if (service.isTriangulation() || service.isDelaunay())
 		{
 			sub_Menu_Id3 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(FIGURES_CONVEX_TEXT, convex_hull);
@@ -176,7 +160,7 @@ void Menu::updateMenu(Status *status)
 			glutAddMenuEntry(FIGURES_TRIANGULATION_PATH_TEXT, triangulation_path);
 			glutAddMenuEntry(FIGURES_FILTER_EDGES, filter_edges);
 
-			if (status->isVoronoi())
+			if (service.isVoronoi())
 			{
 				glutAddMenuEntry(FIGURES_GABRIEL_TEXT, gabriel);
 				glutAddMenuEntry(FIGURES_VORONOI_PATH_TEXT, voronoi_path);
@@ -184,22 +168,22 @@ void Menu::updateMenu(Status *status)
 		}
 
 		// Output data submenu.
-		if (status->isSet())
+		if (service.isSetCreated())
 		{
 			sub_Menu_Id4 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(EXPORT_FLAT_FILE, write_points);
-			if (status->isTriangulation())
+			if (service.isTriangulation())
 			{
 				glutAddMenuEntry(EXPORT_DCEL_FILE, write_dcel);
-				if (status->isDelaunay())
+				if (service.isDelaunay())
 				{
 					glutAddMenuEntry(EXPORT_DELAUNAY_FILE, write_delaunay);
 				}
-				if (status->isVoronoi())
+				if (service.isVoronoi())
 				{
 					glutAddMenuEntry(EXPORT_VORONOI_FILE, write_voronoi);
 				}
-				if (status->isGabriel())
+				if (service.isGabriel())
 				{
 					glutAddMenuEntry(EXPORT_GABRIEL_FILE, write_gabriel);
 				}
@@ -207,11 +191,11 @@ void Menu::updateMenu(Status *status)
 		}
 
 		// Information submenu.
-		if (status->isSet())
+		if (service.isSetCreated())
 		{
 			sub_Menu_Id5 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(INFORMATION_DCEL_TEXT, dcel_info);
-			if (status->isVoronoi())
+			if (service.isVoronoi())
 			{
 				glutAddMenuEntry(INFORMATION_VORONOI_TEXT, voronoi_info);
 			}
@@ -221,19 +205,19 @@ void Menu::updateMenu(Status *status)
 		menu_Id = glutCreateMenu(menu_level_1);
 		glutAddSubMenu(INPUTSET_MENU_TEXT, sub_Menu_Input);
 		glutAddMenuEntry(PARAMETERS_MENU_TEXT, parameters);
-		if (status->isSet())
+		if (service.isSetCreated())
 		{
 			glutAddSubMenu(TRIANGULATIONS_MENU_TEXT, sub_Menu_Id2);
 		}
-		if (status->isTriangulation() || status->isDelaunay())
+		if (service.isTriangulation() || service.isDelaunay())
 		{
 			glutAddSubMenu(FIGURES_MENU_TEXT, sub_Menu_Id3);
 		}
-		if (status->isSet())
+		if (service.isSetCreated())
 		{
 			glutAddSubMenu(EXPORT_MENU_TEXT, sub_Menu_Id4);
 		}
-		if (status->isSet())
+		if (service.isSetCreated())
 		{
 			glutAddSubMenu(INFORMATION_MENU_TEXT, sub_Menu_Id5);
 		}
@@ -257,4 +241,25 @@ void Menu::resetMenuOption()
 void menu_level_1(int menuId)
 {
     enOption = (MenuOption) menuId;
+}
+
+int Menu::createGenerateMenu()
+{
+    int iMenuId = glutCreateMenu(menu_level_1);
+    glutAddMenuEntry(INPUTSET_RANDOM_TEXT, randomly);
+    glutAddMenuEntry(INPUTSET_CLUSTER_TEXT, cluster);
+
+    return iMenuId;
+}
+
+int Menu::createReadMenu()
+{
+    int iMenuId = glutCreateMenu(menu_level_1);
+    glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, read_points_flat_file);
+    glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, read_points_dcel_file);
+    glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, read_delaunay);
+    glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, read_voronoi);
+    glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, read_gabriel);
+
+    return iMenuId;
 }

@@ -31,7 +31,7 @@ Process::Process(int argc, char **argv, bool printData, StoreService *storeServi
     storeService = storeServiceIn;
 
     // Initialize display
-    dispManager = new DisplayManager(argc, argv, storeService);
+    dispManager = new DisplayManager(argc, argv, storeServiceIn);
     dispManager->updateMenu();
     dispManager->setLoopFunction(executeWrapper);
 }
@@ -93,9 +93,6 @@ void Process::execute()
     CommandResult *result = cmd->getResult();
     if (result->wasSuccess())
     {
-        // Update menu status
-        result->updateStatus();
-
         // Get displayable elements
         vector<Displayable*> vDisplayable(0);
         result->getItems(vDisplayable);

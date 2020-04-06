@@ -5,7 +5,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "DisplayService.h"
-#include "Displayable.h"
+#include "Visual/Display/Displayable/Displayable.h"
 #include "Menu.h"
 
 #include <vector>
@@ -24,7 +24,6 @@ class DisplayManager
     *******************************************************************************************************************/
     vector<Displayable *>   vDisplayables;
     Menu 			        menu;		    // Menu object.
-    StoreService            *storeService;
 
     /*******************************************************************************************************************
      * Private methods declaration
@@ -52,7 +51,7 @@ public:
     /*******************************************************************************************************************
      * Public methods declaration
      *******************************************************************************************************************/
-    DisplayManager(int argc, char **argv, StoreService *service) : vDisplayables(0), storeService(service)
+    DisplayManager(int argc, char **argv, StoreService *storeServ) : vDisplayables(0), menu(*storeServ)
     {
         // Initialize display
         DisplayService::init(argc, argv);
@@ -101,7 +100,7 @@ public:
      * @fn      updateMenu
      * @brief   Updae menu entries
      */
-    void updateMenu() { menu.updateMenu(storeService->getStatus()); }
+    void updateMenu() { menu.updateMenu(); }
 };
 
 

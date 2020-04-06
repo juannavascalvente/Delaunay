@@ -157,7 +157,6 @@ bool StarTriangulation::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Poin
 
 bool StarTriangulation::build()
 {
-	bool	built=true;					// Return value.
 	int		i=0;						// Loop counter.
 	int		len=0;						// Loop length.
 	struct ConvexPoint	convexPoint={};	// Point to insert in convex hull.
@@ -417,7 +416,8 @@ bool StarTriangulation::build()
 	// Update convex hull face departing edge.
 	this->dcel.updateFace(edgeId, 0);
 
-	return built;
+    isBuilt = true;
+	return isBuilt;
 }
 
 /***************************************************************************
