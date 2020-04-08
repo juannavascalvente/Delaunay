@@ -6,7 +6,7 @@
  */
 
 #include "defines.h"
-#include "Dcel/Vertex.h"
+#include "Vertex.h"
 
 #include <iostream>
 using namespace std;

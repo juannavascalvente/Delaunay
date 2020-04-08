@@ -61,6 +61,9 @@ file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include/Figures
         ${BUILD_PATH}/include/Figures/Generators
         ${BUILD_PATH}/include/Gabriel
+        ${BUILD_PATH}/include/InOut
+        ${BUILD_PATH}/include/InOut/Reader
+        ${BUILD_PATH}/include/InOut/Writer
         ${BUILD_PATH}/include/Store
         ${BUILD_PATH}/include/Triangulation
         ${BUILD_PATH}/include/Voronoi
@@ -73,6 +76,9 @@ file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/src/Figures/*.cpp
         ${BUILD_PATH}/src/Figures/Generators/*.cpp
         ${BUILD_PATH}/src/Gabriel/*.cpp
+        ${BUILD_PATH}/src/InOut/*.cpp
+        ${BUILD_PATH}/src/InOut/Reader/*.cpp
+        ${BUILD_PATH}/src/InOut/Writer/*.cpp
         ${BUILD_PATH}/src/Store/*.cpp
         ${BUILD_PATH}/src/Triangulation/*.cpp
         ${BUILD_PATH}/src/Voronoi/*.cpp

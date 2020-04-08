@@ -1,12 +1,4 @@
-/*
- * Face.cpp
- *
- *  Created on: Jun 30, 2016
- *      Author: jnavas
- */
-
-#include "defines.h"
-#include "Dcel/Face.h"
+#include "Face.h"
 
 #include <sstream>
 using namespace std;
@@ -46,7 +38,7 @@ Face::Face(int edge)
 * GLOBAL:	NONE
 * Description: checks if face has an invalid edge
 ***************************************************************************/
-bool Face::isInvalid(void)
+bool Face::isInvalid()
 {
 	return (this->edge == INVALID_FACE);
 }

@@ -16,6 +16,7 @@
 #include "DcelFigureBuilder.h"
 #include "LineFactory.h"
 #include "PointFactory.h"
+#include "PointsReader.h"
 
 
 /***********************************************************************************************************************
@@ -478,7 +479,7 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay have not been already created
-        return !in.getStoreService()->isDelaunay();
+        return in.getStoreService()->isSetCreated();
     };
 
     /**
@@ -2005,20 +2006,16 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelReader::readPoints(Config::getInFlatFilename(), true, *dcel);
+        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), false, vPoints);
 
         if (this->isSuccess)
         {
-            // Add point display
-            for (size_t i=0; i< dcel->getNumVertex() ; i++)
-            {
-                vPoints.push_back(*dcel->getRefPoint(i));
-            }
-
             // Add points
             Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
             vDisplayable.push_back(dispPoints);
+
+            // Save result
+            in.getStoreService()->save(vPoints);
         }
 
         // Build result
@@ -2036,68 +2033,6 @@ public:
     }
 };
 
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
-class CommandReadPointsDcel : public Command
-{
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    vector<Point<TYPE>> vPoints;
-    vector<Displayable*> vDisplayable;
-
-public:
-    /*******************************************************************************************************************
-    * Public class methods
-    *******************************************************************************************************************/
-    explicit CommandReadPointsDcel(StoreService *storeServiceIn) : Command(storeServiceIn) {};
-
-
-    /**
-     * @fn      run
-     * @brief   Read points from a dcel file
-     *
-     * @return  true read was successfully
-     *          false otherwise
-     */
-    CommandResult* runCommand() override
-    {
-        // Reset store data
-        in.getStoreService()->reset();
-
-        // Run command
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, *dcel);
-
-        if (this->isSuccess)
-        {
-            // Add point display
-            for (size_t i=0; i< dcel->getNumVertex() ; i++)
-            {
-                vPoints.push_back(*dcel->getRefPoint(i));
-            }
-
-            // Add points
-            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
-            vDisplayable.push_back(dispPoints);
-        }
-
-        // Build result
-        return createResult();
-    }
-
-
-    /**
-     * @fn      createResult
-     * @brief   Creates command result
-     */
-    CommandResult *createResult() override
-    {
-        return new CommandResult(getSuccess(), vDisplayable);
-    }
-};
 
 
 /***********************************************************************************************************************
@@ -2244,8 +2179,7 @@ public:
     CommandResult* runCommand() override
     {
         // Write points to file
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelWriter::writePoints(Config::getOutFlatFilename(), INVALID, *dcel);
+        this->isSuccess = DcelWriter::writePoints(Config::getOutFlatFilename(), in.getStoreService()->getPoints());
 
         // Build result
         return createResult();
@@ -2290,7 +2224,7 @@ public:
     {
         // Write dcel to file
         Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), false, *dcel);
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, true);
 
         // Build result
         return createResult();

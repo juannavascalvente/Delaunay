@@ -15,7 +15,7 @@
 ***********************************************************************************************************************/
 void VoronoiIO::print(const Voronoi &voronoi, std::ostream &out)
 {
-    DcelWriter::print(out, voronoi.dcel);
+    DcelWriter::print(voronoi.dcel, out);
 }
 
 
@@ -30,7 +30,7 @@ bool VoronoiIO::read(const string &strFileName, Voronoi &voronoi)
 
 bool VoronoiIO::write(const string &strFileName, const Voronoi &voronoi)
 {
-    bool isSuccess = DcelWriter::write(strFileName, false, voronoi.dcel);
+    bool isSuccess = DcelWriter::write(strFileName, voronoi.dcel, false);
 
     return isSuccess;
 }

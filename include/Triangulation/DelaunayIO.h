@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 23/3/20.
-//
-
 #ifndef DELAUNAY_DELAUNAYIO_H
 #define DELAUNAY_DELAUNAYIO_H
 

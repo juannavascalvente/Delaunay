@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
@@ -186,12 +182,6 @@ Command *CommandFactory::createReadPoints(StoreService *storeService)
     return new CommandReadPoints(storeService);
 }
 
-Command *CommandFactory::createReadPointsDcel(StoreService *storeService)
-{
-    // Create command
-    return new CommandReadPointsDcel(storeService);
-}
-
 
 Command *CommandFactory::createReadDelaunay(StoreService *storeService)
 {
@@ -265,7 +255,6 @@ void CommandFactory::initialize()
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(voronoi_info, CommandFactory::createVoronoiInfo));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(clear, CommandFactory::createClear));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_flat_file, CommandFactory::createReadPoints));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_dcel_file, CommandFactory::createReadPointsDcel));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_delaunay, CommandFactory::createReadDelaunay));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_voronoi, CommandFactory::createNull));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_gabriel, CommandFactory::createNull));

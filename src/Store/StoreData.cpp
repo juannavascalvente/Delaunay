@@ -7,6 +7,34 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
+void StoreData::deleteStar()
+{
+    delete triangulation;
+    triangulation = nullptr;
+}
+
+
+void StoreData::deleteDelaunay()
+{
+    delete delaunay;
+    delaunay = nullptr;
+}
+
+
+void StoreData::deleteVoronoi()
+{
+    delete voronoi;
+    voronoi = nullptr;
+}
+
+
+void StoreData::deleteGabriel()
+{
+    delete gabriel;
+    gabriel = nullptr;
+}
+
+
 void StoreData::save(vector<Point<TYPE>> &v)
 {
     vPoints = v;

@@ -52,6 +52,14 @@ public:
 
 
     /*******************************************************************************************************************
+    * Delete
+    *******************************************************************************************************************/
+    void deleteTriangulation() { repository->getData()->deleteStar(); };
+    void deleteDelaunay() { repository->getData()->deleteDelaunay(); };
+    void deleteVoronoi() { repository->getData()->deleteVoronoi(); };
+    void deleteGabriel() { repository->getData()->deleteGabriel(); };
+
+    /*******************************************************************************************************************
     * Checkers
     *******************************************************************************************************************/
     bool isSetCreated() { return !getPoints().empty(); };
@@ -64,7 +72,7 @@ public:
     * Getters
     *******************************************************************************************************************/
     vector<Point<TYPE>>      &getPoints()    { return *repository->getData()->getPoints(); };
-    Delaunay    *getDelaunay()  { return repository->getData()->getDelaunay(); };
+    Delaunay    *getDelaunay()  { return repository->getData()->getDelaunayData(); };
     Voronoi     *getVoronoi()   { return repository->getData()->getVoronoi(); };
     Gabriel     *getGabriel()   { return repository->getData()->getGabriel(); };
     StarTriangulation *getStarTriang() { return repository->getData()->getStarTriang(); };

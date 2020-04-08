@@ -23,6 +23,7 @@ class DisplayManager
     * Class members
     *******************************************************************************************************************/
     vector<Displayable *>   vDisplayables;
+    vector<Displayable *>   vDisplayablesSaved;
     Menu 			        menu;		    // Menu object.
 
     /*******************************************************************************************************************

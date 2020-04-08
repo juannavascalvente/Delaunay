@@ -21,7 +21,6 @@ using namespace std;
 #define	INPUTSET_CLUSTER_TEXT			"Clusters"
 #define	READ_MENU_TEXT					"Read"
 #define	INPUTSET_READ_FLAT_TEXT			"Flat file"
-#define	INPUTSET_READ_DCEL_POINTS_TEXT 	"Points DCEL file"
 #define	INPUTSET_READ_INCREMENTAL_TEXT	"Incremental files"
 #define	INPUTSET_READ_VORONOI_TEXT		"Voronoi file"
 #define INPUTSET_READ_GABRIEL_TEXT		"Gabriel file"
@@ -256,7 +255,6 @@ int Menu::createReadMenu()
 {
     int iMenuId = glutCreateMenu(menu_level_1);
     glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, read_points_flat_file);
-    glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, read_points_dcel_file);
     glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, read_delaunay);
     glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, read_voronoi);
     glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, read_gabriel);
