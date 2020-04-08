@@ -17,6 +17,7 @@
 #include "LineFactory.h"
 #include "PointFactory.h"
 #include "PointsReader.h"
+#include "PointsWriter.h"
 
 
 /***********************************************************************************************************************
@@ -2179,7 +2180,7 @@ public:
     CommandResult* runCommand() override
     {
         // Write points to file
-        this->isSuccess = DcelWriter::writePoints(Config::getOutFlatFilename(), in.getStoreService()->getPoints());
+        this->isSuccess = PointsWriter::write(Config::getOutFlatFilename(), in.getStoreService()->getPoints());
 
         // Build result
         return createResult();

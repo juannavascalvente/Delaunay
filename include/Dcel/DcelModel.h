@@ -131,7 +131,7 @@ public:
      * @fn              reset
      * @brief           Resets dcel data
      */
-    void reset();
+    void reset(bool isResetPoints = true);
 };
 
 

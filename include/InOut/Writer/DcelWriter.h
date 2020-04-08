@@ -38,17 +38,6 @@ public:
     static bool write(const string &fileName, const DcelModel &dcel, bool isBinary=false);
 
     /**
-     * @fn          writePoints
-     * @brief       Writes points set form dcel
-     *
-     * @param fileName  (IN) File name
-     * @param vPoints   (IN) Vector of points to write
-     * @return          true if file written
-     *                  false otherwise
-     */
-    static bool writePoints(const string &fileName, vector<Point<TYPE>> &vPoints);
-
-    /**
      * @fn          print
      * @brief       Prints dcel formart to stream
      *

@@ -31,15 +31,15 @@ public:
 	  Public functions.
 	------------------------------------------------------------------------*/
 	//static void buildText(string func, string f, int n, ...);
-	static void buildText(string &func, string &f, const string& text);
-	static void buildText(string &func, string &f, int value);
-    static void buildText(string &func, string &f, size_t szValue);
-	static void buildText(string &func, string &f, TYPE value);
+	static void buildText(string func, string f, const string& text);
+	static void buildText(string func, string f, int value);
+    static void buildText(string func, string f, size_t szValue);
+	static void buildText(string func, string f, TYPE value);
 #ifdef FLOAT_TYPE
-	static void buildText(string &func, string &f, double value);
+	static void buildText(string func, string f, double value);
 #endif
-	static void buildText(string &func, string &f, Point<TYPE> *point);
-	static void buildRange(string &func, string &f, int start, int end);
+	static void buildText(string func, string f, Point<TYPE> *point);
+	static void buildRange(string func, string f, int start, int end);
 	static void write(bool print, enum MessageCategory category);
 
 	static void buildText(const string& text);

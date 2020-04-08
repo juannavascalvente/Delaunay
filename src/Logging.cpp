@@ -98,7 +98,7 @@ void Logging::buildText(int value)
 * GLOBAL:	NONE
 * Description: updates function name and text to be printed.
 ***************************************************************************/
-void Logging::buildText(string &func, string &f, const string& text)
+void Logging::buildText(string func, string f, const string& text)
 {
 	// Check if text must be concatenated.
 	if (concat)
@@ -108,8 +108,8 @@ void Logging::buildText(string &func, string &f, const string& text)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = text;
 		concat = true;
 	}
@@ -126,7 +126,7 @@ void Logging::buildText(string &func, string &f, const string& text)
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Logging::buildText(string &func, string &f, int value)
+void Logging::buildText(string func, string f, int value)
 {
 	string Result;
 	ostringstream convert;
@@ -140,8 +140,8 @@ void Logging::buildText(string &func, string &f, int value)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
@@ -158,7 +158,7 @@ void Logging::buildText(string &func, string &f, int value)
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Logging::buildText(string &func, string &f, size_t szValue)
+void Logging::buildText(string func, string f, size_t szValue)
 {
     string Result;
     ostringstream convert;
@@ -172,8 +172,8 @@ void Logging::buildText(string &func, string &f, size_t szValue)
     else
     {
         // Copy function and text to be printed.
-        function = func;
-        file = f;
+        function = std::move(func);
+        file = std::move(f);
         message = convert.str();
         concat = true;
     }
@@ -190,7 +190,7 @@ void Logging::buildText(string &func, string &f, size_t szValue)
 * GLOBAL:	NONE
 * Description: writes TYPE to the logging file
 ***************************************************************************/
-void Logging::buildText(string &func, string &f, TYPE value)
+void Logging::buildText(string func, string f, TYPE value)
 {
 	string Result;
 	ostringstream convert;
@@ -204,8 +204,8 @@ void Logging::buildText(string &func, string &f, TYPE value)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
@@ -222,7 +222,7 @@ void Logging::buildText(string &func, string &f, TYPE value)
 * Description: writes a double to the logging file
 ***************************************************************************/
 #ifdef FLOAT_TYPE
-void Logging::buildText(string &func, string &f, double value)
+void Logging::buildText(string func, string f, double value)
 {
 	string Result;
 	ostringstream convert;
@@ -236,8 +236,8 @@ void Logging::buildText(string &func, string &f, double value)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
@@ -254,7 +254,7 @@ void Logging::buildText(string &func, string &f, double value)
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Logging::buildText(string &func, string &f, Point<TYPE> *point)
+void Logging::buildText(string func, string f, Point<TYPE> *point)
 {
 	string Result;
 	ostringstream convert;
@@ -268,8 +268,8 @@ void Logging::buildText(string &func, string &f, Point<TYPE> *point)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
@@ -286,7 +286,7 @@ void Logging::buildText(string &func, string &f, Point<TYPE> *point)
 * GLOBAL:	NONE
 * Description: Writes range boundaries
 ***************************************************************************/
-void Logging::buildRange(string &func, string &f, int start, int end)
+void Logging::buildRange(string func, string f, int start, int end)
 {
 	string Result;
 	ostringstream convert;
@@ -300,7 +300,7 @@ void Logging::buildRange(string &func, string &f, int start, int end)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
+		function = std::move(func);
 		file = std::move(f);
 		message = convert.str();
 		concat = true;
