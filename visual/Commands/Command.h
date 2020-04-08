@@ -2060,15 +2060,15 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-//        auto *t = new StarTriangulation();
-//        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *t);
-//        if (this->isSuccess)
-//        {
-//            in.getStoreService()->save(*t);
-//        }
-//
-//        // Free resources
-//        delete t;
+        auto *t = new StarTriangulation();
+        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), false, *t->getRefDcel());
+        if (this->isSuccess)
+        {
+            in.getStoreService()->save(*t);
+        }
+
+        // Free resources
+        delete t;
 
         // Build result
         return createResult();
@@ -2087,7 +2087,7 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+            Dcel *dcel = in.getStoreService()->getStarTriang()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
         }
 
@@ -2288,8 +2288,18 @@ public:
      */
     CommandResult* runCommand() override
     {
+        // Check what triangulation is being used
+        Dcel *dcel;
+        if (in.getStoreService()->isTriangulation())
+        {
+            dcel = in.getStoreService()->getStarTriang()->getRefDcel();
+        }
+        else
+        {
+            dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        }
+
         // Write dcel to file
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
         this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, false);
 
         // Build result
