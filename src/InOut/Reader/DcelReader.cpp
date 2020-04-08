@@ -29,7 +29,7 @@ bool DcelReader::read(const string &fileName, bool isBinary, Dcel &dcel)
         read = DcelReader::readDcel(fileName, dcel);
     }
 
-    return(read);
+    return read;
 }
 
 
