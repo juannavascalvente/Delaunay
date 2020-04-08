@@ -350,12 +350,22 @@ void DcelModel::getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Poi
 void DcelModel::reset(bool isResetPoints)
 {
     // Check if points must be reset
-    if (isResetPoints)
+    if (isResetPoints && !this->vVertex.empty())
     {
         this->vVertex.clear();
     }
-    this->vEdges.clear();
-    this->vFaces.clear();
+
+    // Reset edges
+    if (!this->vEdges.empty())
+    {
+        this->vEdges.clear();
+    }
+
+    // Reset faces
+    if (!this->vFaces.empty())
+    {
+        this->vFaces.clear();
+    }
 }
 
 

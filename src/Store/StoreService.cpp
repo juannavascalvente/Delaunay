@@ -28,3 +28,27 @@ void StoreService::reset()
     deleteVoronoi();
     deleteGabriel();
 }
+
+
+void StoreService::save(StarTriangulation &triangulation)
+{
+    // Save triangulation
+    repository->getData()->save(triangulation);
+
+    // Reset points in store
+    vector<Point<TYPE>> vPoints;
+    triangulation.getRefDcel()->getPoints(vPoints);
+    repository->getData()->save(vPoints);
+}
+
+
+void StoreService::save(Delaunay &delaunay)
+{
+    // Save Delaunay
+    repository->getData()->save(delaunay);
+
+    // Reset points in store
+    vector<Point<TYPE>> vPoints;
+    delaunay.getRefDcel()->getPoints(vPoints);
+    repository->getData()->save(vPoints);
+};

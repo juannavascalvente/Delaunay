@@ -252,9 +252,9 @@ void StatisticsStarTriangulationRegister::deallocate()
 void StatisticsTriangulationData::analyzeTriangulation(StarTriangulation &triangulation)
 {
 	// Get # points, edges and faces.
-	this->setPoints(triangulation.getDcel()->getNumVertex());
-	this->setEdges(triangulation.getDcel()->getNumEdges());
-	this->setFaces(triangulation.getDcel()->getNumFaces());
+	this->setPoints(triangulation.getRefDcel()->getNumVertex());
+	this->setEdges(triangulation.getRefDcel()->getNumEdges());
+	this->setFaces(triangulation.getRefDcel()->getNumFaces());
 
 	// Compute # edges the convex hull.
 	if (!triangulation.isConvexHullComputed())

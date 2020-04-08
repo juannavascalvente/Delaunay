@@ -51,6 +51,7 @@ class CommandFactory
     static Command *createVoronoiInfo(StoreService *storeService);
     static Command *createClear(StoreService *storeService);
     static Command *createReadPoints(StoreService *storeService);
+    static Command *createReadStar(StoreService *storeService);
     static Command *createReadDelaunay(StoreService *storeService);
 //    static Command *createReadVoronoi(StoreService *storeService);
 //    static Command *createReadGabriel(StoreService *storeService);

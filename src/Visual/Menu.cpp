@@ -171,9 +171,9 @@ void Menu::updateMenu()
 		{
 			sub_Menu_Id4 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(EXPORT_FLAT_FILE, write_points);
-			if (service.isTriangulation())
+			if (service.isTriangulation() || service.isDelaunay())
 			{
-				glutAddMenuEntry(EXPORT_DCEL_FILE, write_dcel);
+				glutAddMenuEntry(EXPORT_DCEL_FILE, write_triangulation);
 				if (service.isDelaunay())
 				{
 					glutAddMenuEntry(EXPORT_DELAUNAY_FILE, write_delaunay);

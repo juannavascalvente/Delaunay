@@ -183,6 +183,13 @@ Command *CommandFactory::createReadPoints(StoreService *storeService)
 }
 
 
+Command *CommandFactory::createReadStar(StoreService *storeService)
+{
+    // Create command
+    return new CommandReadStar(storeService);
+}
+
+
 Command *CommandFactory::createReadDelaunay(StoreService *storeService)
 {
     // Create command
@@ -255,11 +262,12 @@ void CommandFactory::initialize()
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(voronoi_info, CommandFactory::createVoronoiInfo));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(clear, CommandFactory::createClear));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_flat_file, CommandFactory::createReadPoints));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_star_triangulation, CommandFactory::createReadStar));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_delaunay, CommandFactory::createReadDelaunay));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_voronoi, CommandFactory::createNull));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_gabriel, CommandFactory::createNull));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_points, CommandFactory::createWritePoints));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_dcel, CommandFactory::createWriteDcel));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_triangulation, CommandFactory::createWriteDcel));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_delaunay, CommandFactory::createWriteDelaunay));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_voronoi, CommandFactory::createWriteVoronoi));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_gabriel, CommandFactory::createWriteGabriel));

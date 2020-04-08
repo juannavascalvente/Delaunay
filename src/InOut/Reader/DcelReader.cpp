@@ -137,7 +137,7 @@ bool DcelReader::readDcel(const string &fileName, Dcel &dcel)
             }
         }
     }
-        // Error opening file.
+    // Error opening file.
     else
     {
         Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");

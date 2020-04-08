@@ -19,7 +19,7 @@ bool getStarTriangulation(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
         isSuccess = triangulation->build();
 
         // Update output
-        dcelOut = *triangulation->getDcel();
+        dcelOut = *triangulation->getRefDcel();
 
         // Free resources
         delete triangulation;

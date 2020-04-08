@@ -439,7 +439,7 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            Dcel *dcel = in.getStoreService()->getStarTriang()->getDcel();
+            Dcel *dcel = in.getStoreService()->getStarTriang()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
         }
 
@@ -1197,7 +1197,7 @@ public:
             else
             {
                 StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-                dcel = DisplayableFactory::createDcel(triangulation->getDcel());
+                dcel = DisplayableFactory::createDcel(triangulation->getRefDcel());
             }
             vDisplayable.push_back(dcel);
 
@@ -1436,7 +1436,7 @@ public:
             else
             {
                 StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-                dcel = DisplayableFactory::createDcel(triangulation->getDcel());
+                dcel = DisplayableFactory::createDcel(triangulation->getRefDcel());
             }
             vDisplayable.push_back(dcel);
 
@@ -1519,7 +1519,7 @@ public:
             }
             else
             {
-                dcel = in.getStoreService()->getStarTriang()->getDcel();
+                dcel = in.getStoreService()->getStarTriang()->getRefDcel();
             }
 
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getStoreService()->getMinLengthEdge()));
@@ -2035,6 +2035,66 @@ public:
 };
 
 
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandReadStar : public Command
+{
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadStar(StoreService *storeServiceIn) : Command(storeServiceIn) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Read Delaunay from file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+//        auto *t = new StarTriangulation();
+//        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *t);
+//        if (this->isSuccess)
+//        {
+//            in.getStoreService()->save(*t);
+//        }
+//
+//        // Free resources
+//        delete t;
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        // Set in.getStoreService() to update
+
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+        }
+
+        return new CommandResult(getSuccess(), vDisplayable);
+    }
+};
+
 
 /***********************************************************************************************************************
 * Class declaration
@@ -2061,8 +2121,15 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        auto *delaunay = new Delaunay();
         this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+        if (this->isSuccess)
+        {
+            in.getStoreService()->save(*delaunay);
+        }
+
+        // Free resources
+        delete delaunay;
 
         // Build result
         return createResult();
@@ -2075,8 +2142,6 @@ public:
      */
     CommandResult *createResult() override
     {
-        // Set in.getStoreService() to update
-
         // Add items to display
         vector<Displayable*> vDisplayable;
         if (getSuccess())
@@ -2225,7 +2290,7 @@ public:
     {
         // Write dcel to file
         Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, true);
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, false);
 
         // Build result
         return createResult();

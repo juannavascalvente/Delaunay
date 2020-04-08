@@ -57,6 +57,14 @@ public:
      * @return
      */
     bool imaginaryFace(int faceIndex);
+
+    /**
+     * @fn              getPoints
+     * @brief           Gets Dcel set of points
+     *
+     * @param vOut      (OUT) Points in dcel
+     */
+    void getPoints(vector<Point<TYPE>> &vOut);
 };
 
 #endif /* DCEL_H_ */

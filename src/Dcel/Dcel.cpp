@@ -85,6 +85,15 @@ bool Dcel::imaginaryFace(int faceId)
 }
 
 
+void Dcel::getPoints(vector<Point<TYPE>> &vOut)
+{
+    for (auto v : vVertex)
+    {
+        vOut.push_back(v.getPoint());
+    }
+}
+
+
 /***************************************************************************
 * Name: 		isExternalEdge
 * IN:			edgeIndex		index of the edge to check.

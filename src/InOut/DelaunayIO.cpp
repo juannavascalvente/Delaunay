@@ -21,6 +21,8 @@ bool DelaunayIO::read(const string &fileName, const string &graphFileName, Delau
     read = DcelReader::read(fileName, false, delaunay.dcel);
     if (read)
     {
+        delaunay.setValid(true);
+
         // Initialize graph.
         delaunay.initGraph();
 
