@@ -21,6 +21,8 @@ class Graph
     vector<int> vFaceNode;
     vector<Node> vNodes;
 
+    friend class GraphWriter;
+
 public:
     /*******************************************************************************************************************
     * Public methods declarations
@@ -53,11 +55,6 @@ public:
 
 	// Graph size functions.
 	void reset();
-
-	// I/O functions.
-	void print(std::ostream& out);
-	bool read(const string& fileName);
-	bool write(const string& fileName);
 };
 
 #endif /* INCLUDE_GRAPH_H_ */

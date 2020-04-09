@@ -35,9 +35,9 @@ public:
 	//------------------------------------------------------------------------
 	// Public functions.
 	//------------------------------------------------------------------------
-	void set(int origin, int twin, int	previous, int next, int face);
-	void reset(void);
-	bool isInvalid(void);
+	void set(int originIn, int twinIn, int	previousIn, int nextIn, int faceIn);
+	void reset();
+	bool isInvalid();
 
 	// Get / Set.
 	inline void setOrigin(int value) { this->origin = value; };
@@ -46,11 +46,11 @@ public:
 	inline void setNext(int value) { this->next = value; };
 	inline void setFace(int value) { this->face = value; };
 
-	inline int getOrigin(void) { return(this->origin); };
-	inline int getTwin(void) { return(this->twin); };
-	inline int getPrevious(void) { return(this->previous); };
-	inline int getNext(void) { return(this->next); };
-	inline int getFace(void) { return(this->face); };
+	inline int getOrigin() { return(this->origin); };
+	inline int getTwin() { return(this->twin); };
+	inline int getPrevious() { return(this->previous); };
+	inline int getNext() { return(this->next); };
+	inline int getFace() { return(this->face); };
 
 	// Operators.
 	friend istream& operator>>(istream &in, Edge &edge)
@@ -104,7 +104,7 @@ public:
 
 	// I/O operations.
 	void print(std::ostream& out) const;
-	string toStr(void);
+	string toStr();
 };
 
 

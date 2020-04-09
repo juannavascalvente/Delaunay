@@ -20,12 +20,6 @@
 class Dcel : public DcelModel
 {
 	/*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-	bool	created;
-	bool	incremental;
-
-	/*******************************************************************************************************************
 	* Private methods
 	*******************************************************************************************************************/
 	void quicksort(Vertex *origin, Vertex *list, int first, int last);
@@ -35,8 +29,8 @@ public:
 	/*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    Dcel() : created(false), incremental(false) {};
-    explicit Dcel(vector<Point<TYPE>> &v) : DcelModel(v), created(false), incremental(false) {};
+    Dcel() = default;
+    explicit Dcel(vector<Point<TYPE>> &v) : DcelModel(v) {};
 	~Dcel() = default;
 
 	// Check functions.
@@ -63,6 +57,14 @@ public:
      * @return
      */
     bool imaginaryFace(int faceIndex);
+
+    /**
+     * @fn              getPoints
+     * @brief           Gets Dcel set of points
+     *
+     * @param vOut      (OUT) Points in dcel
+     */
+    void getPoints(vector<Point<TYPE>> &vOut);
 };
 
 #endif /* DCEL_H_ */

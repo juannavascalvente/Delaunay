@@ -1,37 +1,38 @@
-#ifndef DELAUNAY_COMMANDPARAMIN_H
-#define DELAUNAY_COMMANDPARAMIN_H
-
+#ifndef DELAUNAY_POINTSREADER_H
+#define DELAUNAY_POINTSREADER_H
 
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "defines.h"
-#include "StoreService.h"
-
-#include <cstddef>
+#include "Point.h"
 
 
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CmdParamIn
+class PointsReader
 {
     /*******************************************************************************************************************
-    * Class members
+    * Private class methods
     *******************************************************************************************************************/
-    StoreService *storeService;
+    static bool readFlat(const string &fileName, vector<Point<TYPE>> &vPoints);
+    static bool readBinary(const string &fileName, vector<Point<TYPE>> &vPoints);
 
 public:
-
     /*******************************************************************************************************************
-    * Public methods
+    * Public class methods
     *******************************************************************************************************************/
-    explicit CmdParamIn(StoreService *storeServiceIn) : storeService(storeServiceIn) {};
-
-    /*******************************************************************************************************************
-    * Getters
-    *******************************************************************************************************************/
-    StoreService *getStoreService() const { return storeService; }
+    /**
+     * @fn      read
+     * @brief   read the set of points from a flat file or a DCEL file depending on the "fromFlatFile· flag
+     *
+     * @param   fileName        (IN) File name
+     * @param   fromFlatFile    (IN) Flag that stands for binary format
+     * @param   vPoints         (OUT) Points set
+     * @return
+     */
+    static bool read(const string &fileName, bool isBinary, vector<Point<TYPE>> &vPoints);
 };
 
-#endif //DELAUNAY_COMMANDPARAMIN_H
+
+#endif //DELAUNAY_POINTSREADER_H

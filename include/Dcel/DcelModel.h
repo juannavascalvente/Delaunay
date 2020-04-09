@@ -29,6 +29,8 @@ protected:
     vector<Edge> 	vEdges;
     vector<Face> 	vFaces;
 
+    friend class DcelWriter;
+
 public:
     /*******************************************************************************************************************
     * Public methods
@@ -70,12 +72,15 @@ public:
 
     // Add / Delete functions.
     void addVertex(const Point<TYPE> *p, int edge);
+    void addVertex(const Vertex &v);
     void updateVertex(int edge_ID, int index);
     void updateVertex(Point<TYPE> *p, int index);
     void swapVertex(int index1, int index2);
-    void addEdge(int origin, int	twin, int previou, int next, int face);
+    void addEdge(int origin, int twin, int previou, int next, int face);
+    void addEdge(Edge &edge);
     void updateEdge(int origin, int twin, int previous, int next, int face, int index);
     void addFace(int face);
+    void addFace(Face &f);
     void updateFace(int edge_ID, int index);
 
 
@@ -126,7 +131,7 @@ public:
      * @fn              reset
      * @brief           Resets dcel data
      */
-    void reset();
+    void reset(bool isResetPoints = true);
 };
 
 

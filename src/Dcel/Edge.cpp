@@ -1,12 +1,4 @@
-/*
- * Edge.cpp
- *
- *  Created on: Jun 29, 2016
- *      Author: jnavas
- */
-
-#include "Dcel/Edge.h"
-#include "defines.h"
+#include "Edge.h"
 
 #include <sstream>
 using namespace std;
@@ -45,24 +37,24 @@ Edge::Edge(int origin, int twin, int prev, int next, int face)
 //------------------------------------------------------------------------
 /***************************************************************************
 * Name: set
-* IN:		origin		origin point
-* 			twin		twin edge
-* 			previous	previous edge
-* 			next		next edge
-* 			face		edge face
+* IN:		originIn	origin point
+* 			twinIn		twin edge
+* 			previousIn	previous edge
+* 			nextIn		next edge
+* 			faceIn		edge face
 * OUT:		NONE
 * RETURN:	NONE
 * GLOBAL:	NONE
 * Description: starts infinite loop.
 ***************************************************************************/
-void Edge::set(int origin, int twin, int previous, int next, int face)
+void Edge::set(int originIn, int twinIn, int previousIn, int nextIn, int faceIn)
 {
 	// Set input values.
-	this->origin = origin;
-	this->twin = twin;
-	this->previous = previous;
-	this->next = next;
-	this->face = face;
+	this->origin = originIn;
+	this->twin = twinIn;
+	this->previous = previousIn;
+	this->next = nextIn;
+	this->face = faceIn;
 }
 
 
@@ -95,7 +87,7 @@ void Edge::reset()
 * Description: 	Checks if the edge has origin point index or any edge as
 * 				INVALID.
 ***************************************************************************/
-bool Edge::isInvalid(void)
+bool Edge::isInvalid()
 {
 	return ((this->origin == INVALID_ORIGIN) ||
 			(this->twin == INVALID_EDGE) ||

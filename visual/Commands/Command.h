@@ -16,6 +16,8 @@
 #include "DcelFigureBuilder.h"
 #include "LineFactory.h"
 #include "PointFactory.h"
+#include "PointsReader.h"
+#include "PointsWriter.h"
 
 
 /***********************************************************************************************************************
@@ -49,10 +51,8 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    Command() : isSuccess(false), in(nullptr, nullptr), result(nullptr) {};
-    explicit Command(StoreService *storeServiceIn, ConfigService *configService) : isSuccess(false),
-                                                                                   in(storeServiceIn, configService),
-                                                                                   result(nullptr) {};
+    Command() : isSuccess(false), in(nullptr), result(nullptr) {};
+    explicit Command(StoreService *storeServiceIn) : isSuccess(false), in(storeServiceIn), result(nullptr) {};
     virtual ~Command() { delete result; };
 
 
@@ -99,7 +99,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandNull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandNull(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -121,7 +121,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandFail(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandFail(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -135,7 +135,7 @@ public:
      * @fn      printRunnableMsg
      * @brief   Fail command cannot be executed
      */
-    void printRunnableMsg()
+    void printRunnableMsg() override
     {
         cout << "Wrong command has been created and cannot be executed" << endl;
     };
@@ -152,7 +152,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandReadConfig(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandReadConfig(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      runCommand
@@ -188,7 +188,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandGenerateRandom(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandGenerateRandom(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -200,7 +200,7 @@ public:
     bool isRunnable() override
     {
         // Number of points higher than 0
-        return (in.getConfigService()->getNumPoints() > 0);
+        return (in.getStoreService()->getNumPoints() > 0);
     };
 
     /**
@@ -210,7 +210,7 @@ public:
     void printRunnableMsg() override
     {
         // Check number of points
-        if (in.getConfigService()->getNumPoints() == 0)
+        if (in.getStoreService()->getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -225,7 +225,7 @@ public:
      */
     CommandResult * runCommand() override
     {
-        size_t szNumPoints = in.getConfigService()->getNumPoints();
+        size_t szNumPoints = in.getStoreService()->getNumPoints();
 
         // Reset store data
         in.getStoreService()->reset();
@@ -275,7 +275,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandGenerateCluster(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandGenerateCluster(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn      isRunnable
@@ -290,9 +290,9 @@ public:
     bool isRunnable() override
     {
         // All values are higher than 0
-        return (in.getConfigService()->getNumPoints() > 0.0) &&
-                (in.getConfigService()->getNumClusters() > 0) &&
-                (in.getConfigService()->getNumPoints() > 0);
+        return (in.getStoreService()->getNumPoints() > 0.0) &&
+                (in.getStoreService()->getNumClusters() > 0) &&
+                (in.getStoreService()->getNumPoints() > 0);
     };
 
     /**
@@ -305,19 +305,19 @@ public:
         in.getStoreService()->reset();
 
         // Check radius
-        if (in.getConfigService()->getNumPoints() <= 0.0)
+        if (in.getStoreService()->getNumPoints() <= 0.0)
         {
             cout << "One of the values is not higher than 0" << endl;
         }
 
         // Check number of clusters
-        if (in.getConfigService()->getNumClusters() == 0)
+        if (in.getStoreService()->getNumClusters() == 0)
         {
             cout << "Number of cluster to generate is zero" << endl;
         }
 
         // Check number of points
-        if (in.getConfigService()->getNumPoints() == 0)
+        if (in.getStoreService()->getNumPoints() == 0)
         {
             cout << "Number of points to generate is zero" << endl;
         }
@@ -332,9 +332,9 @@ public:
      */
     CommandResult * runCommand() override
     {
-        size_t szNumPoints = in.getConfigService()->getNumPoints();
-        size_t szNumClusters = in.getConfigService()->getNumClusters();
-        TYPE radius = in.getConfigService()->getRadius();
+        size_t szNumPoints = in.getStoreService()->getNumPoints();
+        size_t szNumClusters = in.getStoreService()->getNumClusters();
+        TYPE radius = in.getStoreService()->getRadius();
 
         // Run command
         bool isRunSuccess = DcelGenerator::generateClusters(szNumPoints, szNumClusters, radius, vPoints);
@@ -377,7 +377,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandStarTriangulation(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {}
+    explicit CommandStarTriangulation(StoreService *storeServiceIn) : Command(storeServiceIn) {}
 
     /**
      * @fn       printRunnableMsg
@@ -439,7 +439,7 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
-            Dcel *dcel = in.getStoreService()->getStarTriang()->getDcel();
+            Dcel *dcel = in.getStoreService()->getStarTriang()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel, INVALID));
         }
 
@@ -458,7 +458,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    CommandDelaunay(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandDelaunay(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
     /**
      * @fn       printRunnableMsg
@@ -480,7 +480,7 @@ public:
     bool isRunnable() override
     {
         // Star triangulation and Delaunay have not been already created
-        return !in.getStoreService()->isDelaunay();
+        return in.getStoreService()->isSetCreated();
     };
 
     /**
@@ -546,7 +546,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandConvexHull(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandConvexHull(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -635,7 +635,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandVoronoi(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -725,7 +725,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandGabriel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandGabriel(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -841,7 +841,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTriangulationPath(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandTriangulationPath(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -964,7 +964,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandVoronoiPath(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandVoronoiPath(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1105,7 +1105,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandClosestPoint(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandClosestPoint(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1197,7 +1197,7 @@ public:
             else
             {
                 StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-                dcel = DisplayableFactory::createDcel(triangulation->getDcel());
+                dcel = DisplayableFactory::createDcel(triangulation->getRefDcel());
             }
             vDisplayable.push_back(dcel);
 
@@ -1228,7 +1228,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFindFace(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandFindFace(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1352,7 +1352,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTwoClosest(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandTwoClosest(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1436,7 +1436,7 @@ public:
             else
             {
                 StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-                dcel = DisplayableFactory::createDcel(triangulation->getDcel());
+                dcel = DisplayableFactory::createDcel(triangulation->getRefDcel());
             }
             vDisplayable.push_back(dcel);
 
@@ -1461,7 +1461,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFilterEdges(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandFilterEdges(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1519,10 +1519,10 @@ public:
             }
             else
             {
-                dcel = in.getStoreService()->getStarTriang()->getDcel();
+                dcel = in.getStoreService()->getStarTriang()->getRefDcel();
             }
 
-            vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getConfigService()->getMinLengthEdge()));
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel, in.getStoreService()->getMinLengthEdge()));
         }
 
         return new CommandResult(getSuccess(), vDisplayable);
@@ -1545,7 +1545,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandCircumcentres(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandCircumcentres(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1580,8 +1580,6 @@ public:
      */
     CommandResult* runCommand() override
     {
-        setIsSuccess(true);
-
         // Add circles
         Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
         for (int faceID=1; faceID< dcel->getNumFaces() ; faceID++)
@@ -1604,6 +1602,7 @@ public:
         }
 
         // Build result
+        setIsSuccess(true);
         return createResult();
     }
 
@@ -1646,7 +1645,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandEdgeCircle(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandEdgeCircle(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1681,8 +1680,6 @@ public:
      */
     CommandResult* runCommand() override
     {
-        setIsSuccess(true);
-
         // Loop all faces (but external).
         Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
         for (int edgeIndex=0; edgeIndex< dcel->getNumEdges() ; edgeIndex++)
@@ -1710,6 +1707,7 @@ public:
         }
 
         // Build result
+        setIsSuccess(true);
         return createResult();
     }
 
@@ -1838,7 +1836,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandDcelInfo(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService)
+    explicit CommandDcelInfo(StoreService *storeServiceIn) : Command(storeServiceIn)
     {
         dcel = in.getStoreService()->getDelaunay()->getRefDcel();
     };
@@ -1922,7 +1920,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit  CommandVoronoiInfo(StoreService *storeServiceIn, ConfigService *configService) : CommandDcelInfo(storeServiceIn, configService)
+    explicit  CommandVoronoiInfo(StoreService *storeServiceIn) : CommandDcelInfo(storeServiceIn)
     {
         dcel = storeServiceIn->getVoronoi()->getRefDcel();
     };
@@ -1943,7 +1941,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandClear(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandClear(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -1991,7 +1989,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadPoints(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandReadPoints(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -2007,20 +2005,16 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelReader::readPoints(Config::getInFlatFilename(), true, *dcel);
+        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), false, vPoints);
 
         if (this->isSuccess)
         {
-            // Add point display
-            for (size_t i=0; i< dcel->getNumVertex() ; i++)
-            {
-                vPoints.push_back(*dcel->getRefPoint(i));
-            }
-
             // Add points
             Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
             vDisplayable.push_back(dispPoints);
+
+            // Save result
+            in.getStoreService()->save(vPoints);
         }
 
         // Build result
@@ -2042,76 +2036,13 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandReadPointsDcel : public Command
-{
-    /*******************************************************************************************************************
-    * Class members
-    *******************************************************************************************************************/
-    vector<Point<TYPE>> vPoints;
-    vector<Displayable*> vDisplayable;
-
-public:
-    /*******************************************************************************************************************
-    * Public class methods
-    *******************************************************************************************************************/
-    explicit CommandReadPointsDcel(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
-
-
-    /**
-     * @fn      run
-     * @brief   Read points from a dcel file
-     *
-     * @return  true read was successfully
-     *          false otherwise
-     */
-    CommandResult* runCommand() override
-    {
-        // Reset store data
-        in.getStoreService()->reset();
-
-        // Run command
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelReader::readPoints(Config::getInDCELFilename(), false, *dcel);
-
-        if (this->isSuccess)
-        {
-            // Add point display
-            for (size_t i=0; i< dcel->getNumVertex() ; i++)
-            {
-                vPoints.push_back(*dcel->getRefPoint(i));
-            }
-
-            // Add points
-            Displayable *dispPoints = DisplayableFactory::createPointsSet(vPoints);
-            vDisplayable.push_back(dispPoints);
-        }
-
-        // Build result
-        return createResult();
-    }
-
-
-    /**
-     * @fn      createResult
-     * @brief   Creates command result
-     */
-    CommandResult *createResult() override
-    {
-        return new CommandResult(getSuccess(), vDisplayable);
-    }
-};
-
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
-class CommandReadDelaunay : public Command
+class CommandReadStar : public Command
 {
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandReadDelaunay(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandReadStar(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -2127,8 +2058,15 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+        auto *t = new StarTriangulation();
+        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), false, *t->getRefDcel());
+        if (this->isSuccess)
+        {
+            in.getStoreService()->save(*t);
+        }
+
+        // Free resources
+        delete t;
 
         // Build result
         return createResult();
@@ -2147,6 +2085,65 @@ public:
         vector<Displayable*> vDisplayable;
         if (getSuccess())
         {
+            Dcel *dcel = in.getStoreService()->getStarTriang()->getRefDcel();
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+        }
+
+        return new CommandResult(getSuccess(), vDisplayable);
+    }
+};
+
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
+class CommandReadDelaunay : public Command
+{
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadDelaunay(StoreService *storeServiceIn) : Command(storeServiceIn) {};
+
+
+    /**
+     * @fn      run
+     * @brief   Read Delaunay from file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+        auto *delaunay = new Delaunay();
+        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+        if (this->isSuccess)
+        {
+            in.getStoreService()->save(*delaunay);
+        }
+
+        // Free resources
+        delete delaunay;
+
+        // Build result
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        // Add items to display
+        vector<Displayable*> vDisplayable;
+        if (getSuccess())
+        {
             Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
             vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
         }
@@ -2159,69 +2156,91 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-//class CommandReadVoronoi : public Command
-//{
-//    /*******************************************************************************************************************
-//    * Class members
-//    *******************************************************************************************************************/
-//    vector<Displayable*> vDisplayable;
-//
-//public:
-//    /*******************************************************************************************************************
-//    * Public class methods
-//    *******************************************************************************************************************/
-//    explicit CommandReadVoronoi(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
-//
-//
-//    /**
-//     * @fn      run
-//     * @brief   Read Delaunay from file
-//     *
-//     * @return  true read was successfully
-//     *          false otherwise
-//     */
-//    CommandResult* runCommand() override
-//    {
-//        // Reset store data
-//        in.getStoreService()->reset();
-//
-//        // Run command
-//        Dcel *dcel = in.getStoreService()->getDcel();
-//        Delaunay *delaunay = in.getStoreService()->getDelaunay();
-//        delaunay->setDCEL(dcel);
-//        this->isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
-//
-//        if (this->isSuccess)
-//        {
-//            delaunay->setAlgorithm(INCREMENTAL);
-//        }
-//
-//        // Build result
-//        return createResult();
-//    }
-//
-//
-//    /**
-//     * @fn      createResult
-//     * @brief   Creates command result
-//     */
-//    CommandResult *createResult() override
-//    {
-//        // Add items to display
-//        vector<Displayable*> vDisplayableIn;
-//        if (getSuccess())
-//        {
-//            Dcel *dcel = in.getStoreService()->getDcel();
-//            Voronoi *voronoi = in.getStoreService()->getVoronoi();
-//
-//            // Add delaunay and voronoi
-//            vDisplayableIn.push_back(DisplayableFactory::createDcel(dcel));
-//            vDisplayableIn.push_back(DisplayableFactory::createDcel(voronoi->getRefDcel()));
-//        }
-//
-//        return new CommandResult(getSuccess(), vDisplayableIn);
-//    }
-//};
+class CommandReadVoronoi : public Command
+{
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    vector<Displayable*> vDisplayable;
+
+public:
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+    explicit CommandReadVoronoi(StoreService *storeServiceIn) : Command(storeServiceIn) {};
+
+    /**
+     * @fn      isRunnable
+     * @brief   Checks a Delaunay triangulation exist
+     *
+     * @return  true if command can be ran
+     *          false otherwise
+     */
+    bool isRunnable() override
+    {
+        // Delaunay triangulation must exist
+        return in.getStoreService()->isDelaunay();
+    }
+
+    /**
+     * @fn      run
+     * @brief   Read Voronoi from file
+     *
+     * @return  true read was successfully
+     *          false otherwise
+     */
+    CommandResult* runCommand() override
+    {
+        // Reset store data
+        in.getStoreService()->reset();
+
+        // Run command
+        auto *delaunay = new Delaunay();
+        auto *voronoi  = new Voronoi();
+        bool isSuccess = DelaunayIO::read(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+        if (isSuccess)
+        {
+            isSuccess = VoronoiIO::read(Config::getOutVoronoiFilename(), *voronoi);
+        }
+
+        // Save data
+        if (isSuccess)
+        {
+            // Save result
+            in.getStoreService()->save(*delaunay);
+            in.getStoreService()->save(*voronoi);
+        }
+
+        // Free resources
+        delete delaunay;
+        delete voronoi;
+
+        // Build result
+        setIsSuccess(isSuccess);
+        return createResult();
+    }
+
+
+    /**
+     * @fn      createResult
+     * @brief   Creates command result
+     */
+    CommandResult *createResult() override
+    {
+        // Add items to display
+        if (getSuccess())
+        {
+            Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+            Voronoi *voronoi = in.getStoreService()->getVoronoi();
+
+            // Add delaunay and voronoi
+            vDisplayable.push_back(DisplayableFactory::createDcel(dcel));
+            vDisplayable.push_back(DisplayableFactory::createDcel(voronoi->getRefDcel()));
+        }
+
+        return new CommandResult(getSuccess(), vDisplayable);
+    }
+};
 
 
 /***********************************************************************************************************************
@@ -2233,7 +2252,7 @@ public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFile(StoreService *storeServiceIn, ConfigService *configService) : Command(storeServiceIn, configService) {};
+    explicit CommandWriteFile(StoreService *storeServiceIn) : Command(storeServiceIn) {};
 
 
     /**
@@ -2246,8 +2265,7 @@ public:
     CommandResult* runCommand() override
     {
         // Write points to file
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelWriter::writePoints(Config::getOutFlatFilename(), INVALID, *dcel);
+        this->isSuccess = PointsWriter::write(Config::getOutFlatFilename(), in.getStoreService()->getPoints());
 
         // Build result
         return createResult();
@@ -2273,13 +2291,13 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandWriteFileDcel : public CommandWriteFile
+class CommandWriteDcel : public CommandWriteFile
 {
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileDcel(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandWriteDcel(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run
@@ -2290,9 +2308,19 @@ public:
      */
     CommandResult* runCommand() override
     {
+        // Check what triangulation is being used
+        Dcel *dcel;
+        if (in.getStoreService()->isTriangulation())
+        {
+            dcel = in.getStoreService()->getStarTriang()->getRefDcel();
+        }
+        else
+        {
+            dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        }
+
         // Write dcel to file
-        Dcel *dcel = in.getStoreService()->getDelaunay()->getRefDcel();
-        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), false, *dcel);
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, false);
 
         // Build result
         return createResult();
@@ -2303,13 +2331,13 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandWriteFileDelaunay : public CommandWriteFile
+class CommandFileDelaunay : public CommandWriteFile
 {
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileDelaunay(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandFileDelaunay(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run
@@ -2332,13 +2360,13 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandWriteFileVoronoi : public CommandWriteFile
+class CommandWriteVoronoi : public CommandWriteFile
 {
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileVoronoi(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandWriteVoronoi(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run
@@ -2349,10 +2377,18 @@ public:
      */
     CommandResult* runCommand() override
     {
-        // Write dcel to file
-        this->isSuccess = VoronoiIO::write(Config::getOutVoronoiFilename(), *getInput()->getStoreService()->getVoronoi());
+        // Write Delaunay to file
+        Delaunay *delaunay = getInput()->getStoreService()->getDelaunay();
+        bool isSuccess = DelaunayIO::write(Config::getInDCELFilename(), Config::getInGraphFilename(), *delaunay);
+
+        // Write Voronoi to file
+        if (isSuccess)
+        {
+            isSuccess = VoronoiIO::write(Config::getOutVoronoiFilename(), *getInput()->getStoreService()->getVoronoi());
+        }
 
         // Build result
+        setIsSuccess(isSuccess);
         return createResult();
     }
 };
@@ -2361,13 +2397,13 @@ public:
 /***********************************************************************************************************************
 * Class declaration
 ***********************************************************************************************************************/
-class CommandWriteFileGabriel : public CommandWriteFile
+class CommandWriteGabriel : public CommandWriteFile
 {
 public:
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandWriteFileGabriel(StoreService *storeServiceIn, ConfigService *configService) : CommandWriteFile(storeServiceIn, configService) {};
+    explicit CommandWriteGabriel(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
 
     /**
      * @fn      run

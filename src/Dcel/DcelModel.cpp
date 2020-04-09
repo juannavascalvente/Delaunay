@@ -25,6 +25,12 @@ void DcelModel::addVertex(const Point<TYPE> *p, const int edge)
 }
 
 
+void DcelModel::addVertex(const Vertex &v)
+{
+    vVertex.push_back(v);
+}
+
+
 /***************************************************************************
 * Name: 	updateVertex
 * IN:		edgeID			new edge to set for point
@@ -114,6 +120,12 @@ void DcelModel::addEdge(int origin, int twin, int previous, int next, int face)
 {
     Edge e(origin, twin, previous, next, face);
     this->vEdges.push_back(e);
+}
+
+
+void DcelModel::addEdge(Edge &edge)
+{
+    this->vEdges.push_back(edge);
 }
 
 
@@ -212,6 +224,10 @@ void DcelModel::addFace(const int edge)
     this->vFaces.push_back(face);
 }
 
+void DcelModel::addFace(Face &f)
+{
+    this->vFaces.push_back(f);
+}
 
 /***************************************************************************
 * Name: 	updateFace
@@ -331,12 +347,25 @@ void DcelModel::getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Poi
 }
 
 
-void DcelModel::reset()
+void DcelModel::reset(bool isResetPoints)
 {
-    // Reset counters.
-    this->vVertex.clear();
-    this->vEdges.clear();
-    this->vFaces.clear();
+    // Check if points must be reset
+    if (isResetPoints && !this->vVertex.empty())
+    {
+        this->vVertex.clear();
+    }
+
+    // Reset edges
+    if (!this->vEdges.empty())
+    {
+        this->vEdges.clear();
+    }
+
+    // Reset faces
+    if (!this->vFaces.empty())
+    {
+        this->vFaces.clear();
+    }
 }
 
 

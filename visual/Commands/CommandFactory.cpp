@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
@@ -20,7 +16,7 @@ map<int, pfuncCommandCreate> CommandFactory::mapFactories;
 /***********************************************************************************************************************
 * Public method definitions
 ***********************************************************************************************************************/
-Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService, ConfigService *configServiceIn)
+Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService)
 {
     if (CommandFactory::mapFactories.empty())
     {
@@ -32,11 +28,11 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
     // Check if option is valid
     if (CommandFactory::mapFactories.find(szOptionCmdId) == CommandFactory::mapFactories.end())
     {
-        command = CommandFactory::createFail(storeService, configServiceIn);
+        command = CommandFactory::createFail(storeService);
     }
     else
     {
-        command = CommandFactory::mapFactories.at(szOptionCmdId)(storeService, configServiceIn);
+        command = CommandFactory::mapFactories.at(szOptionCmdId)(storeService);
     }
 
     return command;
@@ -46,199 +42,200 @@ Command *CommandFactory::create(size_t szOptionCmdId, StoreService *storeService
 /***********************************************************************************************************************
 * Private method definitions
 ***********************************************************************************************************************/
-Command *CommandFactory::createNull(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createNull(StoreService *storeService)
 {
     // Create command
-    return new CommandNull(storeService, configService);
+    return new CommandNull(storeService);
 }
 
-Command *CommandFactory::createFail(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createFail(StoreService *storeService)
 {
     // Create command
-    return new CommandFail(storeService, configService);
-}
-
-
-Command *CommandFactory::createReadCfg(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandReadConfig(storeService, configService);
+    return new CommandFail(storeService);
 }
 
 
-Command *CommandFactory::createRandomGenerator(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createReadCfg(StoreService *storeService)
 {
     // Create command
-    return new CommandGenerateRandom(storeService, configService);
+    return new CommandReadConfig(storeService);
 }
 
 
-Command *CommandFactory::createClusterGenerator(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createRandomGenerator(StoreService *storeService)
 {
     // Create command
-    return new CommandGenerateCluster(storeService, configService);
+    return new CommandGenerateRandom(storeService);
 }
 
 
-Command *CommandFactory::createStarTriangulation(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createClusterGenerator(StoreService *storeService)
 {
     // Create command
-    return new CommandStarTriangulation(storeService, configService);
+    return new CommandGenerateCluster(storeService);
 }
 
 
-Command *CommandFactory::createDelaunay(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createStarTriangulation(StoreService *storeService)
 {
     // Create command
-    return new CommandDelaunay(storeService, configService);
+    return new CommandStarTriangulation(storeService);
 }
 
 
-Command *CommandFactory::createConvexHull(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createDelaunay(StoreService *storeService)
 {
     // Create command
-    return new CommandConvexHull(storeService, configService);
+    return new CommandDelaunay(storeService);
 }
 
 
-Command *CommandFactory::createVoronoi(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createConvexHull(StoreService *storeService)
 {
     // Create command
-    return new CommandVoronoi(storeService, configService);
+    return new CommandConvexHull(storeService);
 }
 
 
-Command *CommandFactory::createGabriel(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createVoronoi(StoreService *storeService)
 {
     // Create command
-    return new CommandGabriel(storeService, configService);
-}
-
-Command *CommandFactory::createTriangulationPath(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandTriangulationPath(storeService, configService);
-}
-
-Command *CommandFactory::createVoronoiPath(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandVoronoiPath(storeService, configService);
-}
-
-Command *CommandFactory::createClosestPoint(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandClosestPoint(storeService, configService);
-}
-
-Command *CommandFactory::createFindFace(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandFindFace(storeService, configService);
-}
-
-Command *CommandFactory::createTwoClosest(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandTwoClosest(storeService, configService);
-}
-
-Command *CommandFactory::createFilterEdges(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandFilterEdges(storeService, configService);
-}
-
-Command *CommandFactory::createCircumcentres(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandCircumcentres(storeService, configService);
-}
-
-Command *CommandFactory::createEdgeCircle(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandEdgeCircle(storeService, configService);
-}
-
-Command *CommandFactory::createDcelInfo(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandDcelInfo(storeService, configService);
-}
-
-Command *CommandFactory::createVoronoiInfo(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandVoronoiInfo(storeService, configService);
-}
-
-Command *CommandFactory::createClear(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandClear(storeService, configService);
-}
-
-Command *CommandFactory::createReadPoints(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandReadPoints(storeService, configService);
-}
-
-Command *CommandFactory::createReadPointsDcel(StoreService *storeService, ConfigService *configService)
-{
-    // Create command
-    return new CommandReadPointsDcel(storeService, configService);
+    return new CommandVoronoi(storeService);
 }
 
 
-Command *CommandFactory::createReadDelaunay(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createGabriel(StoreService *storeService)
 {
     // Create command
-    return new CommandReadDelaunay(storeService, configService);
+    return new CommandGabriel(storeService);
 }
 
-//Command *CommandFactory::createReadVoronoi(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createTriangulationPath(StoreService *storeService)
+{
+    // Create command
+    return new CommandTriangulationPath(storeService);
+}
+
+Command *CommandFactory::createVoronoiPath(StoreService *storeService)
+{
+    // Create command
+    return new CommandVoronoiPath(storeService);
+}
+
+Command *CommandFactory::createClosestPoint(StoreService *storeService)
+{
+    // Create command
+    return new CommandClosestPoint(storeService);
+}
+
+Command *CommandFactory::createFindFace(StoreService *storeService)
+{
+    // Create command
+    return new CommandFindFace(storeService);
+}
+
+Command *CommandFactory::createTwoClosest(StoreService *storeService)
+{
+    // Create command
+    return new CommandTwoClosest(storeService);
+}
+
+Command *CommandFactory::createFilterEdges(StoreService *storeService)
+{
+    // Create command
+    return new CommandFilterEdges(storeService);
+}
+
+Command *CommandFactory::createCircumcentres(StoreService *storeService)
+{
+    // Create command
+    return new CommandCircumcentres(storeService);
+}
+
+Command *CommandFactory::createEdgeCircle(StoreService *storeService)
+{
+    // Create command
+    return new CommandEdgeCircle(storeService);
+}
+
+Command *CommandFactory::createDcelInfo(StoreService *storeService)
+{
+    // Create command
+    return new CommandDcelInfo(storeService);
+}
+
+Command *CommandFactory::createVoronoiInfo(StoreService *storeService)
+{
+    // Create command
+    return new CommandVoronoiInfo(storeService);
+}
+
+Command *CommandFactory::createClear(StoreService *storeService)
+{
+    // Create command
+    return new CommandClear(storeService);
+}
+
+Command *CommandFactory::createReadPoints(StoreService *storeService)
+{
+    // Create command
+    return new CommandReadPoints(storeService);
+}
+
+
+Command *CommandFactory::createReadStar(StoreService *storeService)
+{
+    // Create command
+    return new CommandReadStar(storeService);
+}
+
+
+Command *CommandFactory::createReadDelaunay(StoreService *storeService)
+{
+    // Create command
+    return new CommandReadDelaunay(storeService);
+}
+
+Command *CommandFactory::createReadVoronoi(StoreService *storeService)
+{
+    // Create command
+    return new CommandReadVoronoi(storeService);
+}
+
+//Command *CommandFactory::createReadGabriel(StoreService *storeService)
 //{
 //    // Create command
-//    return new CommandReadVoronoi(storeService, configService);
-//}
-//
-//Command *CommandFactory::createReadGabriel(StoreService *storeService, ConfigService *configService)
-//{
-//    // Create command
-//    return new CommandClear(storeService, configService);
+//    return new CommandClear(storeService);
 //}
 
-Command *CommandFactory::createWritePoints(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createWritePoints(StoreService *storeService)
 {
     // Create command
-    return new CommandWriteFile(storeService, configService);
+    return new CommandWriteFile(storeService);
 }
 
-Command *CommandFactory::createWriteDcel(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createWriteDcel(StoreService *storeService)
 {
     // Create command
-    return new CommandWriteFileDcel(storeService, configService);
+    return new CommandWriteDcel(storeService);
 }
 
-Command *CommandFactory::createWriteDelaunay(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createWriteDelaunay(StoreService *storeService)
 {
     // Create command
-    return new CommandWriteFileDelaunay(storeService, configService);
+    return new CommandFileDelaunay(storeService);
 }
 
-Command *CommandFactory::createWriteVoronoi(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createWriteVoronoi(StoreService *storeService)
 {
     // Create command
-    return new CommandWriteFileVoronoi(storeService, configService);
+    return new CommandWriteVoronoi(storeService);
 }
 
-Command *CommandFactory::createWriteGabriel(StoreService *storeService, ConfigService *configService)
+Command *CommandFactory::createWriteGabriel(StoreService *storeService)
 {
     // Create command
-    return new CommandWriteFileGabriel(storeService, configService);
+    return new CommandWriteGabriel(storeService);
 }
 
 void CommandFactory::initialize()
@@ -265,12 +262,12 @@ void CommandFactory::initialize()
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(voronoi_info, CommandFactory::createVoronoiInfo));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(clear, CommandFactory::createClear));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_flat_file, CommandFactory::createReadPoints));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_points_dcel_file, CommandFactory::createReadPointsDcel));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_star_triangulation, CommandFactory::createReadStar));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_delaunay, CommandFactory::createReadDelaunay));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_voronoi, CommandFactory::createNull));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_voronoi, CommandFactory::createReadVoronoi));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_gabriel, CommandFactory::createNull));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_points, CommandFactory::createWritePoints));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_dcel, CommandFactory::createWriteDcel));
+    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_triangulation, CommandFactory::createWriteDcel));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_delaunay, CommandFactory::createWriteDelaunay));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_voronoi, CommandFactory::createWriteVoronoi));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_gabriel, CommandFactory::createWriteGabriel));

@@ -1,10 +1,3 @@
-/*
- * Process.h
- *
- *  Created on: Jun 29, 2016
- *      Author: jnavas
- */
-
 #ifndef PROCESS_H_
 #define PROCESS_H_
 
@@ -12,8 +5,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "ConfigService.h"
-#include "Visual/Display/DisplayManager.h"
+#include "DisplayManager.h"
 #include "Logging.h"
 #include "StoreService.h"
 
@@ -27,7 +19,6 @@ class Process
     * Class members
     *******************************************************************************************************************/
     DisplayManager      *dispManager;
-    ConfigService       *configService;
     StoreService        *storeService;
 	Logging 		    *log;			// Log file.
 
@@ -45,8 +36,7 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn,
-            ConfigService *configServiceIn);
+    Process(int argc, char **argv, bool printData, StoreService *storeServiceIn);
 	~Process();
 
     /**

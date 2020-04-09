@@ -1,15 +1,6 @@
-/*
- * Vertex.cpp
- *
- *  Created on: Jul 5, 2016
- *      Author: jnavas
- */
-
 #include "defines.h"
-#include "Dcel/Vertex.h"
+#include "Vertex.h"
 
-#include <iostream>
-using namespace std;
 
 /*****************************************************************************
  * Name: 		random

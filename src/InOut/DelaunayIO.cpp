@@ -5,47 +5,51 @@
 #include "DcelWriter.h"
 #include "Delaunay.h"
 #include "DelaunayIO.h"
+#include "GraphReader.h"
+#include "GraphWriter.h"
 
 
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-bool DelaunayIO::read(const string &fileName, const string &graphFileName, Delaunay &delaunay)
+bool DelaunayIO::read(const string &strDcelFileName, const string &strGraphFileName, Delaunay &delaunay)
 {
-    bool	read;		// Return value.
+    bool	isSuccess;		// Return value.
 
     // Initialize output
     delaunay.reset();
 
     // Read DCEL data.
-    read = DcelReader::read(fileName, false, delaunay.dcel);
-    if (read)
+    isSuccess = DcelReader::read(strDcelFileName, false, delaunay.dcel);
+    if (isSuccess)
     {
+        delaunay.setValid(true);
+
         // Initialize graph.
         delaunay.initGraph();
 
         // Read graph data.
-        read = delaunay.graph.read(graphFileName);
+        isSuccess = GraphReader::read(strGraphFileName, false, delaunay.graph);
     }
 
-    return read;
+    return isSuccess;
 }
 
 
-bool DelaunayIO::write(const string &strFileName, const string &strGraphFileName, Delaunay &delaunay)
+bool DelaunayIO::write(const string &strDcelFileName, const string &strGraphFileName, Delaunay &delaunay)
 {
-    bool	success;		// Return value.
+    bool	isSuccess;		// Return value.
 
     // Write DCEL data.
-    success = DcelWriter::write(strFileName, false, delaunay.dcel);
-    if (success)
+    isSuccess = DcelWriter::write(strDcelFileName, delaunay.dcel, false);
+    if (isSuccess)
     {
         // Write graph data if graph exists.
         if (delaunay.graph.getSize() > 0)
         {
-            success = delaunay.graph.write(strGraphFileName);
+            isSuccess = GraphWriter::write(strGraphFileName, false, delaunay.graph);
         }
     }
 
-    return success;
+    return isSuccess;
 }

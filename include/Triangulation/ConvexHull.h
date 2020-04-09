@@ -24,10 +24,13 @@ public:
     *******************************************************************************************************************/
     ConvexHull() = default;
     ~ConvexHull() = default;
-    ConvexHull(const ConvexHull &d)
+    ConvexHull(const ConvexHull &h)
     {
-        this->hull = d.hull;
-        this->vEdges = d.vEdges;
+        if (this != &h)
+        {
+            this->hull = h.hull;
+            this->vEdges = h.vEdges;
+        }
     }
 
     /**

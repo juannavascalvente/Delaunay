@@ -53,7 +53,7 @@ public:
      */
     void reset()
     {
-        dcel.reset();
+        dcel.reset(false);
         hull.reset();
     }
 

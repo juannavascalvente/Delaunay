@@ -58,17 +58,18 @@ public:
     /*******************************************************************************************************************
     * Convex hull functions
     *******************************************************************************************************************/
-	bool isConvexHullComputed() { return !hull.isEmpty(); };
-	bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); };
-	bool getConvexHullEdges(vector<int> &vEdges) { return hull.getConvexHullEdges(vEdges);  };
+	bool isConvexHullComputed() { return !hull.isEmpty(); }
+	bool getConvexHull(Polygon &polygon) { return hull.getConvexHull(polygon); }
+	bool getConvexHullEdges(vector<int> &vEdges) { return hull.getConvexHullEdges(vEdges);  }
 	size_t getConvexHullLen() { return hull.size(); }
 
     /*******************************************************************************************************************
     * Getter/Setters
     *******************************************************************************************************************/
-    Graph* getGraph() {return &graph;}
-	Dcel *getRefDcel() { return &this->dcel; };
-    bool isValid() const { return isBuilt; };
+    Graph* getGraph() {return &graph; }
+	Dcel *getRefDcel() { return &this->dcel; }
+    bool isValid() const { return isBuilt; }
+    void setValid(bool isValid) { isBuilt = isValid; }
 
     /*******************************************************************************************************************
     * Triangulation interface functions implementation
@@ -77,7 +78,6 @@ public:
     bool convexHull() override ;
     bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
     bool findFace(Point<TYPE> &origin, int &faceId) override ;
-
     bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex) override ;
     bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override ;
 #ifdef INCREMENTAL_DELAUNAY_STATISTICS

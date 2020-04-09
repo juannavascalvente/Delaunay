@@ -14,7 +14,7 @@ enum MenuOption
     randomly = 2,
     cluster = 3,
     read_points_flat_file = 4,
-    read_points_dcel_file = 5,
+    read_star_triangulation = 5,
     read_delaunay = 7,
     read_voronoi = 8,
     read_gabriel = 9,
@@ -36,7 +36,7 @@ enum MenuOption
     clear = 25,
     quit = 26,
     write_points = 27,
-    write_dcel = 28,
+    write_triangulation = 28,
     write_delaunay = 29,
     write_voronoi = 30,
     write_gabriel = 31

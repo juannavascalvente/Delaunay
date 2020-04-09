@@ -34,6 +34,7 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
+    StarTriangulation() : nPending(0), isBuilt(false) {};
     explicit StarTriangulation(vector<Point<TYPE>> &vPoints) : Triangulation(vPoints), nPending(0), isBuilt(false) {};
 	~StarTriangulation() = default;
     StarTriangulation(const StarTriangulation &t) : Triangulation(t)
@@ -59,7 +60,7 @@ public:
     /*******************************************************************************************************************
     * Getters/Setters
     *******************************************************************************************************************/
-    Dcel* getDcel() {return &dcel;}
+    Dcel* getRefDcel() {return &dcel;}
     bool isValid() const { return isBuilt; };
 
     /*******************************************************************************************************************

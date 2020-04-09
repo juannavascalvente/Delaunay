@@ -1,7 +1,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "Visual/Display/DisplayManager.h"
+#include "DisplayManager.h"
 
 
 /***********************************************************************************************************************
@@ -9,17 +9,20 @@
 ***********************************************************************************************************************/
 void DisplayManager::process()
 {
-    // Clear display.
-    DisplayService::clear();
+    if (!vDisplayables.empty())
+    {
+        // Clear display.
+        DisplayService::clear();
 
-    // Draw figures
-    draw();
+        // Draw figures
+        draw();
 
-    // Full images into display.
-    DisplayService::flush();
+        // Full images into display.
+        DisplayService::flush();
 
-    // Remove figures
-    reset();
+        // Remove figures
+        reset();
+    }
 }
 
 

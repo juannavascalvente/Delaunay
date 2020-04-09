@@ -20,11 +20,11 @@ using namespace std;
 #define	INPUTSET_RANDOM_TEXT			"randomly"
 #define	INPUTSET_CLUSTER_TEXT			"Clusters"
 #define	READ_MENU_TEXT					"Read"
-#define	INPUTSET_READ_FLAT_TEXT			"Flat file"
-#define	INPUTSET_READ_DCEL_POINTS_TEXT 	"Points DCEL file"
-#define	INPUTSET_READ_INCREMENTAL_TEXT	"Incremental files"
-#define	INPUTSET_READ_VORONOI_TEXT		"Voronoi file"
-#define INPUTSET_READ_GABRIEL_TEXT		"Gabriel file"
+#define	INPUTSET_READ_FLAT_TEXT			"Flat points set"
+#define	INPUTSET_READ_STAR_TRIANG_TEXT	"Triangulation"
+#define	INPUTSET_READ_INCREMENTAL_TEXT	"Incremental Delaunay"
+#define	INPUTSET_READ_VORONOI_TEXT		"Voronoi"
+#define INPUTSET_READ_GABRIEL_TEXT		"Gabriel"
 //#define	INPUTSET_SHAKE_DCEL_TEXT		"Shake points"
 
 // Parameters menu entries text.
@@ -172,9 +172,9 @@ void Menu::updateMenu()
 		{
 			sub_Menu_Id4 = glutCreateMenu(menu_level_1);
 			glutAddMenuEntry(EXPORT_FLAT_FILE, write_points);
-			if (service.isTriangulation())
+			if (service.isTriangulation() || service.isDelaunay())
 			{
-				glutAddMenuEntry(EXPORT_DCEL_FILE, write_dcel);
+				glutAddMenuEntry(EXPORT_DCEL_FILE, write_triangulation);
 				if (service.isDelaunay())
 				{
 					glutAddMenuEntry(EXPORT_DELAUNAY_FILE, write_delaunay);
@@ -256,7 +256,7 @@ int Menu::createReadMenu()
 {
     int iMenuId = glutCreateMenu(menu_level_1);
     glutAddMenuEntry(INPUTSET_READ_FLAT_TEXT, read_points_flat_file);
-    glutAddMenuEntry(INPUTSET_READ_DCEL_POINTS_TEXT, read_points_dcel_file);
+    glutAddMenuEntry(INPUTSET_READ_STAR_TRIANG_TEXT, read_star_triangulation);
     glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, read_delaunay);
     glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, read_voronoi);
     glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, read_gabriel);

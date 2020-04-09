@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 #ifndef DELAUNAY_STORESERVICE_H
 #define DELAUNAY_STORESERVICE_H
 
@@ -9,6 +5,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "Config.h"
 #include "Dcel.h"
 #include "Delaunay.h"
 #include "Gabriel.h"
@@ -46,6 +43,23 @@ public:
     void destroy();
 
     /*******************************************************************************************************************
+    * Config
+    *******************************************************************************************************************/
+    size_t getNumPoints() { return Config::getNPoints(); };
+    size_t getNumClusters() { return Config::getNClusters(); };
+    size_t getRadius() { return Config::getRadius(); };
+    size_t getMinLengthEdge() { return Config::getMinLengthEdge(); };
+
+
+    /*******************************************************************************************************************
+    * Delete
+    *******************************************************************************************************************/
+    void deleteTriangulation() { repository->getData()->deleteStar(); };
+    void deleteDelaunay() { repository->getData()->deleteDelaunay(); };
+    void deleteVoronoi() { repository->getData()->deleteVoronoi(); };
+    void deleteGabriel() { repository->getData()->deleteGabriel(); };
+
+    /*******************************************************************************************************************
     * Checkers
     *******************************************************************************************************************/
     bool isSetCreated() { return !getPoints().empty(); };
@@ -58,7 +72,7 @@ public:
     * Getters
     *******************************************************************************************************************/
     vector<Point<TYPE>>      &getPoints()    { return *repository->getData()->getPoints(); };
-    Delaunay    *getDelaunay()  { return repository->getData()->getDelaunay(); };
+    Delaunay    *getDelaunay()  { return repository->getData()->getDelaunayData(); };
     Voronoi     *getVoronoi()   { return repository->getData()->getVoronoi(); };
     Gabriel     *getGabriel()   { return repository->getData()->getGabriel(); };
     StarTriangulation *getStarTriang() { return repository->getData()->getStarTriang(); };
@@ -67,8 +81,8 @@ public:
     * Setters
     *******************************************************************************************************************/
     void    save(vector<Point<TYPE>> &vPoints) { repository->getData()->save(vPoints); };
-    void    save(StarTriangulation &triangulation) { repository->getData()->save(triangulation); };
-    void    save(Delaunay &delaunay) { repository->getData()->save(delaunay); };
+    void    save(StarTriangulation &triangulation);
+    void    save(Delaunay &delaunay);
     void    save(Voronoi &voronoi) { repository->getData()->save(voronoi); };
     void    save(Gabriel &gabriel) { repository->getData()->save(gabriel); };
 };

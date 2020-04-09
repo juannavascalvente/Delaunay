@@ -169,8 +169,7 @@ int executeVisual(int argc, char **argv)
 	{
 		// Create process.
         auto *storeService = new StoreService(StoreDataRepository::getInstance());
-        auto *configService = new ConfigService();
-		Process process = Process(argc, argv, printData, storeService, configService);
+		Process process = Process(argc, argv, printData, storeService);
 		process.setInstance(&process);
 
 		// Main loop.

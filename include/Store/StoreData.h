@@ -32,11 +32,20 @@ public:
     *******************************************************************************************************************/
     StoreData() : delaunay(nullptr), triangulation(nullptr), voronoi(nullptr), gabriel(nullptr) {};
 
+
+    /*******************************************************************************************************************
+    * Getters
+    *******************************************************************************************************************/
+    void deleteStar();
+    void deleteDelaunay();
+    void deleteVoronoi();
+    void deleteGabriel();
+
     /*******************************************************************************************************************
     * Getters
     *******************************************************************************************************************/
     vector<Point<TYPE>> *getPoints()   { return &vPoints; };
-    Delaunay *getDelaunay() { return delaunay; };
+    Delaunay *getDelaunayData() { return delaunay; };
     StarTriangulation *getStarTriang() { return triangulation; };
     Voronoi *getVoronoi()   { return voronoi; };
     Gabriel *getGabriel()   { return gabriel; };
