@@ -462,24 +462,24 @@ public:
 
     /**
      * @fn       printRunnableMsg
-     * @brief    Prints message to explain that Delaunay triangulation has been already computed
+     * @brief    Prints message to explain there is no set of points
      */
     void printRunnableMsg() override
     {
-        cout << "Triangulation already computed" << endl;
+        cout << "There is no set of points to use" << endl;
     };
 
 
     /**
      * @fn      isRunnable
-     * @brief   Checks Delaunay triangulation is not already displayed
+     * @brief   Checks there is a set of points to use as input
      *
      * @return  true if command can be ran
      *          false otherwise
      */
     bool isRunnable() override
     {
-        // Star triangulation and Delaunay have not been already created
+        // Set of points must exist
         return in.getStoreService()->isSetCreated();
     };
 
@@ -492,20 +492,26 @@ public:
      */
     CommandResult * runCommand() override
     {
-        // Get reference to current DCEL and Delaunay
-        auto *delaunay = new Delaunay(in.getStoreService()->getPoints());
+        bool isRunSuccess=true;
 
-        // Build Delaunay from DCEL.
-        bool isRunSuccess = delaunay->build();
-
-        // Save result
-        if (isRunSuccess)
+        // If Delaunay already exists -> do nothing
+        if (!in.getStoreService()->isDelaunay())
         {
-            in.getStoreService()->save( *delaunay);
-        }
+            // Get reference to current DCEL and Delaunay
+            auto *delaunay = new Delaunay(in.getStoreService()->getPoints());
 
-        // Free resources
-        delete delaunay;
+            // Build Delaunay from DCEL.
+            isRunSuccess = delaunay->build();
+
+            // Save result
+            if (isRunSuccess)
+            {
+                in.getStoreService()->save( *delaunay);
+            }
+
+            // Free resources
+            delete delaunay;
+        }
 
         // Build result
         setIsSuccess(isRunSuccess);
@@ -2168,19 +2174,6 @@ public:
     * Public class methods
     *******************************************************************************************************************/
     explicit CommandReadVoronoi(StoreService *storeServiceIn) : Command(storeServiceIn) {};
-
-    /**
-     * @fn      isRunnable
-     * @brief   Checks a Delaunay triangulation exist
-     *
-     * @return  true if command can be ran
-     *          false otherwise
-     */
-    bool isRunnable() override
-    {
-        // Delaunay triangulation must exist
-        return in.getStoreService()->isDelaunay();
-    }
 
     /**
      * @fn      run

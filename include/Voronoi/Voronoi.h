@@ -73,10 +73,11 @@ public:
 	bool 	isInnerToArea(const Point<TYPE> &p, int areaId);
 
     /*******************************************************************************************************************
-    * Getters
+    * Getters/Setters
     *******************************************************************************************************************/
-    bool isValid() const { return isBuilt; };
-    inline Dcel* getRefDcel() { return(&this->dcel); };
+    bool isValid() const { return isBuilt; }
+    void setValid(bool isValue) { isBuilt = isValue; }
+    inline Dcel* getRefDcel() { return(&this->dcel); }
 
     /**
      * @fn              getCentre
@@ -84,7 +85,7 @@ public:
      * @param areaId    (IN) Area whose center point is returned
      * @param centre    (OUT) Area center
      */
-    void 		 getCentre(int areaId, Point<TYPE> &centre) { centre = *this->dcel.getRefPoint(areaId); };
+    void 		 getCentre(int areaId, Point<TYPE> &centre) { centre = *this->dcel.getRefPoint(areaId); }
 };
 
 #endif /* INCLUDE_VORONOI_H_ */

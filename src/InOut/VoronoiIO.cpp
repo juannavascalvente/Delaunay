@@ -20,6 +20,7 @@ bool VoronoiIO::read(const string &strFileName, Voronoi &voronoi)
 {
     // Read voronoi DCEL file.
     bool isSuccess = DcelReader::read(strFileName, false, voronoi.dcel);
+    voronoi.setValid(isSuccess);
 
     return isSuccess;
 }
