@@ -1,14 +1,6 @@
-/*
- * Logging.cpp
- *
- *  Created on: Jul 7, 2016
- *      Author: jnavas
- */
-
 #include <Logging.h>
-#include <string.h>
+#include <cstring>
 #include <sstream>
-#include <stdarg.h>
 
 bool forceStdOutput;
 bool opened;					// Log file opened flag.
@@ -17,7 +9,6 @@ string file;					// File source code name.
 string function;				// Function name.
 string message;					// Message text.
 ofstream *ofs;					// Output stream.
-int	fileCounter;
 
 // Internal static variables.
 //Logging *Logging::instance=NULL;
@@ -25,7 +16,7 @@ int	fileCounter;
 //------------------------------------------------------------------------
 // Constructors / Destructor.
 //------------------------------------------------------------------------
-Logging::Logging(const string fileName, bool force)
+Logging::Logging(const string& fileName, bool force)
 {
 	// Initialize attributes.
 	concat = false;
@@ -36,7 +27,6 @@ Logging::Logging(const string fileName, bool force)
 	function = "";
 	file = "";
 	message = "";
-	fileCounter = 0;
 	forceStdOutput = force;
 }
 
@@ -62,7 +52,7 @@ Logging::~Logging()
 * GLOBAL:	NONE
 * Description: adds a string to the message to print
 ***************************************************************************/
-void Logging::buildText(string text)
+void Logging::buildText(const string& text)
 {
 	message = message + text;
 	concat = true;
@@ -97,34 +87,6 @@ void Logging::buildText(int value)
 	}
 }
 
-/***************************************************************************
-* Name: 	buildTestHeader
-* IN:		testId		test id
-* 			nTest		number of tests to execute
-* 			testName	test name
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: updates function name and text to be printed.
-***************************************************************************/
-void Logging::buildTestHeader(int testId, int nTests, string testName)
-{
-	ostringstream convertTestId;
-	convertTestId << testId;
-
-	ostringstream convertnTests;
-	convertnTests << nTests;
-
-	Logging::buildText("**********************************************\n");
-	Logging::buildText("Executing test ");
-	Logging::buildText(convertTestId.str());
-	Logging::buildText("/");
-	Logging::buildText(convertnTests.str());
-	Logging::buildText("\nTest name: ");
-	Logging::buildText(testName);
-	Logging::buildText("\n**********************************************");
-	Logging::write(true, Testing);
-}
 
 /***************************************************************************
 * Name: buildText
@@ -136,7 +98,7 @@ void Logging::buildTestHeader(int testId, int nTests, string testName)
 * GLOBAL:	NONE
 * Description: updates function name and text to be printed.
 ***************************************************************************/
-void Logging::buildText(string func, string f, string text)
+void Logging::buildText(string func, string f, const string& text)
 {
 	// Check if text must be concatenated.
 	if (concat)
@@ -146,8 +108,8 @@ void Logging::buildText(string func, string f, string text)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = text;
 		concat = true;
 	}
@@ -178,12 +140,45 @@ void Logging::buildText(string func, string f, int value)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
 }
+
+
+/***************************************************************************
+* Name: write
+* IN:		function		function that writes the log
+* 			text			message to be logged
+* 			value			integer to be logged
+* OUT:		NONE
+* RETURN:	NONE
+* GLOBAL:	NONE
+* Description: starts infinite loop.
+***************************************************************************/
+void Logging::buildText(string func, string f, size_t szValue)
+{
+    string Result;
+    ostringstream convert;
+    convert << szValue;
+
+    // Check if text must be concatenated.
+    if (concat)
+    {
+        message = message + convert.str();
+    }
+    else
+    {
+        // Copy function and text to be printed.
+        function = std::move(func);
+        file = std::move(f);
+        message = convert.str();
+        concat = true;
+    }
+}
+
 
 /***************************************************************************
 * Name: write
@@ -209,8 +204,8 @@ void Logging::buildText(string func, string f, TYPE value)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
@@ -241,8 +236,8 @@ void Logging::buildText(string func, string f, double value)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
@@ -273,8 +268,8 @@ void Logging::buildText(string func, string f, Point<TYPE> *point)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}
@@ -305,8 +300,8 @@ void Logging::buildRange(string func, string f, int start, int end)
 	else
 	{
 		// Copy function and text to be printed.
-		function = func;
-		file = f;
+		function = std::move(func);
+		file = std::move(f);
 		message = convert.str();
 		concat = true;
 	}

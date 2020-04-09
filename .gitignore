@@ -1,11 +1,17 @@
-# Project settings.
+# Project settings
 .cproject
 .project
 
 # Project folders
+.idea/
+cmake-build*/
 .settings/
 Debug/
 obj/
+tmp/
 
-# Executables.
+# Log
+log.txt
+
+# Executables
 geometric

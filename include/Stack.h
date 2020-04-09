@@ -1,10 +1,3 @@
-/*
- * Stack.h
- *
- *  Created on: Jul 22, 2016
- *      Author: jnavas
- */
-
 #ifndef INCLUDE_STACK_H_
 #define INCLUDE_STACK_H_
 
@@ -17,7 +10,9 @@
 //#define DEBUG_POP_STACK
 #endif
 
-#include "string.h"
+#include <cstring>
+#include "Logging.h"
+
 
 //*****************************************************************************
 //                           	STACK CLASS

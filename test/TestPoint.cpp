@@ -119,10 +119,6 @@ TEST (PointUnitTest, Test_Random_Shake_Shift)
     q = p;
     EXPECT_EQ(p, q);
 
-    // Check point is not equal after shaking it.
-    p.shake();
-    EXPECT_NE(p, q);
-
     // Check middle point between p and r.
     float fpShift=0.2;
     q = p;
