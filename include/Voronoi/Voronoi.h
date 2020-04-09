@@ -16,14 +16,14 @@ class Voronoi
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-	Dcel 	triangulation;		// Reference to triangulation DCEL data.
+	Dcel 	*triangulation;		// Reference to triangulation DCEL data.
 	Dcel 	dcel;				// Reference to Voronoi DCEL data.
 	bool    isBuilt;
 
     /*******************************************************************************************************************
     * Private methods declarations
     *******************************************************************************************************************/
-	void computeCircumcentres(bool isIncremental);
+    void computeCircumcentres();
 	void buildArea(int pointIndex);
 	Point<TYPE> computeExtremeVoronoi(int edgeIndex, Point<TYPE> &centre);
 	bool edgeExists(Edge &edge);
@@ -35,8 +35,8 @@ public:
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Voronoi() : isBuilt(false) {};
-	explicit Voronoi(Dcel &t) : triangulation(t), isBuilt(false) {};
+	Voronoi() : triangulation(nullptr), isBuilt(false) {};
+	explicit Voronoi(Dcel *t) : triangulation(t), isBuilt(false) {};
 	~Voronoi() = default;
 
     Voronoi(const Voronoi &d)
@@ -59,7 +59,7 @@ public:
 	 * @return                  true if build successfully
 	 *                          false otherwise
 	 */
-	bool 	build(bool isIncremental);
+    bool build();
 
 	/**
 	 * @fn              isInnerToArea
@@ -73,10 +73,11 @@ public:
 	bool 	isInnerToArea(const Point<TYPE> &p, int areaId);
 
     /*******************************************************************************************************************
-    * Getters
+    * Getters/Setters
     *******************************************************************************************************************/
-    bool isValid() const { return isBuilt; };
-    inline Dcel* getRefDcel() { return(&this->dcel); };
+    bool isValid() const { return isBuilt; }
+    void setValid(bool isValue) { isBuilt = isValue; }
+    inline Dcel* getRefDcel() { return(&this->dcel); }
 
     /**
      * @fn              getCentre
@@ -84,7 +85,7 @@ public:
      * @param areaId    (IN) Area whose center point is returned
      * @param centre    (OUT) Area center
      */
-    void 		 getCentre(int areaId, Point<TYPE> &centre) { centre = *this->dcel.getRefPoint(areaId); };
+    void 		 getCentre(int areaId, Point<TYPE> &centre) { centre = *this->dcel.getRefPoint(areaId); }
 };
 
 #endif /* INCLUDE_VORONOI_H_ */

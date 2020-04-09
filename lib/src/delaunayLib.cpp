@@ -78,10 +78,10 @@ bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
         if (isSuccess)
         {
             // Create Voronoi
-            auto *voronoi = new Voronoi(*delaunay->getRefDcel());
+            auto *voronoi = new Voronoi(delaunay->getRefDcel());
 
             // Compute Voronoi diagram.
-            isSuccess = voronoi->build(true);
+            isSuccess = voronoi->build();
 
             dcelOut = *voronoi->getRefDcel();
             delete voronoi;
