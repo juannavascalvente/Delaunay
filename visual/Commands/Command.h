@@ -680,10 +680,10 @@ public:
         // Initialize voronoi data
         Delaunay *delaunay = in.getStoreService()->getDelaunay();
         Dcel *dcel = delaunay->getRefDcel();
-        auto *voronoi = new Voronoi(*dcel);
+        auto *voronoi = new Voronoi(dcel);
 
         // Compute Voronoi diagram
-        bool isRunSuccess = voronoi->build(true);
+        bool isRunSuccess = voronoi->build();
 
         // Save result
         if (isRunSuccess)

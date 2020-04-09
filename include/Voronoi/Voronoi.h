@@ -16,14 +16,14 @@ class Voronoi
     /*******************************************************************************************************************
     * Class members
     *******************************************************************************************************************/
-	Dcel 	triangulation;		// Reference to triangulation DCEL data.
+	Dcel 	*triangulation;		// Reference to triangulation DCEL data.
 	Dcel 	dcel;				// Reference to Voronoi DCEL data.
 	bool    isBuilt;
 
     /*******************************************************************************************************************
     * Private methods declarations
     *******************************************************************************************************************/
-	void computeCircumcentres(bool isIncremental);
+    void computeCircumcentres();
 	void buildArea(int pointIndex);
 	Point<TYPE> computeExtremeVoronoi(int edgeIndex, Point<TYPE> &centre);
 	bool edgeExists(Edge &edge);
@@ -35,8 +35,8 @@ public:
     /*******************************************************************************************************************
     * Public methods declarations
     *******************************************************************************************************************/
-	Voronoi() : isBuilt(false) {};
-	explicit Voronoi(Dcel &t) : triangulation(t), isBuilt(false) {};
+	Voronoi() : triangulation(nullptr), isBuilt(false) {};
+	explicit Voronoi(Dcel *t) : triangulation(t), isBuilt(false) {};
 	~Voronoi() = default;
 
     Voronoi(const Voronoi &d)
@@ -59,7 +59,7 @@ public:
 	 * @return                  true if build successfully
 	 *                          false otherwise
 	 */
-	bool 	build(bool isIncremental);
+    bool build();
 
 	/**
 	 * @fn              isInnerToArea
