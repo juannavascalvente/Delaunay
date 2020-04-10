@@ -14,6 +14,9 @@
 ***********************************************************************************************************************/
 void PointFactory::generateRandom(size_t szNum, vector<Point<TYPE>> &vPoints)
 {
+    // Clear output
+    vPoints.clear();
+
     // Create n lines.
     for (size_t i=0; i<szNum ;i++)
     {
