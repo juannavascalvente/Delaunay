@@ -698,6 +698,35 @@ bool Dcel::findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesI
 }
 
 
+bool Dcel::isInsideFace(const Point<TYPE> &p, int faceId)
+{
+	bool inner=true;		// Return value
+
+	// Get edge in current face.
+	int iFirstEdgeIdx = getFaceEdge(faceId) - 1;
+	int iCurrentEdgeIdx = iFirstEdgeIdx;
+
+	do
+	{
+		// Get origin and destination points.
+		Point<TYPE> origin = *getRefPoint(getOrigin(iCurrentEdgeIdx) - 1);
+		Point<TYPE> dest   = *getRefPoint(getOrigin(getTwin(iCurrentEdgeIdx) - 1) - 1);
+
+		// If right turn then it is not inner.
+		if (origin.check_Turn(dest, p) == RIGHT_TURN)
+		{
+			inner = false;
+		}
+
+		// Get nexte edge.
+		iCurrentEdgeIdx = getNext(iCurrentEdgeIdx) - 1;
+
+	} while ((iCurrentEdgeIdx != iFirstEdgeIdx) && inner);
+
+	return inner;
+}
+
+
 /***********************************************************************************************************************
 * Private methods definitions
 ***********************************************************************************************************************/

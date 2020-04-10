@@ -6,6 +6,7 @@
 #include "Circle.h"
 #include "defines.h"
 #include "Logging.h"
+#include "PointFactory.h"
 #include "Stack.h"
 #include "StarTriangulation.h"
 
@@ -126,6 +127,81 @@ bool StarTriangulation::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 
 	return found;
 }
+
+
+bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
+{
+    bool isSuccess=false;           // Return value
+
+    // Get edge from a random point
+    int iIdx=(int) drand48();
+    iIdx %= dcel.getNumVertex();
+    int iEdgeIdx = dcel.getPointEdge(iIdx) - 1;
+
+    bool isFinished=false;
+    do
+    {
+        // Get edge face
+        faceId = dcel.getFace(iEdgeIdx);
+
+        // Check if point is interior to current face
+        if (dcel.isInsideFace(point, faceId))
+        {
+            // Face found
+            isFinished = true;
+            isSuccess = true;
+        }
+        // Move to adjacent face
+        else
+        {
+            // Point is out of convex hull
+            if (faceId == EXTERNAL_FACE)
+            {
+                isFinished = true;
+                isSuccess = true;
+            }
+            else
+            {
+                // Get face centre
+                vector<Point<TYPE>> vPoints;
+                dcel.getFacePoints(faceId, vPoints);
+                Circle circle = Circle(vPoints);
+                Point<TYPE> *centre = circle.getRefCentre();
+
+                // Find out what edge intersects line between face centre and target point
+                Line l (point, *centre);
+                int edgeIntersectionId=INVALID;
+                if (dcel.getEdgeInserection(l, faceId, edgeIntersectionId))
+                {
+                    // Get next face
+                    iEdgeIdx = dcel.getTwin(edgeIntersectionId - 1) - 1;
+                }
+                else
+                {
+                    isFinished = true;
+                    isSuccess = false;
+                    cout << "Error finding face in Star triangulation. No face found" << endl;
+                }
+            }
+        }
+
+    } while (!isFinished);
+
+    return isSuccess;
+}
+
+
+bool StarTriangulation::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
+{
+    bool isSuccess=false;           // Return value
+
+    // Create line between both points
+//    Line line(origin, dest);
+
+
+
+    return isSuccess;
+};
 
 
 bool StarTriangulation::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex)

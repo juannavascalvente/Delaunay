@@ -49,6 +49,8 @@ public:
 	bool 	getEdgeInserection(Line &line, int face, int &edgeId);
 	bool 	findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesId);
 
+	bool isInsideFace(const Point<TYPE> &p, int faceId);
+
     /**
      * @fn                  imaginaryFace
      * @brief               Checks if any of the vertex of the face is imaginary (only incremental algorithms)
