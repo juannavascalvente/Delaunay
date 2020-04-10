@@ -165,11 +165,12 @@ bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
                 // Get face centre
                 vector<Point<TYPE>> vPoints;
                 dcel.getFacePoints(faceId, vPoints);
-                Circle circle = Circle(vPoints);
-                Point<TYPE> *centre = circle.getRefCentre();
+                Polygon triangle(vPoints);
+                Point<TYPE> centre;
+                triangle.centroid(centre);
 
                 // Find out what edge intersects line between face centre and target point
-                Line l (point, *centre);
+                Line l (point, centre);
                 int edgeIntersectionId=INVALID;
                 if (dcel.getEdgeInserection(l, faceId, edgeIntersectionId))
                 {
