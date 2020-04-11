@@ -19,7 +19,9 @@ bool PointsWriter::write(const string &fileName, vector<Point<TYPE>> &vPoints)
     // Check file is opened.
     if (ofs.is_open())
     {
-        // Points loop.
+        // Points loop
+        ofs << fixed;
+        ofs.precision(6);
         for (auto point : vPoints)
         {
             ofs << " " << point;
