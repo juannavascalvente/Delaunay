@@ -29,6 +29,7 @@ public:
     *******************************************************************************************************************/
 	Polygon() = default;
 	explicit Polygon(int n) : vPoints(n) {};
+    explicit Polygon(vector<Point<TYPE>> &v) { vPoints = v; }
 	virtual ~Polygon() = default;
     Polygon(const Polygon &p) { vPoints = p.vPoints; }
 

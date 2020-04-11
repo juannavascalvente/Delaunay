@@ -1,13 +1,14 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include <cfloat>
-
 #include "Circle.h"
 #include "defines.h"
 #include "Logging.h"
 #include "Stack.h"
 #include "StarTriangulation.h"
+
+#include <cfloat>
+#include <queue>
 
 
 /***********************************************************************************************************************
@@ -126,6 +127,100 @@ bool StarTriangulation::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 
 	return found;
 }
+
+
+bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
+{
+    bool isSuccess=false;           // Return value
+
+    // Get edge from a random point
+    int iIdx=(int) drand48();
+    iIdx %= dcel.getNumVertex();
+
+    // Get point face
+    int iEdgeIdx = dcel.getPointEdge(iIdx) - 1;
+    faceId = dcel.getFace(iEdgeIdx);
+
+    // Get face centroid (face is a triangle)
+    vector<Point<TYPE>> vPoints;
+    dcel.getFacePoints(faceId, vPoints);
+    Polygon triangle(vPoints);
+    Point<TYPE> centre;
+    triangle.centroid(centre);
+
+    // Compute line between face centroid and point to locate
+    Line l (point, centre);
+
+    bool isFinished=false;
+    do
+    {
+        // Get edge face
+        faceId = dcel.getFace(iEdgeIdx);
+
+        // Check if point is interior to current face
+        if (dcel.isInsideFace(point, faceId))
+        {
+            // Face found
+            isFinished = true;
+            isSuccess = true;
+        }
+        // Move to adjacent face
+        else
+        {
+            // Point is out of convex hull
+            if (faceId == EXTERNAL_FACE)
+            {
+                isFinished = true;
+                isSuccess = true;
+            }
+            else
+            {
+                // Find out what edge intersects line between face centre and target point
+                queue<int> qEdgesId;
+                if (dcel.getEdgeIntersection(l, faceId, qEdgesId))
+                {
+                    // If two edges intersect line -> remove the one that is equal to previous edge index
+                    if (qEdgesId.size() == 2)
+                    {
+                        if ((qEdgesId.front()-1) == iEdgeIdx)
+                        {
+                            qEdgesId.pop();
+                        }
+                    }
+
+                    // Get edge that intersects
+                    iEdgeIdx = qEdgesId.front() - 1;
+                    qEdgesId.pop();
+
+                    // Get twin edge to move to next face in next iteration
+                    iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
+                }
+                else
+                {
+                    isFinished = true;
+                    isSuccess = false;
+                    cout << "Error finding face in Star triangulation. No face found" << endl;
+                }
+            }
+        }
+
+    } while (!isFinished);
+
+    return isSuccess;
+}
+
+
+bool StarTriangulation::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
+{
+    bool isSuccess=false;           // Return value
+
+    // Create line between both points
+//    Line line(origin, dest);
+
+
+
+    return isSuccess;
+};
 
 
 bool StarTriangulation::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex)

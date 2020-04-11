@@ -841,13 +841,14 @@ class CommandTriangulationPath : public Command
     *******************************************************************************************************************/
     Line line;
     vector<Polygon> vPolygons;
+    Dcel *dcel;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTriangulationPath(StoreService *storeServiceIn) : Command(storeServiceIn) {};
+    explicit CommandTriangulationPath(StoreService *storeServiceIn) : Command(storeServiceIn), dcel(nullptr) {};
 
 
     /**
@@ -856,21 +857,21 @@ public:
      */
     void printRunnableMsg() override
     {
-        cout << "Triangulation must be incremental Delaunay to be able to run find path" << endl;
+        cout << "A triangulation must exits" << endl;
     }
 
 
     /**
      * @fn      isRunnable
-     * @brief   Checks Delaunay triangulation has been created and it as built using incremental algorithm
+     * @brief   Checks a triangulation must exits
      *
      * @return  true if command can be ran
      *          false otherwise
      */
     bool isRunnable() override
     {
-        // Delaunay and Voronoi must exist
-        return in.getStoreService()->isDelaunay();
+        // A triangulation must exits
+        return in.getStoreService()->isDelaunay() || in.getStoreService()->isTriangulation();
     }
 
 
@@ -893,20 +894,32 @@ public:
             line = vLines.at(1);
         }
 
-        // TODO https://github.com/juannavascalvente/Delaunay/issues/61
         // Compute triangles path between two points.
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
         vector<int> vFacesId;
         Point<TYPE> p = line.getOrigin();
         Point<TYPE> q = line.getDest();
-        bool isRunSuccess = delaunay->findPath(p, q, vFacesId);
+
+        // Check what triangulation is active
+        bool isRunSuccess;
+        if (in.getStoreService()->isDelaunay())
+        {
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            isRunSuccess = delaunay->findPath(p, q, vFacesId);
+            dcel = delaunay->getRefDcel();
+        }
+        else
+        {
+            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+            isRunSuccess = triangulation->findPath(p, q, vFacesId);
+            dcel = triangulation->getRefDcel();
+        }
 
         if (isRunSuccess)
         {
             for (auto face : vFacesId)
             {
                 vector<Point<TYPE>> vFacesPoints;
-                DcelFigureBuilder::getFacePoints(face, *delaunay->getRefDcel(), vFacesPoints);
+                DcelFigureBuilder::getFacePoints(face, *dcel, vFacesPoints);
 
                 Polygon polygon;
                 for (auto point : vFacesPoints)
@@ -934,8 +947,6 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            Dcel *dcel = delaunay->getRefDcel();
             Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayables.push_back(dispDelaunay);
 
@@ -1228,36 +1239,37 @@ class CommandFindFace : public Command
     *******************************************************************************************************************/
     vector<Point<TYPE>> vPoints;
     vector<Polygon> vPolygons;
+    Dcel *dcel;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFindFace(StoreService *storeServiceIn) : Command(storeServiceIn) {};
+    explicit CommandFindFace(StoreService *storeServiceIn) : Command(storeServiceIn), dcel(nullptr) {};
 
 
     /**
      * @fn       printRunnableMsg
-     * @brief    Prints message to explain that Incremental Delaunay must exist
+     * @brief    Prints message to explain that triangulation path can be only computed using incremental Delaunay
      */
     void printRunnableMsg() override
     {
-        cout << "Incremental Delaunay must exist to find face" << endl;
+        cout << "A triangulation must exits" << endl;
     }
 
 
     /**
      * @fn      isRunnable
-     * @brief   Find path can only be executed if Delaunay incremental has been computed
+     * @brief   Checks a triangulation must exits
      *
      * @return  true if command can be ran
      *          false otherwise
      */
     bool isRunnable() override
     {
-        // Triangulation must exist
-        return in.getStoreService()->isDelaunay();
+        // A triangulation must exits
+        return in.getStoreService()->isDelaunay() || in.getStoreService()->isTriangulation();
     }
 
 
@@ -1277,33 +1289,43 @@ public:
         PointFactory::readFromConfig(point);
 
         // Find face.
-        bool isRunSuccess=false;
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        bool isRunSuccess;
         if (in.getStoreService()->isDelaunay())
         {
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
             isRunSuccess = delaunay->findFace(point, faceId);
+            dcel = delaunay->getRefDcel();
         }
         else
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            this->isSuccess = triangulation->findFace(point, faceId);
+            isRunSuccess = triangulation->findFace(point, faceId);
+            dcel = triangulation->getRefDcel();
         }
 
         // Add point to locate
         vPoints.push_back(point);
 
         // Add face if it is not imaginary
-        if (isRunSuccess && (faceId != EXTERNAL_FACE))
+        vPolygons.clear();
+        if (isRunSuccess)
         {
-            vector<Point<TYPE>> vFacesPoints;
-            DcelFigureBuilder::getFacePoints(faceId, *delaunay->getRefDcel(), vFacesPoints);
-
-            Polygon polygon;
-            for (auto item : vFacesPoints)
+            if (faceId != EXTERNAL_FACE)
             {
-                polygon.add(item);
+                vector<Point<TYPE>> vFacesPoints;
+                DcelFigureBuilder::getFacePoints(faceId, *dcel, vFacesPoints);
+
+                Polygon polygon;
+                for (auto item : vFacesPoints)
+                {
+                    polygon.add(item);
+                }
+                vPolygons.push_back(polygon);
             }
-            vPolygons.push_back(polygon);
+            else
+            {
+                cout << "Poins is external to convex hull" << endl;
+            }
         }
 
         // Build result
@@ -1323,8 +1345,7 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(delaunay->getRefDcel());
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayable.push_back(dispDelaunay);
 
             // Add points (point to locate and closest point)
@@ -1844,7 +1865,14 @@ public:
     *******************************************************************************************************************/
     explicit CommandDcelInfo(StoreService *storeServiceIn) : Command(storeServiceIn)
     {
-        dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        if (in.getStoreService()->isDelaunay())
+        {
+            dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        }
+        else
+        {
+            dcel = in.getStoreService()->getStarTriang()->getRefDcel();
+        }
     };
 
 

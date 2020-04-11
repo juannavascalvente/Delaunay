@@ -77,8 +77,8 @@ public:
     bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex) override ;
     bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
     // TODO https://github.com/juannavascalvente/Delaunay/issues/63
-    bool findFace(Point<TYPE> &origin, int &faceId) override { return false; };
-    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override { return false; };
+    bool findFace(Point<TYPE> &point, int &faceId) override ;
+    bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override ;
 };
 
 #endif /* TRIANGULATION_H_ */

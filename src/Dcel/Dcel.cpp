@@ -6,6 +6,7 @@
 
 #include <cstring>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -13,8 +14,6 @@ using namespace std;
 /***********************************************************************************************************************
 * Defines
 ***********************************************************************************************************************/
-#define HEADERS 10
-
 #ifdef DEBUG_GEOMETRICAL
 //#define DEBUG_POINTS_GET_FACE_POINTS
 //#define DEBUG_DCEL_FILE
@@ -524,89 +523,46 @@ double Dcel::signedArea(int id1, int id2, int id3)
 * 				"line". If so then returns true and edgeId has the id of the
 * 				intersected edge.
 ***************************************************************************/
-bool Dcel::getEdgeInserection(Line &line, int face, int &edgeId)
+bool Dcel::getEdgeIntersection(Line &line, int face, queue<int> &qEdges)
 {
-	bool intersect=false;		// Return value.
-	int  edgeIndex=0;			// Edge index.
-	Line edgeLine;				// Current edge line.
-	Point<TYPE> origin, dest;	// Edge extreme points.
+	int  iCurrentEdgeIdx=0;			// Edge index.
 
-	// Get first edge in face.
-	if (edgeId == INVALID)
+	// If there is no edge then get face edge
+	if (qEdges.empty())
 	{
-		edgeIndex = this->getFaceEdge(face)-1;
+        iCurrentEdgeIdx = this->getFaceEdge(face) - 1;
 	}
 	else
 	{
-		edgeIndex = edgeId-1;
+        iCurrentEdgeIdx = qEdges.front() - 1;
+        qEdges.pop();
 	}
-#ifdef DEBUG_DCEL_EDGE_INTERSECTION
-	Logging::buildText(__FUNCTION__, __FILE__, "Starting in edge ");
-	Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-	Logging::buildText(__FUNCTION__, __FILE__, " from face ");
-	Logging::buildText(__FUNCTION__, __FILE__, face);
-	Logging::write(true, Info);
-#endif
 
-	// Loop until intersection found.
+	// Loop until first edge is checked again -> all edges have been checked
+    int iFirstEdgeIdx = iCurrentEdgeIdx;
 	do
 	{
-		// Check if current edge is real.
-		if (!this->hasNegativeVertex(edgeIndex+1))
+		// Check if current edge is real
+		if (!this->hasNegativeVertex(iCurrentEdgeIdx + 1))
 		{
-#ifdef DEBUG_DCEL_EDGE_INTERSECTION
-			int	 originId=0;
-			int	 destId=0;
-			originId = this->getOrigin(edgeIndex);
-			destId = this->getOrigin(this->getTwin(edgeIndex)-1);
-			Logging::buildText(__FUNCTION__, __FILE__, "Current edge ");
-			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-			Logging::buildText(__FUNCTION__, __FILE__, " and its twin ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->getTwin(edgeIndex));
-			Logging::buildText(__FUNCTION__, __FILE__, ". Origin point ");
-			Logging::buildText(__FUNCTION__, __FILE__, originId);
-			Logging::buildText(__FUNCTION__, __FILE__, " and destination point ");
-			Logging::buildText(__FUNCTION__, __FILE__, destId);
-			Logging::write(true, Info);
-#endif
 			// Get current edge extreme points.
-			this->getEdgePoints(edgeIndex, origin, dest);
-			edgeLine = Line(origin, dest);
+            Point<TYPE> origin, dest;	// Edge extreme points
+			this->getEdgePoints(iCurrentEdgeIdx, origin, dest);
+            Line edgeLine = Line(origin, dest);
 
-			// Check intersection.
+			// Check intersection
 			if (line.intersect(edgeLine))
 			{
-				// Update return value.
-				edgeId = edgeIndex+1;
-				intersect = true;
-#ifdef DEBUG_DCEL_EDGE_INTERSECTION
-				Logging::buildText(__FUNCTION__, __FILE__, "Intersection found in edge ");
-				Logging::buildText(__FUNCTION__, __FILE__, edgeId);
-				Logging::write(true, Info);
-#endif
-			}
-			else
-			{
-#ifdef DEBUG_DCEL_EDGE_INTERSECTION
-				Logging::buildText(__FUNCTION__, __FILE__, "Do not intersect. Next edge ");
-				Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-				Logging::write(true, Info);
-#endif
+				// Update return value
+                qEdges.push(iCurrentEdgeIdx + 1);
 			}
 		}
-#ifdef DEBUG_DCEL_EDGE_INTERSECTION
-		else
-		{
-			Logging::buildText(__FUNCTION__, __FILE__, "Not real edge ");
-			Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-			Logging::write(true, Info);
-		}
-#endif
-		// Next edge.
-		edgeIndex = this->getNext(edgeIndex)-1;
-	} while (!intersect);
 
-	return(intersect);
+		// Next edge
+		iCurrentEdgeIdx = this->getNext(iCurrentEdgeIdx) - 1;
+	} while (iCurrentEdgeIdx != iFirstEdgeIdx);
+
+	return !qEdges.empty();
 }
 
 /***************************************************************************
@@ -622,52 +578,33 @@ bool Dcel::getEdgeInserection(Line &line, int face, int &edgeId)
 bool Dcel::findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesId)
 {
 	bool found=true;		// Return value.
-	int	edgeId=INVALID;		// Edge id.
 	int firstFace=0;		// First face in path.
 	int lastFace=0;			// First face in path.
 
 	// Get origin and destination faces of the path.
 	firstFace = vExtremeFaces.at(0);
 	lastFace = vExtremeFaces.at(1);
-#ifdef DEBUG_DELAUNAY_FIND_PATH
-	Logging::buildText(__FUNCTION__, __FILE__, "Searching path between faces ");
-	Logging::buildText(__FUNCTION__, __FILE__, firstFace);
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, lastFace);
-	Logging::write(true, Info);
-#endif
+
 	// Check both points are not in the same face.
 	if (firstFace != lastFace)
 	{
+        queue<int> qEdgesId;
 		do
 		{
 			// Get edge intersected by p1-p2 line.
-			if (this->getEdgeInserection(line, firstFace, edgeId))
+			if (this->getEdgeIntersection(line, firstFace, qEdgesId))
 			{
 				// Insert current face.
 				vFacesId.push_back(firstFace);
-#ifdef DEBUG_DELAUNAY_FIND_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Intersected edge is ");
-				Logging::buildText(__FUNCTION__, __FILE__, edgeId);
-				Logging::buildText(__FUNCTION__, __FILE__, ".Inserted face ");
-				Logging::buildText(__FUNCTION__, __FILE__, firstFace);
-				Logging::write(true, Info);
-#endif
+
 				// Get next face.
+				int edgeId = qEdgesId.front();
+                qEdgesId.pop();
 				edgeId = this->getTwin(edgeId-1);
-#ifdef DEBUG_DELAUNAY_FIND_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, "Twin edge ");
-				Logging::buildText(__FUNCTION__, __FILE__, edgeId);
-#endif
 				edgeId = this->getNext(edgeId-1);
 				firstFace = this->getFace(edgeId-1);
-#ifdef DEBUG_DELAUNAY_FIND_PATH
-				Logging::buildText(__FUNCTION__, __FILE__, ".New edge ");
-				Logging::buildText(__FUNCTION__, __FILE__, edgeId);
-				Logging::buildText(__FUNCTION__, __FILE__, " in face ");
-				Logging::buildText(__FUNCTION__, __FILE__, firstFace);
-				Logging::write(true, Info);
-#endif
+
+                qEdgesId.push(edgeId);
 			}
 			else
 			{
@@ -679,22 +616,40 @@ bool Dcel::findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesI
 			}
 		} while ((firstFace != lastFace) && found);
 	}
-#ifdef DEBUG_DELAUNAY_FIND_PATH
-	else
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Both points in the same face.");
-		Logging::write(true, Info);
-	}
-#endif
-#ifdef DEBUG_DELAUNAY_FIND_PATH
-	Logging::buildText(__FUNCTION__, __FILE__, "Added last face ");
-	Logging::buildText(__FUNCTION__, __FILE__, firstFace);
-	Logging::write(true, Info);
-#endif
+
 	// Insert last face.
     vFacesId.push_back(firstFace);
 
 	return(found);
+}
+
+
+bool Dcel::isInsideFace(const Point<TYPE> &p, int faceId)
+{
+	bool inner=true;		// Return value
+
+	// Get edge in current face.
+	int iFirstEdgeIdx = getFaceEdge(faceId) - 1;
+	int iCurrentEdgeIdx = iFirstEdgeIdx;
+
+	do
+	{
+		// Get origin and destination points.
+		Point<TYPE> origin = *getRefPoint(getOrigin(iCurrentEdgeIdx) - 1);
+		Point<TYPE> dest   = *getRefPoint(getOrigin(getTwin(iCurrentEdgeIdx) - 1) - 1);
+
+		// If right turn then it is not inner.
+		if (origin.check_Turn(dest, p) == RIGHT_TURN)
+		{
+			inner = false;
+		}
+
+		// Get nexte edge.
+		iCurrentEdgeIdx = getNext(iCurrentEdgeIdx) - 1;
+
+	} while ((iCurrentEdgeIdx != iFirstEdgeIdx) && inner);
+
+	return inner;
 }
 
 
