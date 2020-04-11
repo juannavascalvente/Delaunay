@@ -1,14 +1,14 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include <cfloat>
-
 #include "Circle.h"
 #include "defines.h"
 #include "Logging.h"
-#include "PointFactory.h"
 #include "Stack.h"
 #include "StarTriangulation.h"
+
+#include <cfloat>
+#include <queue>
 
 
 /***********************************************************************************************************************
@@ -136,7 +136,20 @@ bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
     // Get edge from a random point
     int iIdx=(int) drand48();
     iIdx %= dcel.getNumVertex();
+
+    // Get point face
     int iEdgeIdx = dcel.getPointEdge(iIdx) - 1;
+    faceId = dcel.getFace(iEdgeIdx);
+
+    // Get face centroid (face is a triangle)
+    vector<Point<TYPE>> vPoints;
+    dcel.getFacePoints(faceId, vPoints);
+    Polygon triangle(vPoints);
+    Point<TYPE> centre;
+    triangle.centroid(centre);
+
+    // Compute line between face centroid and point to locate
+    Line l (point, centre);
 
     bool isFinished=false;
     do
@@ -162,20 +175,25 @@ bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
             }
             else
             {
-                // Get face centre
-                vector<Point<TYPE>> vPoints;
-                dcel.getFacePoints(faceId, vPoints);
-                Polygon triangle(vPoints);
-                Point<TYPE> centre;
-                triangle.centroid(centre);
-
                 // Find out what edge intersects line between face centre and target point
-                Line l (point, centre);
-                int edgeIntersectionId=INVALID;
-                if (dcel.getEdgeInserection(l, faceId, edgeIntersectionId))
+                queue<int> qEdgesId;
+                if (dcel.getEdgeIntersection(l, faceId, qEdgesId))
                 {
-                    // Get next face
-                    iEdgeIdx = dcel.getTwin(edgeIntersectionId - 1) - 1;
+                    // If two edges intersect line -> remove the one that is equal to previous edge index
+                    if (qEdgesId.size() == 2)
+                    {
+                        if ((qEdgesId.front()-1) == iEdgeIdx)
+                        {
+                            qEdgesId.pop();
+                        }
+                    }
+
+                    // Get edge that intersects
+                    iEdgeIdx = qEdgesId.front() - 1;
+                    qEdgesId.pop();
+
+                    // Get twin edge to move to next face in next iteration
+                    iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
                 }
                 else
                 {
