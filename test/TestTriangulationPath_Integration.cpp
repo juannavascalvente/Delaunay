@@ -7,21 +7,19 @@
 #include "PointsWriter.h"
 #include "StarTriangulation.h"
 
+#include <cstdio>
 using namespace std;
 
 
 /***********************************************************************************************************************
 * Defines
 ***********************************************************************************************************************/
-#define NUM_SAMPLES_5                   (5)
-#define NUM_SAMPLES_100                 (100)
-#define NUM_SAMPLES_1000                (1000)
-#define NUM_SAMPLES_1000000             (1000000)
-
-#define NUM_ITERATIONS_10               (10)
-#define NUM_ITERATIONS_100              (100)
-#define NUM_ITERATIONS_1000             (1000)
-#define NUM_ITERATIONS_1000000          (1000000)
+#define NUM_ELEMS_10                  (10)
+#define NUM_ELEMS_100                 (100)
+#define NUM_ELEMS_1000                (1000)
+#define NUM_ELEMS_10000               (10000)
+#define NUM_ELEMS_100000              (100000)
+#define NUM_ELEMS_1000000             (1000000)
 
 
 /***********************************************************************************************************************
@@ -36,6 +34,10 @@ namespace
         vector<Point<TYPE>> vPoints;        // Points in set
         Point<TYPE> point;                  // Path origin point
 
+        // Log information file names
+        string strPointFileName = "Point.txt";
+        string strPointSetFileName = "PointSet.txt";
+
     protected:
 
         // Constructor (called before each test case) - SetUp
@@ -44,12 +46,14 @@ namespace
             // Check if input point parameter provided by user.
             point.random();
 
-            string strPointFileName = "Point.txt";
             vector<Point<TYPE>> vPointToLocate;
             vPointToLocate.push_back(point);
             PointsWriter::write(strPointFileName, vPointToLocate);
         };
-        ~TestTriangulationPath_Integration() override = default;
+        ~TestTriangulationPath_Integration() override
+        {
+            remove(strPointFileName.c_str());
+        };
 
     public:
         void executeSubtest(size_t szNumPoints, size_t szNumIterations);
@@ -66,7 +70,6 @@ namespace
             PointFactory::generateRandom(szNumPoints, vPoints);
 
             // Write data before test is executed
-            string strPointSetFileName = "PointSet.txt";
             PointsWriter::write(strPointSetFileName, vPoints);
 
             // Create triangulation
@@ -78,6 +81,11 @@ namespace
 
             // Check result
             EXPECT_TRUE(isRunSuccess);
+            cout << "Success " << szNumPoints << " points. Iter: " << (i+1) << "/" << szNumIterations << endl;
+
+            // Free resources
+            delete triangulation;
+            remove(strPointSetFileName.c_str());
         }
     }
 
@@ -85,9 +93,9 @@ namespace
      * DESCRIPTION:
      *
      */
-    TEST_F(TestTriangulationPath_Integration, Test_Num_Samples_5_Iterations_1000000)
+    TEST_F(TestTriangulationPath_Integration, Test_NUM_ELEMS_10_NUM_ELEMS_1000000)
     {
-        executeSubtest(NUM_SAMPLES_5, NUM_ITERATIONS_1000000);
+        executeSubtest(NUM_ELEMS_10, NUM_ELEMS_1000000);
     }
 
 
@@ -95,26 +103,44 @@ namespace
      * DESCRIPTION:
      *
      */
-    TEST_F(TestTriangulationPath_Integration, Test_Num_Samples_100_Iterations_1000)
+    TEST_F(TestTriangulationPath_Integration, Test_NUM_ELEMS_100_NUM_ELEMS_100000)
     {
-        executeSubtest(NUM_SAMPLES_100, NUM_ITERATIONS_1000);
+        executeSubtest(NUM_ELEMS_100, NUM_ELEMS_100000);
     }
 
     /**
      * DESCRIPTION:
      *
      */
-    TEST_F(TestTriangulationPath_Integration, Test_Num_Samples_1000_Iterations_100)
+    TEST_F(TestTriangulationPath_Integration, Test_NUM_ELEMS_1000_NUM_ELEMS_10000)
     {
-        executeSubtest(NUM_SAMPLES_1000, NUM_ITERATIONS_100);
+        executeSubtest(NUM_ELEMS_1000, NUM_ELEMS_10000);
     }
 
     /**
      * DESCRIPTION:
      *
      */
-    TEST_F(TestTriangulationPath_Integration, Test_Num_Samples_1000000_Iterations_10)
+    TEST_F(TestTriangulationPath_Integration, Test_NUM_ELEMS_10000_NUM_ELEMS_1000)
     {
-        executeSubtest(NUM_SAMPLES_1000000, NUM_ITERATIONS_10);
+        executeSubtest(NUM_ELEMS_10000, NUM_ELEMS_1000);
+    }
+
+    /**
+     * DESCRIPTION:
+     *
+     */
+    TEST_F(TestTriangulationPath_Integration, Test_NUM_ELEMS_100000_NUM_ELEMS_100)
+    {
+        executeSubtest(NUM_ELEMS_100000, NUM_ELEMS_100);
+    }
+
+    /**
+     * DESCRIPTION:
+     *
+     */
+    TEST_F(TestTriangulationPath_Integration, Test_NUM_ELEMS_1000000_NUM_ELEMS_10)
+    {
+        executeSubtest(NUM_ELEMS_1000000, NUM_ELEMS_10);
     }
 }
