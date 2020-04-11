@@ -76,7 +76,6 @@ public:
     bool convexHull() override ;
     bool findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &out, int &pointIndex) override ;
     bool findTwoClosest(Point<TYPE> &p, Point<TYPE> &q) override ;
-    // TODO https://github.com/juannavascalvente/Delaunay/issues/63
     bool findFace(Point<TYPE> &point, int &faceId) override ;
     bool findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId) override ;
 };
