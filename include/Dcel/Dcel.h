@@ -12,6 +12,7 @@
 
 #include <utility>
 #include <vector>
+#include <queue>
 
 
 /***********************************************************************************************************************
@@ -46,7 +47,7 @@ public:
 	double 		signedArea(int id1, int id2, int id3);
 
 	// Figures? PENDING. Move to another module?
-	bool 	getEdgeInserection(Line &line, int face, int &edgeId);
+    bool getEdgeIntersection(Line &line, int face, queue<int> &qEdges);
 	bool 	findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesId);
 
 	bool isInsideFace(const Point<TYPE> &p, int faceId);
