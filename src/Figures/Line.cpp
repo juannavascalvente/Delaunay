@@ -80,7 +80,7 @@ bool Line::intersect(Line &other)
 }
 
 
-bool Line::getIntersection2(Line &other, Point<TYPE> &intersection)
+bool Line::getIntersection(Line &other, Point<TYPE> &intersection)
 {
     // Check if lines intersect
     if (!intersect(other))

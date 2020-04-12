@@ -106,7 +106,16 @@ public:
 	 */
     bool isVertical() { return ((this->getSlopeType() == INF_POS_SLOPE) || (this->getSlopeType() == INF_NEG_SLOPE)); }
 
-    bool getIntersection2(Line &other, Point<TYPE> &intersection);
+    /**
+	 * @fn      getIntersection
+	 * @brief   Get intersection point between both lines. If there is none, then it does not update output
+	 *
+     * @param other         (IN) Line to check
+     * @param intersection  (OUT) Intersection point
+     * @return  true if there is an intersection
+     *          false otherwise
+     */
+    bool getIntersection(Line &other, Point<TYPE> &intersection);
 
 
 	void getMiddle(Point<TYPE> &middle);

@@ -130,12 +130,9 @@ void Polygon::getIntersections(Line &line, vector<Point<TYPE>> &vOut)
         Line currentLine( p, q);
 
         // Check if lines intersect
-        if (currentLine.intersect(line))
-        {
-            Point<TYPE> intersection;
-            currentLine.getIntersection2(line, intersection);
-            vOut.push_back(intersection);
-        }
+        Point<TYPE> intersection;
+        currentLine.getIntersection(line, intersection);
+        vOut.push_back(intersection);
 
         // Next line in polygon
         lineIndex++;
