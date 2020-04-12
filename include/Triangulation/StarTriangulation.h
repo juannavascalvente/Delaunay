@@ -29,6 +29,7 @@ class StarTriangulation : public Triangulation
     * Private methods
     *******************************************************************************************************************/
     bool setNotChecked(int index, bool *isEdgeChecked);
+    void getConvexFacesIntersections(Line &line, vector<int> &vFaces, vector<int> &vEdges);
 
 public:
     /*******************************************************************************************************************
