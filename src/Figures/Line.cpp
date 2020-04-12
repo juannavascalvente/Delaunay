@@ -6,19 +6,11 @@
  */
 
 #include "Figures/Line.h"
-#include "Logging.h"
-#include <float.h>
-#include <limits.h>
 
-//#define DEBUG_EXTEND_SEGMENT
-//#define DEBUG_COMPUTE_SLOPE_N
-//#define DEBUG_LINE_INTERSECT
-
-//#define LINE_GET_DIRECTION
 /*****************************************************************************
 * 							LINE class implementation
 *****************************************************************************/
-Line::Line(void) : m(0.0), n(0.0), enSlopeType(ZERO_SLOPE)
+Line::Line() : m(0.0), n(0.0), enSlopeType(ZERO_SLOPE)
 {
 	// Initialize origin and destination points to (0,0).
 	this->origin.setOrigin();
@@ -34,32 +26,33 @@ Line::Line(Point<TYPE> p, Point<TYPE> q) : origin(p), destination(q), m(0.0),
 //--------------------------------------------------------------------------
 // Public functions.
 //--------------------------------------------------------------------------
-/*****************************************************************************
-FUNCTION:       intersect
-DESCRIPTION:    check if two segments intersects.
-INPUT:          "other" second segment
-OUTPUT:         TRUE    if this and other segments intersects.
-                FALSE   i.o.c.
-PRE:            N/A
-POST:           *********************************************************
-COMPLEXITY:     O(1)
-*****************************************************************************/
+bool Line::isParallel(Line &other)
+{
+    // Check if both are horizontal
+    if (this->isHorizontal() && other.isHorizontal())
+    {
+        return true;
+    }
+
+    // Check if both are vertical
+    return this->isVertical() && other.isVertical();
+}
+
+
 // TODO - Issue #35
-bool Line::intersect(Line other)
+bool Line::intersect(Line &other)
 {
     bool doIntersect=false;
     enum Turn_T	turn1, turn2;
 
+    if (this->isParallel(other))
+    {
+        return false;
+    }
+
     // Compute turns between 1st segment and origin and destination point of segment 2.
     turn1 = this->origin.check_Turn(this->destination, other.origin);
     turn2 = this->origin.check_Turn(this->destination, other.destination);
-#ifdef DEBUG_LINE_INTERSECT
-	Logging::buildText(__FUNCTION__, __FILE__, "First turn 1 is ");
-	Logging::buildText(__FUNCTION__, __FILE__, turn1);
-	Logging::buildText(__FUNCTION__, __FILE__, " and turn 2 is ");
-	Logging::buildText(__FUNCTION__, __FILE__, turn2);
-	Logging::write(true, Info);
-#endif
 
     // If it is collinear then return false (return value already set).
     if ((turn1 != COLLINEAR) && (turn2 != COLLINEAR))
@@ -70,13 +63,7 @@ bool Line::intersect(Line other)
             // Compute turns between 2nd segment and origin and destination point of segment 1.
             turn1 = other.origin.check_Turn(other.destination, this->origin);
             turn2 = other.origin.check_Turn(other.destination, this->destination);
-#ifdef DEBUG_LINE_INTERSECT
-            Logging::buildText(__FUNCTION__, __FILE__, "Second turn 1 is ");
-            Logging::buildText(__FUNCTION__, __FILE__, turn1);
-            Logging::buildText(__FUNCTION__, __FILE__, " and turn 2 is ");
-            Logging::buildText(__FUNCTION__, __FILE__, turn2);
-            Logging::write(true, Info);
-#endif
+
             // If it is collinear then return false (return value already set).
             if ((turn1 != COLLINEAR) && (turn2 != COLLINEAR))
             {
@@ -89,41 +76,82 @@ bool Line::intersect(Line other)
         }
     }
 
-    return(doIntersect);
+    return doIntersect;
 }
 
 
-/*****************************************************************************
- * 	FUNCTION:      	getIntersection
- * 	DESCRIPTION:   	compute intersection between two segments.
- * 	INPUT:         	"other" second segment
- * 	OUTPUT:        	NONE
- * 	IN/OUTPUT:		"intersection" stores intersection point
- * 	PRE:            N/A
- * 	POST:           *********************************************************
- * 	COMPLEXITY:     O(1)
-*****************************************************************************/
-// TODO - Issue #35
-void Line::getIntersection(Line other, Point<TYPE> &intersection)
+bool Line::getIntersection2(Line &other, Point<TYPE> &intersection)
 {
-	// Compute intersection.
-    TYPE   det=0.0;
-    TYPE   A1=0.0, B1=0.0, C1=0.0;
-    TYPE   A2=0.0, B2=0.0, C2=0.0;
+    // Check if lines intersect
+    if (!intersect(other))
+    {
+        return false;
+    }
 
-    A1 = this->destination.getX() - this->origin.getX();
-    B1 = this->destination.getY() - this->origin.getY();
-    C1 = this->destination.getX()*this->origin.getY() - this->origin.getX()*this->destination.getY();
+    // Intersection point coordinates
+    TYPE x;
+    TYPE y;
 
-    A2 = other.destination.getX() - other.origin.getX();
-    B2 = other.destination.getY() - other.origin.getY();
-    C2 = other.destination.getX()*other.origin.getY() - other.origin.getX()*other.destination.getY();
-
-    det = A1*B2 - A2*B1;
+    // Check cases when any (or both) line is vertical or horizontal
+    if (this->isHorizontal())
+    {
+        y = this->getOrigin().getY();
+        if (other.isVertical())
+        {
+            x = other.getOrigin().getX();
+        }
+        else
+        {
+            x = (y - other.n) / other.m;
+        }
+    }
+    else if (this->isVertical())
+    {
+        x = this->getOrigin().getX();
+        if (other.isHorizontal())
+        {
+            y = other.getOrigin().getY();
+        }
+        else
+        {
+            y = other.m*x + other.n;
+        }
+    }
+    else if (other.isHorizontal())
+    {
+        y = other.getOrigin().getY();
+        if (this->isVertical())
+        {
+            x = this->getOrigin().getX();
+        }
+        else
+        {
+            x = (y - this->n) / this->m;
+        }
+    }
+    else if (other.isVertical())
+    {
+        x = other.getOrigin().getX();
+        if (this->isHorizontal())
+        {
+            y = this->getOrigin().getY();
+        }
+        else
+        {
+            y = this->m*x + this->n;
+        }
+    }
+    else
+    {
+        x = (this->n - other.n) / (other.m - this->m);
+        y = this->m*x + this->n;
+    }
 
     // Set intersection values.
-    intersection.setX((A2*C1 - A1*C2) / det);
-    intersection.setY((B2*C1 - B1*C2) / det);
+    intersection.setX(x);
+    intersection.setY(y);
+
+    return true;
 }
 
 /*****************************************************************************
@@ -229,18 +257,17 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 					break;
 				}
 			}
-//			printf("%lf %lf\n", extreme.getX(), extreme.getY());
 			break;
 		}
 		// Set current x and maximum y-coordinate value.
-		case INFINITE_POS_SLOPE:
+		case INF_POS_SLOPE:
 		{
 			extreme.setX(this->origin.getX());
 			extreme.setY(MAX_Y_COORD);
 			break;
 		}
 		// Set current x and minimum y-coordinate value.
-		case INFINITE_NEG_SLOPE:
+		case INF_NEG_SLOPE:
 		{
 			extreme.setX(this->origin.getX());
 			extreme.setY(-MAX_Y_COORD);
@@ -351,12 +378,12 @@ void Line::print(std::ostream& out)
 	out << "Slope type: ";
 	switch (this->enSlopeType)
 	{
-		case INFINITE_POS_SLOPE:
+		case INF_POS_SLOPE:
 		{
 			out << " INFINITE_POS_SLOPE" << endl;
 			break;
 		}
-		case INFINITE_NEG_SLOPE:
+		case INF_NEG_SLOPE:
 		{
 			out << " INFINITE_NEG_SLOPE" << endl;
 			break;
@@ -389,7 +416,7 @@ void Line::print(std::ostream& out)
  * 					n = n value in y=mx + n
  * 	COMPLEXITY:     O(1)
 *****************************************************************************/
-void Line::setSlopeAndN(void)
+void Line::setSlopeAndN()
 {
 	TYPE fpDeltaX = (this->destination.getX() - this->origin.getX());
 	TYPE fpDeltaY = (this->destination.getY() - this->origin.getY());
@@ -403,11 +430,11 @@ void Line::setSlopeAndN(void)
 	{
 		if (fpDeltaY > 0)
 		{
-			this->setSlopeType(INFINITE_POS_SLOPE);
+			this->setSlopeType(INF_POS_SLOPE);
 		}
 		else
 		{
-			this->setSlopeType(INFINITE_NEG_SLOPE);
+			this->setSlopeType(INF_NEG_SLOPE);
 		}
 	}
 	else
@@ -434,28 +461,18 @@ void Line::setSlopeAndN(void)
  * 	POST:			PENDING
  * 	COMPLEXITY:     O(1)
 *****************************************************************************/
-Direction_E Line::getDirection(void)
+Direction_E Line::getDirection()
 {
 	Direction_E direction;		// Return value.
 
-#ifdef LINE_GET_DIRECTION
-	Logging::buildText(__FUNCTION__, __FILE__, "Slope ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getSlope());
-	Logging::buildText(__FUNCTION__, __FILE__, ". Y coordinate for origin ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->origin.getY());
-	Logging::buildText(__FUNCTION__, __FILE__, " and destination ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->destination.getY());
-	Logging::buildText(__FUNCTION__, __FILE__, ". Line direction");
-#endif
-
     // Only first or third quadrant.
-	if (this->getSlopeType() != REAL_SLOPE)
+    if (this->getSlopeType() != REAL_SLOPE)
 	{
-		if (INFINITE_POS_SLOPE == this->getSlopeType())
+		if (INF_POS_SLOPE == this->getSlopeType())
 		{
 			direction = HORIZONTAL_180;
 		}
-		else if (INFINITE_NEG_SLOPE == this->getSlopeType())
+		else if (INF_NEG_SLOPE == this->getSlopeType())
 		{
 			direction = VERTICAL_270;
 		}
@@ -468,23 +485,17 @@ Direction_E Line::getDirection(void)
 			direction = HORIZONTAL_180;
 		}
 	}
-	else if (this->getSlope() > 0.0)
+    else if (this->getSlope() > 0.0)
     {
         // First quadrant.
-		if (this->origin.getY() < this->destination.getY())
+        if (this->origin.getY() < this->destination.getY())
         {
 			if (this->getSlope() > 1.0)
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_45_TO_90.");
-#endif
 				direction = FROM_45_TO_90;
 			}
 			else
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_0_TO_45.");
-#endif
 				direction = FROM_0_TO_45;
 			}
         }
@@ -493,16 +504,10 @@ Direction_E Line::getDirection(void)
         {
 			if (this->getSlope() > 1.0)
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_180_TO_225.");
-#endif
-				direction = FROM_180_TO_225;
+        		direction = FROM_180_TO_225;
 			}
 			else
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_135_TO_180.");
-#endif
 				direction = FROM_135_TO_180;
 			}
         }
@@ -511,45 +516,30 @@ Direction_E Line::getDirection(void)
     else
     {
         // Fourth quadrant.
-    	if (this->origin.getY() > this->destination.getY())
+        if (this->origin.getY() > this->destination.getY())
         {
 			if (this->getSlope() < (-1.0))
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_270_TO_315.");
-#endif
 				direction = FROM_270_TO_315;
 			}
 			else
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_315_TO_360.");
-#endif
 				direction = FROM_315_TO_360;
 			}
         }
         // Second quadrant.
         else
         {
-        	if (this->getSlope() < (-1.0))
+            if (this->getSlope() < (-1.0))
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_135_TO_180.");
-#endif
 				direction = FROM_135_TO_180;
 			}
-			else
+            else
 			{
-#ifdef LINE_GET_DIRECTION
-				Logging::buildText(__FUNCTION__, __FILE__, " FROM_90_TO_135.");
-#endif
 				direction = FROM_90_TO_135;
 			}
         }
     }
 
-#ifdef LINE_GET_DIRECTION
-	Logging::write(true, Info);
-#endif
 	return(direction);
 }

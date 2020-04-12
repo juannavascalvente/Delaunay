@@ -213,11 +213,127 @@ bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
 bool StarTriangulation::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
 {
     bool isSuccess=false;           // Return value
+    cout << origin << endl;
+    cout << dest << endl;
 
-    // Create line between both points
-//    Line line(origin, dest);
+    // Initialize output
+    vFacesId.clear();
 
+    // Set origin point as starting point of the path
+    Point<TYPE> startPoint = origin;
 
+    // Compute convex hull if not already computed
+    if (!isConvexHullComputed())
+    {
+        convexHull();
+    }
+
+    // Get convex hull
+    auto *polygon = new Polygon();
+    getConvexHull(*polygon);
+
+    // Check if origin and destination are internal to convex hull
+    bool isOriginInterior = polygon->isInternal(origin);
+
+    // Check if origin point is not interior
+    if (!isOriginInterior)
+    {
+        Line line(origin, dest);
+        vector<Point<TYPE>> vPoints;
+        polygon->getIntersections(line, vPoints);
+
+        // If there is no intersection with convex hull -> both points are exteriors to points set
+        if (vPoints.empty())
+        {
+            return true;
+        }
+        // Two intersection points -> use closest to origin point
+        else if (vPoints.size() == 2)
+        {
+            TYPE distanceOrigin = origin.distance(vPoints.at(0));
+            TYPE distanceDestination = origin.distance(vPoints.at(1));
+            if (distanceOrigin < distanceDestination)
+            {
+                startPoint = vPoints.at(0);
+            }
+            else
+            {
+                startPoint = vPoints.at(1);
+            }
+        }
+        // One intersection point -> use as starting point
+        else
+        {
+            startPoint = vPoints.at(0);
+        }
+    }
+
+    // Compute face path once the origin point has been computed
+    int faceId;
+    findFace(startPoint, faceId);
+    int iEdgeIdx = dcel.getFaceEdge(faceId);
+
+    // Compute line between start and destination points
+    Line l (startPoint, dest);
+
+    bool isFinished=false;
+    do
+    {
+        // Check if point is interior to current face
+        if (dcel.isInsideFace(dest, faceId))
+        {
+            // Add last face and finish
+            isFinished = true;
+            isSuccess = true;
+            vFacesId.push_back(faceId);
+        }
+        // Move to adjacent face
+        else
+        {
+            // Point is out of convex hull
+            if (faceId == EXTERNAL_FACE)
+            {
+                isFinished = true;
+                isSuccess = true;
+            }
+            else
+            {
+                // Find out what edge in current face intersects line between origin and end points
+                queue<int> qEdgesId;
+                if (dcel.getEdgeIntersection(l, faceId, qEdgesId))
+                {
+                    // If two edges intersect line -> remove the one that is equal to previous edge index
+                    if (qEdgesId.size() == 2)
+                    {
+                        if ((qEdgesId.front()-1) == iEdgeIdx)
+                        {
+                            qEdgesId.pop();
+                        }
+                    }
+
+                    // Add face
+                    vFacesId.push_back(faceId);
+
+                    // Get edge that intersects
+                    iEdgeIdx = qEdgesId.front() - 1;
+                    qEdgesId.pop();
+
+                    // Get twin edge to move to next face in next iteration
+                    iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
+
+                    // Get next face
+                    faceId = dcel.getFace(iEdgeIdx);
+                }
+                else
+                {
+                    isFinished = true;
+                    isSuccess = false;
+                    cout << "Error finding face in Star triangulation. No face found" << endl;
+                }
+            }
+        }
+
+    } while (!isFinished);
 
     return isSuccess;
 };

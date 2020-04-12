@@ -62,7 +62,16 @@ public:
     * Description: 	gets the set of edges(two maximum) that intersects the
     * 				polygon.
     ***************************************************************************/
-	bool	getIntersections(Line &line, vector<int> &intersection);
+	bool getIntersections(Line &line, vector<int> &intersection);
+
+	/**
+	 * @fn      getIntersections
+	 * @brief   Gets the intersection points, if any, between line and polygon
+	 *
+	 * @param   line    (IN) Line to check intersection with polygon
+	 * @param   vOut    (OUT) Vector that contains intersection points (if any)
+	 */
+    void getIntersections(Line &line, vector<Point<TYPE>> &vOut);
 
     /***************************************************************************
     * Name: 	isInternal

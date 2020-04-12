@@ -31,8 +31,8 @@ enum Direction_E {HORIZONTAL_0,
 // Possible slope values.
 typedef enum Line_Slope_Enum
 {
-	INFINITE_POS_SLOPE,
-	INFINITE_NEG_SLOPE,
+	INF_POS_SLOPE,
+	INF_NEG_SLOPE,
 	ZERO_SLOPE,
 	REAL_SLOPE
 } Line_Slope_Enum;
@@ -68,8 +68,47 @@ public:
 	//------------------------------------------------------------------------
 	// Public API.
 	//------------------------------------------------------------------------
-	bool intersect(Line other);
-	void getIntersection(Line other, Point<TYPE> &intersection);
+	/**
+	 * @fn      isParallel
+	 * @brief   Checks if both lines are parallel
+	 *
+	 * @param   other (IN) Line to check with
+	 * @return  True if both are vertical or horizontal lines
+	 *          false otherwise
+	 */
+	bool isParallel(Line &other);
+
+	/**
+	 * @fn      intersect
+	 * @brief   Checks if both lines intersect
+	 *
+	 * @param   other (IN) Line to check with
+	 * @return  True if both lines intersect
+	 *          false otherwise
+	 */
+	bool intersect(Line &other);
+
+	/**
+	 * @fn      isHorizontal
+	 * @brief   Checks if line is horizontal
+	 *
+	 * @return  true if line is horizontal
+	 *          false otherwise
+	 */
+	bool isHorizontal() {  return this->getSlopeType() == ZERO_SLOPE; };
+
+	/**
+	 * @fn      isVertical
+	 * @brief   Checks if line is vertical
+	 *
+	 * @return  true if line is isVertical
+	 *          false otherwise
+	 */
+    bool isVertical() { return ((this->getSlopeType() == INF_POS_SLOPE) || (this->getSlopeType() == INF_NEG_SLOPE)); }
+
+    bool getIntersection2(Line &other, Point<TYPE> &intersection);
+
+
 	void getMiddle(Point<TYPE> &middle);
 	void extendToBoundary(Point<TYPE> &extreme);
 	enum Turn_T	checkTurn(Point<TYPE> *p);
