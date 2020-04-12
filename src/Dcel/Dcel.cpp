@@ -639,7 +639,7 @@ bool Dcel::isInsideFace(const Point<TYPE> &p, int faceId)
 		Point<TYPE> dest   = *getRefPoint(getOrigin(getTwin(iCurrentEdgeIdx) - 1) - 1);
 
 		// If right turn then it is not inner.
-		if (origin.check_Turn(dest, p) == RIGHT_TURN)
+		if (origin.check_Turn(dest, p) != LEFT_TURN)
 		{
 			inner = false;
 		}
