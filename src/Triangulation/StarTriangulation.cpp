@@ -240,10 +240,6 @@ void StarTriangulation::getConvexFacesIntersections(Line &line, vector<int> &vFa
 bool StarTriangulation::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
 {
     bool isSuccess=false;           // Return value
-    cout << fixed;
-    cout.precision(6);
-    cout << origin << endl;
-    cout << dest << endl;
 
     // Initialize output
     vFacesId.clear();

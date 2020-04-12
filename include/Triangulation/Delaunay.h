@@ -37,6 +37,7 @@ class Delaunay: public Triangulation
 	bool isStrictlyInteriorToNode(Point<TYPE> &point, int nodeIndex);
 	void splitNode(int pointIndex, int nodeIndex, int nTriangles);
 	double signedArea(Node *node);
+    void getConvexFacesIntersections(Line &line, vector<int> &vFaces, vector<int> &vEdges);
 
 	friend class DelaunayIO;
 public:

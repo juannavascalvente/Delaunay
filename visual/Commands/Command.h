@@ -899,6 +899,11 @@ public:
         Point<TYPE> p = line.getOrigin();
         Point<TYPE> q = line.getDest();
 
+//        cout << fixed;
+//        cout.precision(6);
+//        cout << p << endl;
+//        cout << q << endl;
+
         // Check what triangulation is active
         bool isRunSuccess;
         if (in.getStoreService()->isDelaunay())
@@ -1896,7 +1901,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        return in.getStoreService()->isTriangulation();
+        return in.getStoreService()->isTriangulation() || in.getStoreService()->isDelaunay();
     }
 
     /**

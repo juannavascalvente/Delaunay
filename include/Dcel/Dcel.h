@@ -56,10 +56,10 @@ public:
      * @fn                  imaginaryFace
      * @brief               Checks if any of the vertex of the face is imaginary (only incremental algorithms)
      *
-     * @param faceIndex     (IN) Face id to check
+     * @param faceId        (IN) Face id to check
      * @return
      */
-    bool imaginaryFace(int faceIndex);
+    bool imaginaryFace(int faceId);
 
     /**
      * @fn              getPoints
