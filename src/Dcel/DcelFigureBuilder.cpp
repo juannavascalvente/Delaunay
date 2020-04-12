@@ -13,13 +13,11 @@
 ***********************************************************************************************************************/
 void DcelFigureBuilder::getEdgePoints(size_t szEdgeIdx, Dcel &dcel, vector<Point<TYPE>> &vPoints)
 {
-    // TODO Add check to control access out of bounds -> https://github.com/juannavascalvente/Delaunay/issues/56
-//    if (szEdgIdx >= dcel.getNEdges())
-//    {
-//        Logging::buildText(__FUNCTION__, __FILE__, "Edge index out of bounds");
-//        Logging::buildText(__FUNCTION__, __FILE__, szEdgIdx);
-//        Logging::write(true, Info);
-//    }
+    // Check out of bounds access
+    if (szEdgeIdx >= dcel.getNumEdges())
+    {
+        throw std::runtime_error(&"Out of bounds access in getEdgePoints: " [ szEdgeIdx]);
+    }
 
     // Get origin and destination points of the edge.
     vPoints.push_back(*dcel.getRefPoint(dcel.getOrigin(szEdgeIdx) - 1));
