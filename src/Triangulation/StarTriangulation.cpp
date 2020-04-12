@@ -213,6 +213,8 @@ bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
 bool StarTriangulation::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
 {
     bool isSuccess=false;           // Return value
+    cout << fixed;
+    cout.precision(6);
     cout << origin << endl;
     cout << dest << endl;
 
