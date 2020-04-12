@@ -116,7 +116,7 @@ TEST (LineUnitTest, Test_Intersection)
 	EXPECT_TRUE(line1.intersect(linePerpendicular));
 	EXPECT_TRUE(linePerpendicular.intersect(line1));
 	Point<TYPE> intersection;
-	line1.getIntersection(linePerpendicular, intersection);
+    line1.getIntersection(linePerpendicular, intersection);
 	EXPECT_EQ(intersection.getX(), p1.getX());
 	EXPECT_EQ(intersection.getY(), r2.getY());
     EXPECT_FALSE(linePerpendicular.intersect(lineParallel));

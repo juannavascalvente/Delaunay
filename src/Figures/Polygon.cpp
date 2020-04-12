@@ -88,11 +88,6 @@ bool Polygon::getIntersections(Line &line, vector<int> &intersection)
 
 	// Compute # segments in polygon.
 	nSegments = this->getNElements()-1;
-#ifdef DEBUG_POLYGON_INTERSECT
-	Logging::buildText(__FUNCTION__, __FILE__, "Number of lines in polyline ");
-	Logging::buildText(__FUNCTION__, __FILE__, nSegments);
-	Logging::write( true, Info);
-#endif
 
 	// Loop until polygon checked or both edges found.
 	while ((intersection.size() < 2) && (lineIndex < nSegments))
@@ -101,91 +96,81 @@ bool Polygon::getIntersections(Line &line, vector<int> &intersection)
 		p = vPoints.at(lineIndex);
 		q = vPoints.at(lineIndex + 1);
 		currentLine = Line( p, q);
-#ifdef DEBUG_POLYGON_INTERSECT
-		Logging::buildText(__FUNCTION__, __FILE__, "Checking segment index ");
-		Logging::buildText(__FUNCTION__, __FILE__, lineIndex);
-		Logging::write( true, Info);
-#endif
+
 		// Check if lines intersect.
 		if (currentLine.intersect(line))
 		{
 			isSuccess = true;
             intersection.push_back(lineIndex);
-#ifdef DEBUG_POLYGON_INTERSECT
-			Logging::buildText(__FUNCTION__, __FILE__, "Intersection found");
-			Logging::write( true, Info);
-#endif
 		}
 
 		// Next line in polygon.
 		lineIndex++;
 	}
 
-#ifdef DEBUG_POLYGON_INTERSECT
-	if (!isSuccess)
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Intersection NOT found.");
-	}
-	else
-	{
-		Logging::buildText(__FUNCTION__, __FILE__, "Intersection finished.");
-	}
-	Logging::write( true, Info);
-#endif
-
 	return(isSuccess);
+}
+
+
+void Polygon::getIntersections(Line &line, vector<Point<TYPE>> &vOut)
+{
+    // Initialize output
+    vOut.clear();
+
+    // Compute # segments in polygon.
+    int nSegments = this->getNElements();
+
+    // Loop until all polygon segments have been checked
+    int lineIndex=0;
+    while (lineIndex < nSegments)
+    {
+        // Get next line
+        Point<TYPE> p = vPoints.at(lineIndex);
+        Point<TYPE> q = vPoints.at((lineIndex + 1) % nSegments);
+        Line currentLine( p, q);
+
+        // Check if lines intersect
+        Point<TYPE> intersection;
+        currentLine.getIntersection(line, intersection);
+        vOut.push_back(intersection);
+
+        // Next line in polygon
+        lineIndex++;
+    }
 }
 
 
 bool Polygon::isInternal(Point<TYPE> &p)
 {
-	bool isInternal=true;		// Return value.
-	int	 i=0;					// Loop counter.
-	int	 nElements=0;			// # elements to check in loop.
-	Point<TYPE> currentPoint;
-	Point<TYPE> nextPoint;
+	bool isInternal=true;		// Return value
 
-#ifdef DEBUG_POLYGON_IS_INTERNAL
-	Logging::buildText(__FUNCTION__, __FILE__, "# lines in polygon is ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getNElements());
-	Logging::write( true, Info);
-#endif
+    // Get first turn
+    Point<TYPE> currentPoint = vPoints.at(0);
+    Point<TYPE> nextPoint = vPoints.at(1);
+    Turn_T enFirstTurn = currentPoint.check_Turn(nextPoint, p);
 
-	// Check all polygon segments.
-	i = 0;
-	nElements = this->getNElements() - 1;
-	while ((i<nElements) && isInternal)
+	// Check all polygon segments
+	size_t szIter=1;
+	size_t szIndex=1;
+	while ((szIter < this->getNElements()) && isInternal)
 	{
-		currentPoint = vPoints.at(i);
-		i++;
-		nextPoint = vPoints.at(i);
+	    // Get next edge extreme points
+		currentPoint = vPoints.at(szIndex);
+        szIndex++;
+        szIndex = szIndex% this->getNElements();
+		nextPoint = vPoints.at(szIndex);
 
-#ifdef DEBUG_POLYGON_IS_INTERNAL
-		Logging::buildText(__FUNCTION__, __FILE__, "Checking line index ");
-		Logging::buildText(__FUNCTION__, __FILE__, i);
-		Logging::write( true, Info);
-#endif
-
-		// If RIGHT_TURN then it is not internal.
-		if (currentPoint.check_Turn(nextPoint, p) == RIGHT_TURN)
+		// Check all turns are in the same direction
+		if (currentPoint.check_Turn(nextPoint, p) != enFirstTurn)
 		{
 			isInternal = false;
 		}
+
+		// Next segment
+        szIter++;
 	}
 
-	// Check if point already external.
-	if (isInternal)
-	{
-		// Check line between first and last point and input point.
-		currentPoint = vPoints.at(nElements);
-		nextPoint = vPoints.at(0);
-		if (currentPoint.check_Turn(nextPoint, p) == RIGHT_TURN)
-		{
-			isInternal = false;
-		}
-	}
-
-	return(isInternal);
+	return isInternal;
 }
 
 

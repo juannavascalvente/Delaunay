@@ -578,49 +578,55 @@ bool Dcel::getEdgeIntersection(Line &line, int face, queue<int> &qEdges)
 bool Dcel::findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesId)
 {
 	bool found=true;		// Return value.
-	int firstFace=0;		// First face in path.
-	int lastFace=0;			// First face in path.
 
-	// Get origin and destination faces of the path.
-	firstFace = vExtremeFaces.at(0);
-	lastFace = vExtremeFaces.at(1);
+	// Get origin and destination faces of the path
+    int currentFace = vExtremeFaces.at(0);
+    int lastFace = vExtremeFaces.at(1);
 
-	// Check both points are not in the same face.
-	if (firstFace != lastFace)
+	// Check both points are not in the same face
+	if (currentFace != lastFace)
 	{
+        int lastEdgeIdx=INVALID;
         queue<int> qEdgesId;
 		do
 		{
 			// Get edge intersected by p1-p2 line.
-			if (this->getEdgeIntersection(line, firstFace, qEdgesId))
+			if (this->getEdgeIntersection(line, currentFace, qEdgesId))
 			{
-				// Insert current face.
-				vFacesId.push_back(firstFace);
+				// Check edges that intersect line
+				while (!qEdgesId.empty())
+                {
+                    int edgeIdx = qEdgesId.front() - 1;
+                    qEdgesId.pop();
+                    int iTwinEdgeIdx = this->getTwin(edgeIdx) - 1;
 
-				// Get next face.
-				int edgeId = qEdgesId.front();
-                qEdgesId.pop();
-				edgeId = this->getTwin(edgeId-1);
-				edgeId = this->getNext(edgeId-1);
-				firstFace = this->getFace(edgeId-1);
+                    // Check that current edge
+                    if (!imaginaryFace(this->getFace(iTwinEdgeIdx)) && (lastEdgeIdx != edgeIdx))
+                    {
+                        // Add current face to output
+                        vFacesId.push_back(currentFace);
 
-                qEdgesId.push(edgeId);
+                        // Get twin edge to access side face
+                        currentFace = this->getFace(iTwinEdgeIdx);
+
+                        // Save edge index to not add it twice
+                        lastEdgeIdx = iTwinEdgeIdx;
+
+                        // Next face has been found -> there is no need to continue processing next edge
+                        if (!qEdgesId.empty())
+                        {
+                            qEdgesId.pop();
+                        }
+                    }
+                }
 			}
-			else
-			{
-				found = false;
-				Logging::buildText(__FUNCTION__, __FILE__, "Current face ");
-				Logging::buildText(__FUNCTION__, __FILE__, firstFace);
-				Logging::buildText(__FUNCTION__, __FILE__, " does not intersect line.");
-				Logging::write(true, Info);
-			}
-		} while ((firstFace != lastFace) && found);
+		} while (currentFace != lastFace);
 	}
 
-	// Insert last face.
-    vFacesId.push_back(firstFace);
+	// Insert last face
+    vFacesId.push_back(currentFace);
 
-	return(found);
+	return found;
 }
 
 
@@ -639,7 +645,7 @@ bool Dcel::isInsideFace(const Point<TYPE> &p, int faceId)
 		Point<TYPE> dest   = *getRefPoint(getOrigin(getTwin(iCurrentEdgeIdx) - 1) - 1);
 
 		// If right turn then it is not inner.
-		if (origin.check_Turn(dest, p) == RIGHT_TURN)
+		if (origin.check_Turn(dest, p) != LEFT_TURN)
 		{
 			inner = false;
 		}
