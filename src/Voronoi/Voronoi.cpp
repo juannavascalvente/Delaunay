@@ -4,7 +4,6 @@
 #include "Logging.h"
 #include "Circle.h"
 #include "Voronoi.h"
-#include "DcelReader.h"
 #include "DcelWriter.h"
 
 

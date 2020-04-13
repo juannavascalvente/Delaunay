@@ -1,15 +1,12 @@
-/*
- * Line.cpp
- *
- *  Created on: Jun 30, 2016
- *      Author: jnavas
- */
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
+#include "Line.h"
 
-#include "Figures/Line.h"
 
-/*****************************************************************************
-* 							LINE class implementation
-*****************************************************************************/
+/***********************************************************************************************************************
+* Public methods definitions
+***********************************************************************************************************************/
 Line::Line() : m(0.0), n(0.0), enSlopeType(ZERO_SLOPE)
 {
 	// Initialize origin and destination points to (0,0).
@@ -23,9 +20,7 @@ Line::Line(Point<TYPE> p, Point<TYPE> q) : origin(p), destination(q), m(0.0),
 	this->setSlopeAndN();
 }
 
-//--------------------------------------------------------------------------
-// Public functions.
-//--------------------------------------------------------------------------
+
 bool Line::isParallel(Line &other)
 {
     // Check if both are horizontal
@@ -39,7 +34,7 @@ bool Line::isParallel(Line &other)
 }
 
 
-// TODO - Issue #35
+
 bool Line::intersect(Line &other)
 {
     bool doIntersect=false;
@@ -184,30 +179,10 @@ void Line::getMiddle(Point<TYPE> &middle)
  * 	POST:
  * 	COMPLEXITY:     O(1)
 *****************************************************************************/
-
-//FROM_0_TO_45,
-//				  FROM_45_TO_90,
-//				  FROM_90_TO_135,
-//                  FROM_135_TO_180,
-//                  FROM_180_TO_225,
-//				  FROM_225_TO_270,
-//				  FROM_270_TO_315,
-//                  FROM_315_TO_360
-
-//MAX_X_COORD				10000.0
-//#define MAX_Y_COORD
 void Line::extendToBoundary(Point<TYPE> &extreme)
 {
     Direction_E direction; 	// Line direction.
 
-    // Compute line m and n.
-#ifdef DEBUG_EXTEND_SEGMENT
-	Logging::buildText(__FUNCTION__, __FILE__, "Segment points are ");
-	Logging::buildText(__FUNCTION__, __FILE__, &this->origin);
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, &this->destination);
-	Logging::write(true, Info);
-#endif
 	// Check type of slope.
 	switch(this->getSlopeType())
 	{
@@ -223,8 +198,8 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 				case FROM_45_TO_90:
 				case FROM_90_TO_135:
 				{
-//					cout << " FROM_45_TO_90 FROM_90_TO_135 " << endl;
-					extreme.setY(MAX_Y_COORD);
+                    TYPE value = MAX(MAX_Y_COORD, this->getDest().getY());
+                    extreme.setY(value*2);
 					extreme.setX((extreme.getY() - this->getN()) / this->getSlope());
 					break;
 				}
@@ -232,8 +207,8 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 				case FROM_135_TO_180:
 				case FROM_180_TO_225:
 				{
-//					cout << " FROM_135_TO_180 FROM_180_TO_225 " << endl;
-					extreme.setX(-MAX_X_COORD);
+                    TYPE value = MIN(-MAX_X_COORD, this->getDest().getX());
+					extreme.setX(value*2);
 					extreme.setY((this->getSlope()*extreme.getX()) + this->getN());
 					break;
 				}
@@ -241,8 +216,8 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 				case FROM_225_TO_270:
 				case FROM_270_TO_315:
 				{
-//					cout << " FROM_225_TO_270 FROM_270_TO_315 " << endl;
-					extreme.setY(-MAX_Y_COORD);
+                    TYPE value = MIN(-MAX_Y_COORD, this->getDest().getY());
+					extreme.setY(value);
 					extreme.setX((extreme.getY() - this->getN()) / this->getSlope());
 					break;
 				}
@@ -251,8 +226,8 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 				// Max X coordinate and compute Y.
 				default:
 				{
-//					cout << " FROM_0_TO_45 FROM_315_TO_360 " << endl;
-					extreme.setX(MAX_X_COORD);
+                    TYPE value = MAX(MAX_X_COORD, this->getDest().getX());
+					extreme.setX(value);
 					extreme.setY((this->getSlope()*extreme.getX()) + this->getN());
 					break;
 				}
@@ -294,12 +269,8 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 			break;
 		}
 	}
-#ifdef DEBUG_EXTEND_SEGMENT
-	Logging::buildText(__FUNCTION__, __FILE__, "Extreme point is ");
-	Logging::buildText(__FUNCTION__, __FILE__, &extreme);
-	Logging::write(true, Info);
-#endif
 }
+
 
 /*****************************************************************************
  * 	FUNCTION:      	checkTurn
@@ -468,11 +439,7 @@ Direction_E Line::getDirection()
     // Only first or third quadrant.
     if (this->getSlopeType() != REAL_SLOPE)
 	{
-		if (INF_POS_SLOPE == this->getSlopeType())
-		{
-			direction = HORIZONTAL_180;
-		}
-		else if (INF_NEG_SLOPE == this->getSlopeType())
+		if (INF_NEG_SLOPE == this->getSlopeType())
 		{
 			direction = VERTICAL_270;
 		}
