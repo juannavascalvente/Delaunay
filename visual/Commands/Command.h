@@ -1173,7 +1173,6 @@ public:
 
         // Find closest point
         int	pointIndex=0;	// Index of the closest point.
-        double distance;
 
         // Check if Delaunay triangulation computed.
         bool isRunSuccess;
