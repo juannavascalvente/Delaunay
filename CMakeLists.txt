@@ -40,7 +40,7 @@ file(GLOB DELAUNAY_VISUAL_HEADER_FILES
         ${BUILD_PATH}/visual/Commands
         ${BUILD_PATH}/include/Visual
         ${BUILD_PATH}/include/Visual/Display
-        ${BUILD_PATH}/include/visual/Display/Displayable
+        ${BUILD_PATH}/include/Visual/Display/Displayable
         )
 
 file(GLOB DELAUNAY_VISUAL_SRC_FILES

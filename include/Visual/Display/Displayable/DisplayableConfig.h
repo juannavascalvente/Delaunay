@@ -28,8 +28,9 @@ class DisplayableConfig
     float fPointSize;
     float fLineSize;
     DisplayableColor color;
+    bool isDashedLines;
 public:
-    DisplayableConfig() : fPointSize(DEFAULT_POINT_SIZE), fLineSize(DEFAULT_LINE_SIZE), color() {};
+    DisplayableConfig() : fPointSize(DEFAULT_POINT_SIZE), fLineSize(DEFAULT_LINE_SIZE), color(), isDashedLines(false) {};
 
     /**
      * @fn      setPointSize
@@ -46,6 +47,12 @@ public:
      * @param   fSize       (IN) Point size
      */
     void setLineSize(float fSize) { fLineSize = fSize; }
+
+    /**
+     * @fn      setDashedLines
+     * @brief   Sets flag to display dashed line
+     */
+    void setDashedLines() { isDashedLines = true; }
 
     /**
      * @fn      setColor
@@ -81,6 +88,12 @@ public:
      * @return  RGB color vector
      */
     DisplayableColor getColor() { return color; }
+
+    /*
+     * @fn      getDashedLines
+     * @brief   Gets flag to display dashed line
+     */
+    bool getDashedLines() { return isDashedLines; }
 };
 
 

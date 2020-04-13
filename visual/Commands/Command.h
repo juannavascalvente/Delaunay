@@ -711,7 +711,9 @@ public:
         if (getSuccess())
         {
             // Add delaunay and voronoi
-            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDelaunay()->getRefDcel()));
+            Displayable *displayDcel = DisplayableFactory::createDcel(in.getStoreService()->getDelaunay()->getRefDcel());
+            displayDcel->setDashedLines();
+            vDisplayable.push_back(displayDcel);
             vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getVoronoi()->getRefDcel()));
         }
 
@@ -822,7 +824,9 @@ public:
         {
             // Add Delaunay and gabriel graph
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            vDisplayable.push_back(DisplayableFactory::createDcel(delaunay->getRefDcel()));
+            Displayable *displayDcel = DisplayableFactory::createDcel(delaunay->getRefDcel());
+            displayDcel->setDashedLines();
+            vDisplayable.push_back(displayDcel);
             vDisplayable.push_back(DisplayableFactory::createPolyLine(vLines));
         }
 
