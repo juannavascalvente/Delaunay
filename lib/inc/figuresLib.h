@@ -35,4 +35,7 @@ bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut);
  */
 bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
 
+
+bool getGabriel(vector<Point<TYPE>> &vPointsIn);
+
 #endif //DELAUNAY_FIGURESLIB_H
