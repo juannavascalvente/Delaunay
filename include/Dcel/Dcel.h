@@ -23,8 +23,8 @@ class Dcel : public DcelModel
 	/*******************************************************************************************************************
 	* Private methods
 	*******************************************************************************************************************/
-	void quicksort(Vertex *origin, Vertex *list, int first, int last);
-	int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
+	static void  quicksort(Vertex *origin, Vertex *list, int first, int last);
+	static int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
 
 public:
 	/*******************************************************************************************************************
