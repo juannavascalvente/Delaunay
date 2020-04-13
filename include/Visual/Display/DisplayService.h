@@ -69,6 +69,25 @@ public:
     static void setLineSize(float size) { glLineWidth(size);} ;
 
     /**
+     * @fn      setDashedLines
+     * @brief   Display dashed line depending on input parameter
+     *
+     * @param isDashed
+     */
+    static void setDashedLines(bool isDashed)
+    {
+        if (isDashed)
+        {
+            glLineStipple(5, 0xAAAA);
+            glEnable(GL_LINE_STIPPLE);
+        }
+        else
+        {
+            glDisable(GL_LINE_STIPPLE);
+        }
+    };
+
+    /**
      * Set color functions.
      */
     static void setColor(const DisplayableColor &color) {glColor3f(color.getRed(), color.getGreen(),color.getBlue()); };

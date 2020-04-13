@@ -39,6 +39,7 @@ class Displayable
         DisplayService::setColor(displayConfig.getColor());
         DisplayService::setPointSize(displayConfig.getPointSize());
         DisplayService::setLineSize(displayConfig.getLineSize());
+        DisplayService::setDashedLines(displayConfig.getDashedLines());
     }
 public:
     explicit Displayable(DisplayableConfig configIn) : displayConfig(configIn) {};
@@ -57,6 +58,12 @@ public:
      * @param   fSize
      */
     void setPointSize(float fSize) { displayConfig.setPointSize(fSize); };
+
+    /**
+     * @fn      setDashedLines
+     * @brief   Sets dashed line depending on config value
+     */
+    void setDashedLines() { displayConfig.setDashedLines(); };
 };
 
 
