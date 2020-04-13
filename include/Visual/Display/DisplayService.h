@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 25/3/20.
-//
-
 #ifndef DELAUNAY_DISPLAYSERVICE_H
 #define DELAUNAY_DISPLAYSERVICE_H
 
@@ -10,7 +6,7 @@
 ***********************************************************************************************************************/
 #include <GL/glut.h>
 #include "defines.h"
-#include "Displayable/DisplayableColor.h"
+#include "DisplayableColor.h"
 
 
 /***********************************************************************************************************************

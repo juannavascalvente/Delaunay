@@ -8,7 +8,7 @@
 #include "Config.h"
 #include "Dcel.h"
 #include "defines.h"
-#include "Displayable/DisplayableFactory.h"
+#include "DisplayableFactory.h"
 #include "Point.h"
 #include "StoreService.h"
 
