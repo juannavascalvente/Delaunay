@@ -80,7 +80,7 @@ bool get2ClosestPoints(vector<Point<TYPE>> &vPoints, Point<TYPE> &p, Point<TYPE>
     return isSuccess;
 }
 
-bool getPointFace(Point<TYPE> &p, vector<Point<TYPE>> &vPoints, FacePoints &facePoints)
+bool getPointFace(Point<TYPE> &p, vector<Point<TYPE>> &vPoints, vector<Point<TYPE>> &facePoints)
 {
     bool isSuccess=false;         // Return value
 
