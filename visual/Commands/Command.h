@@ -785,7 +785,6 @@ public:
             dcelRef = gabriel->getDcel();
 
             // Draw Gabriel edges.
-            // TODO https://github.com/juannavascalvente/Delaunay/issues/60 -> Add dashed lines to highlight results
             for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
             {
                 // Check if current edge mamtches Gabriel restriction.s
