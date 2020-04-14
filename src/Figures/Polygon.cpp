@@ -173,6 +173,78 @@ bool Polygon::isInternal(Point<TYPE> &p)
 	return isInternal;
 }
 
+bool Polygon::operator==(Polygon& other)
+{
+    // Check polygons length
+    if (this->getNElements() != other.getNElements())
+    {
+        return false;
+    }
+
+    // Get points from both polygons
+    vector<Point<TYPE>> vPointsIn;
+    vector<Point<TYPE>> vPointsOut;
+    this->getPoints(vPointsIn);
+    other.getPoints(vPointsOut);
+
+    // Find first point that is equal.
+    size_t szFirstIdx=0;
+    bool isFirstFound=false;
+    while (!isFirstFound && (szFirstIdx<this->getNElements()))
+    {
+        if (vPointsIn.at(szFirstIdx) == vPointsOut.at(0))
+        {
+            isFirstFound = true;
+        }
+        else
+        {
+            szFirstIdx++;
+        }
+    }
+
+    // If at least one point does not belong to both polygons -> return false
+    if (!isFirstFound)
+    {
+        return false;
+    }
+
+    // Return value
+    bool isEqual=true;
+
+    // Check all points in one direction
+    size_t i=0;
+    size_t szCurrentIdx=szFirstIdx;
+    while (isEqual && (i<this->getNElements()))
+    {
+        isEqual = (vPointsIn.at(szCurrentIdx) == vPointsOut.at(i));
+        i++;
+        szCurrentIdx++;
+        szCurrentIdx = szCurrentIdx % this->getNElements();
+    }
+
+    // Check in counter direction
+    if (!isEqual)
+    {
+        i=0;
+        isEqual = true;
+        szCurrentIdx = szFirstIdx;
+        while (isEqual && (i<this->getNElements()))
+        {
+            isEqual = (vPointsIn.at(szCurrentIdx) == vPointsOut.at(i));
+            i++;
+            if (szCurrentIdx == 0)
+            {
+                szCurrentIdx = this->getNElements() - 1;
+            }
+            else
+            {
+                szCurrentIdx--;
+            }
+        }
+    }
+
+    return isEqual;
+}
 
 void Polygon::print(std::ostream& out)
 {
