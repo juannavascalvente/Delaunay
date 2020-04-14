@@ -13,12 +13,6 @@ using namespace std;
 
 
 /***********************************************************************************************************************
-* Public struct definitions
-***********************************************************************************************************************/
-typedef vector<Point<TYPE>> FacePoints;
-
-
-/***********************************************************************************************************************
 * API function declarations
 ***********************************************************************************************************************/
 /**
@@ -58,7 +52,7 @@ bool get2ClosestPoints(vector<Point<TYPE>> &vPoints, Point<TYPE> &p, Point<TYPE>
  * @return  true if face found
  *          false otherwise
  */
-bool getPointFace(Point<TYPE> &p, vector<Point<TYPE>> &vPoints, FacePoints &facePoints);
+bool getPointFace(Point<TYPE> &p, vector<Point<TYPE>> &vPoints, vector<Point<TYPE>> &facePoints);
 
 
 #endif //DELAUNAY_LOCATELIB_H
