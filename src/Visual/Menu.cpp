@@ -153,7 +153,10 @@ void Menu::updateMenu()
 			glutAddMenuEntry(FIGURES_CONVEX_TEXT, convex_hull);
 			glutAddMenuEntry(FIGURES_CIRCUMCENTRES_TEXT, circumcentres);
 			glutAddMenuEntry(FIGURES_EDGES_CRICLES_TEXT, edge_circles);
-			glutAddMenuEntry(FIGURES_VORONOI_TEXT, voronoi);
+			if (service.isDelaunay())
+            {
+                glutAddMenuEntry(FIGURES_VORONOI_TEXT, voronoi);
+            }
 			glutAddMenuEntry(LOCATION_CLOSEST_POINTS_TEXT, closest_point);
 			glutAddMenuEntry(LOCATION_2CLOSEST_POINTS_TEXT, two_closest);
 			glutAddMenuEntry(LOCATION_FIND_FACE_TEXT, find_face);

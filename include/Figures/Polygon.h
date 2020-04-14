@@ -84,6 +84,15 @@ public:
     ***************************************************************************/
 	bool	isInternal(Point<TYPE> &p);
 
+    /**
+     * @fn              ==
+     * @brief           Compares two polygons
+     * @param other     polygon to compare with
+     * @return          true if both polygons are equal
+     *                  false otherwise
+     */
+    bool operator==(Polygon& other);
+
     /***************************************************************************
     * Name: 	print
     * IN:		out			output stream

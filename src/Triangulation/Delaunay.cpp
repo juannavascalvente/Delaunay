@@ -386,9 +386,6 @@ bool Delaunay::convexHull()
 		Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getRefPoint(this->dcel.getOrigin(0)-1));
 		Logging::write(true, Info);
 #endif
-		// Insert initial point (always in the convex hull).
-		this->hull.add(*this->dcel.getRefPoint(this->dcel.getOrigin(0)-1));
-
 		// Get an edge departing from 0 point.
 		edgeIndex = this->dcel.getPointEdge(0) - 1;
 
