@@ -7,6 +7,7 @@
 ***********************************************************************************************************************/
 #include "defines.h"
 #include "Dcel.h"
+#include "Point.h"
 
 
 /***********************************************************************************************************************
@@ -36,6 +37,16 @@ bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut);
 bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
 
 
-bool getGabriel(vector<Point<TYPE>> &vPointsIn);
+/**
+ * @fn                  getGabriel
+ * @brief               Returns the Gabriel graph of a given set of points
+ * @details             The output is an even set of points where every two points is a segment of the Gabriel graph
+ *
+ * @param vPointsIn     (IN) Input set of points
+ * @param vPointsOut    (OUT) Gabriel graph set of points
+ * @return              true if graph built
+ *                      false otherwise
+ */
+bool getGabriel(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
 
 #endif //DELAUNAY_FIGURESLIB_H
