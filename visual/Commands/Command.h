@@ -1012,7 +1012,6 @@ public:
     bool isRunnable() override
     {
         // Delaunay and Voronoi must exist
-        // TODO https://github.com/juannavascalvente/Delaunay/issues/10
         return in.getStoreService()->isVoronoi();
     }
 
