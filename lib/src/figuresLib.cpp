@@ -59,9 +59,6 @@ bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsO
 
     try
     {
-        // Initialize output
-        vPointsOut.clear();
-
         // Create Delaunay
         auto *delaunay = new Delaunay(vPointsIn);
 
@@ -75,8 +72,11 @@ bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsO
                 Polygon hull;
                 if (delaunay->getConvexHull(hull))
                 {
-                    hull.getPoints(vPointsOut);
+                    // Initialize output
+                    vPointsOut.clear();
                     isSuccess = true;
+
+                    hull.getPoints(vPointsOut);
                 }
             }
         }
@@ -103,9 +103,6 @@ bool getGabriel(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut)
 
     try
     {
-        // Initialize output
-        vPointsOut.clear();
-
         // Create Delaunay
         auto *delaunay = new Delaunay(vPointsIn);
 
@@ -122,7 +119,9 @@ bool getGabriel(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut)
                 auto gabriel = new Gabriel(*delaunay->getRefDcel(), *voronoi);
                 if (gabriel->build())
                 {
+                    // Initialize output
                     isSuccess = true;
+                    vPointsOut.clear();
 
                     // Get reference to gabriel dcel.
                     Dcel *dcelRef = gabriel->getDcel();
