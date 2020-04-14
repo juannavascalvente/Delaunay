@@ -46,6 +46,8 @@ file(GLOB DELAUNAY_VISUAL_HEADER_FILES
 file(GLOB DELAUNAY_VISUAL_SRC_FILES
         ${BUILD_PATH}/statistics/*.cpp
         ${BUILD_PATH}/test/*.cpp
+        ${BUILD_PATH}/test/Equivalence/*.cpp
+        ${BUILD_PATH}/test/Integration/*.cpp
         ${BUILD_PATH}/visual/*.cpp
         ${BUILD_PATH}/visual/Commands/*.cpp
         ${BUILD_PATH}/src/Visual/*.cpp

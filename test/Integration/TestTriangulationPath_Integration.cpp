@@ -98,7 +98,6 @@ namespace
         executeSubtest(NUM_ELEMS_10, NUM_ELEMS_1000000);
     }
 
-
     /**
      * DESCRIPTION:
      *
