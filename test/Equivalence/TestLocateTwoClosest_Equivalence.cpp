@@ -7,7 +7,6 @@
 #include "Delaunay.h"
 #include "PointFactory.h"
 #include "StarTriangulation.h"
-#include "Voronoi.h"
 
 using namespace std;
 
@@ -19,9 +18,9 @@ using namespace std;
 #define NUM_POINTS_10000           (10000)
 #define NUM_POINTS_100000          (100000)
 
-#define NUM_ITERATIONS_10           (10)
-#define NUM_ITERATIONS_100          (100)
-#define NUM_ITERATIONS_1000         (1000)
+#define NUM_ITERATIONS_10          (10)
+#define NUM_ITERATIONS_100         (100)
+#define NUM_ITERATIONS_1000        (1000)
 
 
 /***********************************************************************************************************************
@@ -29,7 +28,7 @@ using namespace std;
 ***********************************************************************************************************************/
 namespace
 {
-    class TestLocatePoint_Equivalence : public ::testing::Test
+    class TestLocateTwoClosest_Equivalence : public ::testing::Test
     {
 
     protected:
@@ -37,22 +36,18 @@ namespace
         // You can remove any or all of the following functions if its body
         // is empty.
         // Constructor (called before each test case) - SetUp
-        TestLocatePoint_Equivalence() = default;
+        TestLocateTwoClosest_Equivalence() = default;
 
         // Deconstructor (called after each test case) - TearDown
-        ~TestLocatePoint_Equivalence() override = default;
+        ~TestLocateTwoClosest_Equivalence() override = default;
 
     public:
 
         static void executeSubtest(size_t szNumPoints, size_t szNumIterations);
     };
 
-    void TestLocatePoint_Equivalence::executeSubtest(size_t szNumPoints, size_t szNumIterations)
+    void TestLocateTwoClosest_Equivalence::executeSubtest(size_t szNumPoints, size_t szNumIterations)
     {
-        // Generate random points to find
-        vector<Point<TYPE>> vPointsToFind;
-        PointFactory::generateRandom(szNumIterations, vPointsToFind);
-
         // Execute test szNumIterations times
         for (size_t i=0; i<szNumIterations ; i++)
         {
@@ -65,15 +60,10 @@ namespace
             bool isSuccess = delaunay->build();
             ASSERT_TRUE(isSuccess);
 
-            // Build Voronoi diagram
-            auto *voronoi = new Voronoi(delaunay->getRefDcel());
-            isSuccess = voronoi->build();
-            ASSERT_TRUE(isSuccess);
-
-            // Find closest point in Delaunay triangulation
-            int pointIndex=0;
-            Point<TYPE> closestDelaunay;
-            isSuccess = delaunay->findClosestPoint(vPointsToFind.at(i), voronoi, closestDelaunay, pointIndex);
+            // Find two closest point in Delaunay triangulation
+            Point<TYPE> closestDelaunayP1;
+            Point<TYPE> closestDelaunayP2;
+            isSuccess = delaunay->findTwoClosest(closestDelaunayP1, closestDelaunayP2);
             ASSERT_TRUE(isSuccess);
 
             // Build Star triangulation
@@ -82,18 +72,18 @@ namespace
             ASSERT_TRUE(isSuccess);
 
             // Find closest point in Star triangulation
-            Point<TYPE> closestStar;
-            isSuccess = starTriangulation->findClosestPoint(vPointsToFind.at(i), nullptr, closestStar, pointIndex);
+            Point<TYPE> closestStarP1;
+            Point<TYPE> closestStarP2;
+            isSuccess = starTriangulation->findTwoClosest(closestStarP1, closestStarP2);
             ASSERT_TRUE(isSuccess);
 
-            // Check both points are the same
-            ASSERT_TRUE(closestStar == closestDelaunay);
-
+            // Check closest points are equal
+            ASSERT_TRUE(((closestStarP1 == closestDelaunayP1) && (closestStarP2 == closestDelaunayP2)) ||
+                                ((closestStarP2 == closestDelaunayP1) && (closestStarP1 == closestDelaunayP2)));
             cout << "Test " << (i+1) << "/" << szNumIterations << endl;
 
             // Free resources
             delete starTriangulation;
-            delete voronoi;
             delete delaunay;
         }
     }
@@ -104,7 +94,7 @@ namespace
  * DESCRIPTION:
  *
  */
-TEST_F(TestLocatePoint_Equivalence, Test_Num_Samples_100000_Iter_1000)
+TEST_F(TestLocateTwoClosest_Equivalence, Test_Num_Samples_100000_Iter_1000)
 {
     executeSubtest(NUM_POINTS_100000, NUM_ITERATIONS_10);
 }
@@ -114,7 +104,7 @@ TEST_F(TestLocatePoint_Equivalence, Test_Num_Samples_100000_Iter_1000)
  * DESCRIPTION:
  *
  */
-TEST_F(TestLocatePoint_Equivalence, Test_Num_Samples_10000_Iter_100)
+TEST_F(TestLocateTwoClosest_Equivalence, Test_Num_Samples_10000_Iter_100)
 {
     executeSubtest(NUM_POINTS_10000, NUM_ITERATIONS_100);
 }
@@ -124,7 +114,7 @@ TEST_F(TestLocatePoint_Equivalence, Test_Num_Samples_10000_Iter_100)
  * DESCRIPTION:
  *
  */
-TEST_F(TestLocatePoint_Equivalence, Test_Num_Samples_1000_Iter_10)
+TEST_F(TestLocateTwoClosest_Equivalence, Test_Num_Samples_1000_Iter_10)
 {
     executeSubtest(NUM_POINTS_1000, NUM_ITERATIONS_1000);
 }
