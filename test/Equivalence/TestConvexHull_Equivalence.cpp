@@ -17,11 +17,11 @@ using namespace std;
 ***********************************************************************************************************************/
 #define NUM_POINTS_1000            (1000)
 #define NUM_POINTS_10000           (10000)
-#define NUM_POINTS_100000          (10)
+#define NUM_POINTS_100000          (100000)
 
-#define NUM_ITERATIONS_10           (10)
-#define NUM_ITERATIONS_100          (100)
-#define NUM_ITERATIONS_1000         (1000)
+#define NUM_ITERATIONS_10          (10)
+#define NUM_ITERATIONS_100         (100)
+#define NUM_ITERATIONS_1000        (1000)
 
 
 /***********************************************************************************************************************
