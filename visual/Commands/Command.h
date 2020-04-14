@@ -785,7 +785,6 @@ public:
             dcelRef = gabriel->getDcel();
 
             // Draw Gabriel edges.
-            // TODO https://github.com/juannavascalvente/Delaunay/issues/60 -> Add dashed lines to highlight results
             for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
             {
                 // Check if current edge mamtches Gabriel restriction.s
@@ -1173,7 +1172,6 @@ public:
 
         // Find closest point
         int	pointIndex=0;	// Index of the closest point.
-        double distance;
 
         // Check if Delaunay triangulation computed.
         bool isRunSuccess;
