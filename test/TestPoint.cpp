@@ -77,7 +77,7 @@ TEST (PointUnitTest, Test_Distance)
     Point<TYPE> r(1.0, 1.0);
     EXPECT_EQ(0.0, p.distance(p));
     EXPECT_EQ(1.0, p.distance(q));
-    float fpDistance=sqrt(2.0);
+    TYPE fpDistance=sqrt(2.0);
     EXPECT_EQ(fpDistance, p.distance(r));
 }
 

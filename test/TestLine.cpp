@@ -238,7 +238,7 @@ TEST (LineUnitTest, Test_Extend_To_Boundary)
 	EXPECT_EQ(expectedExtreme, computedExtreme);
 
 	// Check extreme point is in low side.
-	expectedExtreme.setX(3637.727295);
+	expectedExtreme.setX((TYPE) 3637.7272727272725);
 	expectedExtreme.setY(-MAX_X_COORD);
 	q.setX(5.0);
 	q.setY(-10.0);
@@ -247,8 +247,8 @@ TEST (LineUnitTest, Test_Extend_To_Boundary)
 	EXPECT_EQ(expectedExtreme, computedExtreme);
 
 	// Check extreme point is in left side.
-	expectedExtreme.setX(-MAX_X_COORD);
-	expectedExtreme.setY(15002.500000);
+	expectedExtreme.setX(-2*MAX_X_COORD);
+	expectedExtreme.setY(30002.500000);
 	q.setX(-5.0);
 	q.setY(10.0);
 	line.setDestination(&q);
@@ -256,8 +256,8 @@ TEST (LineUnitTest, Test_Extend_To_Boundary)
 	EXPECT_EQ(expectedExtreme, computedExtreme);
 
 	// Check extreme point is in up side.
-	expectedExtreme.setX(5000.500000);
-	expectedExtreme.setY(MAX_Y_COORD);
+	expectedExtreme.setX(10000.500000);
+	expectedExtreme.setY(2*MAX_Y_COORD);
 	q.setX(2.0);
 	q.setY(3.0);
 	line.setDestination(&q);
