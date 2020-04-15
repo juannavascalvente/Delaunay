@@ -14,17 +14,35 @@
 ***********************************************************************************************************************/
 bool PointsWriter::write(const string &fileName, vector<Point<TYPE>> &vPoints)
 {
-    bool isSuccess;		// Return value.
+    bool isSuccess=false;		// Return value.
 
-    // Read points from flat points file
-    if (FileExtensionChecker::isBinary(fileName))
+    try
     {
-        isSuccess = PointsWriter::writeBinary(fileName, vPoints);
+        // Read points from flat points file
+        if (FileExtensionChecker::isBinary(fileName))
+        {
+            isSuccess = PointsWriter::writeBinary(fileName, vPoints);
+        }
+        // Read points from binary file
+        else
+        {
+            isSuccess = PointsWriter::writeFlat(fileName, vPoints);
+        }
     }
-    // Read points from binary file
-    else
+    catch (const ofstream::failure& e)
     {
-        isSuccess = PointsWriter::writeFlat(fileName, vPoints);
+        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
+        Logging::buildText(__FUNCTION__, __FILE__, fileName);
+        Logging::write(true, Error);
+    }
+    catch (bad_alloc &ex)
+    {
+        Logging::buildText(__FUNCTION__, __FILE__, "Error allocating memory");
+        Logging::write( true, Error);
+    }
+    catch (exception &ex)
+    {
+        std::cout << ex.what();
     }
 
     return isSuccess;
@@ -48,31 +66,22 @@ bool PointsWriter::writeFlat(const string &fileName, vector<Point<TYPE>> &vPoint
 {
     bool isSuccess=false;	// Return value.
 
-    try
+    // Open file.
+    ofstream ofs(fileName.c_str(), ios::out);
+    if (ofs.is_open())
     {
-        // Open file.
-        ofstream ofs(fileName.c_str(), ios::out);
-        if (ofs.is_open())
+        // Points loop
+        ofs << fixed;
+        ofs.precision(6);
+        for (auto point : vPoints)
         {
-            // Points loop
-            ofs << fixed;
-            ofs.precision(6);
-            for (auto point : vPoints)
-            {
-                ofs << " " << point;
-            }
-
-            // Close file.
-            ofs.close();
-
-            isSuccess = true;
+            ofs << " " << point;
         }
-    }
-    catch (const ofstream::failure& e)
-    {
-        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
-        Logging::buildText(__FUNCTION__, __FILE__, fileName);
-        Logging::write(true, Error);
+
+        // Close file.
+        ofs.close();
+
+        isSuccess = true;
     }
 
     return isSuccess;
@@ -93,40 +102,32 @@ bool PointsWriter::writeBinary(const string &fileName, vector<Point<TYPE>> &vPoi
 {
     bool isSuccess=false;	// Return value.
 
-    try
+    // Open file.
+    ofstream ofs(fileName.c_str(), ios::out | ios::binary);
+    if (ofs.is_open())
     {
-        // Open file.
-        ofstream ofs(fileName.c_str(), ios::out | ios::binary);
-        if (ofs.is_open())
+        // Allocate buffer to store points
+        auto *buffer = new TYPE[vPoints.size()*2];
+
+        // Points loop
+        size_t idx=0;
+        for (auto point : vPoints)
         {
-            // Allocate buffer to store points
-            auto *buffer = new TYPE[vPoints.size()*2];
-
-            // Points loop
-            size_t idx=0;
-            for (auto point : vPoints)
-            {
-                // Write X coordinate
-                buffer[idx++] = point.getX();
-                buffer[idx++] = point.getY();
-            }
-
-            // Write buffer
-            ofs.write(reinterpret_cast<char*>(buffer), sizeof(TYPE)*idx);
-
-            // Free resources
-            ofs.close();
-            delete[] buffer;
-
-            isSuccess = true;
+            // Write X coordinate
+            buffer[idx++] = point.getX();
+            buffer[idx++] = point.getY();
         }
+
+        // Write buffer
+        ofs.write(reinterpret_cast<char*>(buffer), sizeof(TYPE)*idx);
+
+        // Free resources
+        ofs.close();
+        delete[] buffer;
+
+        isSuccess = true;
     }
-    catch (const ofstream::failure& e)
-    {
-        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
-        Logging::buildText(__FUNCTION__, __FILE__, fileName);
-        Logging::write(true, Error);
-    }
+
 
     return isSuccess;
 }
