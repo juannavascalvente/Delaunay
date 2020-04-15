@@ -206,7 +206,6 @@ bool DcelReader::readBinary(const string &fileName, Dcel &dcel)
             szPtr += sizeof(size_t);
 
             // Get vertex array
-            char intElement[sizeof(int)];
             TYPE x, y;
             int originEdge;
             for (size_t i=0; i<szLength ; i++)
