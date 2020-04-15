@@ -2292,7 +2292,7 @@ public:
     CommandResult* runCommand() override
     {
         // Write points to file
-        this->isSuccess = PointsWriter::write(Config::getOutFlatFilename(), in.getStoreService()->getPoints());
+        this->isSuccess = PointsWriter::write(Config::getOutFlatFilename(), in.getStoreService()->getPoints(), false);
 
         // Build result
         return createResult();
