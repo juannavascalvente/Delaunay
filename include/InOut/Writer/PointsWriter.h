@@ -35,7 +35,7 @@ public:
      * @return          true if file written
      *                  false otherwise
      */
-    static bool write(const string &fileName, vector<Point<TYPE>> &vPoints, bool isBinary=false);
+    static bool write(const string &fileName, vector<Point<TYPE>> &vPoints);
 };
 
 

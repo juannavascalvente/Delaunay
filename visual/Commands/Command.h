@@ -2045,7 +2045,7 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), false, vPoints);
+        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), vPoints);
 
         if (this->isSuccess)
         {
@@ -2292,7 +2292,7 @@ public:
     CommandResult* runCommand() override
     {
         // Write points to file
-        this->isSuccess = PointsWriter::write(Config::getOutFlatFilename(), in.getStoreService()->getPoints(), false);
+        this->isSuccess = PointsWriter::write(Config::getOutFlatFilename(), in.getStoreService()->getPoints());
 
         // Build result
         return createResult();

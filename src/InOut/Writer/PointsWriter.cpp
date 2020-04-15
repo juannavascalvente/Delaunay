@@ -2,6 +2,8 @@
 * Includes
 ***********************************************************************************************************************/
 #include "PointsWriter.h"
+
+#include "FileExtensionChecker.h"
 #include "Logging.h"
 
 #include <cstring>
@@ -10,12 +12,12 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-bool PointsWriter::write(const string &fileName, vector<Point<TYPE>> &vPoints, bool isBinary)
+bool PointsWriter::write(const string &fileName, vector<Point<TYPE>> &vPoints)
 {
     bool isSuccess;		// Return value.
 
     // Read points from flat points file
-    if (isBinary)
+    if (FileExtensionChecker::isBinary(fileName))
     {
         isSuccess = PointsWriter::writeBinary(fileName, vPoints);
     }
@@ -98,29 +100,23 @@ bool PointsWriter::writeBinary(const string &fileName, vector<Point<TYPE>> &vPoi
         if (ofs.is_open())
         {
             // Allocate buffer to store points
-            auto *arr_cBuffer = new char[vPoints.size()*sizeof(Point<TYPE>)];
-            size_t szCnt=0;
+            auto *buffer = new TYPE[vPoints.size()*2];
 
             // Points loop
+            size_t idx=0;
             for (auto point : vPoints)
             {
                 // Write X coordinate
-                TYPE value = point.getX();
-                memcpy(&arr_cBuffer[szCnt], &value, sizeof(TYPE));
-                szCnt += sizeof(TYPE);
-
-                // Write Y coordinate
-                value = point.getY();
-                memcpy(&arr_cBuffer[szCnt], &value, sizeof(TYPE));
-                szCnt += sizeof(TYPE);
+                buffer[idx++] = point.getX();
+                buffer[idx++] = point.getY();
             }
 
             // Write buffer
-            ofs.write(arr_cBuffer, szCnt);
+            ofs.write(reinterpret_cast<char*>(buffer), sizeof(TYPE)*idx);
 
             // Free resources
             ofs.close();
-            delete[] arr_cBuffer;
+            delete[] buffer;
 
             isSuccess = true;
         }

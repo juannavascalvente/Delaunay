@@ -48,7 +48,7 @@ namespace
 
             vector<Point<TYPE>> vPointToLocate;
             vPointToLocate.push_back(point);
-            PointsWriter::write(strPointFileName, vPointToLocate, false);
+            PointsWriter::write(strPointFileName, vPointToLocate);
         };
         ~TestTriangulationPath_Integration() override
         {
@@ -70,7 +70,7 @@ namespace
             PointFactory::generateRandom(szNumPoints, vPoints);
 
             // Write data before test is executed
-            PointsWriter::write(strPointSetFileName, vPoints, false);
+            PointsWriter::write(strPointSetFileName, vPoints);
 
             // Create triangulation
             auto *triangulation = new StarTriangulation(vPoints);
