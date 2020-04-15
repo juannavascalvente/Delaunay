@@ -2099,7 +2099,7 @@ public:
 
         // Run command
         auto *t = new StarTriangulation();
-        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), false, *t->getRefDcel());
+        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), *t->getRefDcel());
         if (this->isSuccess)
         {
             in.getStoreService()->save(*t);
@@ -2347,7 +2347,7 @@ public:
         }
 
         // Write dcel to file
-        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, false);
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel);
 
         // Build result
         return createResult();

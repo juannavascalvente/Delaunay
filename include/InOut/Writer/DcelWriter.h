@@ -31,11 +31,10 @@ public:
      *
      * @param fileName  (IN) File name
      * @param dcel      (IN) Dcel data to write
-     * @param isBinary  (IN) Flag to write data in binary format or plain text
      * @return          true if file written
      *                  false otherwise
      */
-    static bool write(const string &fileName, const DcelModel &dcel, bool isBinary=false);
+    static bool write(const string &fileName, const DcelModel &dcel);
 
     /**
      * @fn          print

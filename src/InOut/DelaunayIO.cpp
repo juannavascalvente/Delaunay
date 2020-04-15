@@ -20,7 +20,7 @@ bool DelaunayIO::read(const string &strDcelFileName, const string &strGraphFileN
     delaunay.reset();
 
     // Read DCEL data.
-    isSuccess = DcelReader::read(strDcelFileName, false, delaunay.dcel);
+    isSuccess = DcelReader::read(strDcelFileName, delaunay.dcel);
     if (isSuccess)
     {
         delaunay.setValid(true);
@@ -41,7 +41,7 @@ bool DelaunayIO::write(const string &strDcelFileName, const string &strGraphFile
     bool	isSuccess;		// Return value.
 
     // Write DCEL data.
-    isSuccess = DcelWriter::write(strDcelFileName, delaunay.dcel, false);
+    isSuccess = DcelWriter::write(strDcelFileName, delaunay.dcel);
     if (isSuccess)
     {
         // Write graph data if graph exists.

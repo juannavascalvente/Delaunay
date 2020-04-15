@@ -5,8 +5,9 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include <string>
 #include "Dcel.h"
+
+#include <string>
 
 
 /***********************************************************************************************************************
@@ -20,7 +21,7 @@ class DcelReader
     *******************************************************************************************************************/
     static bool readVertexSet(ifstream &ifs, Dcel &dcel);
     static bool readBinary(const string &fileName, Dcel &dcel);
-    static bool readDcel(const string &fileName, Dcel &dcel);
+    static bool readFlat(const string &fileName, Dcel &dcel);
 
 public:
 
@@ -33,12 +34,11 @@ public:
      * 				depending on "isBinary" format.
      *
      * @param   fileName  (IN) File name
-     * @param   isBinary  (IN) Binary format flag
      * @param   dcel      (OUT) Dcel to update
      * @return  true if read successfully
      *          false otherwise
      */
-    static bool read(const string &fileName, bool isBinary, Dcel &dcel);
+    static bool read(const string &fileName, Dcel &dcel);
 };
 
 #endif //DELAUNAY_DCELREADER_H
