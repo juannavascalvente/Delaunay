@@ -227,7 +227,7 @@ void Line::extendToBoundary(Point<TYPE> &extreme)
 				default:
 				{
                     TYPE value = MAX(MAX_X_COORD, this->getDest().getX());
-					extreme.setX(value);
+					extreme.setX(value*2);
 					extreme.setY((this->getSlope()*extreme.getX()) + this->getN());
 					break;
 				}

@@ -2,6 +2,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "DcelWriter.h"
+#include "FileExtensionChecker.h"
 #include "Logging.h"
 
 #include <cstring>
@@ -10,18 +11,36 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-bool DcelWriter::write(const string &fileName, const DcelModel &dcel, bool isBinary)
+bool DcelWriter::write(const string &fileName, const DcelModel &dcel)
 {
-    bool isSuccess;		// Return value.
+    bool isSuccess=false;		// Return value.
 
-    // Check if write binary data.
-    if (isBinary)
+    try
     {
-        isSuccess = DcelWriter::writeBinary(fileName, dcel);
+        // Check if write binary data.
+        if (FileExtensionChecker::isBinary(fileName))
+        {
+            isSuccess = DcelWriter::writeBinary(fileName, dcel);
+        }
+        else
+        {
+            isSuccess = DcelWriter::writeFlat(fileName, dcel);
+        }
     }
-    else
+    catch (const ofstream::failure& e)
     {
-        isSuccess = DcelWriter::writeFlat(fileName, dcel);
+        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
+        Logging::buildText(__FUNCTION__, __FILE__, fileName);
+        Logging::write(true, Error);
+    }
+    catch (bad_alloc &ex)
+    {
+        Logging::buildText(__FUNCTION__, __FILE__, "Error allocating memory");
+        Logging::write( true, Error);
+    }
+    catch (exception &ex)
+    {
+        std::cout << ex.what();
     }
 
     return isSuccess;
@@ -67,11 +86,10 @@ void DcelWriter::print(const DcelModel &dcel, std::ostream &out)
  */
 bool DcelWriter::writeFlat(const string &fileName, const DcelModel &dcel)
 {
-    bool isSuccess=true;	// Return value.
-    ofstream ofs;		    // Output file.
+    bool isSuccess;     // Return value.
 
     // Open file.
-    ofs.open(fileName.c_str(), ios::out);
+    ofstream ofs(fileName.c_str(), ios::out);
     if (ofs.is_open())
     {
         // Write # points and points
@@ -97,17 +115,17 @@ bool DcelWriter::writeFlat(const string &fileName, const DcelModel &dcel)
 
         // Close file.
         ofs.close();
+        isSuccess = true;
     }
-        // Error opening file.
+    // Error opening file.
     else
     {
         Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
         Logging::buildText(__FUNCTION__, __FILE__, fileName);
         Logging::write(true, Error);
-        isSuccess = false;
     }
 
-    return(isSuccess);
+    return isSuccess;
 }
 
 
@@ -122,30 +140,28 @@ bool DcelWriter::writeFlat(const string &fileName, const DcelModel &dcel)
  */
 bool DcelWriter::writeBinary(const string &fileName, const DcelModel &dcel)
 {
-    bool isSuccess=true;	    // Return value.
-    ofstream ofs;		    // Output file.
+    bool isSuccess=false;	    // Return value.
 
     // Open file.
-    ofs.open(fileName.c_str(), ios::out);
+    ofstream ofs(fileName.c_str(), ios::out | ios::binary);
     if (ofs.is_open())
     {
         // Computing amount of data to write.
         unsigned long size = sizeof(size_t)*3 + sizeof(Vertex)*dcel.getNumVertex() +
                              sizeof(Edge)*dcel.getNumEdges() +
                              sizeof(Face)*dcel.getNumFaces();
-        size_t szNumBytes=0;
 
-        // Allocate buffer.
+        // Allocate buffer
         char *buffer = new char[size];
-
-        // Common fields.
         char *ptr = buffer;
 
-        // Copy vertex data.
+        // Insert number of vertex
         size_t szValue = dcel.getNumVertex();
         memcpy(ptr, &szValue, sizeof(szValue));
         ptr += sizeof(szValue);
-        szNumBytes += sizeof(szValue);
+
+        // Insert vertex array data
+        size_t szNumBytes = sizeof(szValue);
         TYPE value;
         int iValue;
         for (auto vertex : dcel.vVertex)
@@ -214,15 +230,15 @@ bool DcelWriter::writeBinary(const string &fileName, const DcelModel &dcel)
 
         // Deallocate data.
         delete[] buffer;
+        isSuccess = true;
     }
-        // Error opening file.
+    // Error opening file.
     else
     {
         Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
         Logging::buildText(__FUNCTION__, __FILE__, fileName);
         Logging::write(true, Error);
-        isSuccess = false;
     }
 
-    return(isSuccess);
+    return isSuccess;
 }

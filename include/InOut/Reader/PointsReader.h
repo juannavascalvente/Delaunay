@@ -31,7 +31,7 @@ public:
      * @param   vPoints         (OUT) Points set
      * @return
      */
-    static bool read(const string &fileName, bool isBinary, vector<Point<TYPE>> &vPoints);
+    static bool read(const string &fileName, vector<Point<TYPE>> &vPoints);
 };
 
 

@@ -1,28 +1,49 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "Logging.h"
 #include "PointsReader.h"
 
+#include "FileExtensionChecker.h"
+#include "Logging.h"
+
 #include <sys/stat.h>
+#include <cstring>
 
 
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-bool PointsReader::read(const string &fileName, bool isBinary, vector<Point<TYPE>> &vPoints)
+bool PointsReader::read(const string &fileName, vector<Point<TYPE>> &vPoints)
 {
-    bool isSuccess;		// Return value.
+    bool isSuccess=false;		// Return value.
 
-    // Read points from flat points file
-    if (isBinary)
+    try
     {
-        isSuccess = PointsReader::readBinary(fileName, vPoints);
+        // Read points from flat points file
+        if (FileExtensionChecker::isBinary(fileName))
+        {
+            isSuccess = PointsReader::readBinary(fileName, vPoints);
+        }
+            // Read points from binary file
+        else
+        {
+            isSuccess = PointsReader::readFlat(fileName, vPoints);
+        }
     }
-    // Read points from binary file
-    else
+    catch (const ofstream::failure& e)
     {
-        isSuccess = PointsReader::readFlat(fileName, vPoints);
+        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
+        Logging::buildText(__FUNCTION__, __FILE__, fileName);
+        Logging::write(true, Error);
+    }
+    catch (bad_alloc &ex)
+    {
+        Logging::buildText(__FUNCTION__, __FILE__, "Error allocating memory");
+        Logging::write( true, Error);
+    }
+    catch (exception &ex)
+    {
+        std::cout << ex.what();
     }
 
     return isSuccess;
@@ -43,7 +64,7 @@ bool PointsReader::read(const string &fileName, bool isBinary, vector<Point<TYPE
  */
 bool PointsReader::readFlat(const string &fileName, vector<Point<TYPE>> &vPoints)
 {
-    bool isSuccess=true;	// Return value.
+    bool isSuccess=false;	// Return value.
 
     // Open file.
     ifstream ifs(fileName.c_str(), ios::in);
@@ -66,13 +87,13 @@ bool PointsReader::readFlat(const string &fileName, vector<Point<TYPE>> &vPoints
                     Logging::buildText(__FUNCTION__, __FILE__, "Last point does not have Y coordinate: ");
                     Logging::buildText(__FUNCTION__, __FILE__, fileName);
                     Logging::write(true, Error);
-                    isSuccess = false;
                 }
             }
         }
 
         // Close file.
         ifs.close();
+        isSuccess = true;
     }
     // Error opening points file.
     else
@@ -80,7 +101,6 @@ bool PointsReader::readFlat(const string &fileName, vector<Point<TYPE>> &vPoints
         Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
         Logging::buildText(__FUNCTION__, __FILE__, fileName);
         Logging::write(true, Error);
-        isSuccess = false;
     }
 
     return isSuccess;
@@ -98,10 +118,10 @@ bool PointsReader::readFlat(const string &fileName, vector<Point<TYPE>> &vPoints
  */
 bool PointsReader::readBinary(const string &fileName, vector<Point<TYPE>> &vPoints)
 {
-    bool isSuccess=true;	// Return value.
+    bool isSuccess=false;	// Return value.
 
     // Open file
-    ifstream ifs(fileName.c_str(), ios::in);
+    ifstream ifs(fileName.c_str(), ios::in | ios::binary);
     if (ifs.is_open())
     {
         // Get file size
@@ -109,41 +129,35 @@ bool PointsReader::readBinary(const string &fileName, vector<Point<TYPE>> &vPoin
         stat(fileName.c_str(), &results);
 
         // Allocate buffer
-        char *arr_cBuffer = new char[results.st_size];
+        auto *buffer = new TYPE[results.st_size];
 
         // Read data from file
-        if (!ifs.read (arr_cBuffer, results.st_size))
+        if (!ifs.read(reinterpret_cast<char*>(buffer), results.st_size))
         {
             Logging::buildText(__FUNCTION__, __FILE__, "Not enough data read from file: ");
             Logging::buildText(__FUNCTION__, __FILE__, fileName);
             Logging::buildText(__FUNCTION__, __FILE__, "Data read is: ");
             Logging::buildText(__FUNCTION__, __FILE__, (size_t) ifs.gcount());
             Logging::write(true, Error);
-            isSuccess = false;
         }
         else
         {
             // Check file has a round number of points
-            size_t szPointSize=sizeof(TYPE)*2;
-            if ((ifs.gcount() % szPointSize) != 0)
+            if ((ifs.gcount() % results.st_size) != 0)
             {
                 Logging::buildText(__FUNCTION__, __FILE__, "Last point has no Y coordinate ");
                 Logging::buildText(__FUNCTION__, __FILE__, fileName);
                 Logging::write(true, Error);
-                isSuccess = false;
             }
 
             // Extract points from buffer
-            size_t szPtr=0;
+            size_t szIdx=0;
+            size_t szPointSize=sizeof(TYPE)*2;
             size_t szNumPoints = ifs.gcount() / szPointSize;
             for (size_t i=0; i<szNumPoints ; i++)
             {
-                string fs(&arr_cBuffer[szPtr]);
-                TYPE x = std::stof(fs);
-                szPtr += sizeof(TYPE);
-                fs = &arr_cBuffer[szPtr];
-                TYPE y = std::stof(fs);
-                szPtr += sizeof(TYPE);
+                TYPE x = buffer[szIdx++];
+                TYPE y = buffer[szIdx++];
 
                 // Add point to vector
                 Point<TYPE> p(x,y);
@@ -152,16 +166,15 @@ bool PointsReader::readBinary(const string &fileName, vector<Point<TYPE>> &vPoin
         }
 
         // Free resources
-        delete[] arr_cBuffer;
+        delete[] buffer;
+        isSuccess = true;
     }
     else
     {
         Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
         Logging::buildText(__FUNCTION__, __FILE__, fileName);
         Logging::write(true, Error);
-        isSuccess = false;
     }
 
     return isSuccess;
 }
-

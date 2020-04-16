@@ -12,7 +12,6 @@
 #include "DcelWriter.h"
 #include "DelaunayIO.h"
 #include "VoronoiIO.h"
-#include "GabrielIO.h"
 #include "DcelFigureBuilder.h"
 #include "LineFactory.h"
 #include "PointFactory.h"
@@ -2045,7 +2044,7 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), false, vPoints);
+        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), vPoints);
 
         if (this->isSuccess)
         {
@@ -2099,7 +2098,7 @@ public:
 
         // Run command
         auto *t = new StarTriangulation();
-        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), false, *t->getRefDcel());
+        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), *t->getRefDcel());
         if (this->isSuccess)
         {
             in.getStoreService()->save(*t);
@@ -2347,7 +2346,7 @@ public:
         }
 
         // Write dcel to file
-        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, false);
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel);
 
         // Build result
         return createResult();
@@ -2416,35 +2415,6 @@ public:
 
         // Build result
         setIsSuccess(isSuccess);
-        return createResult();
-    }
-};
-
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
-class CommandWriteGabriel : public CommandWriteFile
-{
-public:
-    /*******************************************************************************************************************
-    * Public class methods
-    *******************************************************************************************************************/
-    explicit CommandWriteGabriel(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
-
-    /**
-     * @fn      run
-     * @brief   Write Delaunay to file
-     *
-     * @return  true built was successfully
-     *          false otherwise
-     */
-    CommandResult* runCommand() override
-    {
-        // Write dcel to file
-        this->isSuccess = GabrielIO::writeBinary(Config::getOutGabrielFilename(), *getInput()->getStoreService()->getGabriel());
-
-        // Build result
         return createResult();
     }
 };
