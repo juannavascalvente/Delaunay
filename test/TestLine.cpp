@@ -233,7 +233,7 @@ TEST (LineUnitTest, Test_Extend_To_Boundary)
 
 	// Check extreme point is in right side.
 	Point<TYPE> computedExtreme;
-	Point<TYPE> expectedExtreme(MAX_X_COORD, MAX_Y_COORD);
+	Point<TYPE> expectedExtreme(2*MAX_X_COORD, 2*MAX_Y_COORD);
 	line.extendToBoundary(computedExtreme);
 	EXPECT_EQ(expectedExtreme, computedExtreme);
 
