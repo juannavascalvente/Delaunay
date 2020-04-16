@@ -137,7 +137,6 @@ bool GraphWriter::writeBinary(const string &strFileName, Graph &graph)
 
         // Insert nodes array length
         size_t szValue = graph.vNodes.size();
-        cout << szValue << endl;
         memcpy(&buffer[szCnt], &szValue, sizeof(szValue));
         szCnt += sizeof(szValue);
 
@@ -149,7 +148,6 @@ bool GraphWriter::writeBinary(const string &strFileName, Graph &graph)
             iValue = node.getNChildren();
             memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
             szCnt += sizeof(iValue);
-            cout << iValue << " ";
 
             // Add children
             for (size_t szIdx=0; szIdx<node.getNChildren() ; szIdx++)
@@ -157,7 +155,6 @@ bool GraphWriter::writeBinary(const string &strFileName, Graph &graph)
                 iValue = node.getiChild(szIdx);
                 memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
                 szCnt += sizeof(iValue);
-                cout << iValue << " ";
             }
 
             // Add points indexes
@@ -166,21 +163,18 @@ bool GraphWriter::writeBinary(const string &strFileName, Graph &graph)
                 iValue = node.getiPoint(szIdx);
                 memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
                 szCnt += sizeof(iValue);
-                cout << iValue << " ";
             }
 
             // Add face
             iValue = node.getFace();
             memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
             szCnt += sizeof(iValue);
-            cout << iValue << endl;
         }
 
         // Insert nodes array length
         szValue = graph.vFaceNode.size();
         memcpy(&buffer[szCnt], &szValue, sizeof(szValue));
         szCnt += sizeof(szValue);
-        cout << szValue << endl;
 
         // Copy faces array data
         for (auto faceNode : graph.vFaceNode)
@@ -188,7 +182,6 @@ bool GraphWriter::writeBinary(const string &strFileName, Graph &graph)
             // Add number of children
             memcpy(&buffer[szCnt], &faceNode, sizeof(faceNode));
             szCnt += sizeof(faceNode);
-            cout << faceNode << endl;
         }
 
         // Write data.
