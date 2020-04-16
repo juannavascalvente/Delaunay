@@ -18,7 +18,7 @@ class GraphReader
     * Private class methods
     *******************************************************************************************************************/
     static bool readFlat(const string &strFileName, Graph &graph);
-    static bool readBinary(const string &fileName, Graph &graph) { return false; };
+    static bool readBinary(const string &strFileName, Graph &graph);
 
 public:
 
@@ -30,12 +30,11 @@ public:
      * @brief       reads the graph data from a file in plain or binary format depending on "isBinary" format.
      *
      * @param   fileName  (IN) File name
-     * @param   isBinary  (IN) Binary format flag
      * @param   graph     (OUT) Graph to update
      * @return  true if read successfully
      *          false otherwise
      */
-    static bool read(const string &fileName, bool isBinary, Graph &graph);
+    static bool read(const string &fileName, Graph &graph);
 };
 
 #endif //DELAUNAY_GRAPHREADER_H

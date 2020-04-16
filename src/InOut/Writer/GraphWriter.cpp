@@ -3,6 +3,9 @@
 ***********************************************************************************************************************/
 #include "GraphWriter.h"
 
+#include "FileExtensionChecker.h"
+#include "Logging.h"
+
 #include <fstream>
 using namespace std;
 
@@ -10,18 +13,36 @@ using namespace std;
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-bool GraphWriter::write(const string &strFileName, bool isBinary, Graph &graph)
+bool GraphWriter::write(const string &strFileName, Graph &graph)
 {
-    bool isSuccess;		// Return value.
+    bool isSuccess=false;		// Return value.
 
-    // Check if write binary data.
-    if (isBinary)
+    try
     {
-        isSuccess = GraphWriter::writeBinary(strFileName, graph);
+        // Check if write binary data.
+        if (FileExtensionChecker::isBinary(strFileName))
+        {
+            isSuccess = GraphWriter::writeBinary(strFileName, graph);
+        }
+        else
+        {
+            isSuccess = GraphWriter::writeFlat(strFileName, graph);
+        }
     }
-    else
+    catch (const ofstream::failure& e)
     {
-        isSuccess = GraphWriter::writeFlat(strFileName, graph);
+        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
+        Logging::buildText(__FUNCTION__, __FILE__, strFileName);
+        Logging::write(true, Error);
+    }
+    catch (bad_alloc &ex)
+    {
+        Logging::buildText(__FUNCTION__, __FILE__, "Error allocating memory");
+        Logging::write( true, Error);
+    }
+    catch (exception &ex)
+    {
+        std::cout << ex.what();
     }
 
     return isSuccess;
@@ -60,43 +81,32 @@ void GraphWriter::print(std::ostream& out, Graph &graph)
  */
 bool GraphWriter::writeFlat(const string &strFileName, Graph &graph)
 {
-    bool success=false;	// Return value.
+    bool isSuccess=false;	// Return value.
 
-    try
+    // Open file.
+    ofstream ofs(strFileName.c_str(), ios::out);
+    if (ofs.is_open())
     {
-        // Open file.
-        ofstream ofs(strFileName.c_str(), ios::out);
-
-        // Check file is opened.
-        if (ofs.is_open())
+        // Nodes main loop.
+        ofs << graph.vNodes.size() << endl;
+        for (size_t i=0; i<graph.getSize() ;i++)
         {
-            // Write # nodes.
-            ofs << graph.getSize() << endl;
-
-            // Nodes main loop.
-            for (size_t i=0; i<graph.getSize() ;i++)
-            {
-                graph.vNodes.at(i).write(ofs);
-                ofs << endl;
-            }
-
-            // Read face-node relations.
-            for (int i : graph.vFaceNode)
-            {
-                ofs << i << endl;
-            }
-
-            // Close file.
-            ofs.close();
-            success = true;
+            graph.vNodes.at(i).write(ofs);
+            ofs << endl;
         }
-    }
-    catch (ofstream::failure &e)
-    {
-        cerr << "Exception opening/reading/closing file " << strFileName << endl;
+
+        // Read face-node relations.
+        for (int i : graph.vFaceNode)
+        {
+            ofs << i << endl;
+        }
+
+        // Close file.
+        ofs.close();
+        isSuccess = true;
     }
 
-    return success;
+    return isSuccess;
 }
 
 
@@ -111,5 +121,86 @@ bool GraphWriter::writeFlat(const string &strFileName, Graph &graph)
  */
 bool GraphWriter::writeBinary(const string &strFileName, Graph &graph)
 {
-    return false;
+    bool isSuccess=false;	// Return value.
+
+    // Open file.
+    ofstream ofs(strFileName.c_str(), ios::out | ios::binary);
+    if (ofs.is_open())
+    {
+        // Computing amount of data to write.
+        unsigned long size = sizeof(size_t) + sizeof(Node)*graph.vNodes.size() +
+                             sizeof(size_t) + sizeof(int)*graph.vFaceNode.size();
+
+        // Allocate buffer.
+        size_t szCnt=0;
+        char *buffer = new char[size];
+
+        // Insert nodes array length
+        size_t szValue = graph.vNodes.size();
+        cout << szValue << endl;
+        memcpy(&buffer[szCnt], &szValue, sizeof(szValue));
+        szCnt += sizeof(szValue);
+
+        // Insert nodes array data
+        int iValue;
+        for (auto node : graph.vNodes)
+        {
+            // Add number of children
+            iValue = node.getNChildren();
+            memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
+            szCnt += sizeof(iValue);
+            cout << iValue << " ";
+
+            // Add children
+            for (size_t szIdx=0; szIdx<node.getNChildren() ; szIdx++)
+            {
+                iValue = node.getiChild(szIdx);
+                memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
+                szCnt += sizeof(iValue);
+                cout << iValue << " ";
+            }
+
+            // Add points indexes
+            for (size_t szIdx=0; szIdx<NODE_POINTS ; szIdx++)
+            {
+                iValue = node.getiPoint(szIdx);
+                memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
+                szCnt += sizeof(iValue);
+                cout << iValue << " ";
+            }
+
+            // Add face
+            iValue = node.getFace();
+            memcpy(&buffer[szCnt], &iValue, sizeof(iValue));
+            szCnt += sizeof(iValue);
+            cout << iValue << endl;
+        }
+
+        // Insert nodes array length
+        szValue = graph.vFaceNode.size();
+        memcpy(&buffer[szCnt], &szValue, sizeof(szValue));
+        szCnt += sizeof(szValue);
+        cout << szValue << endl;
+
+        // Copy faces array data
+        for (auto faceNode : graph.vFaceNode)
+        {
+            // Add number of children
+            memcpy(&buffer[szCnt], &faceNode, sizeof(faceNode));
+            szCnt += sizeof(faceNode);
+            cout << faceNode << endl;
+        }
+
+        // Write data.
+        ofs.write(buffer, sizeof(char)*szCnt);
+
+        // Close file.
+        ofs.close();
+
+        // Deallocate data.
+        delete[] buffer;
+        isSuccess = true;
+    }
+
+    return isSuccess;
 }

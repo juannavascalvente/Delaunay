@@ -151,16 +151,16 @@ bool DcelWriter::writeBinary(const string &fileName, const DcelModel &dcel)
                              sizeof(Edge)*dcel.getNumEdges() +
                              sizeof(Face)*dcel.getNumFaces();
 
-        // Allocate buffer.
+        // Allocate buffer
         char *buffer = new char[size];
-
-        // Common fields.
         char *ptr = buffer;
 
-        // Copy vertex data.
+        // Insert number of vertex
         size_t szValue = dcel.getNumVertex();
         memcpy(ptr, &szValue, sizeof(szValue));
         ptr += sizeof(szValue);
+
+        // Insert vertex array data
         size_t szNumBytes = sizeof(szValue);
         TYPE value;
         int iValue;

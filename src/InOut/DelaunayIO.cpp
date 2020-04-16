@@ -29,7 +29,7 @@ bool DelaunayIO::read(const string &strDcelFileName, const string &strGraphFileN
         delaunay.initGraph();
 
         // Read graph data.
-        isSuccess = GraphReader::read(strGraphFileName, false, delaunay.graph);
+        isSuccess = GraphReader::read(strGraphFileName, delaunay.graph);
     }
 
     return isSuccess;
@@ -47,7 +47,7 @@ bool DelaunayIO::write(const string &strDcelFileName, const string &strGraphFile
         // Write graph data if graph exists.
         if (delaunay.graph.getSize() > 0)
         {
-            isSuccess = GraphWriter::write(strGraphFileName, false, delaunay.graph);
+            isSuccess = GraphWriter::write(strGraphFileName, delaunay.graph);
         }
     }
 
