@@ -152,12 +152,12 @@ namespace
  *          The points set contains 1K points and it is executed 10 times
  *
  */
-//TEST_F(TestDelaunay_Api, Test_Delaunay_Twice)
-//{
-//    executeTwice(NUM_POINTS_3, NUM_ITERATIONS_1000);
-//    executeTwice(NUM_POINTS_10, NUM_ITERATIONS_100);
-//    executeTwice(NUM_POINTS_1000, NUM_ITERATIONS_10);
-//}
+TEST_F(TestDelaunay_Api, Test_Delaunay_Twice)
+{
+    executeTwice(NUM_POINTS_3, NUM_ITERATIONS_1000);
+    executeTwice(NUM_POINTS_10, NUM_ITERATIONS_100);
+    executeTwice(NUM_POINTS_1000, NUM_ITERATIONS_10);
+}
 
 TEST_F(TestDelaunay_Api, Test_Delaunay_Gold)
 {
