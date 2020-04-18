@@ -10,11 +10,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-/***********************************************************************************************************************
-* Defines
-***********************************************************************************************************************/
-
-
 
 /***********************************************************************************************************************
 * Test Class Definition
@@ -37,9 +32,6 @@ namespace
             strTestFilename = strTestFolder + "testInfo.txt";
         }
 
-        // Deconstructor (called after each test case) - TearDown
-        ~TestDelaunay_Api() override = default;
-
     public:
 
         /**
@@ -52,6 +44,12 @@ namespace
          * @param   szNumIterations     (IN) Number of times the triangulations are computed
          */
         void executeTwice(size_t szNumPoints, size_t szNumIterations);
+
+        /**
+         * @fn      checkGold
+         * @brief   Reads a set of precomputed Delaunay triangulation and using their set of points computes the
+         *          Delaunay triangulation and checks both are equal, the computed and the precomputed triangulations
+         */
         void checkGold();
     };
 
@@ -159,6 +157,10 @@ TEST_F(TestDelaunay_Api, Test_Delaunay_Twice)
     executeTwice(NUM_POINTS_1000, NUM_ITERATIONS_10);
 }
 
+/**
+ * @brief   Reads a set of precomputed Deluanya triangulation and using their set of points computes the Delaunay
+ *          triangulation and checks both are equal, the computed and the precomputed triangulations
+ */
 TEST_F(TestDelaunay_Api, Test_Delaunay_Gold)
 {
     checkGold();
