@@ -5,6 +5,7 @@
 #include "DelaunayIO.h"
 #include "PointFactory.h"
 #include "PointsReader.h"
+#include "TriangulationFactory.h"
 #include "TestSuiteReader.h"
 
 #include <gtest/gtest.h>
@@ -68,13 +69,12 @@ namespace
             vPointsSecond = vPointsFirst;
 
             // Build first Delaunay triangulation
-            auto *delaunayFirst = new Delaunay(vPointsFirst);
-            bool isSuccess = delaunayFirst->build();
+            bool isSuccess;
+            Delaunay *delaunayFirst = TriangulationFactory::createDelaunay(vPointsFirst, isSuccess);
             ASSERT_TRUE(isSuccess);
 
             // Build second Delaunay triangulation
-            auto *delaunaySecond = new Delaunay(vPointsSecond);
-            isSuccess = delaunaySecond->build();
+            Delaunay *delaunaySecond = TriangulationFactory::createDelaunay(vPointsSecond, isSuccess);
             ASSERT_TRUE(isSuccess);
 
             // Check Delaunay triangulations are equal
@@ -131,8 +131,7 @@ namespace
             ASSERT_TRUE(isSuccess);
 
             // Build Delaunay using input points
-            auto *delaunay = new Delaunay(vPoints);
-            isSuccess = delaunay->build();
+            Delaunay *delaunay = TriangulationFactory::createDelaunay(vPoints, isSuccess);
             ASSERT_TRUE(isSuccess);
 
             // Check Delaunay triangulations are equal
