@@ -47,7 +47,8 @@ bool Delaunay::build()
     this->dcel.swapVertex(0, highestPointIndex);
 
     // Insert root node.
-    Node node(1, P_MINUS_2, P_MINUS_1, 1);
+    vector<int> vPoints = {1, P_MINUS_2, P_MINUS_1};
+    Node node(vPoints, 1);
     this->graph.insert(node);
 
     // Update edge from new point.
@@ -350,16 +351,16 @@ void Delaunay::flipEdges(int edge_ID)
     this->graph.update(old_Node_ID2, node);
 
     // Insert two new nodes.
-    newNode = Node(this->dcel.getOrigin(edge->getPrevious()-1),
-    				this->dcel.getOrigin(edge_Index),
-					this->dcel.getOrigin(edge->getNext()-1),
-					edge->getFace());
+    vector<int> vPoints1 = {this->dcel.getOrigin(edge->getPrevious()-1),
+                           this->dcel.getOrigin(edge_Index),
+                           this->dcel.getOrigin(edge->getNext()-1)};
+    newNode = Node(vPoints1, edge->getFace());
     this->graph.insert(newNode);
 
-    newNode = Node(this->dcel.getOrigin(twin->getPrevious()-1),
-    				this->dcel.getOrigin(edge->getTwin()-1),
-					this->dcel.getOrigin(twin->getNext()-1),
-					twin->getFace());
+    vector<int> vPoints2 = {this->dcel.getOrigin(twin->getPrevious()-1),
+                            this->dcel.getOrigin(edge->getTwin()-1),
+                            this->dcel.getOrigin(twin->getNext()-1)};
+    newNode = Node(vPoints2, twin->getFace());
     this->graph.insert(newNode);
 
 	// Check recursively edges that could be illegal.
@@ -1150,20 +1151,22 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
         this->graph.update(nodeIndex, ptrNode);
 
 		// Insert three new nodes.
-        newNode[0] = Node(	this->dcel.getOrigin(new_Edge_ID),
-        					this->dcel.getOrigin(new_Edge_ID - 1),
-							this->dcel.getOrigin(faceEdge - 1),
-							ptrNode->getFace());
+		vector<int> vPoints = {this->dcel.getOrigin(new_Edge_ID),
+                                this->dcel.getOrigin(new_Edge_ID - 1),
+                                this->dcel.getOrigin(faceEdge - 1)};
+        newNode[0] = Node(vPoints, ptrNode->getFace());
         area[0] = this->signedArea(&newNode[0]);
-        newNode[1] = Node(	this->dcel.getOrigin(new_Edge_ID + 2),
-        					this->dcel.getOrigin(new_Edge_ID + 1),
-							this->dcel.getOrigin(next_Edge_ID - 1),
-							new_Face_ID);
+        vPoints.clear();
+        vPoints = {this->dcel.getOrigin(new_Edge_ID + 2),
+                   this->dcel.getOrigin(new_Edge_ID + 1),
+                   this->dcel.getOrigin(next_Edge_ID - 1)};
+        newNode[1] = Node(vPoints, new_Face_ID);
         area[1] = this->signedArea(&newNode[1]);
-        newNode[2] = Node(	this->dcel.getOrigin(new_Edge_ID + 4),
-        					this->dcel.getOrigin(new_Edge_ID + 3),
-							this->dcel.getOrigin(prev_Edge_ID - 1),
-							new_Face_ID + 1);
+        vPoints.clear();
+        vPoints = {this->dcel.getOrigin(new_Edge_ID + 4),
+                   this->dcel.getOrigin(new_Edge_ID + 3),
+                   this->dcel.getOrigin(prev_Edge_ID - 1)};
+        newNode[2] = Node(vPoints,new_Face_ID + 1);
         area[2] = this->signedArea(&newNode[2]);
         if (area[0] > area[1])
         {
@@ -1297,10 +1300,10 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
             this->graph.update(oldNode1, ptrNode);
 
 			// Insert two new nodes in first node splitted.
-	        newNode[0] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
-	        					this->dcel.getOrigin(collinear_Index),
-								this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1),
-								this->dcel.getFace(collinear_Index));
+            vector<int> vPoints = {this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
+                                   this->dcel.getOrigin(collinear_Index),
+                                   this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1)};
+	        newNode[0] = Node(vPoints, this->dcel.getFace(collinear_Index));
 			this->graph.insert(newNode[0]);
 #ifdef DEBUG_SPLIT_NODE
 			Logging::buildText(__FUNCTION__, __FILE__, "Splitting 1st triangle ");
@@ -1309,10 +1312,11 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			Logging::buildText(__FUNCTION__, __FILE__, newNode[0].toStr());
 			Logging::write(true, Info);
 #endif
-	        newNode[1] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
-	        					this->dcel.getOrigin(this->dcel.getPrevious(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1)-1),
-								this->dcel.getOrigin(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1),
-								new_Face_ID);
+            vPoints.clear();
+            vPoints = {this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
+                       this->dcel.getOrigin(this->dcel.getPrevious(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1)-1),
+                       this->dcel.getOrigin(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1)};
+	        newNode[1] = Node(vPoints, new_Face_ID);
 			this->graph.insert(newNode[1]);
 
 			// Insert new face.
@@ -1349,10 +1353,11 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
             this->graph.update(oldNode2, ptrNode);
 
 			// Insert two new nodes in first node splitted.
-	        newNode[0] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
-	        					this->dcel.getOrigin(collinear_Index),
-								this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1),
-								this->dcel.getFace(collinear_Index));
+            vPoints.clear();
+            vPoints = {	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
+                        this->dcel.getOrigin(collinear_Index),
+                        this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1)};
+	        newNode[0] = Node(vPoints, this->dcel.getFace(collinear_Index));
 			this->graph.insert(newNode[0]);
 
 			// Update face.
@@ -1362,10 +1367,11 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getRefFace(newNode[0].getFace())->toStr());
 			Logging::write(true, Info);
 #endif
-	        newNode[1] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(next_Edge_ID-1)-1),
-	        					this->dcel.getOrigin(next_Edge_ID-1),
-								this->dcel.getOrigin(this->dcel.getNext(next_Edge_ID-1)-1),
-								this->dcel.getFace(next_Edge_ID-1));
+            vPoints.clear();
+            vPoints = {	this->dcel.getOrigin(this->dcel.getPrevious(next_Edge_ID-1)-1),
+                        this->dcel.getOrigin(next_Edge_ID-1),
+                        this->dcel.getOrigin(this->dcel.getNext(next_Edge_ID-1)-1)};
+	        newNode[1] = Node(vPoints, this->dcel.getFace(next_Edge_ID-1));
 			this->graph.insert(newNode[1]);
 
 			// Insert new face.
@@ -1412,9 +1418,9 @@ double Delaunay::signedArea(Node *node)
 	double   area;           // Return value.
 
 	// Check if any of the vertex is not real: P_MINUS_! or P_MINUS_2.
-	if ((node->getiChild(0) < 0) ||
-		(node->getiChild(1) < 0) ||
-		(node->getiChild(2) < 0))
+	if ((node->getNChildren() == 0) || ((node->getiChild(0) < 0) ||
+                                        (node->getiChild(1) < 0) ||
+		                                (node->getiChild(2) < 0)))
 	{
 		// Set area zero.
 		area = 0.0;

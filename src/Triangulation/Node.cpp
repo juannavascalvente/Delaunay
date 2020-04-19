@@ -3,173 +3,50 @@
 ***********************************************************************************************************************/
 #include "Node.h"
 
-#include <sstream>
-#include <iostream>
+#include <string>
+#include <stdexcept>
 using namespace std;
 
 
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Node::Node()
+void Node::setChildren(int id1, int id2)
 {
-	// Initialize fields.
-	this->nChildren = 0;
-	this->children[0] = INVALID;
-	this->children[1] = INVALID;
-	this->children[2] = INVALID;
-	this->points[0] = INVALID;
-	this->points[1] = INVALID;
-	this->points[2] = INVALID;
-	this->face = INVALID;
-}
-
-Node::Node(int p1, int p2, int p3, int face)
-{
-	// Initialize fields.
-	this->nChildren = 0;
-	this->children[0] = INVALID;
-	this->children[1] = INVALID;
-	this->children[2] = INVALID;
-	this->points[0] = p1;
-	this->points[1] = p2;
-	this->points[2] = p3;
-	this->face = face;
+    vChildren.clear();
+    vChildren.push_back(id1);
+    vChildren.push_back(id2);
 }
 
 
-/***************************************************************************
-* Name: 	print
-* IN:		out			output stream
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	prints node information
-***************************************************************************/
-void Node::print(std::ostream& out)
+void Node::setChildren(int id1, int id2, int id3)
 {
-	// Check if node is a leaf.
-	if (this->isLeaf())
-	{
-		out << "Node is a leaf. Node points: " << this->points[0] <<
-				"," << this->points[1] << "," << this->points[2] <<
-				". Assigned face " << this->face;
-	}
-	// Print node data.
-	else if (this->nChildren == TWO)
-	{
-		out << "Node has " << this->nChildren << " children: " <<
-				this->children[0] << "," << this->children[1] <<
-				". Points: " << this->points[0] << "," << this->points[1] <<
-				"," << this->points[2] << ". Assigned face " <<
-				this->face;
-	}
-	else
-	{
-		out << "Node has " << this->nChildren << " children: " <<
-				this->children[0] << "," << this->children[1] << "," <<
-				this->children[2] << ". Points: " << this->points[0] <<
-				"," << this->points[1] << "," << this->points[2] <<
-				". Assigned face " << this->face;
-	}
+    vChildren.clear();
+    vChildren.push_back(id1);
+    vChildren.push_back(id2);
+    vChildren.push_back(id3);
 }
 
-/***************************************************************************
-* Name: 	read
-* IN:		in			in stream to read form.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	reads the node information from "in" stream.
-***************************************************************************/
-void Node::read(std::istream& in)
+
+int Node::getiChild(int index)
 {
-	int	i=0;		// Loop counter.
+    if (vChildren.empty() || (index > (getNChildren()-1)))
+    {
+        string srtMsg = &"Error accessing node child " [ (index+1)];
+        throw std::runtime_error(srtMsg);
+    }
 
-	// Write node points.
-	for (i=0; i<NODE_POINTS; i++)
-	{
-		in >> this->points[i];
-	}
-
-	// Write node children.
-	in >> this->nChildren;
-	for (i=0; i<MAX_CHILDREN; i++)
-	{
-		in >> this->children[i];
-	}
-
-	// Write node face.
-	in >> this->face;
+    return vChildren.at(index);
 }
 
-/***************************************************************************
-* Name: 	write
-* IN:		out			output stream to write to.
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	writes the node information to "out" stream.
-***************************************************************************/
-void Node::write(std::ostream& out)
+
+int Node::getiPoint(int index)
 {
-	int	i=0;		// Loop counter.
+    if (vPointsId.empty() || (index > NODE_POINTS))
+    {
+        string srtMsg = &"Error accessing node point " [ (index+1)];
+        throw std::runtime_error(srtMsg);
+    }
 
-	// Write node points.
-	for (i=0; i<NODE_POINTS; i++)
-	{
-		out << this->points[i] << " ";
-	}
-
-	// Write node children.
-	out << this->nChildren << " ";
-	for (i=0; i<MAX_CHILDREN; i++)
-	{
-		out << this->children[i] << " ";
-	}
-
-	// Write node face.
-	out << this->face;
-}
-
-/***************************************************************************
-* Name: 	toStr
-* IN:		NONE
-* OUT:		NONE
-* RETURN:	node information as a string
-* GLOBAL:	NONE
-* Description: 	concat the node information as a string
-***************************************************************************/
-string Node::toStr()
-{
-	ostringstream oss;
-	string text;
-
-	// Build file name.
-	this->print( oss);
-	text = oss.str();
-
-	return(text);
-}
-
-/***************************************************************************
-* Name: 	opeartor=
-* IN:		other		node to copy
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	copy input node to "this"
-***************************************************************************/
-Node& Node::operator=(const Node& other)
-{
-	// Copy all fields.
-	this->nChildren = other.nChildren;
-	this->children[0] = other.children[0];
-	this->children[1] = other.children[1];
-	this->children[2] = other.children[2];
-	this->points[0] = other.points[0];
-	this->points[1] = other.points[1];
-	this->points[2] = other.points[2];
-	this->face = other.face;
-	return(*this);
+    return vPointsId.at(index);
 }

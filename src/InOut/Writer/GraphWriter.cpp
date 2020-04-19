@@ -5,6 +5,7 @@
 
 #include "FileExtensionChecker.h"
 #include "Logging.h"
+#include "NodeIO.h"
 
 #include <fstream>
 using namespace std;
@@ -57,7 +58,7 @@ void GraphWriter::print(std::ostream& out, Graph &graph)
     // Print graph nodes.
     for (size_t i=0; i<graph.getSize() ;i++)
     {
-        graph.vNodes.at(i).print(out);
+        NodeIO::print(graph.vNodes.at(i), out);
     }
 
     // Print face-node relations.
@@ -91,7 +92,7 @@ bool GraphWriter::writeFlat(const string &strFileName, Graph &graph)
         ofs << graph.vNodes.size() << endl;
         for (size_t i=0; i<graph.getSize() ;i++)
         {
-            graph.vNodes.at(i).write(ofs);
+            NodeIO::write(graph.vNodes.at(i), ofs);
             ofs << endl;
         }
 

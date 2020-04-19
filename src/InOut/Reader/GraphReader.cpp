@@ -5,6 +5,7 @@
 
 #include "FileExtensionChecker.h"
 #include "Logging.h"
+#include "NodeIO.h"
 
 #include <fstream>
 #include <sys/stat.h>
@@ -69,7 +70,7 @@ bool GraphReader::readFlat(const string& strFileName, Graph &graph)
         Node	node;
         for (size_t i=0; i<szNumElements ;i++)
         {
-            node.read(ifs);
+            NodeIO::read(node, ifs);
             graph.insert(node);
         }
 
@@ -159,17 +160,22 @@ bool GraphReader::readBinary(const string &strFileName, Graph &graph)
                 // Add node
                 if (iNumChildren == 0)
                 {
-                    Node node(iP1, iP2, iP3, iFaceId);
+                    vector<int> vPoints = {iP1, iP2, iP3};
+                    Node node(vPoints, iFaceId);
                     graph.insert(node);
                 }
                 else if (iNumChildren == 2)
                 {
-                    Node node(iP1, iP2, iP3, iChild1, iChild2, iFaceId);
+                    vector<int> vPoints = {iP1, iP2, iP3};
+                    vector<int> vChildren = {iChild1, iChild2};
+                    Node node(vPoints, vChildren, iFaceId);
                     graph.insert(node);
                 }
                 else
                 {
-                    Node node(iP1, iP2, iP3, iChild1, iChild2, iChild3, iFaceId);
+                    vector<int> vPoints = {iP1, iP2, iP3};
+                    vector<int> vChildren = {iChild1, iChild2, iChild3};
+                    Node node(vPoints, vChildren, iFaceId);
                     graph.insert(node);
                 }
             }
