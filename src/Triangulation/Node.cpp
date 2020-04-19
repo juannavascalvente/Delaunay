@@ -11,30 +11,55 @@ using namespace std;
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-Node::Node()
-{
-	// Initialize fields.
-	this->nChildren = 0;
-	this->children[0] = INVALID;
-	this->children[1] = INVALID;
-	this->children[2] = INVALID;
-	this->points[0] = INVALID;
-	this->points[1] = INVALID;
-	this->points[2] = INVALID;
-	this->face = INVALID;
-}
-
 Node::Node(int p1, int p2, int p3, int face)
 {
 	// Initialize fields.
-	this->nChildren = 0;
-	this->children[0] = INVALID;
-	this->children[1] = INVALID;
-	this->children[2] = INVALID;
-	this->points[0] = p1;
-	this->points[1] = p2;
-	this->points[2] = p3;
+	vPointsId.clear();
+    vPointsId.push_back(p1);
+    vPointsId.push_back(p2);
+    vPointsId.push_back(p3);
 	this->face = face;
+}
+
+
+void Node::setChildren(int id1, int id2)
+{
+    vChildren.clear();
+    vChildren.push_back(id1);
+    vChildren.push_back(id2);
+}
+
+
+void Node::setChildren(int id1, int id2, int id3)
+{
+    vChildren.clear();
+    vChildren.push_back(id1);
+    vChildren.push_back(id2);
+    vChildren.push_back(id3);
+}
+
+
+int Node::getiChild(int index)
+{
+    if (vChildren.empty() || (index > (getNChildren()-1)))
+    {
+        string srtMsg = &"Error accessing node child " [ (index+1)];
+        throw std::runtime_error(srtMsg);
+    }
+
+    return vChildren.at(index);
+}
+
+
+int Node::getiPoint(int index)
+{
+    if (vPointsId.empty() || (index > NODE_POINTS))
+    {
+        string srtMsg = &"Error accessing node point " [ (index+1)];
+        throw std::runtime_error(srtMsg);
+    }
+
+    return vPointsId.at(index);
 }
 
 
@@ -51,27 +76,23 @@ void Node::print(std::ostream& out)
 	// Check if node is a leaf.
 	if (this->isLeaf())
 	{
-		out << "Node is a leaf. Node points: " << this->points[0] <<
-				"," << this->points[1] << "," << this->points[2] <<
-				". Assigned face " << this->face;
+		out << "Node is a leaf";
 	}
 	// Print node data.
-	else if (this->nChildren == TWO)
-	{
-		out << "Node has " << this->nChildren << " children: " <<
-				this->children[0] << "," << this->children[1] <<
-				". Points: " << this->points[0] << "," << this->points[1] <<
-				"," << this->points[2] << ". Assigned face " <<
-				this->face;
-	}
 	else
 	{
-		out << "Node has " << this->nChildren << " children: " <<
-				this->children[0] << "," << this->children[1] << "," <<
-				this->children[2] << ". Points: " << this->points[0] <<
-				"," << this->points[1] << "," << this->points[2] <<
-				". Assigned face " << this->face;
+        out << "Node has " << this->vChildren.size() << " children: ";
+        for (auto value : vChildren)
+        {
+            out << value << " ";
+        }
 	}
+    out << ". Node points: ";
+    for (auto value : vPointsId)
+    {
+        out << value << " ";
+    }
+    out << ". Assigned face " << this->face;
 }
 
 /***************************************************************************
@@ -84,19 +105,22 @@ void Node::print(std::ostream& out)
 ***************************************************************************/
 void Node::read(std::istream& in)
 {
-	int	i=0;		// Loop counter.
+    int iValue;
 
 	// Write node points.
-	for (i=0; i<NODE_POINTS; i++)
+	for (size_t i=0; i<NODE_POINTS; i++)
 	{
-		in >> this->points[i];
+		in >> iValue;
+        vPointsId.push_back(iValue);
 	}
 
 	// Write node children.
-	in >> this->nChildren;
-	for (i=0; i<MAX_CHILDREN; i++)
+	in >> iValue;
+	for (size_t  i=0; i<iValue; i++)
 	{
-		in >> this->children[i];
+	    int iChild;
+		in >> iChild;
+        vChildren.push_back(iChild);
 	}
 
 	// Write node face.
@@ -118,14 +142,14 @@ void Node::write(std::ostream& out)
 	// Write node points.
 	for (i=0; i<NODE_POINTS; i++)
 	{
-		out << this->points[i] << " ";
+		out << this->vPointsId.at(i) << " ";
 	}
 
 	// Write node children.
-	out << this->nChildren << " ";
+	out << this->vChildren.size() << " ";
 	for (i=0; i<MAX_CHILDREN; i++)
 	{
-		out << this->children[i] << " ";
+		out << this->vChildren.at(i) << " ";
 	}
 
 	// Write node face.
@@ -150,26 +174,4 @@ string Node::toStr()
 	text = oss.str();
 
 	return(text);
-}
-
-/***************************************************************************
-* Name: 	opeartor=
-* IN:		other		node to copy
-* OUT:		NONE
-* RETURN:	NONE
-* GLOBAL:	NONE
-* Description: 	copy input node to "this"
-***************************************************************************/
-Node& Node::operator=(const Node& other)
-{
-	// Copy all fields.
-	this->nChildren = other.nChildren;
-	this->children[0] = other.children[0];
-	this->children[1] = other.children[1];
-	this->children[2] = other.children[2];
-	this->points[0] = other.points[0];
-	this->points[1] = other.points[1];
-	this->points[2] = other.points[2];
-	this->face = other.face;
-	return(*this);
 }

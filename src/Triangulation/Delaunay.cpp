@@ -1412,9 +1412,9 @@ double Delaunay::signedArea(Node *node)
 	double   area;           // Return value.
 
 	// Check if any of the vertex is not real: P_MINUS_! or P_MINUS_2.
-	if ((node->getiChild(0) < 0) ||
-		(node->getiChild(1) < 0) ||
-		(node->getiChild(2) < 0))
+	if ((node->getNChildren() == 0) || ((node->getiChild(0) < 0) ||
+                                        (node->getiChild(1) < 0) ||
+		                                (node->getiChild(2) < 0)))
 	{
 		// Set area zero.
 		area = 0.0;
