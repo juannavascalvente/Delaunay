@@ -47,7 +47,8 @@ bool Delaunay::build()
     this->dcel.swapVertex(0, highestPointIndex);
 
     // Insert root node.
-    Node node(1, P_MINUS_2, P_MINUS_1, 1);
+    vector<int> vPoints = {1, P_MINUS_2, P_MINUS_1};
+    Node node(vPoints, 1);
     this->graph.insert(node);
 
     // Update edge from new point.
@@ -350,16 +351,16 @@ void Delaunay::flipEdges(int edge_ID)
     this->graph.update(old_Node_ID2, node);
 
     // Insert two new nodes.
-    newNode = Node(this->dcel.getOrigin(edge->getPrevious()-1),
-    				this->dcel.getOrigin(edge_Index),
-					this->dcel.getOrigin(edge->getNext()-1),
-					edge->getFace());
+    vector<int> vPoints1 = {this->dcel.getOrigin(edge->getPrevious()-1),
+                           this->dcel.getOrigin(edge_Index),
+                           this->dcel.getOrigin(edge->getNext()-1)};
+    newNode = Node(vPoints1, edge->getFace());
     this->graph.insert(newNode);
 
-    newNode = Node(this->dcel.getOrigin(twin->getPrevious()-1),
-    				this->dcel.getOrigin(edge->getTwin()-1),
-					this->dcel.getOrigin(twin->getNext()-1),
-					twin->getFace());
+    vector<int> vPoints2 = {this->dcel.getOrigin(twin->getPrevious()-1),
+                            this->dcel.getOrigin(edge->getTwin()-1),
+                            this->dcel.getOrigin(twin->getNext()-1)};
+    newNode = Node(vPoints2, twin->getFace());
     this->graph.insert(newNode);
 
 	// Check recursively edges that could be illegal.
@@ -386,9 +387,6 @@ bool Delaunay::convexHull()
 		Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getRefPoint(this->dcel.getOrigin(0)-1));
 		Logging::write(true, Info);
 #endif
-		// Insert initial point (always in the convex hull).
-		this->hull.add(*this->dcel.getRefPoint(this->dcel.getOrigin(0)-1));
-
 		// Get an edge departing from 0 point.
 		edgeIndex = this->dcel.getPointEdge(0) - 1;
 
@@ -643,6 +641,41 @@ bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &
 }
 
 
+/**
+ * @fn    getConvexFacesIntersections
+ * @brief Get faces and edge in convex hull that intersects input line
+ *
+ * @param line      (IN) Line to check
+ * @param vFaces    (OUT) Faces in convex hull that intersect line
+ * @param vEdges    (OUT) Edges in convex hull that intersect line
+ */
+void Delaunay::getConvexFacesIntersections(Line &line, vector<int> &vFaces, vector<int> &vEdges)
+{
+    // Get convex hull edges
+    vector<int> vConvexEdges;
+    hull.getConvexHullEdges(vConvexEdges);
+
+    Point<TYPE> o;
+    Point<TYPE> d;
+    for (auto edgeId : vConvexEdges)
+    {
+        // Get edge extreme points
+        dcel.getEdgePoints(edgeId - 1, o, d);
+
+        // Build edge line
+        Line l(o, d);
+
+        // If line intersects -> add face
+        if (line.intersect(l))
+        {
+            int iTwinEdge = dcel.getTwin(edgeId - 1);
+            vFaces.push_back(dcel.getFace(iTwinEdge - 1));
+            vEdges.push_back(edgeId);
+        }
+    }
+}
+
+
 /***************************************************************************
 * Name: 	findPath
 * IN:		line		line that determines the path.
@@ -655,19 +688,22 @@ bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &
 bool Delaunay::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
 {
 	bool found=false;				// Return value.
-	bool computePath=false;			// Both points in external face.
-	int	 originFace=0;				// Initial face in the path.
-	int	 destinationFace=0;		    // Final face in the path.
-	int	 i=0;						// Loop counter.
-	int	 nFacesToAdd=0;				// Loop upper bound.
-	int	 edgeIndex=0;				// Edge index.
-	vector<int> intersectEdges;		// Set of edges that intersect convex hull.
-	vector<int> vFaces;
+
+    // Initialize output
+    vFacesId.clear();
+
+    // Build line whose path must be computed
     Line line(origin, dest);
 
-	// Get extreme point faces.
-	if (this->findFace(origin, originFace) && this->findFace(dest, destinationFace))
+    // Get extreme point faces.
+    int	 originFace=0;				// Initial face in the path.
+    int	 destinationFace=0;		    // Final face in the path.
+    if (this->findFace(origin, originFace) && this->findFace(dest, destinationFace))
 	{
+        bool computePath=false;			// Both points in external face.
+
+        vector<int> vFaces;
+
 		// Add non external faces to set.
 		if (originFace != EXTERNAL_FACE)
 		{
@@ -690,25 +726,44 @@ bool Delaunay::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFa
 				this->convexHull();
 			}
 
-			// Line intersects convex hull.
-            Polygon polygon;
-            getConvexHull(polygon);
-			if (polygon.getIntersections(line, intersectEdges))
-			{
-				nFacesToAdd = intersectEdges.size();
-				vector<int> vEdges;
-                this->getConvexHullEdges(vEdges);
-                if (!vEdges.empty())
-                {
-                    computePath = true;
-                    for (i=0; i<nFacesToAdd ;i++)
-                    {
-                        edgeIndex = vEdges.at(intersectEdges.at(i))-1;
-                        originFace = this->dcel.getFace(this->dcel.getTwin(edgeIndex) - 1);
-                        vFaces.push_back(originFace);
-                    }
-                }
-			}
+            vector<int> vEdges;
+            getConvexFacesIntersections(line, vFaces, vEdges);
+
+            // If vFaces is empty -> both points are external and there is no intersection with convex hull
+            if (vFaces.empty())
+            {
+                found = true;
+            }
+            else
+            {
+                computePath = true;
+            }
+
+//			// Line intersects convex hull.
+//            Polygon polygon;
+//            getConvexHull(polygon);
+//            vector<int> intersectEdges;		// Set of edges that intersect convex hull.
+//			if (polygon.getIntersections(line, intersectEdges))
+//			{
+//                int nFacesToAdd = intersectEdges.size();
+//				vector<int> vEdges;
+//                this->getConvexHullEdges(vEdges);
+//                if (!vEdges.empty())
+//                {
+//                    computePath = true;
+//                    int	 edgeIdx;
+//                    for (size_t i=0; i<nFacesToAdd ;i++)
+//                    {
+//                        edgeIdx = vEdges.at(intersectEdges.at(i))-1;
+//                        originFace = this->dcel.getFace(this->dcel.getTwin(edgeIdx) - 1);
+//                        vFaces.push_back(originFace);
+//                    }
+//                }
+//			}
+//			else
+//            {
+//                found = true;
+//            }
 		}
 
 		// If both points are external -> no path to compute.
@@ -722,144 +777,6 @@ bool Delaunay::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFa
 	return found;
 }
 
-///***************************************************************************
-//* Name: 	getInitialFaces
-//* IN:		line			line whose extreme points must be located
-//* 			edgesSet		set of edges that intersect convex hull.
-//* OUT:		NONE
-//* IN/OUT:	initialFace		first face into the DCEL convex hull
-//* 			finalFace		last face into the DCEL convex hull
-//* RETURN:	NONE
-//* GLOBAL:	NONE
-//* Description: 	at least one of the line extreme points is not into the
-//* 				convex hull. PENDING
-//***************************************************************************/
-//void Delaunay::getInitialFaces(Line &line, Set<int> &edgesSet, int &initialFace, int &finalFace)
-//{
-//	int			i=0;			// Loop counter.
-//	Point<TYPE>	point;			// Line extreme point.
-//	Set<int> 	edgesIndex;		// Set of edges index.
-//
-//	//PENDING REMOVE this->dcel.print(std::cout);
-//	// Get real edges ID in DCEL.
-//	for (i=0; i<edgesSet.getNElements() ;i++)
-//	{
-//		edgesIndex.add((*this->getConvexHullEdges()->at(*edgesSet.at(i))) - 1);
-//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-//		Logging::buildText(__FUNCTION__, __FILE__, "Intersected edge index ");
-//		Logging::buildText(__FUNCTION__, __FILE__, *edgesIndex.at(i));
-//		Logging::write(true, Info);
-//#endif
-//	}
-//
-//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-//	Logging::buildText(__FUNCTION__, __FILE__, "Initial faces are ");
-//	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
-//	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-//	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
-//	Logging::write(true, Info);
-//#endif
-//
-//	if (this->dcel.isBottomMostFace(initialFace))
-//	{
-//		if (this->dcel.getFace(*edgesIndex.at(0)) == finalFace)
-//		{
-//			initialFace = this->dcel.getFace(*edgesIndex.at(1));
-//		}
-//		else
-//		{
-//			initialFace = this->dcel.getFace(*edgesIndex.at(0));
-//		}
-//	}
-//	else if (this->dcel.isBottomMostFace(finalFace))
-//	{
-//		if (this->dcel.getFace(*edgesIndex.at(0)) == initialFace)
-//		{
-//			finalFace = this->dcel.getFace(*edgesIndex.at(1));
-//		}
-//		else
-//		{
-//			finalFace = this->dcel.getFace(*edgesIndex.at(0));
-//		}
-//	}
-//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-//	Logging::buildText(__FUNCTION__, __FILE__, "Corrected faces are ");
-//	Logging::buildText(__FUNCTION__, __FILE__, initialFace);
-//	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-//	Logging::buildText(__FUNCTION__, __FILE__, finalFace);
-//	Logging::write(true, Info);
-//#endif
-//
-//	// Check if origin extreme point is internal to the convex hull.
-//	point = line.getOrigin();
-//	if (!this->getConvexHull()->isInternal(point))
-//	{
-//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-//		Logging::buildText(__FUNCTION__, __FILE__, "Origin is external to convex hull");
-//		Logging::write(true, Info);
-//#endif
-//		this->getInternalFace(line, edgesIndex, initialFace);
-//	}
-//
-//	// Check if origin extreme point is internal to the convex hull.
-//	point = line.getDest();
-//	if (!this->getConvexHull()->isInternal(point))
-//	{
-//#ifdef DEBUG_DELAUNAY_GETINITIALFACES
-//		Logging::buildText(__FUNCTION__, __FILE__, "Destination is external to convex hull");
-//		Logging::write(true, Info);
-//#endif
-//		this->getInternalFace(line, edgesIndex, finalFace);
-//	}
-//}
-
-
-///***************************************************************************
-//* Name: 	getInternalFace
-//* IN:		edgesIndex		set of edges to check
-//* OUT:		NONE
-//* IN/OUT:	face			face to be updated
-//* RETURN:	NONE
-//* GLOBAL:	NONE
-//* Description: 	get the face that is in the convex hull that is a twin face
-//* 				of the external input "face".
-//***************************************************************************/
-//void Delaunay::getInternalFace(Line &line, Set<int> &edgesIndex, int &face)
-//{
-//	int		i=0;				// Loop counter.
-//	bool	found;		        // Loop control flag.
-//	int		edgeIndex=0;		// Edge index.
-//
-//	// Initialize loop variables.
-//	i=0;
-//	found = false;
-//
-//	// Loop until all edges checked or face found.
-//	while ((i < edgesIndex.getNElements()) && (!found))
-//	{
-//		// Get next edge.
-//		edgeIndex = *edgesIndex.at(i);
-//#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
-//		Logging::buildText(__FUNCTION__, __FILE__, "Checking edge ");
-//		Logging::buildText(__FUNCTION__, __FILE__, edgeIndex+1);
-//		Logging::write(true, Info);
-//#endif
-//
-//		// Check if edge face is equal to input face.
-//		if (this->dcel.getFace(edgeIndex) == face)
-//		{
-//			// Twin face is the internal face searched.
-//			found = true;
-//			face = this->dcel.getFace(this->dcel.getTwin(edgeIndex)-1);
-//#ifdef DEBUG_DELAUNAY_GET_INTERNAL_FACE
-//			Logging::buildText(__FUNCTION__, __FILE__, "Edge found and face is ");
-//			Logging::buildText(__FUNCTION__, __FILE__, face);
-//			Logging::write(true, Info);
-//#endif
-//		}
-//		i++;
-//	}
-//}
 
 /***************************************************************************
 * Name: 	findFace
@@ -1234,20 +1151,22 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
         this->graph.update(nodeIndex, ptrNode);
 
 		// Insert three new nodes.
-        newNode[0] = Node(	this->dcel.getOrigin(new_Edge_ID),
-        					this->dcel.getOrigin(new_Edge_ID - 1),
-							this->dcel.getOrigin(faceEdge - 1),
-							ptrNode->getFace());
+		vector<int> vPoints = {this->dcel.getOrigin(new_Edge_ID),
+                                this->dcel.getOrigin(new_Edge_ID - 1),
+                                this->dcel.getOrigin(faceEdge - 1)};
+        newNode[0] = Node(vPoints, ptrNode->getFace());
         area[0] = this->signedArea(&newNode[0]);
-        newNode[1] = Node(	this->dcel.getOrigin(new_Edge_ID + 2),
-        					this->dcel.getOrigin(new_Edge_ID + 1),
-							this->dcel.getOrigin(next_Edge_ID - 1),
-							new_Face_ID);
+        vPoints.clear();
+        vPoints = {this->dcel.getOrigin(new_Edge_ID + 2),
+                   this->dcel.getOrigin(new_Edge_ID + 1),
+                   this->dcel.getOrigin(next_Edge_ID - 1)};
+        newNode[1] = Node(vPoints, new_Face_ID);
         area[1] = this->signedArea(&newNode[1]);
-        newNode[2] = Node(	this->dcel.getOrigin(new_Edge_ID + 4),
-        					this->dcel.getOrigin(new_Edge_ID + 3),
-							this->dcel.getOrigin(prev_Edge_ID - 1),
-							new_Face_ID + 1);
+        vPoints.clear();
+        vPoints = {this->dcel.getOrigin(new_Edge_ID + 4),
+                   this->dcel.getOrigin(new_Edge_ID + 3),
+                   this->dcel.getOrigin(prev_Edge_ID - 1)};
+        newNode[2] = Node(vPoints,new_Face_ID + 1);
         area[2] = this->signedArea(&newNode[2]);
         if (area[0] > area[1])
         {
@@ -1381,10 +1300,10 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
             this->graph.update(oldNode1, ptrNode);
 
 			// Insert two new nodes in first node splitted.
-	        newNode[0] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
-	        					this->dcel.getOrigin(collinear_Index),
-								this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1),
-								this->dcel.getFace(collinear_Index));
+            vector<int> vPoints = {this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
+                                   this->dcel.getOrigin(collinear_Index),
+                                   this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1)};
+	        newNode[0] = Node(vPoints, this->dcel.getFace(collinear_Index));
 			this->graph.insert(newNode[0]);
 #ifdef DEBUG_SPLIT_NODE
 			Logging::buildText(__FUNCTION__, __FILE__, "Splitting 1st triangle ");
@@ -1393,10 +1312,11 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			Logging::buildText(__FUNCTION__, __FILE__, newNode[0].toStr());
 			Logging::write(true, Info);
 #endif
-	        newNode[1] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
-	        					this->dcel.getOrigin(this->dcel.getPrevious(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1)-1),
-								this->dcel.getOrigin(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1),
-								new_Face_ID);
+            vPoints.clear();
+            vPoints = {this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
+                       this->dcel.getOrigin(this->dcel.getPrevious(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1)-1),
+                       this->dcel.getOrigin(this->dcel.getTwin(this->dcel.getPrevious(collinear_Index)-1)-1)};
+	        newNode[1] = Node(vPoints, new_Face_ID);
 			this->graph.insert(newNode[1]);
 
 			// Insert new face.
@@ -1433,10 +1353,11 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
             this->graph.update(oldNode2, ptrNode);
 
 			// Insert two new nodes in first node splitted.
-	        newNode[0] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
-	        					this->dcel.getOrigin(collinear_Index),
-								this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1),
-								this->dcel.getFace(collinear_Index));
+            vPoints.clear();
+            vPoints = {	this->dcel.getOrigin(this->dcel.getPrevious(collinear_Index)-1),
+                        this->dcel.getOrigin(collinear_Index),
+                        this->dcel.getOrigin(this->dcel.getNext(collinear_Index)-1)};
+	        newNode[0] = Node(vPoints, this->dcel.getFace(collinear_Index));
 			this->graph.insert(newNode[0]);
 
 			// Update face.
@@ -1446,10 +1367,11 @@ void Delaunay::splitNode(int pointIndex, int nodeIndex, int nTriangles)
 			Logging::buildText(__FUNCTION__, __FILE__, this->dcel.getRefFace(newNode[0].getFace())->toStr());
 			Logging::write(true, Info);
 #endif
-	        newNode[1] = Node(	this->dcel.getOrigin(this->dcel.getPrevious(next_Edge_ID-1)-1),
-	        					this->dcel.getOrigin(next_Edge_ID-1),
-								this->dcel.getOrigin(this->dcel.getNext(next_Edge_ID-1)-1),
-								this->dcel.getFace(next_Edge_ID-1));
+            vPoints.clear();
+            vPoints = {	this->dcel.getOrigin(this->dcel.getPrevious(next_Edge_ID-1)-1),
+                        this->dcel.getOrigin(next_Edge_ID-1),
+                        this->dcel.getOrigin(this->dcel.getNext(next_Edge_ID-1)-1)};
+	        newNode[1] = Node(vPoints, this->dcel.getFace(next_Edge_ID-1));
 			this->graph.insert(newNode[1]);
 
 			// Insert new face.
@@ -1496,9 +1418,9 @@ double Delaunay::signedArea(Node *node)
 	double   area;           // Return value.
 
 	// Check if any of the vertex is not real: P_MINUS_! or P_MINUS_2.
-	if ((node->getiChild(0) < 0) ||
-		(node->getiChild(1) < 0) ||
-		(node->getiChild(2) < 0))
+	if ((node->getNChildren() == 0) || ((node->getiChild(0) < 0) ||
+                                        (node->getiChild(1) < 0) ||
+		                                (node->getiChild(2) < 0)))
 	{
 		// Set area zero.
 		area = 0.0;

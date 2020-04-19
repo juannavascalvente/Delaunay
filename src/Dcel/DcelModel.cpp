@@ -321,29 +321,18 @@ void DcelModel::getFaceVertices(int faceIndex, int *ids)
 }
 
 
-void DcelModel::getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Point<TYPE> &r)
+void DcelModel::getFacePoints(int faceIndex, vector<Point<TYPE>> &vPoints)
 {
-    int		edgeIndex=0;			// Edge index.
+    // Initialize output
+    vPoints.clear();
 
     // Get index edge from face.
-    edgeIndex = this->getFaceEdge(faceIndex) - 1;
-
-#ifdef DEBUG_POINTS_GET_FACE_POINTS
-    Logging::buildText(__FUNCTION__, __FILE__, "Face ");
-	Logging::buildText(__FUNCTION__, __FILE__, faceIndex);
-	Logging::buildText(__FUNCTION__, __FILE__, " points id are ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getOrigin(edgeIndex));
-	Logging::buildText(__FUNCTION__, __FILE__, ",");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getNext(edgeIndex));
-	Logging::buildText(__FUNCTION__, __FILE__, " and ");
-	Logging::buildText(__FUNCTION__, __FILE__, this->getPrevious(edgeIndex));
-	Logging::write(true, Info);
-#endif
+    int edgeIndex = this->getFaceEdge(faceIndex) - 1;
 
     // Get face vertices.
-    p = *this->getRefPoint(this->getOrigin(edgeIndex)-1);
-    q = *this->getRefPoint(this->getOrigin(this->getNext(edgeIndex)-1)-1);
-    r = *this->getRefPoint(this->getOrigin(this->getPrevious(edgeIndex)-1)-1);
+    vPoints.push_back(*this->getRefPoint(this->getOrigin(edgeIndex)-1));
+    vPoints.push_back(*this->getRefPoint(this->getOrigin(this->getNext(edgeIndex)-1)-1));
+    vPoints.push_back(*this->getRefPoint(this->getOrigin(this->getPrevious(edgeIndex)-1)-1));
 }
 
 

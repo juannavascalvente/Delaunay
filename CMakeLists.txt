@@ -13,6 +13,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 # Paths.
 set(BUILD_PATH .)
 
+add_definitions(-DBASEFOLDER="${CMAKE_SOURCE_DIR}")
+
 # Build options
 if (BUILD_DEBUG)
     message("Building DEBUG mode")
@@ -35,17 +37,21 @@ endif (BUILD_DEBUG)
 ########################################### Visual Source code #########################################################
 file(GLOB DELAUNAY_VISUAL_HEADER_FILES
         ${BUILD_PATH}/statistics
-        ${BUILD_PATH}/test
+        ${BUILD_PATH}/test/inc
         ${BUILD_PATH}/visual
         ${BUILD_PATH}/visual/Commands
         ${BUILD_PATH}/include/Visual
         ${BUILD_PATH}/include/Visual/Display
-        ${BUILD_PATH}/include/visual/Display/Displayable
+        ${BUILD_PATH}/include/Visual/Display/Displayable
         )
 
 file(GLOB DELAUNAY_VISUAL_SRC_FILES
         ${BUILD_PATH}/statistics/*.cpp
-        ${BUILD_PATH}/test/*.cpp
+        ${BUILD_PATH}/test/src/Api/*.cpp
+        ${BUILD_PATH}/test/src/Equivalence/*.cpp
+        ${BUILD_PATH}/test/src/Fast/*.cpp
+        ${BUILD_PATH}/test/src/Integration/*.cpp
+        ${BUILD_PATH}/test/src/*.cpp
         ${BUILD_PATH}/visual/*.cpp
         ${BUILD_PATH}/visual/Commands/*.cpp
         ${BUILD_PATH}/src/Visual/*.cpp

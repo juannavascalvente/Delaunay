@@ -29,6 +29,7 @@ public:
     *******************************************************************************************************************/
 	Polygon() = default;
 	explicit Polygon(int n) : vPoints(n) {};
+    explicit Polygon(vector<Point<TYPE>> &v) { vPoints = v; }
 	virtual ~Polygon() = default;
     Polygon(const Polygon &p) { vPoints = p.vPoints; }
 
@@ -61,7 +62,16 @@ public:
     * Description: 	gets the set of edges(two maximum) that intersects the
     * 				polygon.
     ***************************************************************************/
-	bool	getIntersections(Line &line, vector<int> &intersection);
+	bool getIntersections(Line &line, vector<int> &intersection);
+
+	/**
+	 * @fn      getIntersections
+	 * @brief   Gets the intersection points, if any, between line and polygon
+	 *
+	 * @param   line    (IN) Line to check intersection with polygon
+	 * @param   vOut    (OUT) Vector that contains intersection points (if any)
+	 */
+    void getIntersections(Line &line, vector<Point<TYPE>> &vOut);
 
     /***************************************************************************
     * Name: 	isInternal
@@ -73,6 +83,15 @@ public:
     * Description: 	Checks if the input point is interior to the polygon
     ***************************************************************************/
 	bool	isInternal(Point<TYPE> &p);
+
+    /**
+     * @fn              ==
+     * @brief           Compares two polygons
+     * @param other     polygon to compare with
+     * @return          true if both polygons are equal
+     *                  false otherwise
+     */
+    bool operator==(Polygon& other);
 
     /***************************************************************************
     * Name: 	print

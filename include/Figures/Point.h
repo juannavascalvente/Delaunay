@@ -24,7 +24,7 @@ using namespace std;
 //****************************************************************************
 // 								DEFINES
 //****************************************************************************
-#define 	COLLINEAR_THRESHOLD		0.0
+#define 	COLLINEAR_THRESHOLD		0.000001
 
 // Window size
 #define MAX_X_COORD				10000.0
@@ -86,7 +86,6 @@ public:
 	double signedArea(const Point &p, const Point &q);
 
 	// Location interface.
-	bool has_Extreme_Coordinates();
 	enum Turn_T	check_Turn(const Point<A_Type> &p, const Point<A_Type> &q);
 	static bool lowerY(Point<TYPE> *p, Point<TYPE> *q);
 	static bool lexicographicHigher(const Point<TYPE> *p, const Point<TYPE> *q);
@@ -109,7 +108,6 @@ public:
 
 	// I/O interface
 	void print(std::ostream& out) const;
-	void printFormatted(std::ostream& out) const;
 	string toStr();
 	void read(ifstream &ifs);
 	void write(ofstream &ofs);
@@ -121,7 +119,17 @@ public:
 	inline Point& 	operator/(const TYPE value) {this->x /= value; this->y /= value; return(*this);}
 	inline bool 	operator==(const Point& q) const {return ((this->x == q.x) && (this->y == q.y));}
 	inline bool 	operator!=(const Point& q) const {return ((this->x != q.x) || (this->y != q.y));}
-	inline Point& 	operator=(const Point& other ) {this->x = other.x; this->y = other.y; return(*this);}
+	Point& 	operator=(const Point& other)
+    {
+        // Self assignment check
+        if(this != &other)
+        {
+            this->x = other.x;
+            this->y = other.y;
+        }
+
+        return *this;
+	}
 	friend istream &operator>>(istream &in, Point &p) {in >> p.x; in >> p.y; return(in);};
 	friend ostream &operator<<(ostream &out, Point &p) {out << p.x; out << " "; out << p.y; return(out);};
 };
@@ -135,12 +143,8 @@ public:
 *****************************************************************************/
 template <class A_Type> A_Type Point<A_Type>::distance(const Point &p)
 {
-	 A_Type	dist=0.0;			// Return value.
-
 	 // Compute Euclidean distance.
-	dist = sqrt(pow(this->x - p.x, 2) + pow(this->y - p.y, 2));
-
-	return(dist);
+	return sqrt(pow(this->x - p.x, 2) + pow(this->y - p.y, 2));
 }
 
 /*****************************************************************************
@@ -160,26 +164,6 @@ template <class A_Type> double Point<A_Type>::signedArea(const Point &p, const P
 	return(area);
 }
 
-/*****************************************************************************
- * Name: 		has_Extreme_Coordinates
- * Input: 		NONE
- * Description: Checks if points is out of maximum coordinates.
- * Output: 	True if out of bounds. False otherwise.
- * Complexity:	O(1)
-*****************************************************************************/
-template <class A_Type> bool Point<A_Type>::has_Extreme_Coordinates()
-{
-	bool	hasExtreme=false;			// Return value.
-
-	// Check if point out of bounds.
-	if ((this->x >= MAX_X_COORD) || (this->y >= MAX_Y_COORD) ||
-		(this->x <= -MAX_X_COORD) || (this->y <= -MAX_Y_COORD))
-	{
-		hasExtreme = true;
-	}
-
-	return(hasExtreme);
-}
 
 /*****************************************************************************
  * Name: 		check_Turn
@@ -303,19 +287,6 @@ template <class A_Type> string Point<A_Type>::toStr()
 	text = oss.str();
 
 	return(text);
-}
-
-/*****************************************************************************
- * Name: 		printFormatted
- * Input: 		NONE
- * Description: print x and y coordinates between parenthesis.
- * Output: 		NONE
- * Complexity:	O(1)
-*****************************************************************************/
-template <class A_Type> void Point<A_Type>::printFormatted(std::ostream& out) const
-{
-	// Print coordinates.
-	out << "(" << this->x << "," << this->y << ")";
 }
 
 /*****************************************************************************

@@ -44,6 +44,7 @@ public:
 	int getSize() {return this->vNodes.size(); };
     Node* getRefNode(int nodeId) { return &this->vNodes.at(nodeId); };
     int getNodeAssigned(int face);
+    void setNodeAssigned(int iIdx, int iValue) { this->vFaceNode[iIdx] = iValue; };
     int getNChildren(int nodeId) { return this->vNodes.at(nodeId).getNChildren(); };
     int getiChild(int nodeId, int iChild) { return this->vNodes.at(nodeId).getiChild(iChild); };
     void getVertices(int nodeIndex, int &index1, int &index2, int &index3);

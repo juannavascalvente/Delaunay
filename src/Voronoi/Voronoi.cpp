@@ -4,7 +4,6 @@
 #include "Logging.h"
 #include "Circle.h"
 #include "Voronoi.h"
-#include "DcelReader.h"
 #include "DcelWriter.h"
 
 
@@ -129,19 +128,15 @@ void Voronoi::computeCircumcentres()
 	// Loop all faces from 1 because zero face has no circumcentre.
 	for (int faceId=1; faceId< this->triangulation->getNumFaces() ; faceId++)
 	{
-        Point<TYPE>	p, q, r;			// Vertices points.
         Point<TYPE>	invalidPoint;		// Point to use in imaginary faces.
 
 		// Skip imaginary faces.
 		if (!this->triangulation->imaginaryFace(faceId))
 		{
-			this->triangulation->getFacePoints(faceId, p, q, r);
+            vector<Point<TYPE>> vPoints;
+            this->triangulation->getFacePoints(faceId, vPoints);
 
 		    // Build circle.
-            vector<Point<TYPE>> vPoints;
-            vPoints.push_back(p);
-            vPoints.push_back(q);
-            vPoints.push_back(r);
             Circle circle = Circle(vPoints);
 
 			// Add circumcentre.

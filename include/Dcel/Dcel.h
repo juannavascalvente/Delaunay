@@ -12,6 +12,7 @@
 
 #include <utility>
 #include <vector>
+#include <queue>
 
 
 /***********************************************************************************************************************
@@ -22,8 +23,8 @@ class Dcel : public DcelModel
 	/*******************************************************************************************************************
 	* Private methods
 	*******************************************************************************************************************/
-	void quicksort(Vertex *origin, Vertex *list, int first, int last);
-	int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
+	static void  quicksort(Vertex *origin, Vertex *list, int first, int last);
+	static int	 movePivot(Vertex *origin, Vertex *list, int first, int last);
 
 public:
 	/*******************************************************************************************************************
@@ -46,17 +47,19 @@ public:
 	double 		signedArea(int id1, int id2, int id3);
 
 	// Figures? PENDING. Move to another module?
-	bool 	getEdgeInserection(Line &line, int face, int &edgeId);
+    bool getEdgeIntersection(Line &line, int face, queue<int> &qEdges);
 	bool 	findPath(vector<int> &vExtremeFaces, Line &line, vector<int> &vFacesId);
+
+	bool isInsideFace(const Point<TYPE> &p, int faceId);
 
     /**
      * @fn                  imaginaryFace
      * @brief               Checks if any of the vertex of the face is imaginary (only incremental algorithms)
      *
-     * @param faceIndex     (IN) Face id to check
+     * @param faceId        (IN) Face id to check
      * @return
      */
-    bool imaginaryFace(int faceIndex);
+    bool imaginaryFace(int faceId);
 
     /**
      * @fn              getPoints

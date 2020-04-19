@@ -17,7 +17,6 @@ enum MenuOption
     read_star_triangulation = 5,
     read_delaunay = 7,
     read_voronoi = 8,
-    read_gabriel = 9,
     star_triangulation = 10,
     delaunay_triangulation = 11,
     convex_hull = 12,
@@ -39,7 +38,6 @@ enum MenuOption
     write_triangulation = 28,
     write_delaunay = 29,
     write_voronoi = 30,
-    write_gabriel = 31
 };
 
 #endif //DELAUNAY_MENUOPTION_H
