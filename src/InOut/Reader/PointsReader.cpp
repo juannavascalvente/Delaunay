@@ -30,7 +30,7 @@ bool PointsReader::read(const string &fileName, vector<Point<TYPE>> &vPoints)
             isSuccess = PointsReader::readFlat(fileName, vPoints);
         }
     }
-    catch (const ofstream::failure& e)
+    catch (const ifstream::failure& e)
     {
         Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
         Logging::buildText(__FUNCTION__, __FILE__, fileName);
@@ -94,13 +94,6 @@ bool PointsReader::readFlat(const string &fileName, vector<Point<TYPE>> &vPoints
         // Close file.
         ifs.close();
         isSuccess = true;
-    }
-    // Error opening points file.
-    else
-    {
-        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
-        Logging::buildText(__FUNCTION__, __FILE__, fileName);
-        Logging::write(true, Error);
     }
 
     return isSuccess;
@@ -168,12 +161,6 @@ bool PointsReader::readBinary(const string &fileName, vector<Point<TYPE>> &vPoin
         // Free resources
         delete[] buffer;
         isSuccess = true;
-    }
-    else
-    {
-        Logging::buildText(__FUNCTION__, __FILE__, "Error opening file: ");
-        Logging::buildText(__FUNCTION__, __FILE__, fileName);
-        Logging::write(true, Error);
     }
 
     return isSuccess;

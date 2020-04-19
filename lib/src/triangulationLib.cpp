@@ -1,8 +1,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "Delaunay.h"
-#include "StarTriangulation.h"
+#include "TriangulationFactory.h"
 #include "triangulationLib.h"
 
 
@@ -16,8 +15,7 @@ bool getStarTriangulation(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
     try
     {
         // Run command
-        auto *triangulation = new StarTriangulation(vPoints);
-        isSuccess = triangulation->build();
+        auto *triangulation = TriangulationFactory::createStar(vPoints, isSuccess);
 
         // Update output
         dcelOut = *triangulation->getRefDcel();
@@ -41,11 +39,8 @@ bool getDelaunay(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 
     try
     {
-        // Insert points into delaunay
-        auto *delaunay = new Delaunay(vPoints);
-
         // Build Delaunay using incremental algorithm
-        isSuccess = delaunay->build();
+        auto *delaunay = TriangulationFactory::createDelaunay(vPoints, isSuccess);
 
         // Update output
         dcelOut = *delaunay->getRefDcel();
