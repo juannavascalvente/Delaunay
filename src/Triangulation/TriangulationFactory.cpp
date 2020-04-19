@@ -15,6 +15,11 @@ StarTriangulation *TriangulationFactory::createStar(vector<Point<TYPE>> &vPoints
     {
         triangulation = new StarTriangulation(vPoints);
         isSuccess = triangulation->build();
+        if (!isSuccess)
+        {
+            delete triangulation;
+            triangulation = nullptr;
+        }
     }
     catch (bad_alloc &ex)
     {
@@ -36,6 +41,11 @@ Delaunay *TriangulationFactory::createDelaunay(vector<Point<TYPE>> &vPoints, boo
         // Build Delaunay triangulation
         delaunay = new Delaunay(vPoints);
         isSuccess = delaunay->build();
+        if (!isSuccess)
+        {
+            delete delaunay;
+            delaunay = nullptr;
+        }
     }
     catch (bad_alloc &ex)
     {

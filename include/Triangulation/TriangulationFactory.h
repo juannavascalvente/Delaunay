@@ -19,6 +19,9 @@ using namespace std;
 class TriangulationFactory
 {
 public:
+    /*******************************************************************************************************************
+    * Public methods declarations
+    *******************************************************************************************************************/
     /**
      * @fn      createStar
      * @brief   Creates star triangulation using a set of points as input
