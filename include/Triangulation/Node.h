@@ -6,8 +6,6 @@
 ***********************************************************************************************************************/
 #include "defines.h"
 
-#include <iostream>
-#include <string>
 #include <vector>
 using namespace std;
 
@@ -32,6 +30,7 @@ class Node
     vector<int> vPointsId;          // Node points IDs
 	int	face;						// Face id.
 
+	friend class NodeIO;
 public:
 
     /*******************************************************************************************************************
@@ -74,14 +73,6 @@ public:
     int getiPoint(int index);
     void setChildren(int id1, int id2);
     void setChildren(int id1, int id2, int id3);
-
-    /*******************************************************************************************************************
-    * I/O functions
-    *******************************************************************************************************************/
-	void print(std::ostream& out);
-	void read(std::istream& in);
-	void write(std::ostream& out);
-	string toStr();
 };
 
 #endif /* INCLUDE_NODE_H_ */
