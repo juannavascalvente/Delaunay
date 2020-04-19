@@ -14,6 +14,12 @@
 ***********************************************************************************************************************/
 void PointFactory::generateRandom(size_t szNum, vector<Point<TYPE>> &vPoints)
 {
+    // Clear output
+    vPoints.clear();
+
+    // Generate random seed for set points
+    srand48(int(time(nullptr)));
+
     // Create n lines.
     for (size_t i=0; i<szNum ;i++)
     {
@@ -35,15 +41,23 @@ void PointFactory::readFromConfig(Point<TYPE> &point)
     // Check if input point parameter provided by user.
     if (point.getX() == INVALID)
     {
-        // Get min and max coordiantes.
+        // Get min and max coordinates
         int minX, minY, maxX, maxY;
         Config::getScreenCoordinates(minX, minY, maxX, maxY);
 
-        // Generate seed.
+        // Generate random point
+        // Set seed
+        srand48(int(time(nullptr)));
         point.random();
 
-        // Create a random point.
-        point.setX(((int) point.getX()) % (int) maxX);
-        point.setY(((int) point.getY()) % (int) maxY);
+        // Fit to screen
+        if (point.getX() > (double) maxX)
+        {
+            point.setX(point.getX() - (double) maxX);
+        }
+        if (point.getY() > (double) maxY)
+        {
+            point.setY(point.getY() - (double) maxY);
+        }
     }
 }

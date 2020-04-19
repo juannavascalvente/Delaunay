@@ -1,9 +1,3 @@
-/*
- * Menu.cpp
- *
- *  Created on: Jul 4, 2016
- *      Author: juan
- */
 
 #include <GL/glut.h>
 using namespace std;
@@ -24,8 +18,6 @@ using namespace std;
 #define	INPUTSET_READ_STAR_TRIANG_TEXT	"Triangulation"
 #define	INPUTSET_READ_INCREMENTAL_TEXT	"Incremental Delaunay"
 #define	INPUTSET_READ_VORONOI_TEXT		"Voronoi"
-#define INPUTSET_READ_GABRIEL_TEXT		"Gabriel"
-//#define	INPUTSET_SHAKE_DCEL_TEXT		"Shake points"
 
 // Parameters menu entries text.
 #define PARAMETERS_MENU_TEXT			"Read parameters"
@@ -47,7 +39,6 @@ using namespace std;
 #define	FIGURES_TRIANGULATION_PATH_TEXT	"StarTriangulation path"
 
 // Location menu entries.
-//#define LOCATION_MENU_TEXT				"Location"
 #define	LOCATION_CLOSEST_POINTS_TEXT	"Closest to a given"
 #define	LOCATION_2CLOSEST_POINTS_TEXT	"Two closest"
 #define	LOCATION_FIND_FACE_TEXT			"Locate face"
@@ -58,7 +49,6 @@ using namespace std;
 #define EXPORT_DCEL_FILE				"Write DCEL file"
 #define EXPORT_DELAUNAY_FILE			"Write Delaunay files"
 #define EXPORT_VORONOI_FILE				"Write Voronoi file"
-#define EXPORT_GABRIEL_FILE				"Write Gabriel file"
 
 // Export menu entries text.
 #define	INFORMATION_MENU_TEXT			"Information"
@@ -66,7 +56,6 @@ using namespace std;
 #define INFORMATION_VORONOI_TEXT		"Voronoi info"
 
 // Other menu entries text.
-//#define	ZOOM_MENU_TEXT					"Zoom"
 #define	CLEAR_MENU_TEXT					"Clear"
 #define	QUIT_MENU_TEXT					"Quit"
 
@@ -153,7 +142,10 @@ void Menu::updateMenu()
 			glutAddMenuEntry(FIGURES_CONVEX_TEXT, convex_hull);
 			glutAddMenuEntry(FIGURES_CIRCUMCENTRES_TEXT, circumcentres);
 			glutAddMenuEntry(FIGURES_EDGES_CRICLES_TEXT, edge_circles);
-			glutAddMenuEntry(FIGURES_VORONOI_TEXT, voronoi);
+			if (service.isDelaunay())
+            {
+                glutAddMenuEntry(FIGURES_VORONOI_TEXT, voronoi);
+            }
 			glutAddMenuEntry(LOCATION_CLOSEST_POINTS_TEXT, closest_point);
 			glutAddMenuEntry(LOCATION_2CLOSEST_POINTS_TEXT, two_closest);
 			glutAddMenuEntry(LOCATION_FIND_FACE_TEXT, find_face);
@@ -182,10 +174,6 @@ void Menu::updateMenu()
 				if (service.isVoronoi())
 				{
 					glutAddMenuEntry(EXPORT_VORONOI_FILE, write_voronoi);
-				}
-				if (service.isGabriel())
-				{
-					glutAddMenuEntry(EXPORT_GABRIEL_FILE, write_gabriel);
 				}
 			}
 		}
@@ -259,7 +247,6 @@ int Menu::createReadMenu()
     glutAddMenuEntry(INPUTSET_READ_STAR_TRIANG_TEXT, read_star_triangulation);
     glutAddMenuEntry(INPUTSET_READ_INCREMENTAL_TEXT, read_delaunay);
     glutAddMenuEntry(INPUTSET_READ_VORONOI_TEXT, read_voronoi);
-    glutAddMenuEntry(INPUTSET_READ_GABRIEL_TEXT, read_gabriel);
 
     return iMenuId;
 }

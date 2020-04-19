@@ -30,12 +30,11 @@ public:
      * @brief               Writes graph to output file in flat format or binary depending on isBinary value
      *
      * @param strFileName   (IN)    File name to write to
-     * @param isBinary      (IN)    Binary format flag
      * @param graph         (IN)    Graph to write to file
      * @return              true if written successfully
      *                      false otherwise
      */
-    static bool write(const string &strFileName, bool isBinary, Graph &graph);
+    static bool write(const string &strFileName, Graph &graph);
 
 
     /**

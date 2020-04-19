@@ -1,5 +1,5 @@
-#ifndef DELAUNAY_DELAUNAYLIB_H
-#define DELAUNAY_DELAUNAYLIB_H
+#ifndef DELAUNAY_FIGURESLIB_H
+#define DELAUNAY_FIGURESLIB_H
 
 
 /***********************************************************************************************************************
@@ -7,37 +7,12 @@
 ***********************************************************************************************************************/
 #include "defines.h"
 #include "Dcel.h"
-#include "Delaunay.h"
-#include "Voronoi.h"
+#include "Point.h"
 
 
 /***********************************************************************************************************************
 * API function declarations
 ***********************************************************************************************************************/
-/**
- * @fn              getStarTriangulation
- * @brief           Returns the dcel associated to a star triangulation
- *
- * @param vPoints   (IN) Set of points
- * @param dcel      (OUT) Star triangulation in DCEL format
- * @return          true if triangulation built successfully
- *                  false otherwise
- */
-bool getStarTriangulation(vector<TYPE> &vPoints, Dcel &dcel);
-
-
-/**
- * @fn              getDelaunay
- * @brief           Returns the dcel associated to a Delaunay triangulation
- *
- * @param vPoints   (IN) Triangulation points
- * @param dcel      (OUT) Delunay triangulation in DCEL format
- * @return          true if triangulation built successfully
- *                  false otherwise
- */
-bool getDelaunay(vector<TYPE> &vPoints, Dcel &dcel);
-
-
 /**
  * @fn              getDelaunay
  * @brief           Returns the dcel associated to a Delaunay triangulation
@@ -62,4 +37,16 @@ bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut);
 bool getConvexHull(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
 
 
-#endif //DELAUNAY_DELAUNAYLIB_H
+/**
+ * @fn                  getGabriel
+ * @brief               Returns the Gabriel graph of a given set of points
+ * @details             The output is an even set of points where every two points is a segment of the Gabriel graph
+ *
+ * @param vPointsIn     (IN) Input set of points
+ * @param vPointsOut    (OUT) Gabriel graph set of points
+ * @return              true if graph built
+ *                      false otherwise
+ */
+bool getGabriel(vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
+
+#endif //DELAUNAY_FIGURESLIB_H
