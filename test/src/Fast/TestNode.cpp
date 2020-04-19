@@ -42,7 +42,8 @@ TEST (NodeUnitTest, Test_Parameterized_Constructor)
 	int iFace=100;
 
     // Create line using default constructor.
-	Node node(iP, iQ, iR, iFace);
+    vector<int> vPoints = {iP, iQ, iR};
+	Node node(vPoints, iFace);
 
 	// Check fields.
     EXPECT_EQ(0, node.getNChildren());
@@ -75,7 +76,8 @@ TEST (NodeUnitTest, Test_Set_Children)
 	Node nodeDefault;
 
     // Create line using default constructor.
-	Node nodeParams(iP, iQ, iR, iFace);
+    vector<int> vPoints = {iP, iQ, iR};
+    Node nodeParams(vPoints, iFace);
 
     // Check both have no children.
     EXPECT_TRUE(nodeDefault.isLeaf());
@@ -133,8 +135,10 @@ TEST (NodeUnitTest, Test_Assignment_Operator)
 	int iFace=100;
 
     // Create line using default constructor.
-	Node node1(iP+1, iQ+1, iR+1, iFace+1);
-	Node node2(iP, iQ, iR, iFace);
+    vector<int> vPoints = {iP+1, iQ+1, iR+1};
+    Node node1(vPoints, iFace + 1);
+    vPoints = {iP, iQ, iR};
+    Node node2(vPoints, iFace);
 
 	// Check fields.
     EXPECT_EQ(node1.getNChildren(), node2.getNChildren());

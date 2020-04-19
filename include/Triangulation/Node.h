@@ -37,30 +37,8 @@ public:
     * Public class methods
     *******************************************************************************************************************/
 	Node() : face(INVALID) {};
-	Node(int p1, int p2, int p3, int face);
-    Node(int p1, int p2, int p3, int iChild1, int iChild2, int iChild3, int faceIn) : face(faceIn)
-    {
-        // Set children
-        vChildren.push_back(iChild1);
-        vChildren.push_back(iChild2);
-        vChildren.push_back(iChild3);
-
-        // Set points
-        vPointsId.push_back(p1);
-        vPointsId.push_back(p2);
-        vPointsId.push_back(p3);
-    };
-    Node(int p1, int p2, int p3, int iChild1, int iChild2, int faceIn) : face(faceIn)
-    {
-        // Set children
-        vChildren.push_back(iChild1);
-        vChildren.push_back(iChild2);
-
-        // Set points
-        vPointsId.push_back(p1);
-        vPointsId.push_back(p2);
-        vPointsId.push_back(p3);
-    };
+	Node(vector<int> &vPointsIn, int faceIn) : vPointsId(vPointsIn), face(faceIn) {};
+    Node(vector<int> &vChildrenIn, vector<int> &vPointsIn, int faceIn) : vChildren(vChildrenIn), vPointsId(vPointsIn), face(faceIn) {};
 
     /*******************************************************************************************************************
     * Getters/Setters
