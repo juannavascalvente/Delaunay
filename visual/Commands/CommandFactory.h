@@ -1,7 +1,3 @@
-//
-// Created by delaunay on 29/3/20.
-//
-
 #ifndef DELAUNAY_COMMANDFACTORY_H
 #define DELAUNAY_COMMANDFACTORY_H
 
@@ -54,7 +50,6 @@ class CommandFactory
     static Command *createReadStar(StoreService *storeService);
     static Command *createReadDelaunay(StoreService *storeService);
     static Command *createReadVoronoi(StoreService *storeService);
-//    static Command *createReadGabriel(StoreService *storeService);
     static Command *createWritePoints(StoreService *storeService);
     static Command *createWriteDcel(StoreService *storeService);
     static Command *createWriteDelaunay(StoreService *storeService);

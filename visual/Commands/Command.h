@@ -12,7 +12,6 @@
 #include "DcelWriter.h"
 #include "DelaunayIO.h"
 #include "VoronoiIO.h"
-#include "GabrielIO.h"
 #include "DcelFigureBuilder.h"
 #include "LineFactory.h"
 #include "PointFactory.h"
@@ -711,7 +710,9 @@ public:
         if (getSuccess())
         {
             // Add delaunay and voronoi
-            vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getDelaunay()->getRefDcel()));
+            Displayable *displayDcel = DisplayableFactory::createDcel(in.getStoreService()->getDelaunay()->getRefDcel());
+            displayDcel->setDashedLines();
+            vDisplayable.push_back(displayDcel);
             vDisplayable.push_back(DisplayableFactory::createDcel(in.getStoreService()->getVoronoi()->getRefDcel()));
         }
 
@@ -783,7 +784,6 @@ public:
             dcelRef = gabriel->getDcel();
 
             // Draw Gabriel edges.
-            // TODO https://github.com/juannavascalvente/Delaunay/issues/60 -> Add dashed lines to highlight results
             for (size_t edgeIndex=0; edgeIndex<gabriel->getSize() ;edgeIndex++)
             {
                 // Check if current edge mamtches Gabriel restriction.s
@@ -822,7 +822,9 @@ public:
         {
             // Add Delaunay and gabriel graph
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            vDisplayable.push_back(DisplayableFactory::createDcel(delaunay->getRefDcel()));
+            Displayable *displayDcel = DisplayableFactory::createDcel(delaunay->getRefDcel());
+            displayDcel->setDashedLines();
+            vDisplayable.push_back(displayDcel);
             vDisplayable.push_back(DisplayableFactory::createPolyLine(vLines));
         }
 
@@ -841,13 +843,14 @@ class CommandTriangulationPath : public Command
     *******************************************************************************************************************/
     Line line;
     vector<Polygon> vPolygons;
+    Dcel *dcel;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandTriangulationPath(StoreService *storeServiceIn) : Command(storeServiceIn) {};
+    explicit CommandTriangulationPath(StoreService *storeServiceIn) : Command(storeServiceIn), dcel(nullptr) {};
 
 
     /**
@@ -856,21 +859,21 @@ public:
      */
     void printRunnableMsg() override
     {
-        cout << "Triangulation must be incremental Delaunay to be able to run find path" << endl;
+        cout << "A triangulation must exits" << endl;
     }
 
 
     /**
      * @fn      isRunnable
-     * @brief   Checks Delaunay triangulation has been created and it as built using incremental algorithm
+     * @brief   Checks a triangulation must exits
      *
      * @return  true if command can be ran
      *          false otherwise
      */
     bool isRunnable() override
     {
-        // Delaunay and Voronoi must exist
-        return in.getStoreService()->isDelaunay();
+        // A triangulation must exits
+        return in.getStoreService()->isDelaunay() || in.getStoreService()->isTriangulation();
     }
 
 
@@ -893,20 +896,37 @@ public:
             line = vLines.at(1);
         }
 
-        // TODO https://github.com/juannavascalvente/Delaunay/issues/61
         // Compute triangles path between two points.
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
         vector<int> vFacesId;
         Point<TYPE> p = line.getOrigin();
         Point<TYPE> q = line.getDest();
-        bool isRunSuccess = delaunay->findPath(p, q, vFacesId);
+
+//        cout << fixed;
+//        cout.precision(6);
+//        cout << p << endl;
+//        cout << q << endl;
+
+        // Check what triangulation is active
+        bool isRunSuccess;
+        if (in.getStoreService()->isDelaunay())
+        {
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
+            isRunSuccess = delaunay->findPath(p, q, vFacesId);
+            dcel = delaunay->getRefDcel();
+        }
+        else
+        {
+            StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
+            isRunSuccess = triangulation->findPath(p, q, vFacesId);
+            dcel = triangulation->getRefDcel();
+        }
 
         if (isRunSuccess)
         {
             for (auto face : vFacesId)
             {
                 vector<Point<TYPE>> vFacesPoints;
-                DcelFigureBuilder::getFacePoints(face, *delaunay->getRefDcel(), vFacesPoints);
+                DcelFigureBuilder::getFacePoints(face, *dcel, vFacesPoints);
 
                 Polygon polygon;
                 for (auto point : vFacesPoints)
@@ -934,8 +954,6 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            Dcel *dcel = delaunay->getRefDcel();
             Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayables.push_back(dispDelaunay);
 
@@ -993,7 +1011,6 @@ public:
     bool isRunnable() override
     {
         // Delaunay and Voronoi must exist
-        // TODO https://github.com/juannavascalvente/Delaunay/issues/10
         return in.getStoreService()->isVoronoi();
     }
 
@@ -1153,7 +1170,6 @@ public:
 
         // Find closest point
         int	pointIndex=0;	// Index of the closest point.
-        double distance;
 
         // Check if Delaunay triangulation computed.
         bool isRunSuccess;
@@ -1228,36 +1244,37 @@ class CommandFindFace : public Command
     *******************************************************************************************************************/
     vector<Point<TYPE>> vPoints;
     vector<Polygon> vPolygons;
+    Dcel *dcel;
 
 public:
 
     /*******************************************************************************************************************
     * Public class methods
     *******************************************************************************************************************/
-    explicit CommandFindFace(StoreService *storeServiceIn) : Command(storeServiceIn) {};
+    explicit CommandFindFace(StoreService *storeServiceIn) : Command(storeServiceIn), dcel(nullptr) {};
 
 
     /**
      * @fn       printRunnableMsg
-     * @brief    Prints message to explain that Incremental Delaunay must exist
+     * @brief    Prints message to explain that triangulation path can be only computed using incremental Delaunay
      */
     void printRunnableMsg() override
     {
-        cout << "Incremental Delaunay must exist to find face" << endl;
+        cout << "A triangulation must exits" << endl;
     }
 
 
     /**
      * @fn      isRunnable
-     * @brief   Find path can only be executed if Delaunay incremental has been computed
+     * @brief   Checks a triangulation must exits
      *
      * @return  true if command can be ran
      *          false otherwise
      */
     bool isRunnable() override
     {
-        // Triangulation must exist
-        return in.getStoreService()->isDelaunay();
+        // A triangulation must exits
+        return in.getStoreService()->isDelaunay() || in.getStoreService()->isTriangulation();
     }
 
 
@@ -1277,33 +1294,43 @@ public:
         PointFactory::readFromConfig(point);
 
         // Find face.
-        bool isRunSuccess=false;
-        Delaunay *delaunay = in.getStoreService()->getDelaunay();
+        bool isRunSuccess;
         if (in.getStoreService()->isDelaunay())
         {
+            Delaunay *delaunay = in.getStoreService()->getDelaunay();
             isRunSuccess = delaunay->findFace(point, faceId);
+            dcel = delaunay->getRefDcel();
         }
         else
         {
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
-            this->isSuccess = triangulation->findFace(point, faceId);
+            isRunSuccess = triangulation->findFace(point, faceId);
+            dcel = triangulation->getRefDcel();
         }
 
         // Add point to locate
         vPoints.push_back(point);
 
         // Add face if it is not imaginary
-        if (isRunSuccess && (faceId != EXTERNAL_FACE))
+        vPolygons.clear();
+        if (isRunSuccess)
         {
-            vector<Point<TYPE>> vFacesPoints;
-            DcelFigureBuilder::getFacePoints(faceId, *delaunay->getRefDcel(), vFacesPoints);
-
-            Polygon polygon;
-            for (auto item : vFacesPoints)
+            if (faceId != EXTERNAL_FACE)
             {
-                polygon.add(item);
+                vector<Point<TYPE>> vFacesPoints;
+                DcelFigureBuilder::getFacePoints(faceId, *dcel, vFacesPoints);
+
+                Polygon polygon;
+                for (auto item : vFacesPoints)
+                {
+                    polygon.add(item);
+                }
+                vPolygons.push_back(polygon);
             }
-            vPolygons.push_back(polygon);
+            else
+            {
+                cout << "Poins is external to convex hull" << endl;
+            }
         }
 
         // Build result
@@ -1323,8 +1350,7 @@ public:
         if (getSuccess())
         {
             // Add Delaunay triangulation
-            Delaunay *delaunay = in.getStoreService()->getDelaunay();
-            Displayable *dispDelaunay = DisplayableFactory::createDcel(delaunay->getRefDcel());
+            Displayable *dispDelaunay = DisplayableFactory::createDcel(dcel);
             vDisplayable.push_back(dispDelaunay);
 
             // Add points (point to locate and closest point)
@@ -1844,7 +1870,14 @@ public:
     *******************************************************************************************************************/
     explicit CommandDcelInfo(StoreService *storeServiceIn) : Command(storeServiceIn)
     {
-        dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        if (in.getStoreService()->isDelaunay())
+        {
+            dcel = in.getStoreService()->getDelaunay()->getRefDcel();
+        }
+        else
+        {
+            dcel = in.getStoreService()->getStarTriang()->getRefDcel();
+        }
     };
 
 
@@ -1868,7 +1901,7 @@ public:
     bool isRunnable() override
     {
         // Triangulation must exist
-        return in.getStoreService()->isTriangulation();
+        return in.getStoreService()->isTriangulation() || in.getStoreService()->isDelaunay();
     }
 
     /**
@@ -2011,7 +2044,7 @@ public:
         in.getStoreService()->reset();
 
         // Run command
-        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), false, vPoints);
+        this->isSuccess = PointsReader::read(Config::getInFlatFilename(), vPoints);
 
         if (this->isSuccess)
         {
@@ -2065,7 +2098,7 @@ public:
 
         // Run command
         auto *t = new StarTriangulation();
-        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), false, *t->getRefDcel());
+        this->isSuccess = DcelReader::read(Config::getInDCELFilename(), *t->getRefDcel());
         if (this->isSuccess)
         {
             in.getStoreService()->save(*t);
@@ -2313,7 +2346,7 @@ public:
         }
 
         // Write dcel to file
-        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel, false);
+        this->isSuccess = DcelWriter::write(Config::getOutDCELFilename(), *dcel);
 
         // Build result
         return createResult();
@@ -2382,35 +2415,6 @@ public:
 
         // Build result
         setIsSuccess(isSuccess);
-        return createResult();
-    }
-};
-
-
-/***********************************************************************************************************************
-* Class declaration
-***********************************************************************************************************************/
-class CommandWriteGabriel : public CommandWriteFile
-{
-public:
-    /*******************************************************************************************************************
-    * Public class methods
-    *******************************************************************************************************************/
-    explicit CommandWriteGabriel(StoreService *storeServiceIn) : CommandWriteFile(storeServiceIn) {};
-
-    /**
-     * @fn      run
-     * @brief   Write Delaunay to file
-     *
-     * @return  true built was successfully
-     *          false otherwise
-     */
-    CommandResult* runCommand() override
-    {
-        // Write dcel to file
-        this->isSuccess = GabrielIO::writeBinary(Config::getOutGabrielFilename(), *getInput()->getStoreService()->getGabriel());
-
-        // Build result
         return createResult();
     }
 };

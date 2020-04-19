@@ -202,12 +202,6 @@ Command *CommandFactory::createReadVoronoi(StoreService *storeService)
     return new CommandReadVoronoi(storeService);
 }
 
-//Command *CommandFactory::createReadGabriel(StoreService *storeService)
-//{
-//    // Create command
-//    return new CommandClear(storeService);
-//}
-
 Command *CommandFactory::createWritePoints(StoreService *storeService)
 {
     // Create command
@@ -230,12 +224,6 @@ Command *CommandFactory::createWriteVoronoi(StoreService *storeService)
 {
     // Create command
     return new CommandWriteVoronoi(storeService);
-}
-
-Command *CommandFactory::createWriteGabriel(StoreService *storeService)
-{
-    // Create command
-    return new CommandWriteGabriel(storeService);
 }
 
 void CommandFactory::initialize()
@@ -265,10 +253,8 @@ void CommandFactory::initialize()
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_star_triangulation, CommandFactory::createReadStar));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_delaunay, CommandFactory::createReadDelaunay));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_voronoi, CommandFactory::createReadVoronoi));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(read_gabriel, CommandFactory::createNull));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_points, CommandFactory::createWritePoints));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_triangulation, CommandFactory::createWriteDcel));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_delaunay, CommandFactory::createWriteDelaunay));
     mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_voronoi, CommandFactory::createWriteVoronoi));
-    mapFactories.insert(std::pair<int, pfuncCommandCreate>(write_gabriel, CommandFactory::createWriteGabriel));
 }

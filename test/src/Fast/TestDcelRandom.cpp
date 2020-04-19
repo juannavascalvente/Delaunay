@@ -38,7 +38,7 @@ namespace
         // You can remove any or all of the following functions if its body
         // is empty.
         // Constructor (called before each test case) - SetUp
-        TestDcelRandom()
+        TestDcelRandom() : szTestCnt(0)
         {
             // Initialize data.
             strFolders[0] = "/home/delaunay/Projects/Git/Delaunay/tmp/output/Random/NumSamples_10/";
@@ -47,9 +47,7 @@ namespace
         }
 
         // Deconstructor (called after each test case) - TearDown
-        ~TestDcelRandom() override
-        {
-        }
+        ~TestDcelRandom() override = default;
 
         void SetUp() override
         {

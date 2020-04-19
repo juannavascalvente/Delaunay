@@ -19,7 +19,7 @@ void VoronoiIO::print(const Voronoi &voronoi, std::ostream &out)
 bool VoronoiIO::read(const string &strFileName, Voronoi &voronoi)
 {
     // Read voronoi DCEL file.
-    bool isSuccess = DcelReader::read(strFileName, false, voronoi.dcel);
+    bool isSuccess = DcelReader::read(strFileName, voronoi.dcel);
     voronoi.setValid(isSuccess);
 
     return isSuccess;
@@ -28,7 +28,7 @@ bool VoronoiIO::read(const string &strFileName, Voronoi &voronoi)
 
 bool VoronoiIO::write(const string &strFileName, const Voronoi &voronoi)
 {
-    bool isSuccess = DcelWriter::write(strFileName, voronoi.dcel, false);
+    bool isSuccess = DcelWriter::write(strFileName, voronoi.dcel);
 
     return isSuccess;
 }

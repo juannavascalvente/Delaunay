@@ -21,28 +21,28 @@
 
 // Trigonometric defines.
 #ifndef PI
-#define PI         				3.1415926535
+#define PI         				(3.1415926535)
 #endif
 
-#define FAILURE     			0
-#define SUCCESS     			1
+#define FAILURE     			(0)
+#define SUCCESS     			(1)
 
 // Validity defines.
-#define VALID       			1
-#define INVALID     			-1
+#define VALID       			(1)
+#define INVALID     			(-1)
 
-#define DELTA_DIFF  			0.05
+#define DELTA_DIFF  			(0.05)
 
 // Imaginary points.
-#define     P_MINUS_1           -1
-#define     P_MINUS_2           -2
+#define     P_MINUS_1           (-1)
+#define     P_MINUS_2           (-2)
 
 // File name max length.
 #ifndef FILENAME_MAX
-#define FILENAME_MAX			200
+#define FILENAME_MAX			(200)
 #endif
 
-#define FLOAT_TYPE
+//#define FLOAT_TYPE
 #ifdef FLOAT_TYPE
 #define TYPE					float
 #else
@@ -53,9 +53,9 @@
 #define POINT_T					TYPE
 
 // Define Kilobyte size.
-#define SIZE_OF_KB				1024.0
+#define SIZE_OF_KB				(1024.0)
 
-#define NPOINTS_TRIANGLE		3
-#define DEFAUTL_CONVEXHULL_LEN	20
+#define NPOINTS_TRIANGLE		(3)
+#define DEFAUTL_CONVEXHULL_LEN	(20)
 
 #endif

@@ -14,6 +14,7 @@
 ***********************************************************************************************************************/
 #define 	EXTERNAL_FACE       	(0)
 #define     NO_UPDATE           	(-1)
+#define     FACE_MIN_NUM_POINTS   	(3)
 
 
 /***********************************************************************************************************************
@@ -38,6 +39,11 @@ public:
     DcelModel() = default;
     explicit DcelModel(vector<Point<TYPE>> &v)
     {
+        if (v.size() < FACE_MIN_NUM_POINTS)
+        {
+            throw std::runtime_error(&"Minimum number of points to create a Dcel must be " [ FACE_MIN_NUM_POINTS]);
+        }
+
         for (auto point : v)
         {
             Vertex vertex(INVALID, point);
@@ -112,11 +118,9 @@ public:
      * @brief               Get points coordinates of a given face
      *
      * @param faceIndex     (IN)    Face whose points are returned
-     * @param p             (OUT)   Point 1
-     * @param q             (OUT)   Point 2
-     * @param r             (OUT)   Point 3
+     * @param vPoints       (OUT)   Points in face
      */
-    void getFacePoints(int faceIndex, Point<TYPE> &p, Point<TYPE> &q, Point<TYPE> &r);
+    void getFacePoints(int faceIndex, vector<Point<TYPE>> &vPoints);
 
     /**
      * @fn              ==

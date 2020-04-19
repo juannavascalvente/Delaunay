@@ -1,72 +1,56 @@
-/*
- * Node.h
- *
- *  Created on: Jul 11, 2016
- *      Author: jnavas
- */
-
 #ifndef INCLUDE_NODE_H_
 #define INCLUDE_NODE_H_
 
-#include <iostream>
-#include <string>
+/***********************************************************************************************************************
+* Includes
+***********************************************************************************************************************/
+#include "defines.h"
+
+#include <vector>
 using namespace std;
 
-//----------------------------------------------------------------------------
-// PUBLIC defines
-//----------------------------------------------------------------------------
-#define ZERO 			0
+
+/***********************************************************************************************************************
+* Defines
+***********************************************************************************************************************/
 #define TWO 			2
-#define THREE 			3
 #define MAX_CHILDREN	3
 #define NODE_POINTS		3
 
-//****************************************************************************
-//                           	NODE CLASS
-//****************************************************************************
+
+/***********************************************************************************************************************
+* Class declaration
+***********************************************************************************************************************/
 class Node
 {
-	//------------------------------------------------------------------------
-	// Attributes
-	//------------------------------------------------------------------------
-	int nChildren;					// # children.
-	int children[MAX_CHILDREN];		// Children identifiers.
-	int	points[NODE_POINTS];		// Points indexes.
+    /*******************************************************************************************************************
+    * Class members
+    *******************************************************************************************************************/
+    vector<int> vChildren;          // Children nodes IDs
+    vector<int> vPointsId;          // Node points IDs
 	int	face;						// Face id.
 
+	friend class NodeIO;
 public:
-	//------------------------------------------------------------------------
-	// Constructor/Destructor
-	//------------------------------------------------------------------------
-	Node(void);
-	Node(int p1, int p2, int p3, int face);
 
-	//------------------------------------------------------------------------
-	// Public functions.
-	//------------------------------------------------------------------------
-	// GET/SET functions.
-	inline int getNChildren(void) { return(this->nChildren); };
-	inline int getiChild(int index) { return(this->children[index]); };
-	inline int getiPoint(int index) { return(this->points[index]); };
-	inline int getFace(void) { return(this->face); };
-	inline void setChildren(int id1, int id2) { this->children[0] = id1;
-												 this->children[1] = id2;
-												 this->nChildren = 2; };
-	inline void setChildren(int id1, int id2, int id3) { this->children[0] = id1;
-														  this->children[1] = id2;
-														  this->children[2] = id3;
-														  this->nChildren = 3; };
-	inline bool isLeaf(void) { return(getNChildren() == ZERO); };
-	inline bool splitted(void) { return(getNChildren() == TWO); };
+    /*******************************************************************************************************************
+    * Public class methods
+    *******************************************************************************************************************/
+	Node() : face(INVALID) {};
+	Node(vector<int> &vPointsIn, int faceIn) : vPointsId(vPointsIn), face(faceIn) {};
+    Node(vector<int> &vChildrenIn, vector<int> &vPointsIn, int faceIn) : vChildren(vChildrenIn), vPointsId(vPointsIn), face(faceIn) {};
 
-	// I/O functions.
-	void print(std::ostream& out);
-	void read(std::istream& in);
-	void write(std::ostream& out);
-	string toStr(void);
-
-	// Overload operators.
-	Node& operator=( const Node& other );
+    /*******************************************************************************************************************
+    * Getters/Setters
+    *******************************************************************************************************************/
+	inline int getNChildren() { return vChildren.size(); };
+	inline int getFace() { return(this->face); };
+	inline bool isLeaf() { return vChildren.empty(); };
+	inline bool isSplitted() { return (getNChildren() == TWO); };
+    int getiChild(int index);
+    int getiPoint(int index);
+    void setChildren(int id1, int id2);
+    void setChildren(int id1, int id2, int id3);
 };
 
 #endif /* INCLUDE_NODE_H_ */

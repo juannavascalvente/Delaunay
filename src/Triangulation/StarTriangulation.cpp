@@ -1,13 +1,14 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include <cfloat>
-
 #include "Circle.h"
 #include "defines.h"
 #include "Logging.h"
 #include "Stack.h"
 #include "StarTriangulation.h"
+
+#include <cfloat>
+#include <queue>
 
 
 /***********************************************************************************************************************
@@ -38,48 +39,37 @@ struct ConvexPoint
 bool StarTriangulation::convexHull()
 {
     bool    isHullBuilt=false;
-	int	 	index=0;			// Array index.
-	int	 	first_Index=0;		// Index of first edge.
-	Point<TYPE> *point;			// Current vertex.
-	Edge 	*currentEdge;		// Current edge.
-	Face 	*face;				// Current face.
 
 	try
 	{
 		// Get outer face.
-		face = this->dcel.getRefFace(0);
+        Face *face = this->dcel.getRefFace(0);
 
 		// Get index of first edge.
-		index = face->getEdge() - 1;
-		first_Index = index;
+        int iCurrentIdx = face->getEdge() - 1;
+        int iFirstIdx = iCurrentIdx;
 
 		// Loop convex hull points.
 		this->hull.reset();
+
+        Point<TYPE> *point;			// Current point
+        Edge 	*currentEdge;		// Current edge
 		while (!isHullBuilt)
 		{
 			// Get edge info.
-			currentEdge = this->dcel.getRefEdge(index);
+			currentEdge = this->dcel.getRefEdge(iCurrentIdx);
 
 			// Get origin of current edge.
 			point = this->dcel.getRefPoint(currentEdge->getOrigin()-1);
-#ifdef DEBUG_TRIANGULATION_CONVEX_HULL
-			Logging::buildText(__FUNCTION__, __FILE__, "Point to add to convex hull: ");
-			Logging::buildText(__FUNCTION__, __FILE__, currentEdge->getOrigin());
-			Logging::write(true);
-#endif
 
 			// Insert next point.
-			this->hull.add(*point);
+			this->hull.add(*point, iCurrentIdx + 1);
 
 			// Get next edge.
-			index = currentEdge->getNext()-1;
-			if (index == first_Index)
+			iCurrentIdx = currentEdge->getNext() - 1;
+			if (iCurrentIdx == iFirstIdx)
 			{
                 isHullBuilt = true;
-#ifdef DEBUG_TRIANGULATION_CONVEX_HULL
-				Logging::buildText(__FUNCTION__, __FILE__, "Convex hull computed.");
-				Logging::write(true);
-#endif
 			}
 		}
 	}
@@ -125,6 +115,276 @@ bool StarTriangulation::findTwoClosest(Point<TYPE> &p, Point<TYPE> &q)
 	}
 
 	return found;
+}
+
+
+bool StarTriangulation::findFace(Point<TYPE> &point, int &faceId)
+{
+    bool isSuccess=false;           // Return value
+
+    // Get edge from a random point
+    int iIdx=(int) drand48();
+    iIdx %= dcel.getNumVertex();
+
+    // Get point face
+    int iEdgeIdx = dcel.getPointEdge(iIdx) - 1;
+    faceId = dcel.getFace(iEdgeIdx);
+
+    // Get face centroid (face is a triangle)
+    vector<Point<TYPE>> vPoints;
+    dcel.getFacePoints(faceId, vPoints);
+    Polygon triangle(vPoints);
+    Point<TYPE> centre;
+    triangle.centroid(centre);
+
+    // Compute line between face centroid and point to locate
+    Line l (point, centre);
+
+    bool isFinished=false;
+    do
+    {
+        // Get edge face
+        faceId = dcel.getFace(iEdgeIdx);
+
+        // Check if point is interior to current face
+        if (dcel.isInsideFace(point, faceId))
+        {
+            // Face found
+            isFinished = true;
+            isSuccess = true;
+        }
+        // Move to adjacent face
+        else
+        {
+            // Point is out of convex hull
+            if (faceId == EXTERNAL_FACE)
+            {
+                isFinished = true;
+                isSuccess = true;
+            }
+            else
+            {
+                // Find out what edge intersects line between face centre and target point
+                queue<int> qEdgesId;
+                if (dcel.getEdgeIntersection(l, faceId, qEdgesId))
+                {
+                    // If two edges intersect line -> remove the one that is equal to previous edge index
+                    if (qEdgesId.size() == 2)
+                    {
+                        if ((qEdgesId.front()-1) == iEdgeIdx)
+                        {
+                            qEdgesId.pop();
+                        }
+                    }
+
+                    // Get edge that intersects
+                    iEdgeIdx = qEdgesId.front() - 1;
+                    qEdgesId.pop();
+
+                    // Get twin edge to move to next face in next iteration
+                    iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
+                }
+                else
+                {
+                    isFinished = true;
+                    isSuccess = false;
+                    cout << "Error finding face in Star triangulation. No face found" << endl;
+                }
+            }
+        }
+
+    } while (!isFinished);
+
+    return isSuccess;
+}
+
+
+/**
+ * @fn    getConvexFacesIntersections
+ * @brief Get faces and edge in convex hull that intersects input line
+ *
+ * @param line      (IN) Line to check
+ * @param vFaces    (OUT) Faces in convex hull that intersect line
+ * @param vEdges    (OUT) Edges in convex hull that intersect line
+ */
+void StarTriangulation::getConvexFacesIntersections(Line &line, vector<int> &vFaces, vector<int> &vEdges)
+{
+    // Initialize output
+    vFaces.clear();
+
+    // Get convex hull edges
+    vector<int> vConvexEdges;
+    hull.getConvexHullEdges(vConvexEdges);
+
+    Point<TYPE> o;
+    Point<TYPE> d;
+    for (auto edgeId : vConvexEdges)
+    {
+        // Get edge extreme points
+        dcel.getEdgePoints(edgeId - 1, o, d);
+
+        // Build edge line
+        Line l(o, d);
+
+        // If line intersects -> add face
+        if (line.intersect(l))
+        {
+            int iTwinEdge = dcel.getTwin(edgeId - 1);
+            vFaces.push_back(dcel.getFace(iTwinEdge - 1));
+            vEdges.push_back(edgeId);
+        }
+    }
+}
+
+
+bool StarTriangulation::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFacesId)
+{
+    bool isSuccess=false;           // Return value
+
+    // Initialize output
+    vFacesId.clear();
+
+    // Set origin point as starting point of the path
+    Point<TYPE> startPoint = origin;
+
+    // Compute convex hull if not already computed
+    if (!isConvexHullComputed())
+    {
+        convexHull();
+    }
+
+    // Get convex hull
+    auto *polygon = new Polygon();
+    getConvexHull(*polygon);
+
+    // Check if origin and destination are internal to convex hull
+    bool isOriginInterior = polygon->isInternal(origin);
+
+    int faceId=0;
+    int iEdgeIdx=0;
+
+    // Check if origin point is not interior -> get first face in convex hull
+    bool isFaceFound=true;
+    if (!isOriginInterior)
+    {
+        // Get faces that intersect line
+        Line line(origin, dest);
+        vector<int> vFaces;
+        vector<int> vEdges;
+        getConvexFacesIntersections(line, vFaces, vEdges);
+
+        // If line intersect twice convex hull -> Select closest face.
+        if (vFaces.size() == 2)
+        {
+            // Get origin point for edges
+            Point<TYPE> *p1 = dcel.getRefPoint(dcel.getOrigin(vEdges.at(0) - 1) - 1);
+            Point<TYPE> *p2 = dcel.getRefPoint(dcel.getOrigin(vEdges.at(1) - 1) - 1);
+
+            // Closest point to origin line point is the face that must be used as starting point
+            TYPE distanceOrigin = origin.distance(*p1);
+            TYPE distanceDestination = origin.distance(*p2);
+            if (distanceOrigin < distanceDestination)
+            {
+                faceId = vFaces.at(0);
+                iEdgeIdx = vEdges.at(0) - 1;
+                iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
+            }
+            else
+            {
+                faceId = vFaces.at(1);
+                iEdgeIdx = vEdges.at(1) - 1;
+                iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
+            }
+        }
+        // Line intersects convex hull once -> select that face
+        else if (vFaces.size() == 1)
+        {
+            faceId = vFaces.at(0);
+            iEdgeIdx = vEdges.at(0) - 1;
+            iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
+        }
+        // No intersection between convex hull and line between input points -> both are external to convex hull
+        else
+        {
+            isFaceFound = false;
+        }
+    }
+    // Origin point is interior -> find origin point face
+    else
+    {
+        findFace(startPoint, faceId);
+        iEdgeIdx = dcel.getFaceEdge(faceId) - 1;
+    }
+
+    // Line between points and set of points do not intersect -> there is no faces path
+    if (!isFaceFound)
+    {
+        return true;
+    }
+
+    // Compute line between start and destination points
+    Line l (startPoint, dest);
+
+    bool isFinished=false;
+    do
+    {
+        // Check if point is interior to current face
+        if (dcel.isInsideFace(dest, faceId))
+        {
+            // Add last face and finish
+            isFinished = true;
+            isSuccess = true;
+            vFacesId.push_back(faceId);
+        }
+        // Move to adjacent face
+        else
+        {
+            // Point is out of convex hull
+            if (faceId == EXTERNAL_FACE)
+            {
+                isFinished = true;
+                isSuccess = true;
+            }
+            else
+            {
+                // Find out what edge in current face intersects line between origin and end points
+                queue<int> qEdgesId;
+                if (dcel.getEdgeIntersection(l, faceId, qEdgesId))
+                {
+                    // If two edges intersect line -> remove the one that is equal to previous edge index
+                    if (qEdgesId.size() == 2)
+                    {
+                        if ((qEdgesId.front()-1) == iEdgeIdx)
+                        {
+                            qEdgesId.pop();
+                        }
+                    }
+
+                    // Add face
+                    vFacesId.push_back(faceId);
+
+                    // Get edge that intersects
+                    iEdgeIdx = qEdgesId.front() - 1;
+                    qEdgesId.pop();
+
+                    // Get twin edge to move to next face in next iteration
+                    iEdgeIdx = dcel.getTwin(iEdgeIdx) - 1;
+
+                    // Get next face
+                    faceId = dcel.getFace(iEdgeIdx);
+                }
+                else
+                {
+                    isFinished = true;
+                    isSuccess = false;
+                    cout << "Error finding face in Star triangulation. No face found" << endl;
+                }
+            }
+        }
+
+    } while (!isFinished);
+
+    return isSuccess;
 }
 
 

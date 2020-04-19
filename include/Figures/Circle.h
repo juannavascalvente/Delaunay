@@ -14,7 +14,7 @@ using namespace std;
 /***********************************************************************************************************************
 * Defines
 ***********************************************************************************************************************/
-//#define NUM_POINTS_IN_CIRCLE            (3)
+#define NUM_POINTS_IN_CIRCLE            (3)
 
 
 /***********************************************************************************************************************
@@ -40,10 +40,15 @@ public:
     * Public class methods
     *******************************************************************************************************************/
 	Circle(Point<TYPE> *centre, TYPE radius);
-	// TODO Circle must contain only 3 elements in vector: https://github.com/juannavascalvente/Delaunay/issues/58
 	explicit Circle(vector<Point<TYPE>> &vPointsIn) : vPoints(vPointsIn)
     {
-        // Initialize fields.
+	    // Check exactly 3 points are used to create circle
+	    if (vPointsIn.size() != NUM_POINTS_IN_CIRCLE)
+        {
+            throw std::runtime_error("Circle must be created using exactly 3 points\n");
+        }
+
+        // Initialize fields
         computeCentre();
         this->radius = this->centre.distance(vPointsIn.at(0));
     };
