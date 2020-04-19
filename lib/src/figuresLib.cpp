@@ -4,7 +4,7 @@
 #include "figuresLib.h"
 #include "Delaunay.h"
 #include "Gabriel.h"
-#include "Voronoi.h"
+#include "VoronoiFactory.h"
 
 
 /***********************************************************************************************************************
@@ -16,29 +16,16 @@ bool getVoronoi(vector<Point<TYPE>> &vPoints, Dcel &dcelOut)
 
     try
     {
-        // Create Delaunay
-        auto *delaunay = new Delaunay(vPoints);
-
-        // Build Delaunay using incremental algorithm
-        if (delaunay->build())
+        // Create Voronoi diagram
+        auto *voronoi = VoronoiFactory::create(vPoints, isSuccess);
+        if (isSuccess)
         {
-            // Create Voronoi
-            auto *voronoi = new Voronoi(delaunay->getRefDcel());
-
-            // Compute Voronoi diagram.
-            if (voronoi->build())
-            {
-                // Copy Voronoi Dcel
-                dcelOut = *voronoi->getRefDcel();
-
-                isSuccess = true;
-            }
-
-            delete voronoi;
+            // Copy Voronoi Dcel
+            dcelOut = *voronoi->getRefDcel();
         }
 
         // Free resources
-        delete delaunay;
+        delete voronoi;
     }
     catch (std::bad_alloc& ba)
     {
