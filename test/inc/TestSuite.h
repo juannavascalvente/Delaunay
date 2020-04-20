@@ -14,9 +14,10 @@
 ***********************************************************************************************************************/
 #define NUM_POINTS_3                (3)
 #define NUM_POINTS_10               (10)
-#define NUM_POINTS_1000             (1000)
-#define NUM_POINTS_10000            (10000)
-#define NUM_POINTS_100000           (100000)
+#define NUM_POINTS_1K               (1000)
+#define NUM_POINTS_10K              (10000)
+#define NUM_POINTS_100K             (100000)
+#define NUM_POINTS_1M               (1000000)
 
 #define NUM_ITERATIONS_10           (10)
 #define NUM_ITERATIONS_100          (100)

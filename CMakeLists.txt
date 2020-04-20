@@ -50,6 +50,7 @@ file(GLOB DELAUNAY_VISUAL_SRC_FILES
         ${BUILD_PATH}/test/src/Api/*.cpp
         ${BUILD_PATH}/test/src/Equivalence/*.cpp
         ${BUILD_PATH}/test/src/Fast/*.cpp
+        ${BUILD_PATH}/test/src/Profiling/*.cpp
         ${BUILD_PATH}/test/src/Integration/*.cpp
         ${BUILD_PATH}/test/src/*.cpp
         ${BUILD_PATH}/visual/*.cpp

@@ -15,9 +15,9 @@ using namespace std;
 /***********************************************************************************************************************
 * Defines
 ***********************************************************************************************************************/
-#define NUM_POINTS_1000            (1000)
-#define NUM_POINTS_10000           (10000)
-#define NUM_POINTS_100000          (100000)
+#define NUM_POINTS_1K            (1000)
+#define NUM_POINTS_10K           (10000)
+#define NUM_POINTS_100K          (100000)
 
 #define NUM_ITERATIONS_10          (10)
 #define NUM_ITERATIONS_100         (100)
@@ -99,7 +99,7 @@ namespace
  */
 TEST_F(TestConvexHull_Equivalence, Test_Num_Samples_100000_Iter_1000)
 {
-    executeSubtest(NUM_POINTS_100000, NUM_ITERATIONS_1000);
+    executeSubtest(NUM_POINTS_100K, NUM_ITERATIONS_1000);
 }
 
 
@@ -109,7 +109,7 @@ TEST_F(TestConvexHull_Equivalence, Test_Num_Samples_100000_Iter_1000)
  */
 TEST_F(TestConvexHull_Equivalence, Test_Num_Samples_10000_Iter_100)
 {
-    executeSubtest(NUM_POINTS_10000, NUM_ITERATIONS_100);
+    executeSubtest(NUM_POINTS_10K, NUM_ITERATIONS_100);
 }
 
 
@@ -119,5 +119,5 @@ TEST_F(TestConvexHull_Equivalence, Test_Num_Samples_10000_Iter_100)
  */
 TEST_F(TestConvexHull_Equivalence, Test_Num_Samples_1000_Iter_10)
 {
-    executeSubtest(NUM_POINTS_1000, NUM_ITERATIONS_10);
+    executeSubtest(NUM_POINTS_1K, NUM_ITERATIONS_10);
 }
