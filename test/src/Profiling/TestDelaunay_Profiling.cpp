@@ -23,20 +23,28 @@ namespace
     public:
 
         /**
-         * @fn      executeTwice
+         * @fn      execute
          * @brief   Generates a set of random points and computes the Delaunay triangulations using that set of points.
          *          The number of points is defined by szNumPoints and it is executed szNumIterations times
          *
          * @param   szNumPoints         (IN) Points set number of points
          * @param   szNumIterations     (IN) Number of times the triangulation is computed
          */
-        static void executeTwice(size_t szNumPoints, size_t szNumIterations, string strFileName);
+        static void execute(size_t szNumPoints, size_t szNumIterations, string strFileName);
 
+        /**
+         * @fn      writeReport
+         * @brief   Writes a report to a file. The report contains one execution time per line and the last two lines
+         *          are total and average tim
+         *
+         * @param   strFileName     (IN) Output file name
+         * @param   vTimes          (IN) Vector that contains execution times
+         */
         static void writeReport(const string& strFileName, const vector<std::chrono::duration<double>>& vTimes);
     };
 
 
-    void TestDelaunay_Profiling::executeTwice(size_t szNumPoints, size_t szNumIterations, string strFileName)
+    void TestDelaunay_Profiling::execute(size_t szNumPoints, size_t szNumIterations, string strFileName)
     {
         vector<std::chrono::duration<double>> vTimes;
 
@@ -93,18 +101,50 @@ namespace
 
 
 /**
- * @brief   Computes Delaunay triangulation using different subset of points (range from 1K to 1M. Each one is executed
- *          100 times and the average is computed
+* @brief   Computes Delaunay triangulation 100 times using 1K points and writes a report
  */
-TEST_F(TestDelaunay_Profiling, Test_Delaunay)
+TEST_F(TestDelaunay_Profiling, Test_Delaunay_1K_100)
 {
+    string strFileName="Delaunay_1K_100.txt";
     vector<std::chrono::duration<double>> vTimes;
-    executeTwice(NUM_POINTS_1K, NUM_ITERATIONS_10, "Delaunay_1K_100.txt");
-    cout << "Delaunay_1K_100.txt...Done" << endl;
-    executeTwice(NUM_POINTS_10K, NUM_ITERATIONS_100, "Delaunay_10K_100.txt");
-    cout << "Delaunay_10K_100.txt...Done" << endl;
-    executeTwice(NUM_POINTS_100K, NUM_ITERATIONS_100, "Delaunay_100K_100.txt");
-    cout << "Delaunay_100K_100.txt...Done" << endl;
-    executeTwice(NUM_POINTS_1M, NUM_ITERATIONS_100, "Delaunay_1M_100.txt");
-    cout << "Delaunay_1M_100.txt...Done" << endl;
+    cout << strFileName << "..." << endl;
+    execute(NUM_POINTS_1K, NUM_ITERATIONS_10, strFileName);
+    cout << strFileName << "...Done" << endl;
 }
+
+/**
+ * @brief   Computes Delaunay triangulation 100 times using 10K points and writes a report
+ */
+TEST_F(TestDelaunay_Profiling, Test_Delaunay_10K_100)
+{
+    string strFileName="Delaunay_10K_100.txt";
+    vector<std::chrono::duration<double>> vTimes;
+    cout << strFileName << "..." << endl;
+    execute(NUM_POINTS_10K, NUM_ITERATIONS_10, strFileName);
+    cout << strFileName << "...Done" << endl;
+}
+
+/**
+* @brief   Computes Delaunay triangulation 100 times using 100K points and writes a report
+ */
+TEST_F(TestDelaunay_Profiling, Test_Delaunay_100K_100)
+{
+    string strFileName="Delaunay_100K_100.txt";
+    vector<std::chrono::duration<double>> vTimes;
+    cout << strFileName << "..." << endl;
+    execute(NUM_POINTS_100K, NUM_ITERATIONS_10, strFileName);
+    cout << strFileName << "...Done" << endl;
+}
+
+/**
+* @brief   Computes Delaunay triangulation 100 times using 1M points and writes a report
+ */
+TEST_F(TestDelaunay_Profiling, Test_Delaunay_1M_100)
+{
+    string strFileName="Delaunay_1M_100.txt";
+    vector<std::chrono::duration<double>> vTimes;
+    cout << strFileName << "..." << endl;
+    execute(NUM_POINTS_1M, NUM_ITERATIONS_10, strFileName);
+    cout << strFileName << "...Done" << endl;
+}
+
