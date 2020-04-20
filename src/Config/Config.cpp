@@ -31,6 +31,7 @@ using namespace std;
 #define	DEFAULT_OUTPUT_GRAPH_FILENAME	"outGraph.txt"
 #define DEFAULT_OUTPUT_VORONOI_FILENAME "outVoronoi.txt"
 #define DEFAULT_OUTPUT_GABRIEL_FILENAME	"outGabriel.txt"
+#define	DEFAULT_OUTPUT_EXTRA_FILENAME	""
 #define DEFAULT_MIN_X					-1
 #define DEFAULT_MAX_X					5000
 #define DEFAULT_MIN_Y					-1
@@ -58,6 +59,7 @@ using namespace std;
 #define MIN_LENGTH_EDGE_PARAM		"MIN_LENGTH_EDGE"
 #define ZOOM_PARAM					"ZOOM"
 #define CLUSTER_SET_PARAM			"CLUSTER_SET"
+#define OUTPUT_EXTRA_FILE_PARAM 	"OUTPUT_EXTRA_FILE"
 
 
 /***********************************************************************************************************************
@@ -91,6 +93,7 @@ int Config::iMaxY = DEFAULT_MAX_Y;
 int Config::nClusters = DEFAULT_NCLUSTERS;
 TYPE Config::clusterRadius = DEFAULT_CLUSTER_RADIUS;
 
+string Config::strExtraOutput;
 
 /***********************************************************************************************************************
 * Public methods
@@ -181,6 +184,10 @@ bool Config::readConfig(const string &strFileName)
 					// Get input value.
 					Config::inGraphFileName = strValue;
 				}
+				else if (strField == OUTPUT_EXTRA_FILE_PARAM)
+                {
+                    Config::strExtraOutput = strValue;
+                }
 //				else if (strField == INPUT_VORONOI_FILE_PARAM)
 //				{
 //					// Get input value.
@@ -383,6 +390,7 @@ void Config::setDefaultConfig()
     Config::destinationPoint = Point<TYPE>(INVALID, INVALID);
     Config::nAnchors = DEFAULT_ANCHORS;
     Config::minLengthEdge = FLT_MAX;
+    Config::strExtraOutput = DEFAULT_OUTPUT_EXTRA_FILENAME;
 
     // Initialize window dimensions.
     Config::iMinX = DEFAULT_MIN_X;

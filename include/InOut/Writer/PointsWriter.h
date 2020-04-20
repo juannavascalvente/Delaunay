@@ -15,8 +15,8 @@ class PointsWriter
     /*******************************************************************************************************************
     * Private class methods
     *******************************************************************************************************************/
-    static bool writeFlat(const string &fileName, vector<Point<TYPE>> &vPoints);
-    static bool writeBinary(const string &fileName, vector<Point<TYPE>> &vPoints);
+    static bool writeFlat(const string &fileName, const vector<Point<TYPE>> &vPoints);
+    static bool writeBinary(const string &fileName, const vector<Point<TYPE>> &vPoints);
 
 public:
     /*******************************************************************************************************************
@@ -35,7 +35,7 @@ public:
      * @return          true if file written
      *                  false otherwise
      */
-    static bool write(const string &fileName, vector<Point<TYPE>> &vPoints);
+    static bool write(const string &fileName, const vector<Point<TYPE>> &vPoints);
 };
 
 

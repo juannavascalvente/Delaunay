@@ -12,7 +12,7 @@
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-bool PointsWriter::write(const string &fileName, vector<Point<TYPE>> &vPoints)
+bool PointsWriter::write(const string &fileName, const vector<Point<TYPE>> &vPoints)
 {
     bool isSuccess=false;		// Return value.
 
@@ -62,7 +62,7 @@ bool PointsWriter::write(const string &fileName, vector<Point<TYPE>> &vPoints)
  * @return          true if file written successfully
  *                  false otherwise
  */
-bool PointsWriter::writeFlat(const string &fileName, vector<Point<TYPE>> &vPoints)
+bool PointsWriter::writeFlat(const string &fileName, const vector<Point<TYPE>> &vPoints)
 {
     bool isSuccess=false;	// Return value.
 
@@ -98,7 +98,7 @@ bool PointsWriter::writeFlat(const string &fileName, vector<Point<TYPE>> &vPoint
  * @return          true if file written successfully
  *                  false otherwise
  */
-bool PointsWriter::writeBinary(const string &fileName, vector<Point<TYPE>> &vPoints)
+bool PointsWriter::writeBinary(const string &fileName, const vector<Point<TYPE>> &vPoints)
 {
     bool isSuccess=false;	// Return value.
 
