@@ -4,7 +4,6 @@
 #include "Delaunay.h"
 #include "DelaunayIO.h"
 #include "PointFactory.h"
-#include "PointsReader.h"
 #include "TriangulationFactory.h"
 #include "TestSuiteReader.h"
 
@@ -30,7 +29,7 @@ namespace
          * @param   szNumPoints         (IN) Points set number of points
          * @param   szNumIterations     (IN) Number of times the triangulation is computed
          */
-        static void execute(size_t szNumPoints, size_t szNumIterations, string strFileName);
+        static void execute(size_t szNumPoints, size_t szNumIterations, const string& strFileName);
 
         /**
          * @fn      writeReport
@@ -44,7 +43,7 @@ namespace
     };
 
 
-    void TestDelaunay_Profiling::execute(size_t szNumPoints, size_t szNumIterations, string strFileName)
+    void TestDelaunay_Profiling::execute(size_t szNumPoints, size_t szNumIterations, const string& strFileName)
     {
         vector<std::chrono::duration<double>> vTimes;
 
