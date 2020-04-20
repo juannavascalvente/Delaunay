@@ -16,9 +16,9 @@ using namespace std;
 #define TEST_NAME_FIELD                     "Name"
 
 #define TEST_POINTS_IN_FIELD                "PointsIn"
-//#define TEST_DELAUNAY_IN_FIELD              "DelaunayIn"
-//#define TEST_DELAUNAY_GRAPH_IN_FIELD        "DelaunayGraphIn"
 
+
+#define TEST_CONVEX_HULL_OUT_FIELD          "ConvexHullOut"
 #define TEST_DELAUNAY_OUT_FIELD             "DelaunayOut"
 #define TEST_DELAUNAY_GRAPH_OUT_FIELD       "DelaunayGraphOut"
 #define TEST_VORONOI_OUT_FIELD              "VoronoiOut"

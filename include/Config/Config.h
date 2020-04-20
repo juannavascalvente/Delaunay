@@ -1,10 +1,3 @@
-/*
- * Config.h
- *
- *  Created on: Jul 4, 2016
- *      Author: juan
- */
-
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
@@ -53,6 +46,8 @@ class Config
     static int		iMinY;				// Min value in y-coordinates.
     static int		iMaxY;				// Max value in y-coordinates.
 
+    static string   strExtraOutput;     // Extra output file name
+
     static void setDefaultConfig();
 
 public:
@@ -93,6 +88,7 @@ public:
 	static inline TYPE getMinLengthEdge()    { return (Config::minLengthEdge);}
     static Point<TYPE> getDestinationPoint() { return Config::destinationPoint;}
     static Point<TYPE> getOriginPoint()      { return Config::originPoint;}
+    static inline string getExtraOutputFilename()   { return(Config::strExtraOutput); };
 };
 
 #endif /* CONFIG_H_ */

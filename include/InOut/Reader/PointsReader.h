@@ -15,8 +15,8 @@ class PointsReader
     /*******************************************************************************************************************
     * Private class methods
     *******************************************************************************************************************/
-    static bool readFlat(const string &fileName, vector<Point<TYPE>> &vPoints);
-    static bool readBinary(const string &fileName, vector<Point<TYPE>> &vPoints);
+    static bool readFlat(const string &strFileName, vector<Point<TYPE>> &vPoints);
+    static bool readBinary(const string &strFileName, vector<Point<TYPE>> &vPoints);
 
 public:
     /*******************************************************************************************************************
@@ -26,12 +26,12 @@ public:
      * @fn      read
      * @brief   read the set of points from a flat file or a DCEL file depending on the "fromFlatFile· flag
      *
-     * @param   fileName        (IN) File name
+     * @param   strFileName     (IN) File name
      * @param   fromFlatFile    (IN) Flag that stands for binary format
      * @param   vPoints         (OUT) Points set
      * @return
      */
-    static bool read(const string &fileName, vector<Point<TYPE>> &vPoints);
+    static bool read(const string &strFileName, vector<Point<TYPE>> &vPoints);
 };
 
 

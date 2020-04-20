@@ -22,6 +22,8 @@ class Polygon
     *******************************************************************************************************************/
 	vector<Point<TYPE>> vPoints;
 
+	friend class FigureIO;
+
 public:
 
     /*******************************************************************************************************************
@@ -92,26 +94,6 @@ public:
      *                  false otherwise
      */
     bool operator==(Polygon& other);
-
-    /***************************************************************************
-    * Name: 	print
-    * IN:		out			output stream
-    * OUT:		NONE
-    * RETURN:	NONE
-    * GLOBAL:	NONE
-    * Description: 	print the set of points.
-    ***************************************************************************/
-	void 	print(std::ostream& out);
-
-    /***************************************************************************
-    * Name: 	toStr
-    * IN:		NONE
-    * OUT:		NONE
-    * RETURN:	string		set of points as text.
-    * GLOBAL:	NONE
-    * Description: 	convert to string the set of points
-    ***************************************************************************/
-	string 	toStr();
 };
 
 #endif /* INCLUDE_POLYLINE_H_ */

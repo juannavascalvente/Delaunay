@@ -245,25 +245,3 @@ bool Polygon::operator==(Polygon& other)
 
     return isEqual;
 }
-
-void Polygon::print(std::ostream& out)
-{
-	// Print all points.
-	for (auto point : vPoints)
-    {
-	    point.print(out);
-    }
-}
-
-
-string Polygon::toStr()
-{
-	ostringstream oss;
-	string text;
-
-	// Build file name.
-	this->print( oss);
-	text = oss.str();
-
-	return(text);
-}

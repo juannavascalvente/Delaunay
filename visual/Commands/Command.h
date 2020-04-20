@@ -11,12 +11,13 @@
 #include "DcelReader.h"
 #include "DcelWriter.h"
 #include "DelaunayIO.h"
-#include "VoronoiIO.h"
 #include "DcelFigureBuilder.h"
+#include "FigureIO.h"
 #include "LineFactory.h"
 #include "PointFactory.h"
 #include "PointsReader.h"
 #include "PointsWriter.h"
+#include "VoronoiIO.h"
 
 
 /***********************************************************************************************************************
@@ -601,6 +602,11 @@ public:
             StarTriangulation *triangulation = in.getStoreService()->getStarTriang();
             isRunSuccess = triangulation->convexHull();
             triangulation->getConvexHull(hull);
+        }
+
+        if (!Config::getExtraOutputFilename().empty())
+        {
+            FigureIO::write(Config::getExtraOutputFilename(), hull);
         }
 
         // Build result
