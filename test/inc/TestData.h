@@ -19,6 +19,7 @@ using namespace std;
 
 
 #define TEST_CONVEX_HULL_OUT_FIELD          "ConvexHullOut"
+#define TEST_STAR_OUT_FIELD                 "StarOut"
 #define TEST_DELAUNAY_OUT_FIELD             "DelaunayOut"
 #define TEST_DELAUNAY_GRAPH_OUT_FIELD       "DelaunayGraphOut"
 #define TEST_VORONOI_OUT_FIELD              "VoronoiOut"

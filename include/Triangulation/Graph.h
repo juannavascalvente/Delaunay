@@ -41,7 +41,7 @@ public:
         return *this;
     }
 
-	int getSize() {return this->vNodes.size(); };
+	int getSize() const {return this->vNodes.size(); };
     Node* getRefNode(int nodeId) { return &this->vNodes.at(nodeId); };
     int getNodeAssigned(int face);
     void setNodeAssigned(int iIdx, int iValue) { this->vFaceNode[iIdx] = iValue; };

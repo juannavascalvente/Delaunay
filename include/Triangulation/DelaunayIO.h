@@ -4,6 +4,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "Delaunay.h"
 #include "Node.h"
 
 
@@ -36,7 +37,7 @@ public:
      * @return                  true if written successfully
      *                          false otherwise
      */
-    static bool write(const string &strDcelFileName, const string &strGraphFileName, Delaunay &delaunay);
+    static bool write(const string &strDcelFileName, const string &strGraphFileName, const Delaunay &delaunay);
 };
 
 

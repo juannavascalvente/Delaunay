@@ -14,7 +14,7 @@ using namespace std;
 /***********************************************************************************************************************
 * Public methods definitions
 ***********************************************************************************************************************/
-bool GraphWriter::write(const string &strFileName, Graph &graph)
+bool GraphWriter::write(const string &strFileName, const Graph &graph)
 {
     bool isSuccess=false;		// Return value.
 
@@ -50,7 +50,7 @@ bool GraphWriter::write(const string &strFileName, Graph &graph)
 }
 
 
-void GraphWriter::print(std::ostream& out, Graph &graph)
+void GraphWriter::print(const Graph &graph, std::ostream &out)
 {
     // Print graph length and size.
     out << "Graph # elements: " << graph.getSize() << std::endl;
@@ -58,7 +58,8 @@ void GraphWriter::print(std::ostream& out, Graph &graph)
     // Print graph nodes.
     for (size_t i=0; i<graph.getSize() ;i++)
     {
-        NodeIO::print(graph.vNodes.at(i), out);
+        Node node = graph.vNodes.at(i);
+        NodeIO::print(node, out);
     }
 
     // Print face-node relations.
@@ -80,7 +81,7 @@ void GraphWriter::print(std::ostream& out, Graph &graph)
  * @return              true if written successfully
  *                      false otherwise
  */
-bool GraphWriter::writeFlat(const string &strFileName, Graph &graph)
+bool GraphWriter::writeFlat(const string &strFileName, const Graph &graph)
 {
     bool isSuccess=false;	// Return value.
 
@@ -92,7 +93,8 @@ bool GraphWriter::writeFlat(const string &strFileName, Graph &graph)
         ofs << graph.vNodes.size() << endl;
         for (size_t i=0; i<graph.getSize() ;i++)
         {
-            NodeIO::write(graph.vNodes.at(i), ofs);
+            Node node = graph.vNodes.at(i);
+            NodeIO::write(node, ofs);
             ofs << endl;
         }
 
@@ -120,7 +122,7 @@ bool GraphWriter::writeFlat(const string &strFileName, Graph &graph)
  * @return              true if written successfully
  *                      false otherwise
  */
-bool GraphWriter::writeBinary(const string &strFileName, Graph &graph)
+bool GraphWriter::writeBinary(const string &strFileName, const Graph &graph)
 {
     bool isSuccess=false;	// Return value.
 
