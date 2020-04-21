@@ -21,6 +21,7 @@ namespace
     {
         string strTestFilename;
         string strTestFolder;
+        string strTestPointsFolder;
     protected:
 
         // You can remove any or all of the following functions if its body
@@ -29,7 +30,8 @@ namespace
         TestStar_Api()
         {
             string strBaseFolder = BASEFOLDER;
-            strTestFolder = strBaseFolder + "/data/TestData/DelaunayGolden/";
+            strTestFolder = strBaseFolder + "/data/TestData/StarGolden/";
+            strTestPointsFolder = strBaseFolder + "/data/TestData/PointsGolden/";
             strTestFilename = strTestFolder + "testInfo.txt";
         }
 
@@ -107,7 +109,7 @@ namespace
             // Get points file name
             string srFileName;
             isSuccess = test.getValue(TEST_POINTS_IN_FIELD, srFileName);
-            string strPointsFilename = strTestFolder + srFileName;
+            string strPointsFilename = strTestPointsFolder + srFileName;
             ASSERT_TRUE(isSuccess);
 
             // Read points from input file
