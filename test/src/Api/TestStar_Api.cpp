@@ -1,7 +1,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
-#include "Delaunay.h"
+#include "DcelReader.h"
 #include "DelaunayIO.h"
 #include "PointFactory.h"
 #include "PointsReader.h"
@@ -17,7 +17,7 @@
 ***********************************************************************************************************************/
 namespace
 {
-    class TestDelaunay_Api : public ::testing::Test
+    class TestStar_Api : public ::testing::Test
     {
         string strTestFilename;
         string strTestFolder;
@@ -26,7 +26,7 @@ namespace
         // You can remove any or all of the following functions if its body
         // is empty.
         // Constructor (called before each test case) - SetUp
-        TestDelaunay_Api()
+        TestStar_Api()
         {
             string strBaseFolder = BASEFOLDER;
             strTestFolder = strBaseFolder + "/data/TestData/DelaunayGolden/";
@@ -37,7 +37,7 @@ namespace
 
         /**
          * @fn      executeTwice
-         * @brief   Generates a set of random points and computes two Delaunay triangulations using that set of points.
+         * @brief   Generates a set of random points and computes two Star triangulations using that set of points.
          *          Then it compares both triangulations to be equal. The number of points is defined by szNumPoints
          *          and it is executed szNumIterations times
          *
@@ -48,14 +48,14 @@ namespace
 
         /**
          * @fn      checkGold
-         * @brief   Reads a set of precomputed Delaunay triangulation and using their set of points computes the
-         *          Delaunay triangulation and checks both are equal, the computed and the precomputed triangulations
+         * @brief   Reads a set of precomputed Star triangulation and using their set of points computes the
+         *          Star triangulation and checks both are equal, the computed and the precomputed triangulations
          */
         void checkGold();
     };
 
 
-    void TestDelaunay_Api::executeTwice(size_t szNumPoints, size_t szNumIterations)
+    void TestStar_Api::executeTwice(size_t szNumPoints, size_t szNumIterations)
     {
         // Execute test szNumIterations times
         for (size_t i=0; i<szNumIterations ; i++)
@@ -68,25 +68,25 @@ namespace
             PointFactory::generateRandom(szNumPoints, vPointsFirst);
             vPointsSecond = vPointsFirst;
 
-            // Build first Delaunay triangulation
+            // Build first Star triangulation
             bool isSuccess;
-            Delaunay *delaunayFirst = TriangulationFactory::createDelaunay(vPointsFirst, isSuccess);
+            auto *starFirst = TriangulationFactory::createStar(vPointsFirst, isSuccess);
             ASSERT_TRUE(isSuccess);
 
-            // Build second Delaunay triangulation
-            Delaunay *delaunaySecond = TriangulationFactory::createDelaunay(vPointsSecond, isSuccess);
+            // Build second Star triangulation
+            auto *starSecond = TriangulationFactory::createStar(vPointsSecond, isSuccess);
             ASSERT_TRUE(isSuccess);
 
-            // Check Delaunay triangulations are equal
-            ASSERT_TRUE(*delaunayFirst->getRefDcel() == *delaunaySecond->getRefDcel());
+            // Check Star triangulations are equal
+            ASSERT_TRUE(*starFirst->getRefDcel() == *starSecond->getRefDcel());
 
             // Free resources
-            delete delaunaySecond;
-            delete delaunayFirst;
+            delete starFirst;
+            delete starSecond;
         }
     }
 
-    void TestDelaunay_Api::checkGold()
+    void TestStar_Api::checkGold()
     {
         // Read test suite
         TestSuite suite;
@@ -115,39 +115,37 @@ namespace
             isSuccess = PointsReader::read(strPointsFilename, vPoints);
             ASSERT_TRUE(isSuccess);
 
-            // Get Delaunay files
-            isSuccess = test.getValue(TEST_DELAUNAY_OUT_FIELD, srFileName);
-            string strDelaunayFilename = strTestFolder + srFileName;
-            ASSERT_TRUE(isSuccess);
-            isSuccess = test.getValue(TEST_DELAUNAY_GRAPH_OUT_FIELD, srFileName);
-            string strGraphFilename = strTestFolder + srFileName;
+            // Get Star file
+            isSuccess = test.getValue(TEST_STAR_OUT_FIELD, srFileName);
+            string strStarFilename = strTestFolder + srFileName;
             ASSERT_TRUE(isSuccess);
 
-            // Read Delaunay from file
-            Delaunay goldenDelaunay;
-            isSuccess = DelaunayIO::read(strDelaunayFilename, strGraphFilename, goldenDelaunay);
+            // Read Star from file
+            auto *goldenStar = new StarTriangulation();
+            isSuccess = DcelReader::read(strStarFilename, *goldenStar->getRefDcel());
             ASSERT_TRUE(isSuccess);
 
-            // Build Delaunay using input points
-            Delaunay *delaunay = TriangulationFactory::createDelaunay(vPoints, isSuccess);
+            // Build Star using input points
+            auto *computedStar = TriangulationFactory::createStar(vPoints, isSuccess);
             ASSERT_TRUE(isSuccess);
 
-            // Check Delaunay triangulations are equal
-            ASSERT_TRUE(*goldenDelaunay.getRefDcel() == *delaunay->getRefDcel());
+            // Check Star triangulations are equal
+            ASSERT_TRUE(*goldenStar->getRefDcel() == *computedStar->getRefDcel());
 
             // Free resources
-            delete delaunay;
+            delete computedStar;
+            delete goldenStar;
         }
     }
 }
 
 
 /**
- * @brief   Create two Delaunay triangulations using the same points set and compare the results are the same
- *          The number of points and number of times the Delaunay is computed changes for every execution
+ * @brief   Create two Star triangulations using the same points set and compare the results are the same
+ *          The number of points and number of times the Star is computed changes for every execution
  *
  */
-TEST_F(TestDelaunay_Api, Test_Delaunay_Twice)
+TEST_F(TestStar_Api, Test_Star_Twice)
 {
     executeTwice(NUM_POINTS_3, NUM_ITERATIONS_1000);
     executeTwice(NUM_POINTS_10, NUM_ITERATIONS_100);
@@ -155,10 +153,10 @@ TEST_F(TestDelaunay_Api, Test_Delaunay_Twice)
 }
 
 /**
- * @brief   Reads a set of precomputed Delaunay triangulation and using their set of points computes the Delaunay
+ * @brief   Reads a set of precomputed Star triangulation and using their set of points computes the Star
  *          triangulation and checks both are equal, the computed and the precomputed triangulations
  */
-TEST_F(TestDelaunay_Api, Test_Delaunay_Gold)
+TEST_F(TestStar_Api, Test_Star_Gold)
 {
     checkGold();
 }

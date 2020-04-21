@@ -18,8 +18,8 @@ class GraphWriter
     /*******************************************************************************************************************
     * Private methods declarations
     *******************************************************************************************************************/
-    static bool writeFlat(const string &strFileName, Graph &graph);
-    static bool writeBinary(const string &strFileName, Graph &graph);
+    static bool writeFlat(const string &strFileName, const Graph &graph);
+    static bool writeBinary(const string &strFileName, const Graph &graph);
 
 public:
     /*******************************************************************************************************************
@@ -34,7 +34,7 @@ public:
      * @return              true if written successfully
      *                      false otherwise
      */
-    static bool write(const string &strFileName, Graph &graph);
+    static bool write(const string &strFileName, const Graph &graph);
 
 
     /**
@@ -44,7 +44,7 @@ public:
      * @param out       (IN)    Stream where data is printed
      * @param graph     (IN)    Graph to print
      */
-    static void print(std::ostream &out, Graph &graph);
+    static void print(const Graph &graph, std::ostream &out);
 };
 
 

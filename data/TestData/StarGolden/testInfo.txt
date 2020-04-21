@@ -1,0 +1,6 @@
+<TEST>
+Name=GoldenDelaunay_10
+PointsIn=Points10.bin
+DelaunayOut=Delaunay10.bin
+DelaunayGraphOut=Graph10.bin
+</TEST>

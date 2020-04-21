@@ -36,7 +36,7 @@ bool DelaunayIO::read(const string &strDcelFileName, const string &strGraphFileN
 }
 
 
-bool DelaunayIO::write(const string &strDcelFileName, const string &strGraphFileName, Delaunay &delaunay)
+bool DelaunayIO::write(const string &strDcelFileName, const string &strGraphFileName, const Delaunay &delaunay)
 {
     bool	isSuccess;		// Return value.
 
