@@ -74,6 +74,7 @@ file(GLOB DELAUNAY_HEADER_FILES
         ${BUILD_PATH}/include/Store
         ${BUILD_PATH}/include/Triangulation
         ${BUILD_PATH}/include/Voronoi
+        ${BUILD_PATH}/lib/inc
         )
 
 file(GLOB DELAUNAY_SRC_FILES
@@ -89,6 +90,7 @@ file(GLOB DELAUNAY_SRC_FILES
         ${BUILD_PATH}/src/Store/*.cpp
         ${BUILD_PATH}/src/Triangulation/*.cpp
         ${BUILD_PATH}/src/Voronoi/*.cpp
+        ${BUILD_PATH}/lib/src/*.cpp
         )
 
 ################################################### GTest #############################################################

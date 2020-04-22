@@ -8,7 +8,6 @@
 #include "TestSuiteReader.h"
 
 #include <gtest/gtest.h>
-//#include <iostream>
 
 
 /***********************************************************************************************************************
@@ -22,8 +21,7 @@ namespace
         string strTestFolder;
     protected:
 
-        // You can remove any or all of the following functions if its body
-        // is empty.
+        // You can remove any or all of the following functions if its body is empty.
         // Constructor (called before each test case) - SetUp
         TestConvexHull_Api()
         {
