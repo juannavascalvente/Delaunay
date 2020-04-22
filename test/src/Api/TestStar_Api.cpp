@@ -2,10 +2,10 @@
 * Includes
 ***********************************************************************************************************************/
 #include "DcelReader.h"
-#include "DelaunayIO.h"
 #include "PointFactory.h"
 #include "PointsReader.h"
 #include "TriangulationFactory.h"
+#include "triangulationLib.h"
 #include "TestSuiteReader.h"
 
 #include <gtest/gtest.h>
@@ -128,14 +128,14 @@ namespace
             ASSERT_TRUE(isSuccess);
 
             // Build Star using input points
-            auto *computedStar = TriangulationFactory::createStar(vPoints, isSuccess);
+            Dcel computedDcel;
+            isSuccess = getStarTriangulation(vPoints, computedDcel);
             ASSERT_TRUE(isSuccess);
 
             // Check Star triangulations are equal
-            ASSERT_TRUE(*goldenStar->getRefDcel() == *computedStar->getRefDcel());
+            ASSERT_TRUE(*goldenStar->getRefDcel() == computedDcel);
 
             // Free resources
-            delete computedStar;
             delete goldenStar;
         }
     }

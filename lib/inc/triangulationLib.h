@@ -21,7 +21,7 @@
  * @return          true if triangulation built successfully
  *                  false otherwise
  */
-bool getStarTriangulation(vector<TYPE> &vPoints, Dcel &dcel);
+bool getStarTriangulation(vector<Point<TYPE>> &vPoints, Dcel &dcel);
 
 
 /**
@@ -33,7 +33,7 @@ bool getStarTriangulation(vector<TYPE> &vPoints, Dcel &dcel);
  * @return          true if triangulation built successfully
  *                  false otherwise
  */
-bool getDelaunay(vector<TYPE> &vPoints, Dcel &dcel);
+bool getDelaunay(vector<Point<TYPE>> &vPoints, Dcel &dcel);
 
 
 #endif //DELAUNAY_TRIANGULATIONLIB_H
