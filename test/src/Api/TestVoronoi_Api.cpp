@@ -1,6 +1,7 @@
 /***********************************************************************************************************************
 * Includes
 ***********************************************************************************************************************/
+#include "figuresLib.h"
 #include "PointFactory.h"
 #include "PointsReader.h"
 #include "TestSuiteReader.h"
@@ -69,19 +70,17 @@ namespace
 
             // Build first Voronoi triangulation
             bool isSuccess;
-            auto *VoronoiFirst = VoronoiFactory::create(vPointsFirst, isSuccess);
+            Dcel dcelOut1;
+            isSuccess = getVoronoi(vPointsFirst, dcelOut1);
             ASSERT_TRUE(isSuccess);
 
             // Build second Voronoi triangulation
-            auto *VoronoiSecond = VoronoiFactory::create(vPointsSecond, isSuccess);
+            Dcel dcelOut2;
+            isSuccess = getVoronoi(vPointsSecond, dcelOut2);
             ASSERT_TRUE(isSuccess);
 
             // Check Voronoi triangulations are equal
-            ASSERT_TRUE(*VoronoiFirst->getRefDcel() == *VoronoiSecond->getRefDcel());
-
-            // Free resources
-            delete VoronoiSecond;
-            delete VoronoiFirst;
+            ASSERT_TRUE(dcelOut1 == dcelOut2);
         }
     }
 
@@ -125,14 +124,12 @@ namespace
             ASSERT_TRUE(isSuccess);
 
             // Build Voronoi using input points
-            auto *Voronoi = VoronoiFactory::create(vPoints, isSuccess);
+            Dcel dcelOut;
+            isSuccess = getVoronoi(vPoints, dcelOut);
             ASSERT_TRUE(isSuccess);
 
             // Check Voronoi triangulations are equal
-            ASSERT_TRUE(*goldenVoronoi.getRefDcel() == *Voronoi->getRefDcel());
-
-            // Free resources
-            delete Voronoi;
+            ASSERT_TRUE(*goldenVoronoi.getRefDcel() == dcelOut);
         }
     }
 }

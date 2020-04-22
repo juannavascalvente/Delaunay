@@ -2,6 +2,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "FigureIO.h"
+#include "figuresLib.h"
 #include "PointFactory.h"
 #include "PointsReader.h"
 #include "TriangulationFactory.h"
@@ -59,38 +60,25 @@ namespace
         {
             // Two points set
             vector<Point<TYPE>> vPointsFirst;
+            vector<Point<TYPE>> vPointsFirstConvexHull;
             vector<Point<TYPE>> vPointsSecond;
+            vector<Point<TYPE>> vPointsSecondConvexHull;
 
             // Generate random points set
             PointFactory::generateRandom(szNumPoints, vPointsFirst);
             vPointsSecond = vPointsFirst;
 
-            // Build first Delaunay triangulation
+            // Build first convex hull
             bool isSuccess;
-            auto *starTriangulation = TriangulationFactory::createStar(vPointsFirst, isSuccess);
-            ASSERT_TRUE(isSuccess);
-            isSuccess = starTriangulation->convexHull();
+            isSuccess = getConvexHull(vPointsFirst, vPointsFirstConvexHull);
             ASSERT_TRUE(isSuccess);
 
-            // Build second Delaunay triangulation
-            auto *delaunay = TriangulationFactory::createDelaunay(vPointsSecond, isSuccess);
-            ASSERT_TRUE(isSuccess);
-            isSuccess = delaunay->convexHull();
-            ASSERT_TRUE(isSuccess);
-
-            // Get convex hull from both triangulations
-            Polygon starHull, delaunayHull;
-            isSuccess = starTriangulation->getConvexHull(starHull);
-            ASSERT_TRUE(isSuccess);
-            isSuccess = delaunay->getConvexHull(delaunayHull);
+            // Build first convex hull
+            isSuccess = getConvexHull(vPointsSecond, vPointsSecondConvexHull);
             ASSERT_TRUE(isSuccess);
 
             // Check convex hulls are equal
-            ASSERT_TRUE(starHull == delaunayHull);
-
-            // Free resources
-            delete delaunay;
-            delete starTriangulation;
+            ASSERT_TRUE(vPointsFirstConvexHull == vPointsSecondConvexHull);
         }
     }
 
@@ -132,23 +120,17 @@ namespace
             Polygon readHull;
             isSuccess = FigureIO::read(strHullFilename, readHull);
             ASSERT_TRUE(isSuccess);
+            vector<Point<TYPE>> vPointsConvexHullOriginal;
+            readHull.getPoints(vPointsConvexHullOriginal);
 
             // Build Delaunay triangulation
-            Delaunay *delaunay = TriangulationFactory::createDelaunay(vPoints, isSuccess);
-            ASSERT_TRUE(isSuccess);
-
-            // Get convex hull
-            isSuccess = delaunay->convexHull();
-            ASSERT_TRUE(isSuccess);
-            Polygon computedHull;
-            isSuccess = delaunay->getConvexHull(computedHull);
+            // Build first convex hull
+            vector<Point<TYPE>> vPointsConvexHull;
+            isSuccess = getConvexHull(vPoints, vPointsConvexHull);
             ASSERT_TRUE(isSuccess);
 
             // Check Delaunay triangulations are equal
-            ASSERT_TRUE(computedHull == readHull);
-
-            // Free resources
-            delete delaunay;
+            ASSERT_TRUE(vPointsConvexHull == vPointsConvexHullOriginal);
         }
     }
 }
