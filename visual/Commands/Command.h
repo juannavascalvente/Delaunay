@@ -1446,6 +1446,11 @@ public:
             Delaunay *delaunay = in.getStoreService()->getDelaunay();
             vPoints.push_back(p);
             vPoints.push_back(q);
+
+            if (!Config::getExtraOutputFilename().empty())
+            {
+                PointsWriter::write(Config::getExtraOutputFilename(), vPoints);
+            }
         }
 
         // Build result

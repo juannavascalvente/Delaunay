@@ -23,6 +23,7 @@ using namespace std;
 #define TEST_DELAUNAY_OUT_FIELD             "DelaunayOut"
 #define TEST_DELAUNAY_GRAPH_OUT_FIELD       "DelaunayGraphOut"
 #define TEST_VORONOI_OUT_FIELD              "VoronoiOut"
+#define TEST_TWO_POINTS_OUT_FIELD           "OutputPoints"
 
 
 /***********************************************************************************************************************
