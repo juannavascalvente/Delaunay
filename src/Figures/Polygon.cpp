@@ -173,7 +173,7 @@ bool Polygon::isInternal(Point<TYPE> &p)
 	return isInternal;
 }
 
-bool Polygon::operator==(Polygon& other)
+bool Polygon::operator==(const Polygon& other) const
 {
     // Check polygons length
     if (this->getNElements() != other.getNElements())

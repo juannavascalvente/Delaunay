@@ -1299,6 +1299,13 @@ public:
         // Check if input point parameter provided by user.
         PointFactory::readFromConfig(point);
 
+        if (!Config::getExtraOutputFilename().empty())
+        {
+            vector<Point<TYPE>> vLocate;
+            vLocate.push_back(point);
+            PointsWriter::write(Config::getExtraOutputFilename()+"in.bin", vLocate);
+        }
+
         // Find face.
         bool isRunSuccess;
         if (in.getStoreService()->isDelaunay())
@@ -1325,6 +1332,11 @@ public:
             {
                 vector<Point<TYPE>> vFacesPoints;
                 DcelFigureBuilder::getFacePoints(faceId, *dcel, vFacesPoints);
+
+                if (!Config::getExtraOutputFilename().empty())
+                {
+                    PointsWriter::write(Config::getExtraOutputFilename(), vFacesPoints);
+                }
 
                 Polygon polygon;
                 for (auto item : vFacesPoints)
