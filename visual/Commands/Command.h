@@ -1174,6 +1174,13 @@ public:
         Point<TYPE> point, closest;
         PointFactory::readFromConfig(point);
 
+        if (!Config::getExtraOutputFilename().empty())
+        {
+            vector<Point<TYPE>> vLocate;
+            vLocate.push_back(point);
+            PointsWriter::write(Config::getExtraOutputFilename()+"in.bin", vLocate);
+        }
+
         // Find closest point
         int	pointIndex=0;	// Index of the closest point.
 
@@ -1197,6 +1204,13 @@ public:
         {
             vPoints.push_back(point);
             vPoints.push_back(closest);
+
+            vector<Point<TYPE>> vPointsClosest;
+            vPointsClosest.push_back(closest);
+            if (!Config::getExtraOutputFilename().empty())
+            {
+                PointsWriter::write(Config::getExtraOutputFilename(), vPointsClosest);
+            }
         }
 
         // Build result

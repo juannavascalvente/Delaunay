@@ -13,7 +13,7 @@
 ***********************************************************************************************************************/
 namespace
 {
-    class TestTwoClosest_Api : public ::testing::Test
+    class TestClosest_Api : public ::testing::Test
     {
         string strTestFilename;
         string strTestFolder;
@@ -22,10 +22,10 @@ namespace
 
         // You can remove any or all of the following functions if its body is empty.
         // Constructor (called before each test case) - SetUp
-        TestTwoClosest_Api()
+        TestClosest_Api()
         {
             string strBaseFolder = BASEFOLDER;
-            strTestFolder = strBaseFolder + "/data/TestData/TwoClosestGolden/";
+            strTestFolder = strBaseFolder + "/data/TestData/ClosestPointGolden/";
             strTestPointsFolder = strBaseFolder + "/data/TestData/PointsGolden/";
             strTestFilename = strTestFolder + "testInfo.txt";
         }
@@ -34,13 +34,12 @@ namespace
 
         /**
          * @fn      checkGold
-         * @brief   Reads a set of points and computes the two closest point in each set and checks if they are equal
-         *          to the already computed two closest points
+         * @brief   Reads a set of points and an input point and computes the closest point in the points set
          */
         void checkGold();
     };
 
-    void TestTwoClosest_Api::checkGold()
+    void TestClosest_Api::checkGold()
     {
         // Read test suite
         TestSuite suite;
@@ -69,42 +68,42 @@ namespace
             isSuccess = PointsReader::read(strPointsFilename, vPoints);
             ASSERT_TRUE(isSuccess);
 
-            // Get two closest points file name
+            // Get input point file name
+            isSuccess = test.getValue(TEST_SINGLE_POINT_IN_FIELD, strFilename);
+            string strPointFilename = strTestFolder + strFilename;
+            ASSERT_TRUE(isSuccess);
+
+            // Read input point
+            vector<Point<TYPE>> vPointLocate;
+            isSuccess = PointsReader::read(strPointFilename, vPointLocate);
+            ASSERT_TRUE(isSuccess);
+
+            // Get closest point file name
             isSuccess = test.getValue(TEST_POINTS_OUT_FIELD, strFilename);
             string strTwoClosestFilename = strTestFolder + strFilename;
             ASSERT_TRUE(isSuccess);
 
-            // Read two closest points
-            vector<Point<TYPE>> vOriginalPoints;
-            isSuccess = PointsReader::read(strTwoClosestFilename, vOriginalPoints);
+            // Read closest point
+            vector<Point<TYPE>> vGoldenClosestPoints;
+            isSuccess = PointsReader::read(strTwoClosestFilename, vGoldenClosestPoints);
             ASSERT_TRUE(isSuccess);
 
-            // Get two closest in set of points
-            Point<TYPE> computedPoint1;
-            Point<TYPE> computedPoint2;
-            isSuccess =  get2ClosestPoints(vPoints, computedPoint1, computedPoint2);
+            // Compute closest point
+            Point<TYPE> computedClosest;
+            isSuccess = getClosestPoint(vPointLocate[0], vPoints, computedClosest);
             ASSERT_TRUE(isSuccess);
 
             // Check points are equal
-            if (computedPoint1 == vOriginalPoints[0])
-            {
-                ASSERT_EQ(computedPoint2, vOriginalPoints[1]);
-            }
-            else
-            {
-                ASSERT_NE(computedPoint1, vOriginalPoints[1]);
-                ASSERT_EQ(computedPoint2, vOriginalPoints[0]);
-            }
+            ASSERT_EQ(computedClosest, vGoldenClosestPoints[0]);
         }
     }
 }
 
 
 /**
- * @brief   Reads a set of points and computes the two closest point in each set and checks if they are equal
- *          to the already computed two closest points
+ * @brief   Reads a set of points and an input point and computes the closest point in the points set
  */
-TEST_F(TestTwoClosest_Api, Test_TwoClosest_Gold)
+TEST_F(TestClosest_Api, Test_Closest_Gold)
 {
     checkGold();
 }
