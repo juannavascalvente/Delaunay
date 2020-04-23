@@ -38,8 +38,8 @@ public:
     /*******************************************************************************************************************
     * Public methods
     *******************************************************************************************************************/
-	inline int getNElements() { return(vPoints.size()); };
-    inline void getPoints(vector<Point<TYPE>> &vPointsOut) { vPointsOut = vPoints; };
+	inline int getNElements() const { return(vPoints.size()); };
+    inline void getPoints(vector<Point<TYPE>> &vPointsOut) const { vPointsOut = vPoints; };
 	inline Point<TYPE> at(size_t szIdx) { return(vPoints.at(szIdx)); };
 	inline void	add(Point<TYPE> &p) { vPoints.push_back(p); };
 	inline void reset() { vPoints.clear(); };
@@ -93,7 +93,7 @@ public:
      * @return          true if both polygons are equal
      *                  false otherwise
      */
-    bool operator==(Polygon& other);
+    bool operator==(const Polygon& other) const;
 };
 
 #endif /* INCLUDE_POLYLINE_H_ */

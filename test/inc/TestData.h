@@ -15,7 +15,8 @@ using namespace std;
 ***********************************************************************************************************************/
 #define TEST_NAME_FIELD                     "Name"
 
-#define TEST_POINTS_IN_FIELD                "PointsIn"
+#define TEST_POINTS_SET_IN_FIELD            "PointsIn"
+#define TEST_SINGLE_POINT_IN_FIELD          "PointIn"
 
 
 #define TEST_CONVEX_HULL_OUT_FIELD          "ConvexHullOut"
@@ -23,7 +24,7 @@ using namespace std;
 #define TEST_DELAUNAY_OUT_FIELD             "DelaunayOut"
 #define TEST_DELAUNAY_GRAPH_OUT_FIELD       "DelaunayGraphOut"
 #define TEST_VORONOI_OUT_FIELD              "VoronoiOut"
-#define TEST_TWO_POINTS_OUT_FIELD           "OutputPoints"
+#define TEST_POINTS_OUT_FIELD               "OutputPoints"
 
 
 /***********************************************************************************************************************

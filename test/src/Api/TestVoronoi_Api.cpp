@@ -104,7 +104,7 @@ namespace
 
             // Get points file name
             string strFileName;
-            isSuccess = test.getValue(TEST_POINTS_IN_FIELD, strFileName);
+            isSuccess = test.getValue(TEST_POINTS_SET_IN_FIELD, strFileName);
             string strPointsFilename = strTestFolder + strFileName;
             ASSERT_TRUE(isSuccess);
 
