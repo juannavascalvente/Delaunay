@@ -912,6 +912,14 @@ public:
 //        cout << p << endl;
 //        cout << q << endl;
 
+        if (!Config::getExtraOutputFilename().empty())
+        {
+            vector<Point<TYPE>> vPath;
+            vPath.push_back(p);
+            vPath.push_back(q);
+            PointsWriter::write(Config::getExtraOutputFilename()+"in.bin", vPath);
+        }
+
         // Check what triangulation is active
         bool isRunSuccess;
         if (in.getStoreService()->isDelaunay())
@@ -929,6 +937,7 @@ public:
 
         if (isRunSuccess)
         {
+            vector<Point<TYPE>> vPathPoints;
             for (auto face : vFacesId)
             {
                 vector<Point<TYPE>> vFacesPoints;
@@ -938,8 +947,14 @@ public:
                 for (auto point : vFacesPoints)
                 {
                     polygon.add(point);
+                    vPathPoints.push_back(point);
                 }
                 vPolygons.push_back(polygon);
+            }
+
+            if (!Config::getExtraOutputFilename().empty())
+            {
+                PointsWriter::write(Config::getExtraOutputFilename(), vPathPoints);
             }
         }
 

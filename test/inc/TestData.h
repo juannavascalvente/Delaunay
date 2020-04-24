@@ -17,7 +17,7 @@ using namespace std;
 
 #define TEST_POINTS_SET_IN_FIELD            "PointsIn"
 #define TEST_SINGLE_POINT_IN_FIELD          "PointIn"
-
+#define TEST_EXTREME_POINTS_IN_FIELD        "ExtremePoints"
 
 #define TEST_CONVEX_HULL_OUT_FIELD          "ConvexHullOut"
 #define TEST_STAR_OUT_FIELD                 "StarOut"
