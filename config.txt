@@ -14,4 +14,4 @@ N_ANCHORS=2
 MIN_LENGTH_EDGE=2000.0
 ZOOM=-1.0,10000.0,-1,10000.0
 CLUSTER_SET=2,200
-OUTPUT_EXTRA_FILE=/home/delaunay/Projects/Git/Delaunay/data/TestData/TriangulationPathGolden/Path_1000000.bin
+OUTPUT_EXTRA_FILE=/home/delaunay/Projects/Git/Delaunay/data/TestData/VoronoiPathGolden/Path_1000000.bin

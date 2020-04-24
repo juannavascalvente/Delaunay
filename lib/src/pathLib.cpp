@@ -100,12 +100,17 @@ bool getVoronoiPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPoints
                         vPointsOut.clear();
 
                         // Iterate path faces
-                        Dcel *dcel = delaunay->getRefDcel();
                         for (auto face : vFacesId)
                         {
-                            // Add point
-                            Point<TYPE> *p = dcel->getRefPoint(face-1);
-                            vPointsOut.push_back(*p);
+                            // Get current face points
+                            vector<Point<TYPE>> vFacesPoints;
+                            DcelFigureBuilder::getFacePoints(face, *voronoi->getRefDcel(), vFacesPoints);
+
+                            // Add face points to output
+                            for (auto point : vFacesPoints)
+                            {
+                                vPointsOut.push_back(point);
+                            }
                         }
                     }
                 }
