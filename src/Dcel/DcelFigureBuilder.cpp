@@ -50,4 +50,7 @@ void DcelFigureBuilder::getFacePoints(size_t szFaceIdx, Dcel &dcel, vector<Point
         // Get next edge.
         szEdgeIdx = dcel.getNext(szEdgeIdx) - 1;
     } while (szEdgeIdx != szFirstEdgeIdx);
+
+    // Remove last element because it is already inserted as first element
+    vPoints.erase(vPoints.end());
 }
