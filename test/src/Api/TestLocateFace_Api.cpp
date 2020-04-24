@@ -35,8 +35,8 @@ namespace
 
         /**
          * @fn      checkGold
-         * @brief   Reads a set of points and computes the two closest point in each set and checks if they are equal
-         *          to the already computed two closest points
+         * @brief   Reads a set of points and an a given point and locate the face where that poins lies into. It also reads
+         *          a precomputed face and compare if both faces are the same
          */
         void checkGold();
     };
@@ -105,10 +105,10 @@ namespace
 
 
 /**
- * @brief   Reads a set of points and computes the two closest point in each set and checks if they are equal
- *          to the already computed two closest points
+ * @brief   Reads a set of points and an a given point and locate the face where that poins lies into. It also reads
+ *          a precomputed face and compare if both faces are the same
  */
-TEST_F(TestLocateFace_Api, Test_Delaunay_Gold)
+TEST_F(TestLocateFace_Api, Test_LocateFace_Gold)
 {
     checkGold();
 }
