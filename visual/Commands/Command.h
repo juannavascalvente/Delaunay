@@ -1057,6 +1057,14 @@ public:
         Point<TYPE> p = line.getOrigin();
         Point<TYPE> q = line.getDest();
 
+        if (!Config::getExtraOutputFilename().empty())
+        {
+            vector<Point<TYPE>> vLocate;
+            vLocate.push_back(p);
+            vLocate.push_back(q);
+            PointsWriter::write(Config::getExtraOutputFilename()+"in.bin", vLocate);
+        }
+
         // Compute triangles path between two points.
         vector<int> vFacesId;
         Voronoi *voronoi = in.getStoreService()->getVoronoi();
@@ -1082,6 +1090,8 @@ public:
 
         if (isRunSuccess)
         {
+            vector<Point<TYPE>> vPathPoints;
+
             for (auto face : vFacesId)
             {
                 vector<Point<TYPE>> vFacesPoints;
@@ -1091,8 +1101,14 @@ public:
                 for (auto point : vFacesPoints)
                 {
                     polygon.add(point);
+                    vPathPoints.push_back(point);
                 }
                 vPolygons.push_back(polygon);
+            }
+
+            if (!Config::getExtraOutputFilename().empty())
+            {
+                PointsWriter::write(Config::getExtraOutputFilename(), vPathPoints);
             }
         }
 
