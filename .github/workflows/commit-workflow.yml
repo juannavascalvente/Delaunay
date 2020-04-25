@@ -8,6 +8,11 @@ on:
 
 jobs:
   build:
+
+    # Define machine where job will be executed
+    runs-on: ubuntu-latest
+
+    # Define job steps
     steps:
       - id: step1
         run: echo "Hello World"
