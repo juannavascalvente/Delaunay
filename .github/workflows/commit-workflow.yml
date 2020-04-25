@@ -16,12 +16,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Install Glut
-        run: sudo apt-get install freeglut3 freeglut3-dev
       - name: Checkout Gtest
         uses: CyberZHG/github-action-gtest@master
-      - name: List content
-        run: ls -l
+      - name: Install Glut
+        run: sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
       - name: Build CMake Release
         run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       - name: Clean
