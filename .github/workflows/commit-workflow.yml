@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - Task_*    # Push events on branches whose name starts with Task_*
+
+jobs:
+  build:
     steps:
       - id: step1
         run: echo "Hello World"
