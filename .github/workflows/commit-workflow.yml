@@ -14,11 +14,10 @@ jobs:
 
     # Define job steps
     steps:
-      - uses: actions/checkout@v2
-      - uses: CyberZHG/github-action-gtest@master
-      - with:
-        repository: imranTalukder/Graphics-Project
-        path: GL
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Checkout Gtest
+        uses: CyberZHG/github-action-gtest@master
       - name: List content
         run: ls -l
       - name: Build CMake Release
