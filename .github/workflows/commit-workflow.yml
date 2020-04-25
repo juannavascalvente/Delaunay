@@ -14,6 +14,7 @@ jobs:
 
     # Define job steps
     steps:
+      - uses: actions/checkout@v2
       - name: Build CMake Release
         run: ls -l
       #- name: Clean
