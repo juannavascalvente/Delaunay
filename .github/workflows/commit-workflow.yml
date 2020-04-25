@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: CyberZHG/github-action-gtest@master
-      - uses: NishkarshRaj/Computer-Graphics@0.1
+      - uses: NishkarshRaj/OpenGL_Actions@1.0
       - name: Build CMake Release
         run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       - name: Clean
