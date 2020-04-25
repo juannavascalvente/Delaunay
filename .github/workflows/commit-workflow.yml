@@ -15,5 +15,5 @@ jobs:
     # Define job steps
     steps:
       - name: Compile
-        #run: echo "Hello World"
-        run: make
+        run: echo "Hello World"
+        #run: make
