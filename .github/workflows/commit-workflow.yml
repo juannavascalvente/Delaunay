@@ -16,8 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Build CMake Release
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+      - name: Checkout Gtest
+        uses: CyberZHG/github-action-gtest@master
       - name: Clean
         run: cmake --build . --target clean -- -j 4
       - name: Build all
