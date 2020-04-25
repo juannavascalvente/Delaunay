@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Install Glut
-        run: apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
+        run: sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
       - name: Checkout Gtest
         uses: CyberZHG/github-action-gtest@master
       - name: List content
