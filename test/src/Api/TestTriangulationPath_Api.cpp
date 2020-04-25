@@ -93,9 +93,19 @@ namespace
             ASSERT_TRUE(isSuccess);
 
             // Compute triangulation pah
-            vector<Point<TYPE>> vPointsPath;
-            isSuccess = getTriangulationPath(vExtremePoints[0], vExtremePoints[1], vPoints, vPointsPath);
+            vector<FaceT> vFaces;
+            isSuccess = getTriangulationPath(vExtremePoints[0], vExtremePoints[1], vPoints, vFaces);
             ASSERT_TRUE(isSuccess);
+
+            // Extract faces points
+            vector<Point<TYPE>> vPointsPath;
+            for (const auto& face : vFaces)
+            {
+                for (auto point : face)
+                {
+                    vPointsPath.push_back(point);
+                }
+            }
 
             // Check Delaunay triangulations are equal
             ASSERT_TRUE(vPointsComputedPath == vPointsPath);

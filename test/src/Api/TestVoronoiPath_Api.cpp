@@ -94,12 +94,22 @@ namespace
             ASSERT_TRUE(isSuccess);
 
             // Compute Voronoi path
-            vector<Point<TYPE>> vComputedPoints;
-            isSuccess = getVoronoiPath(vExtremePoints[0], vExtremePoints[1], vPoints, vComputedPoints);
+            vector<FaceT> vFaces;
+            isSuccess = getVoronoiPath(vExtremePoints[0], vExtremePoints[1], vPoints, vFaces);
             ASSERT_TRUE(isSuccess);
 
+            // Extract faces points
+            vector<Point<TYPE>> vPointsPath;
+            for (const auto& face : vFaces)
+            {
+                for (auto point : face)
+                {
+                    vPointsPath.push_back(point);
+                }
+            }
+
             // Check Voronoi triangulations are equal
-            ASSERT_TRUE(vComputedPoints == vGoldenPathPoints);
+            ASSERT_TRUE(vPointsPath == vGoldenPathPoints);
         }
     }
 }
