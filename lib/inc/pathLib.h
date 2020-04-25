@@ -5,6 +5,7 @@
 * Includes
 ***********************************************************************************************************************/
 #include "Point.h"
+#include "TypeDefs.h"
 
 
 /***********************************************************************************************************************
@@ -18,11 +19,11 @@
  * @param o             (IN) Origin path point
  * @param d             (IN) Destination path point
  * @param vPointsIn     (IN) Set of points that is used to compute triangulation
- * @param vPointsOut    (OUT) Set of points that contains a face every three points
+ * @param vFaces        (OUT) Array of faces. Each face contains an array of points
  * @return              true if path computed
  *                      false otherwise
  */
-bool getTriangulationPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
+bool getTriangulationPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<FaceT> &vFaces);
 
 
 /**
@@ -33,11 +34,11 @@ bool getTriangulationPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &v
  * @param o             (IN) Origin path point
  * @param d             (IN) Destination path point
  * @param vPointsIn     (IN) Set of points that is used to compute Voronoi
- * @param vPointsOut    (OUT) Set of points that contains one Voronoi face every point
+ * @param vFaces        (OUT) Array of faces. Each face contains an array of points
  * @return              true if path computed
  *                      false otherwise
  */
-bool getVoronoiPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut);
+bool getVoronoiPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<FaceT> &vFaces);
 
 
 #endif //DELAUNAY_PATHLIB_H

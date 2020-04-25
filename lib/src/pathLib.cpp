@@ -10,7 +10,7 @@
 /***********************************************************************************************************************
 * API function declarations
 ***********************************************************************************************************************/
-bool getTriangulationPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut)
+bool getTriangulationPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<FaceT> &vFaces)
 {
     bool isSuccess=false;       // Return value
 
@@ -26,20 +26,24 @@ bool getTriangulationPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &v
             {
                 // Initialize output
                 isSuccess = true;
-                vPointsOut.clear();
+                vFaces.clear();
 
                 // Iterate faces
-                for (auto face : vFacesId)
+                for (auto faceId : vFacesId)
                 {
                     // Get current face points
                     vector<Point<TYPE>> vFacesPoints;
-                    DcelFigureBuilder::getFacePoints(face, *delaunay->getRefDcel(), vFacesPoints);
+                    DcelFigureBuilder::getFacePoints(faceId, *delaunay->getRefDcel(), vFacesPoints);
 
-                    // Add points to output
+                    // Add points to face
+                    FaceT face = {};
                     for (auto point : vFacesPoints)
                     {
-                        vPointsOut.push_back(point);
+                        face.push_back(point);
                     }
+
+                    // Add face to output
+                    vFaces.push_back(face);
                 }
             }
         }
@@ -59,7 +63,7 @@ bool getTriangulationPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &v
     return isSuccess;
 }
 
-bool getVoronoiPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<Point<TYPE>> &vPointsOut)
+bool getVoronoiPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPointsIn, vector<FaceT> &vFaces)
 {
     bool isSuccess=false;       // Return value
 
@@ -86,31 +90,35 @@ bool getVoronoiPath(Point<TYPE> &o, Point<TYPE> &d, vector<Point<TYPE>> &vPoints
                     delaunay->findClosestPoint(d, voronoi, closest, pointFace2))
                 {
                     // Add faces to set whose path must be computed
-                    vector<int> vFaces;
-                    vFaces.push_back(pointFace1 + 1);
-                    vFaces.push_back(pointFace2 + 1);
+                    vector<int> vPathFaces;
+                    vPathFaces.push_back(pointFace1 + 1);
+                    vPathFaces.push_back(pointFace2 + 1);
 
                     // Find path
                     Line line(o, d);
                     vector<int> vFacesId;
-                    if (voronoi->getRefDcel()->findPath(vFaces, line, vFacesId))
+                    if (voronoi->getRefDcel()->findPath(vPathFaces, line, vFacesId))
                     {
                         // Initialize output
                         isSuccess = true;
-                        vPointsOut.clear();
+                        vFaces.clear();
 
                         // Iterate path faces
-                        for (auto face : vFacesId)
+                        for (auto faceId : vFacesId)
                         {
                             // Get current face points
                             vector<Point<TYPE>> vFacesPoints;
-                            DcelFigureBuilder::getFacePoints(face, *voronoi->getRefDcel(), vFacesPoints);
+                            DcelFigureBuilder::getFacePoints(faceId, *voronoi->getRefDcel(), vFacesPoints);
 
-                            // Add face points to output
+                            // Add points to face
+                            FaceT face = {};
                             for (auto point : vFacesPoints)
                             {
-                                vPointsOut.push_back(point);
+                                face.push_back(point);
                             }
+
+                            // Add face to output
+                            vFaces.push_back(face);
                         }
                     }
                 }
