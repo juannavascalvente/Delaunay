@@ -1,0 +1,10 @@
+name: Push_FastTest
+
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - Task_*    # Push events on branches whose name starts with Task_*
+    steps:
+      - id: step1
+        run: echo "Hello World"
