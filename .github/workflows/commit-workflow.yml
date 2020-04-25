@@ -15,4 +15,5 @@ jobs:
     # Define job steps
     steps:
       - id: step1
-        run: echo "Hello World"
+        #run: echo "Hello World"
+        run: cmake --build --target all -- -j 4
