@@ -14,10 +14,9 @@ jobs:
 
     # Define job steps
     steps:
-      - uses: actions/checkout@v2
-      - uses: CyberZHG/github-action-gtest@master
-      - uses: imranTalukder/Graphics-Project@master
       - name: Build CMake Release
+        - uses: actions/checkout@v2
+        - uses: CyberZHG/github-action-gtest@master
         run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       - name: Clean
         run: cmake --build . --target clean -- -j 4
