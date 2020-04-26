@@ -26,10 +26,11 @@ jobs:
           ls -l
           cmake --version
           sudo cmake CMakeLists.txt
-#          make
+          make
+          ls -l *.a
 #          cp lib/*.a /usr/lib
-      - name: Clean
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+#      - name: Clean
+#        run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
 #        run: cmake --build . --target clean -- -j 4
 #      - name: Download Google-Test
 #        uses: CyberZHG/github-action-gtest@master
