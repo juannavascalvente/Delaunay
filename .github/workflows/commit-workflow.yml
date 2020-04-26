@@ -26,7 +26,7 @@ jobs:
           ls -l
           cmake --version
           sudo cmake CMakeLists.txt
-          make
+          sudo make
           ls -l *.a
 #          cp lib/*.a /usr/lib
 #      - name: Clean
