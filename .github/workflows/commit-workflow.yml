@@ -19,7 +19,9 @@ jobs:
       - name: List
         run: ls -l .github
       - name: Pwd
-        run: ls -l .github/workflow
+        run: ls -l .github/workflows
+      - name: Pwd2
+        run: ls -l .github/actions
       - name: Install Dependencies
         uses: ./.github/actions/openGL
 #      - name: Install GLUT
