@@ -31,5 +31,5 @@ jobs:
         run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       - name: Build all
         run: cmake --build . --target all -- -j 4
-#      -name: Run Fast Test
-#        run: Delaunay -test --gtest_filter=-*_Equivalence*:*_Integration*:*_Api*:*_Profiling*
+      - name: Run Fast Test
+        run: Delaunay -test --gtest_filter=-*_Equivalence*:*_Integration*:*_Api*:*_Profiling*
