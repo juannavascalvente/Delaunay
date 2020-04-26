@@ -99,9 +99,15 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 
+################################################### OpenGL #############################################################
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
+include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
+
+
 ################################################ Executable ###########################################################
 add_executable(Delaunay ${DELAUNAY_SRC_FILES} ${DELAUNAY_VISUAL_SRC_FILES})
-target_link_libraries(Delaunay LINK_PUBLIC m pthread ${GTEST_LIBRARIES} -lglut -lGL)
+target_link_libraries(Delaunay LINK_PUBLIC m pthread ${GTEST_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
 target_include_directories(Delaunay
         PUBLIC
         ${DELAUNAY_HEADER_FILES}
