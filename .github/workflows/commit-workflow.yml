@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
         name: Checkout
-      - uses: ./.github/actions/openGL
+      - uses: actions/openGL
         name: Install Dependencies
 #      - name: Install GLUT
 #        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
