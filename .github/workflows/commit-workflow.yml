@@ -21,7 +21,11 @@ jobs:
 #      #- name: Download Google-Test
 #      #  uses: CyberZHG/github-action-gtest@master
       - name: Load CMake
-        run:  ls -l /usr/lib/libgtest*
+        run:  ls -l /usr/
+      - name: Load CMake2
+        run:  ls -l /usr/lib/
+      - name: Load CMake3
+        run:  ls -l /usr/lib/*
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all
