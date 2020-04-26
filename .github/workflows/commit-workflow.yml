@@ -14,8 +14,7 @@ jobs:
 
     # Define job steps
     steps:
-      - name: Download Delaunay repo
-        uses: actions/checkout@master
+      - uses: actions/checkout@master
       - name: Install Dependencies
         uses: ./.github/actions/openGL
 #      - name: Install GLUT
