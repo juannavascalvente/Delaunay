@@ -25,7 +25,7 @@ jobs:
       - name: Load CMake2
         run:  ls -l /usr/lib/
       - name: Load CMake3
-        run:  ls -l /usr/lib/*
+        run:  ls -l /usr/lib/libgtest*
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all

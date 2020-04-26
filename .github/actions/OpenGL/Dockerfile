@@ -8,5 +8,6 @@ RUN cmake CMakeLists.txt
 RUN make
 RUN pwd
 RUN ls -l lib/*.a
-COPY lib/*.a /usr/lib
+COPY lib/libgtest.a /usr/lib
+COPY lib/libgtest_main.a /usr/lib
 RUN ls -l /usr/lib/libgtest*.a
