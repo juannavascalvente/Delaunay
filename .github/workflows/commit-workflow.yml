@@ -23,9 +23,10 @@ jobs:
       - name: Configure GTest
         run: |
           cd /usr/src/gtest
-          cmake CMakeLists.txt
-          make
-          cp lib/*.a /usr/lib
+          ls -l
+#          cmake CMakeLists.txt
+#          make
+#          cp lib/*.a /usr/lib
       - name: Clean
         run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
 #        run: cmake --build . --target clean -- -j 4
