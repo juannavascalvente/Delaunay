@@ -17,9 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
       - name: List
-        uses: ls -l ./.github/actions/openGL
+        run: ls -l ./.github/actions/openGL
       - name: Pwd
-        uses: pwd
+        run: pwd
       - name: Install Dependencies
         uses: ./.github/actions/openGL
 #      - name: Install GLUT
