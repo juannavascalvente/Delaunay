@@ -26,8 +26,6 @@ jobs:
         uses: ./.github/actions/OpenGL
 #      - name: Install GLUT
 #        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
-      - name: Check GLUT
-        run: dpkg -L freeglut3-dev
 #      #- name: Download Google-Test
 #      #  uses: CyberZHG/github-action-gtest@master
       - name: Load CMake
