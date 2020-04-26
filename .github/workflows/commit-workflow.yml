@@ -17,9 +17,9 @@ jobs:
       - uses: actions/checkout@master
 #      - uses: ./.github/actions/OpenGL
       - name: Install GLUT
-        run: sudo apt-get install -y apt-utils cmake freeglut3-dev mesa-utils libgtest-dev googletest
-      -name: Clean
-        run: cmake --build . --target clean -- -j 4
+        run: ls -l
+#      -name: Clean
+#        run: cmake --build . --target clean -- -j 4
 #      - name: Download Google-Test
 #        uses: CyberZHG/github-action-gtest@master
 #      - name: Load CMake
