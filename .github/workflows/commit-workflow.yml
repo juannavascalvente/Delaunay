@@ -32,4 +32,4 @@ jobs:
       - name: Build all
         run: cmake --build . --target all -- -j 4
       - name: Run Fast Test
-        run: Delaunay -test --gtest_filter=-*_Equivalence*:*_Integration*:*_Api*:*_Profiling*
+        run: ./Delaunay -test --gtest_filter=-*_Equivalence*:*_Integration*:*_Api*:*_Profiling*
