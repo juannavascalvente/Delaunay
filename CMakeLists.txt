@@ -100,10 +100,12 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 
 ################################################### OpenGL #############################################################
-find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
-include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
-
+find_package(OpenGL REQUIRED)
+include_directories(${GLUT_INCLUDE_DIR})
+message(${OPENGL_LIBRARIES})
+message("00000000000000000000000000000000000000")
+message(${GLUT_LIBRARY})
 
 ################################################ Executable ###########################################################
 add_executable(Delaunay ${DELAUNAY_SRC_FILES} ${DELAUNAY_VISUAL_SRC_FILES})
