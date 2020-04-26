@@ -14,10 +14,10 @@ jobs:
 
     # Define job steps
     steps:
-      - uses: actions/checkout@master
-        name: Checkout
-      - uses: actions/openGL
-        name: Install Dependencies
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Install Dependencies
+        uses: ./.github/actions/openGL
 #      - name: Install GLUT
 #        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
       - name: Check GLUT
