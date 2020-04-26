@@ -14,6 +14,7 @@ jobs:
 
     # Define job steps
     steps:
+      uses: ./.github/actions/OpenGL
       - name: Checkout code
         uses: actions/checkout@master
       - name: List
@@ -22,8 +23,6 @@ jobs:
         run: ls -l .github/workflows
       - name: Pwd2
         run: ls -l .github/actions
-      - name: Install Dependencies
-        uses: ./.github/actions/OpenGL
 #      - name: Install GLUT
 #        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
 #      #- name: Download Google-Test
