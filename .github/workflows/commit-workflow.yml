@@ -15,17 +15,19 @@ jobs:
     # Define job steps
     steps:
       - uses: actions/checkout@master
-      - uses: ./.github/actions/OpenGL
-#      - name: Install GLUT
-#        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
-      - name: Download Google-Test
-        uses: CyberZHG/github-action-gtest@master
+#      - uses: ./.github/actions/OpenGL
+      - name: Install GLUT
+        run: sudo apt-get install -y apt-utils cmake freeglut3-dev mesa-utils libgtest-dev googletest
+      -name: Clean
+        run: cmake --build . --target clean -- -j 4
+#      - name: Download Google-Test
+#        uses: CyberZHG/github-action-gtest@master
 #      - name: Load CMake
 #        run:  ls -l /usr/
 #      - name: Load CMake2
 #        run:  ls -l /usr/lib/
-      - name: Load CMake3
-        run:  ls -l /googletest
+#      - name: Load CMake3
+#        run:  ls -l /googletest
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all
