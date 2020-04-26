@@ -16,16 +16,18 @@ jobs:
     steps:
       - name: Download Delaunay repo
         uses: actions/checkout@v2
-      - name: Install GLUT
-        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
-      - name: Check GLUT
-        run: dpkg -L freeglut3-dev
+      - name: Install Dependencies
+        uses: ../actions/openGL
+#      - name: Install GLUT
+#        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
+#      - name: Check GLUT
+#        run: dpkg -L freeglut3-dev
       #- name: Download Google-Test
       #  uses: CyberZHG/github-action-gtest@master
-      - name: Load Cmake
-        run:  |
-            echo "Hello"
-            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+#      - name: Load Cmake
+#        run:  |
+#            export GTEST_DIR="/usr/include/gtest/googletest/" GTEST_LIB_DIR="/usr/lib/x86_64-linux-gnu"
+#            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all
