@@ -7,5 +7,6 @@ WORKDIR /usr/src/gtest
 RUN cmake CMakeLists.txt
 RUN make
 RUN pwd
-RUN ls -l
+RUN ls -l lib/*.a
 RUN cp lib/*.a /usr/lib
+RUN ls -l /usr/lib/libgtest*.a
