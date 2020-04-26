@@ -109,7 +109,7 @@ message(${GLUT_LIBRARY})
 
 ################################################ Executable ###########################################################
 add_executable(Delaunay ${DELAUNAY_SRC_FILES} ${DELAUNAY_VISUAL_SRC_FILES})
-target_link_libraries(Delaunay LINK_PUBLIC m pthread ${GTEST_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+target_link_libraries(Delaunay LINK_PUBLIC m pthread ${GTEST_LIBRARIES} -lglut -lGLU -lGL)
 target_include_directories(Delaunay
         PUBLIC
         ${DELAUNAY_HEADER_FILES}
