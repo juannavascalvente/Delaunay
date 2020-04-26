@@ -16,18 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - uses: ./.github/actions/OpenGL
-      - name: List
-        run: ls -l .github
-      - name: Pwd
-        run: ls -l .github/workflows
-      - name: Pwd2
-        run: ls -l .github/actions
 #      - name: Install GLUT
 #        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
 #      #- name: Download Google-Test
 #      #  uses: CyberZHG/github-action-gtest@master
       - name: Load CMake
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+        run:  |
+            sudo apt-get install -y apt-utils cmake freeglut3-dev mesa-utils libgtest-dev
+            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all
