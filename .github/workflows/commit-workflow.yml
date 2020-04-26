@@ -23,8 +23,9 @@ jobs:
       - name: Configure GTest
         run: |
           cd /usr/src/gtest
+          ls -l
           cmake --version
-          cmake CMakeLists.txt
+          sudo cmake CMakeLists.txt
 #          make
 #          cp lib/*.a /usr/lib
       - name: Clean
