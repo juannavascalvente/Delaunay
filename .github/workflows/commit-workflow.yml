@@ -16,4 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       #- uses: CyberZHG/github-action-gtest@master
+      - name: Clean
+        run: cmake --build . --target clean -- -j 4
+      #- name: Build all
+      #  run: cmake --build . --target DelaunayLib -- -j 4
 
