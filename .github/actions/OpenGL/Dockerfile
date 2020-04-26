@@ -6,8 +6,5 @@ RUN cmake --version
 WORKDIR /usr/src/gtest
 RUN cmake CMakeLists.txt
 RUN make
-RUN pwd
-RUN ls -l lib/*.a
-COPY lib/libgtest.a /usr/lib
-COPY lib/libgtest_main.a /usr/lib
-RUN ls -l /usr/lib/libgtest*.a
+RUN cp lib/*.a /usr/lib
+RUN ls -l /usr/lib/*.a
