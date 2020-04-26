@@ -1,6 +1,6 @@
 # Compiler flags
 set(CMAKE_CXX_STANDARD 14)
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.13)
 
 # Project name
 project(Delaunay)
@@ -99,9 +99,17 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 
+################################################### OpenGL #############################################################
+find_package(GLUT REQUIRED)
+find_package(OpenGL REQUIRED)
+include_directories(${GLUT_INCLUDE_DIR})
+message(${OPENGL_LIBRARIES})
+message("00000000000000000000000000000000000000")
+message(${GLUT_LIBRARY})
+
 ################################################ Executable ###########################################################
 add_executable(Delaunay ${DELAUNAY_SRC_FILES} ${DELAUNAY_VISUAL_SRC_FILES})
-target_link_libraries(Delaunay LINK_PUBLIC m pthread ${GTEST_LIBRARIES} -lglut -lGL)
+target_link_libraries(Delaunay LINK_PUBLIC m pthread ${GTEST_LIBRARIES} -lglut -lGLU -lGL)
 target_include_directories(Delaunay
         PUBLIC
         ${DELAUNAY_HEADER_FILES}

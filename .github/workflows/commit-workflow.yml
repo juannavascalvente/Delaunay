@@ -1,0 +1,35 @@
+name: Push_FastTest
+
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - Task_*    # Push events on branches whose name starts with Task_*
+
+jobs:
+  build:
+
+    # Define machine where job will be executed
+    runs-on: ubuntu-latest
+
+    # Define job steps
+    steps:
+      - uses: actions/checkout@master
+      - name: Update
+        run: sudo apt-get update
+      - name: Install dependencies
+        run: sudo apt-get install -y freeglut3-dev mesa-utils libgtest-dev googletest
+      - name: Configure GTest
+        run: |
+          cd /usr/src/gtest
+          ls -l
+          cmake --version
+          sudo cmake CMakeLists.txt
+          sudo make
+          sudo cp *.a /usr/lib
+      - name: Clean
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+      - name: Build all
+        run: cmake --build . --target all -- -j 4
+      - name: Run Fast Test
+        run: ./Delaunay -test --gtest_filter=-*_Equivalence*:*_Integration*:*_Api*:*_Profiling*
