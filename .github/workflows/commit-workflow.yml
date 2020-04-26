@@ -14,7 +14,7 @@ jobs:
 
     # Define job steps
     steps:
-      uses: ./.github/actions/OpenGL
+      - uses: ./.github/actions/OpenGL
       - name: Checkout code
         uses: actions/checkout@master
       - name: List
