@@ -14,7 +14,7 @@ jobs:
 
     # Define job steps
     steps:
-      - uses: actions/checkout
+      - uses: actions/checkout@master
       - name: List
         run: ls -l .github
       - name: Pwd
