@@ -21,9 +21,7 @@ jobs:
 #      #- name: Download Google-Test
 #      #  uses: CyberZHG/github-action-gtest@master
       - name: Load CMake
-        run:  |
-            sudo apt-get install -y apt-utils cmake freeglut3-dev mesa-utils libgtest-dev
-            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+        run:  cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all
