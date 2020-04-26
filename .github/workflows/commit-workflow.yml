@@ -16,10 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@master
 #      - uses: ./.github/actions/OpenGL
-      - name: Install GLUT
+      - name: Update
         run: sudo apt-get update
       - name: Install GLUT
-        run: sudo apt-get install -y freeglut3-dev mesa-utils
+        run: sudo apt-get install -y freeglut3-dev mesa-utils libgtest-dev googletest
 #      -name: Clean
 #        run: cmake --build . --target clean -- -j 4
 #      - name: Download Google-Test
