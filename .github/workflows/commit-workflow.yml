@@ -20,10 +20,8 @@ jobs:
         run: sudo apt-get update
       - name: Install GLUT
         run: sudo apt-get install -y freeglut3-dev mesa-utils libgtest-dev googletest
-      - name: Check OpenGL version
-        run: glxinfo | grep "OpenGL version"
-#      -name: Clean
-#        run: cmake --build . --target clean -- -j 4
+      -name: Clean
+        run: cmake --build . --target clean -- -j 4
 #      - name: Download Google-Test
 #        uses: CyberZHG/github-action-gtest@master
 #      - name: Load CMake
