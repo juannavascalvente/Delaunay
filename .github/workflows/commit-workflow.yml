@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@master
 #      - uses: ./.github/actions/OpenGL
       - name: Install GLUT
-        run: ls -l
+        run: sudo apt-get update
 #      -name: Clean
 #        run: cmake --build . --target clean -- -j 4
 #      - name: Download Google-Test
