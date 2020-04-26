@@ -20,12 +20,12 @@ jobs:
         uses: ./.github/actions/openGL
 #      - name: Install GLUT
 #        run: sudo apt-get install freeglut3-dev mesa-utils libgtest-dev -y
-#      - name: Check GLUT
-#        run: dpkg -L freeglut3-dev
+      - name: Check GLUT
+        run: dpkg -L freeglut3-dev
 #      #- name: Download Google-Test
 #      #  uses: CyberZHG/github-action-gtest@master
-#      - name: Load CMake
-#        run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+      - name: Load CMake
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all
