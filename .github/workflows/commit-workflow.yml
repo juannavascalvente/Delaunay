@@ -14,11 +14,13 @@ jobs:
 
     # Define job steps
     steps:
-      - uses: actions/checkout@v2
+      - name: Download Google-Test
+        uses: CyberZHG/github-action-gtest@master
+#      - name: Download Delaunay repo
+#        uses: actions/checkout@v2
       - name: Install GLUT
         run: sudo apt-get install -y freeglut3-dev
       - name: Load Cmake
-        uses: CyberZHG/github-action-gtest@master
         run: dpkg -L freeglut3-dev
       #  run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
