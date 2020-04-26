@@ -17,10 +17,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install GLUT
         run: sudo apt-get install -y freeglut3-dev
-      - name: List
-        run: dpkg -L freeglut3-dev
       - name: Load Cmake
-      - uses: CyberZHG/github-action-gtest@master
+        uses: CyberZHG/github-action-gtest@master
+        run: dpkg -L freeglut3-dev
       #  run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
