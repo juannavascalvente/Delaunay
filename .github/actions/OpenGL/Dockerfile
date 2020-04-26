@@ -1,6 +1,6 @@
 FROM ubuntu
 RUN apt-get -y update
-RUN apt-get install -y apt-utils cmake freeglut3-dev mesa-utils libgtest-dev googletest
+RUN apt-get install -y apt-utils cmake freeglut3-dev mesa-utils libgtest-dev googletest build-essential
 RUN cmake --version
 WORKDIR /usr/src/gtest
 RUN pwd
