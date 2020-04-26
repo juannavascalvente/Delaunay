@@ -8,4 +8,4 @@ RUN cmake CMakeLists.txt
 RUN make
 RUN pwd
 RUN ls -l
-RUN cp *.a /usr/lib
+RUN cp lib/*.a /usr/lib
