@@ -15,7 +15,7 @@ jobs:
     # Define job steps
     steps:
       - uses: actions/checkout@v2
-      #- uses: CyberZHG/github-action-gtest@master
+      - uses: CyberZHG/github-action-gtest@master
       - name: Load Cmake
         run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
