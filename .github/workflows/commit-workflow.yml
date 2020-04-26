@@ -23,8 +23,9 @@ jobs:
       #- name: Download Google-Test
       #  uses: CyberZHG/github-action-gtest@master
       - name: Load Cmake
-        run:  echo "Hello"
-              cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
+        run:  |
+            echo "Hello"
+            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE=TRUE -G "CodeBlocks - Unix Makefiles" .
       #- name: Clean
       #  run: cmake --build . --target clean -- -j 4
       #- name: Build all
