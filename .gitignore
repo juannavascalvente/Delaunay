@@ -9,9 +9,17 @@ cmake-build*/
 Debug/
 obj/
 tmp/
+venv/
 
 # Log
 log.txt
 
 # Executables
-geometric
+Delaunay
+
+# Single files
+*.txt
+*.a
+*.out
+Delaunay.cbp
+cmake_install.cmake
