@@ -4,8 +4,9 @@
 
 # Project folders
 .idea/
-cmake-build*/
 .settings/
+cmake-build*/
+data/
 Debug/
 obj/
 tmp/
