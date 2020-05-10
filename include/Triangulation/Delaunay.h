@@ -31,8 +31,8 @@ class Delaunay: public Triangulation
     void initGraph();
 	void checkEdge(int edge_ID);
 	void flipEdges(int edge_ID);
-	bool addPointToDelaunay(int index);
-	bool locateNode(const Point<TYPE> &point, int &nodeIndex);
+	void addPoint(int index);
+    void locateNode(const Point<TYPE> &point, int &nodeIndex);
 	bool isInteriorToNode(const Point<TYPE> &point, int nodeIndex);
 	bool isStrictlyInteriorToNode(Point<TYPE> &point, int nodeIndex);
 	void splitNode(int pointIndex, int nodeIndex, int nTriangles);

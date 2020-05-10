@@ -72,14 +72,14 @@ bool Delaunay::build()
     // Loop all other points.
     int pointIndex=1;
     int nPoints = this->dcel.getNumVertex();
-    isBuilt = true;
-    while ((pointIndex < nPoints) && isBuilt)
+    while (pointIndex < nPoints)
     {
         // Insert new point into triangle where it is located.
-        isBuilt = this->addPointToDelaunay(pointIndex);
+        this->addPoint(pointIndex);
         pointIndex++;
     }
 
+    isBuilt = true;
    	return isBuilt;
 }
 
@@ -563,76 +563,72 @@ bool Delaunay::findClosestPoint(Point<TYPE> &in, Voronoi *voronoi, Point<TYPE> &
 	memset(insertedPoints, 0, sizeof(bool)* this->dcel.getNumVertex());
 
 	// Get node index of the face that surrounds point.
-    bool found = this->locateNode(in, nodeIndex);
-	if (found)
-	{
-        pointIndex = 0;
-        queue<int> queue;
+    this->locateNode(in, nodeIndex);
 
-		// Insert points from node.
-		for (size_t i=0; i<NPOINTS_TRIANGLE ;i++)
-		{
-			pointIndex = this->graph.getRefNode(nodeIndex)->getiPoint(i)-1;
-			if (pointIndex >= 0)
-			{
-				// Insert current point and set as inserted.
-				insertedPoints[pointIndex] = true;
-				queue.push(pointIndex);
-			}
-		}
+    pointIndex = 0;
+    queue<int> queue;
 
-		// Set loop condition.
-		found = false;
+    // Insert points from node.
+    for (size_t i=0; i<NPOINTS_TRIANGLE ;i++)
+    {
+        pointIndex = this->graph.getRefNode(nodeIndex)->getiPoint(i)-1;
+        if (pointIndex >= 0)
+        {
+            // Insert current point and set as inserted.
+            insertedPoints[pointIndex] = true;
+            queue.push(pointIndex);
+        }
+    }
 
-		// Check point in queue until closest is found.
-		do
-		{
-			// Get next point.
-			pointIndex = queue.front();
-            queue.pop();
+    // Check point in queue until closest is found.
+    bool found = false;
+    do
+    {
+        // Get next point.
+        pointIndex = queue.front();
+        queue.pop();
 
-			// Check if point inner to current Voronoi area.
-			if (voronoi->isInnerToArea(in, pointIndex+1))
-			{
-				found = true;
-			}
-			else
-			{
-				// Get edge departing from current point.
-                int currentEdgeIndex = this->dcel.getPointEdge(pointIndex)-1;
-				currentEdgeIndex = this->dcel.getPrevious(currentEdgeIndex)-1;
-                int currentPointIndex = this->dcel.getOrigin(currentEdgeIndex)-1;
+        // Check if point inner to current Voronoi area.
+        if (voronoi->isInnerToArea(in, pointIndex+1))
+        {
+            found = true;
+        }
+        else
+        {
+            // Get edge departing from current point.
+            int currentEdgeIndex = this->dcel.getPointEdge(pointIndex)-1;
+            currentEdgeIndex = this->dcel.getPrevious(currentEdgeIndex)-1;
+            int currentPointIndex = this->dcel.getOrigin(currentEdgeIndex)-1;
 
-				// Set end of loop condition.
-                int firstPointIndex = currentPointIndex;
+            // Set end of loop condition.
+            int firstPointIndex = currentPointIndex;
 
-				do
-				{
-					// Insert only if not already checked.
-					if (currentPointIndex >= 0)
-					{
-						if (!insertedPoints[currentPointIndex])
-						{
-							// Insert current point and set as inserted.
-							insertedPoints[currentPointIndex] = true;
-							queue.push(currentPointIndex);
-						}
-					}
+            do
+            {
+                // Insert only if not already checked.
+                if (currentPointIndex >= 0)
+                {
+                    if (!insertedPoints[currentPointIndex])
+                    {
+                        // Insert current point and set as inserted.
+                        insertedPoints[currentPointIndex] = true;
+                        queue.push(currentPointIndex);
+                    }
+                }
 
-					// Get next edge.
-					currentEdgeIndex = this->dcel.getTwin(currentEdgeIndex)-1;
-					currentEdgeIndex = this->dcel.getPrevious(currentEdgeIndex)-1;
-					currentPointIndex = this->dcel.getOrigin(currentEdgeIndex)-1;
-				} while (currentPointIndex != firstPointIndex);
-			}
-		} while (!found && !queue.empty());
+                // Get next edge.
+                currentEdgeIndex = this->dcel.getTwin(currentEdgeIndex)-1;
+                currentEdgeIndex = this->dcel.getPrevious(currentEdgeIndex)-1;
+                currentPointIndex = this->dcel.getOrigin(currentEdgeIndex)-1;
+            } while (currentPointIndex != firstPointIndex);
+        }
+    } while (!found && !queue.empty());
 
-		if (found)
-		{
-			// Update output data.
-			out = *this->dcel.getRefPoint(pointIndex);
-		}
-	}
+    if (found)
+    {
+        // Update output data.
+        out = *this->dcel.getRefPoint(pointIndex);
+    }
 
 	// Deallocate memory.
 	delete[] insertedPoints;
@@ -789,21 +785,18 @@ bool Delaunay::findPath(Point<TYPE> &origin, Point<TYPE> &dest, vector<int> &vFa
 ***************************************************************************/
 bool Delaunay::findFace(Point<TYPE> &origin, int &faceId)
 {
-	int		nodeIndex=0;		// Index of the node assigned to face.
-
 	// Locate node.
-	bool found = this->locateNode(origin, nodeIndex);
-	if (found)
-	{
-		// Get face in node.
-        faceId = this->graph.getRefNode(nodeIndex)->getFace();
-		if (this->dcel.imaginaryFace(faceId))
-		{
-            faceId = EXTERNAL_FACE;
-		}
-	}
+    int		nodeIndex=0;		// Index of the node assigned to face.
+    this->locateNode(origin, nodeIndex);
 
-	return found;
+    // Get face in node.
+    faceId = this->graph.getRefNode(nodeIndex)->getFace();
+    if (this->dcel.imaginaryFace(faceId))
+    {
+        faceId = EXTERNAL_FACE;
+    }
+
+	return true;
 }
 
 
@@ -820,157 +813,81 @@ bool Delaunay::findFace(Point<TYPE> &origin, int &faceId)
 }
 
 
-/***************************************************************************
-* Name: 	addPointToDelaunay
-* IN:		index		index of the point to locate.
-* OUT:		NONE
-* RETURN:	true		if point inserted.
-* 			false 		i.o.c.
-* GLOBAL:	NONE
-* Description: 	Locates the node where the point whose index is the input
-* 				parameter and inserts the point in the triangulation.
-***************************************************************************/
-bool Delaunay::addPointToDelaunay(int index)
+/**
+ * @fn      addPoint
+ * @brief   Locates the node where the point whose index is the input parameter and inserts the point in the triangulation.
+ *
+ * @param   index   (IN)    Index of the point to add to the Delaunay triangulation
+ */
+void Delaunay::addPoint(int index)
 {
-	bool	inserted=false;		// Return value.
-	int		nodeIndex=0;		// Current node index.
+	int		nodeIndex=0;		    // Current node index.
 	Point<TYPE> *point=nullptr;   	// Pointer to points in DCEL.
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-	this->nNodesCheckedIndex = index;
-	this->nNodesChecked[nNodesCheckedIndex] = 1;
-#endif
 
 	// Get new point to insert.
 	point = this->dcel.getRefPoint(index);
 
 	// Gets node where index point is located.
-    if (this->locateNode(*point, nodeIndex))
+    this->locateNode(*point, nodeIndex);
+
+    // Check if point is strictly interior (not over an edge).
+    if (this->isStrictlyInteriorToNode(*point, nodeIndex))
     {
-#ifdef DEBUG_DELAUNAY_INSERTPOINT
-		Logging::buildText(__FUNCTION__, __FILE__, "Node is a leaf. Point is interior to node ");
-		Logging::buildText(__FUNCTION__, __FILE__, nodeIndex+1);
-		Logging::write(true, Info);
-#endif
-
-        // Check if point is strictly interior (not over an edge).
-        if (this->isStrictlyInteriorToNode(*point, nodeIndex))
-        {
-#ifdef DEBUG_DELAUNAY_INSERTPOINT
-        	Logging::buildText(__FUNCTION__, __FILE__, "Point is strictly interior");
-			Logging::write(true, Info);
-#endif
-            // Split current node creating 3 triangles.
-            this->splitNode(index, nodeIndex, 3);
-        }
-        // Point over an edge.
-        else
-        {
-#ifdef DEBUG_DELAUNAY_INSERTPOINT
-        	Logging::buildText(__FUNCTION__, __FILE__, "Point is over an edge");
-			Logging::write(true, Info);
-#endif
-            // Split current node creating 4 triangles.
-            this->splitNode(index, nodeIndex, 4);
-        }
-#ifdef DEBUG_DELAUNAY_INSERTPOINT
-		Logging::buildText(__FUNCTION__, __FILE__, "Point inserted");
-		Logging::write(true, Info);
-#endif
-		inserted = true;
+        // Split current node creating 3 triangles.
+        this->splitNode(index, nodeIndex, 3);
     }
-
-	return(inserted);
+        // Point over an edge.
+    else
+    {
+        // Split current node creating 4 triangles.
+        this->splitNode(index, nodeIndex, 4);
+    }
 }
 
 
-/***************************************************************************
-* Name: 	locateNode
-* IN:		index		index of the point to locate.
-* OUT:		nodeIndex	node where point should be inserted.
-* RETURN:	true		if node found
-* 			false 		i.o.c.
-* GLOBAL:	NONE
-* Description: 	Locates the node where the point whose index is the first
-* 				input parameter is located.
-***************************************************************************/
-bool Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
+/**
+ * @fn      locateNode
+ * @brief   Locates the node where the point whose index is the first input parameter is located
+ *
+ * @param   point       (IN) Point to locate
+ * @param   nodeIndex   (OUT) Node where point falls into
+ */
+void Delaunay::locateNode(const Point<TYPE> &point, int &nodeIndex)
 {
-	bool	locatedNode;	    // Return value.
-	int     i=0;                // Loop counter.
-	int		nChildren=0;		// # children in current node.
-	bool	error=false; 		// Fatal error flag.
-
-#ifdef DEBUG_DELAUNAY_LOCATENODE
-	Logging::buildText(__FUNCTION__, __FILE__, "Searching point " );
-	Logging::buildText(__FUNCTION__, __FILE__, &point);
-	Logging::write(true, Info);
-#endif
-
     // Loop until triangle found or error in process.
 	nodeIndex = 0;
-    while ((!this->graph.isLeaf(nodeIndex)) && (!error))
+    Node *currentNode = this->graph.getRefNode(nodeIndex);
+    while (!currentNode->isLeaf())
     {
-#ifdef INCREMENTAL_DELAUNAY_STATISTICS
-    	this->nNodesChecked[this->nNodesCheckedIndex]++;
-#endif
-       	// PENDING REMOVE ASSIGNED FACE WHEN NODE IS INTERIOR.
         // Search triangle in children nodes.
-        i = 0;
-        locatedNode = false;
-        nChildren = this->graph.getNChildren(nodeIndex);
-        while ((!locatedNode) && (i < nChildren))
+        size_t i = 0;
+        bool locatedNode = false;
+        while ((!locatedNode) && (i < currentNode->getNChildren()))
         {
-#ifdef DEBUG_DELAUNAY_LOCATENODE
-        	Logging::buildText(__FUNCTION__, __FILE__, "Analyzing ");
-			Logging::buildText(__FUNCTION__, __FILE__, i+1);
-			Logging::buildText(__FUNCTION__, __FILE__, "-child from node ");
-			Logging::buildText(__FUNCTION__, __FILE__, nodeIndex);
-			Logging::buildText(__FUNCTION__, __FILE__, " that is node ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->graph.getiChild(nodeIndex, i));
-			Logging::buildText(__FUNCTION__, __FILE__, ". ");
-			Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(this->graph.getiChild(nodeIndex, i))->toStr());
-			Logging::write(true, Info);
-#endif
-
             // Check if point is interior to i-child node.
-            if (this->isInteriorToNode(point, this->graph.getiChild(nodeIndex, i)))
+            int iChildNode = currentNode->getiChild(i);
+            if (this->isInteriorToNode(point, iChildNode))
             {
                	// Search in next children node.
-                nodeIndex = this->graph.getiChild(nodeIndex, i);
+                nodeIndex = iChildNode;
+                currentNode = this->graph.getRefNode(nodeIndex);
 
                 // End loop.
                 locatedNode = true;
-#ifdef DEBUG_DELAUNAY_LOCATENODE
-				Logging::buildText(__FUNCTION__, __FILE__, "Point is inside node ");
-				Logging::buildText(__FUNCTION__, __FILE__, nodeIndex);
-				Logging::buildText(__FUNCTION__, __FILE__, ". ");
-				Logging::buildText(__FUNCTION__, __FILE__, this->graph.getRefNode(nodeIndex)->toStr());
-				Logging::write(true, Info);
-#endif
             }
             // Next child.
             else
             {
                 // Check if all children checked.
             	i++;
-                if (i == nChildren)
+                if (i == currentNode->getNChildren())
                 {
-#ifdef DEBUG_DELAUNAY_LOCATENODE
-                	// Print error message.
-					Logging::buildText(__FUNCTION__, __FILE__, "Error: point at node index ");
-					Logging::buildText(__FUNCTION__, __FILE__, nodeIndex);
-					Logging::buildText(__FUNCTION__, __FILE__, " is not interior to any node. Coordinates");
-					Logging::buildText(__FUNCTION__, __FILE__, &point);
-					Logging::write(true, Error);
-#endif
-					// End main loop.
-					error = true;
+                    string strMsg = "Point " + point.toStr() + " is not interior to node " + std::to_string(nodeIndex);
+                    throw std::runtime_error(strMsg);
                 }
             }
         }
     }
-
-    return(this->graph.isLeaf(nodeIndex) && !error);
 }
 
 

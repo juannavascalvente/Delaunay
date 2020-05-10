@@ -108,7 +108,7 @@ public:
 
 	// I/O interface
 	void print(std::ostream& out) const;
-	string toStr();
+	string toStr() const;
 	void read(ifstream &ifs);
 	void write(ofstream &ofs);
 
@@ -277,7 +277,7 @@ template <class A_Type> void Point<A_Type>::print(std::ostream& out) const
 * GLOBAL:	NONE
 * Description: 	concat the point information as a string
 ***************************************************************************/
-template <class A_Type> string Point<A_Type>::toStr()
+template <class A_Type> string Point<A_Type>::toStr() const
 {
 	ostringstream oss;
 	string text;
